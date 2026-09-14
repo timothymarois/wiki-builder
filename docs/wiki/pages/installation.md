@@ -99,6 +99,13 @@ each page's date.[^sync] The tool writes no ignore file, so a project adds `docs
 ./scripts/dev-wiki.sh check
 ```
 
+## Continuous integration
+
+`wiki check` exits with 1 on any problem, so a CI job that runs it fails the moment a change breaks the
+wiki.[^exit] Installing the tool includes adding that job to the project's CI, so the wiki is checked on
+every push and pull request and cannot drift unnoticed between local runs, as described on
+[Continuous integration](continuous-integration.md).
+
 ## Updates
 
 An update is a new tag in the script, then `wiki sync` to rewrite the skill and record the release.[^sync]
@@ -121,5 +128,7 @@ An update is a new tag in the script, then `wiki sync` to rewrite the skill and 
     `src/builder/config.py`; `src/builder/build.py` — `write_site()` records dates in `UPDATED.toml`.
 [^ignore]: `.gitignore` — `docs/wiki/site/`; `src/builder/cli.py` — `run()` builds into `site` inside the
     wiki folder, and nothing in `src/builder` writes a `.gitignore`.
+[^exit]: `src/builder/cli.py` — `run()` returns 1 when `check()` finds a problem, and `main()` returns that
+    as the exit code.
 [^version]: `src/builder/build.py` — `version_problems()`, called from `check()`, which gathers every
     problem at once.

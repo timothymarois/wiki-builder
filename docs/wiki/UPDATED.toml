@@ -115,7 +115,7 @@ digest = "22ae116d97a5c082e4e13e6b9ac66e07557375a93af40cc6aa5b698619d886ab"
 
 ["installation"]
 updated = "2026-09-14"
-digest = "edbc3a59c3aef8501e98d8f81617ff4fc4add5b10fbf87ec096d143430eabd13"
+digest = "e5fbba21a99c9e96aa8bdd5092bd4e04263a7108c40fa2bbd5ca9d01b210a25a"
 audited = "2026-09-14"
 
 ["installation-prompt"]
