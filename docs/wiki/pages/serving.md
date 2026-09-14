@@ -9,15 +9,29 @@ rather than on a download or a dead link. What a person sees should always be wh
 """
 
 [[infobox]]
-group = "Server"
+group = "Identity"
 rows = [
   { label = "Command", value = "wiki serve", note = "or wiki with no command" },
-  { label = "Address", value = "127.0.0.1:8787" },
-  { label = "Serves", value = "the whole project" },
+  { label = "Port option", value = "--port" },
+]
+
+[[infobox]]
+group = "Values"
+rows = [
+  { label = "Address", value = "127.0.0.1" },
+  { label = "Default port", value = "8787" },
+]
+
+[[infobox]]
+group = "Rules"
+rows = [
+  { label = "Scope", value = "the whole project" },
+  { label = "Reach", value = "this machine only" },
+  { label = "Caching", value = "none" },
 ]
 +++
 
-`wiki serve` builds the site, serves it, and opens a browser at it.[^serve] It is also what `wiki` does
+`wiki serve` builds the site, serves it at 127.0.0.1 on port 8787, and opens a browser at it.[^serve] It is also what `wiki` does
 when it is given no command at all.[^default] How the site itself is made is described on
 [Site](site.md).
 
@@ -44,7 +58,7 @@ an old copy picks up the new one.[^stamp]
 ## Errors
 
 Successful requests are not logged; failed ones are.[^log] If the port is already in use, the server says
-so, names the option that picks another, and exits with 2.[^port]
+so, names `--port` as the way to pick another, and exits with 2.[^port]
 
 [^serve]: `src/builder/serve.py` — `serve()` binds `127.0.0.1` and opens
     the site's address with `webbrowser.open()`; `src/builder/cli.py` —
@@ -62,4 +76,5 @@ so, names the option that picks another, and exits with 2.[^port]
     asset to its address.
 [^log]: `src/builder/serve.py` — `Handler.log_message()` drops any status
     starting with 2.
-[^port]: `src/builder/serve.py` — `serve()` catches the `OSError` a taken port raises and returns 2.
+[^port]: `src/builder/serve.py` — `serve()` catches the `OSError` a taken port raises and returns 2;
+    `src/builder/cli.py` — `main()` defines `--port`.

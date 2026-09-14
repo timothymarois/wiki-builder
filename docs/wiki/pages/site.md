@@ -10,22 +10,36 @@ should change unless a page did.
 """
 
 [[infobox]]
-group = "Commands"
+group = "Identity"
 rows = [
-  { label = "wiki build", value = "the site, beside the pages" },
-  { label = "wiki publish", value = "clean addresses, for a host" },
-  { label = "wiki player", value = "the reader-facing view" },
+  { label = "Commands", value = "wiki build, wiki publish, wiki player" },
+  { label = "Output", value = "docs/wiki/site", note = "for wiki build" },
+]
+
+[[infobox]]
+group = "Values"
+rows = [
+  { label = "Link ending", value = "index.html", note = "none in a published build" },
+  { label = "Search results", value = "8 at most" },
+]
+
+[[infobox]]
+group = "Rules"
+rows = [
+  { label = "Search scope", value = "page titles only" },
+  { label = "Date change", value = "the page's own text only", note = "any intent, for the goals page" },
+  { label = "Dead links", value = "not refused" },
 ]
 +++
 
-`wiki build` turns the pages into a website, in a folder beside them.[^build] **The site is never
+`wiki build` turns the pages into a website in `docs/wiki/site`, beside them.[^build] **The site is never
 committed.** It is rebuilt every time it is served, so what is served never falls behind the pages.[^serve]
 What refuses a page is described on [Checks](checks.md), and reading the site with its sources on
 [Local server](serving.md).
 
 ## Addresses
 
-Every page is a folder holding one file, and every link names that file.[^links] That way the same site
+Every page is a folder holding one file, `index.html`, and every link names that file.[^links] That way the same site
 works both through a server and opened straight from disk. `wiki publish` builds it with clean addresses
 instead, which work only on a host.[^publish]
 

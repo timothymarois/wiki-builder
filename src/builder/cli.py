@@ -22,38 +22,48 @@ PORT = 8787
 SKILL_NAME = "writing-wiki-pages"
 
 
-def skill_home(root):
+def skill_home(root, directory=None):
     """Where this project keeps its agent skills.
 
-    Two conventions exist and a project has usually picked one already; the tool follows rather than
-    imposes. `.agents/skills` is preferred where both are present because `.claude/skills` is often a
-    symlink to it, and writing through the symlink would be writing to the same place twice.
+    A folder the project names wins, relative to the project: it knows where its agents look better than
+    any convention does. Otherwise two conventions exist and a project has usually picked one already;
+    the tool follows rather than imposes. `.agents/skills` is preferred where both are present because
+    `.claude/skills` is often a symlink to it, and writing through the symlink would be writing to the
+    same place twice.
     """
+    if directory is not None:
+        return root / directory / SKILL_NAME
     for name in (".agents/skills", ".claude/skills"):
         if (root / name).is_dir():
             return root / name / SKILL_NAME
     return root / ".claude/skills" / SKILL_NAME
 
 
-def sync(root, wiki):
+def sync(root, wiki, skill=True, directory=None):
     """Put the skill where this project's agents will read it, and record the release it came from.
 
     The skill has to live in the project rather than inside the package: agents read it from the
-    repository, and a change to how pages must be written belongs in a diff somebody reviews.
+    repository, and a change to how pages must be written belongs in a diff somebody reviews. A project
+    with no agents can leave it out; the release is recorded either way, because `check` compares
+    against it whether or not anyone reads the skill.
     """
-    home = skill_home(root)
-    (home / "references").mkdir(parents=True, exist_ok=True)
     written = []
-    for source, destination in ((SKILL / "SKILL.md", home / "SKILL.md"),
-                                (SKILL / "references" / "the-standard.md",
-                                 home / "references" / "the-standard.md")):
-        text = source.read_text(encoding="utf-8")
-        if not destination.is_file() or destination.read_text(encoding="utf-8") != text:
-            destination.write_text(text, encoding="utf-8", newline="\n")
-            written.append(destination.relative_to(root))
+    if skill:
+        home = skill_home(root, directory)
+        (home / "references").mkdir(parents=True, exist_ok=True)
+        for source, destination in ((SKILL / "SKILL.md", home / "SKILL.md"),
+                                    (SKILL / "references" / "the-standard.md",
+                                     home / "references" / "the-standard.md")):
+            text = source.read_text(encoding="utf-8")
+            if not destination.is_file() or destination.read_text(encoding="utf-8") != text:
+                destination.write_text(text, encoding="utf-8", newline="\n")
+                written.append(destination.relative_to(root) if destination.is_relative_to(root)
+                               else destination)
     record_version(wiki, __version__)
     for path in written:
         print(f"wiki: wrote {path}")
+    if not skill:
+        print("wiki: the skill was left out, as asked")
     print(f"wiki: {CONFIG} records wiki-builder {__version__}")
     return 0
 
@@ -92,8 +102,14 @@ def main(argv=None):
 
     commands.add_parser("build", parents=[place], help="render the pages into the site")
     commands.add_parser("check", parents=[place], help="every reason the wiki is not fit to read")
-    commands.add_parser("sync", parents=[place],
-                        help="write the skill into this project and record the release")
+    synced = commands.add_parser("sync", parents=[place],
+                                 help="write the skill into this project and record the release")
+    skill = synced.add_mutually_exclusive_group()
+    skill.add_argument("--skill-dir", type=Path, default=None,
+                       help="the folder to put the skill in, relative to the project; defaults to "
+                            ".agents/skills, or .claude/skills")
+    skill.add_argument("--no-skill", action="store_true",
+                       help="record the release without writing the skill")
     served = commands.add_parser("serve", parents=[place], help="build, serve, and open a browser at it")
     served.add_argument("--port", type=int, default=PORT)
     published = commands.add_parser("publish", parents=[place],
@@ -126,7 +142,7 @@ def run(args, root, wiki):
     command = args.command or "serve"
 
     if command == "sync":
-        return sync(root, wiki)
+        return sync(root, wiki, skill=not args.no_skill, directory=args.skill_dir)
 
     if command == "bless":
         print(bless(root, args.picture, args.reason, wiki))

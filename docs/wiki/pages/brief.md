@@ -7,6 +7,20 @@ intent = """
 The brief exists so that anyone arriving at wiki-builder, person or agent, learns in one screen what it
 is, who it is for and what it refuses. It stays short and stable, and names nothing private.
 """
+
+[[infobox]]
+group = "Identity"
+rows = [
+  { label = "Name", value = "wiki-builder" },
+]
+
+[[infobox]]
+group = "Requirements"
+rows = [
+  { label = "Python", value = "3.11 or newer" },
+  { label = "Parser", value = "mistune, pinned exactly" },
+  { label = "Runner", value = "uv" },
+]
 +++
 
 ## Purpose

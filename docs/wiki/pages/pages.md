@@ -9,29 +9,38 @@ page is found, so nobody has to keep a list in step with the files.
 """
 
 [[infobox]]
-group = "Defaults"
+group = "Identity"
 rows = [
-  { label = "Status", value = "draft", note = "until the owner approves it" },
-  { label = "Readers", value = "internal" },
+  { label = "Location", value = "docs/wiki/pages" },
+  { label = "Format", value = "markdown, with TOML front matter" },
 ]
 
 [[infobox]]
-group = "Limits"
+group = "Defaults"
 rows = [
-  { label = "Intent", value = "120 words" },
-  { label = "Page", value = "500 words", note = "references not counted" },
+  { label = "Status", value = "draft", note = "until the owner approves it" },
+  { label = "Intent limit", value = "120 words" },
+]
+
+[[infobox]]
+group = "Rules"
+rows = [
+  { label = "Required fields", value = "title, intent" },
+  { label = "Sidebar place", value = "the page's path" },
+  { label = "Reserved name", value = "source" },
 ]
 +++
 
-A **page** is one markdown file with a few lines of settings at the top.[^front] Where the file sits is
+A **page** is one markdown file in `docs/wiki/pages`, with a few lines of TOML settings at the
+top.[^front] Where the file sits is
 both its address and its place in the sidebar: a page in a folder named after another page nests beneath
 that page without being listed anywhere.[^tree] This page covers what a page holds and when it becomes
 part of the wiki; what the build makes of it is on [Site](site.md).
 
 ## Intent
 
-Every page must say what it is for, in an **intent**, or the build stops.[^required] An intent may run to
-120 words, and a longer one also stops the build.[^required] Every intent is collected onto
+Every page must have a title and say what it is for, in an **intent**, or the build stops.[^required]
+An intent may run to 120 words by default, and a longer one also stops the build.[^required] Every intent is collected onto
 [the goals page](goals.md) in sidebar order, so the purpose of the whole tool can be read in one
 sitting.[^goals]
 
@@ -60,8 +69,9 @@ appear at its foot, and each links to a generated page listing everything in tha
 The **Source** tab shows the page's own markdown with a button that copies it, which is why no page may be
 named "source".[^source]
 
-[^front]: `src/builder/build.py` — `read_front_matter()` reads TOML between
-    two `+++` fences, and refuses a page whose fences are missing or unreadable.
+[^front]: `src/builder/build.py` — `wiki_of()` puts the wiki in `docs/wiki`, whose `pages` `write_site()`
+    reads; `read_front_matter()` reads TOML between two `+++` fences, and refuses a page whose fences are
+    missing or unreadable.
 [^tree]: `src/builder/build.py` — `read_pages()` keeps a page's path as its
     id; `children_of()` and `render_nav()` nest a page under the page whose path contains it.
 [^required]: `src/builder/build.py` — `read_pages()` refuses a page with no

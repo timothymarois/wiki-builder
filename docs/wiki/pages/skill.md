@@ -10,15 +10,31 @@ that project asks for it, and arrive where somebody reviews it.
 """
 
 [[infobox]]
-group = "Skill"
+group = "Identity"
 rows = [
+  { label = "Name", value = "writing-wiki-pages" },
   { label = "Command", value = "wiki sync" },
-  { label = "Holds", value = "the rules, and a worked example" },
+  { label = "Options", value = "--skill-dir, --no-skill" },
+]
+
+[[infobox]]
+group = "Contents"
+rows = [
+  { label = "Instructions", value = "SKILL.md" },
+  { label = "Worked example", value = "references/the-standard.md" },
+]
+
+[[infobox]]
+group = "Rules"
+rows = [
+  { label = "Location", value = ".agents/skills, else .claude/skills", note = "unless --skill-dir names one" },
+  { label = "Release record", value = "wiki.toml", note = "checked by wiki check" },
 ]
 +++
 
-The **skill** is the half of the tool that is not code: instructions for writing a page, and a worked
-example of one page written well and badly.[^files] `wiki sync` copies it into the project, where agents
+The **skill**, `writing-wiki-pages`, is the half of the tool that is not code: instructions for writing
+a page in `SKILL.md`, and a worked example of one page written well and badly in
+`references/the-standard.md`.[^files] `wiki sync` copies it into the project, where agents
 read it.[^sync] The rules it teaches are enforced by the [Checks](checks.md).
 
 ## Home
@@ -30,16 +46,19 @@ is often a link to it, and writing through the link would write the same place t
 The skill lands in a folder named after itself, and a file is rewritten only when its text has
 changed.[^written]
 
+`wiki sync --skill-dir` names the folder instead, relative to the project, and the skill goes there
+whatever else exists; the folder is created if it is missing.[^skilldir] `wiki sync --no-skill` records
+the release without writing the skill, and asking for both at once is refused.[^noskill]
+
 ## Release
 
-`wiki sync` also records, in the project's settings file, which release of the tool the project is
-on.[^record] It changes that one line and leaves the rest of the hand-written file alone.[^record]
+`wiki sync` also records, in `wiki.toml`, which release of the tool the project is on.[^record] It changes that one line and leaves the rest of the hand-written file alone.[^record]
 
 **`wiki check` fails while that record is missing or names a different release**, and it says to run
 `wiki sync`.[^version] A newer release can add a check, and a new check finds old pages; the record makes
 that failure expected rather than surprising.[^version]
 
-[^files]: `src/builder/cli.py` — `sync()` copies `SKILL.md` and
+[^files]: `src/builder/cli.py` — `SKILL_NAME` names the skill; `sync()` copies `SKILL.md` and
     `references/the-standard.md` from `SKILL`, which
     `src/builder/build.py` finds with `skill_dir()`.
 [^sync]: `src/builder/cli.py` — `sync()`.
@@ -47,6 +66,10 @@ that failure expected rather than surprising.[^version]
     `.claude/skills`, and falls back to `.claude/skills`.
 [^written]: `src/builder/cli.py` — `SKILL_NAME` names the folder; `sync()`
     compares each file's text before writing it.
+[^skilldir]: `src/builder/cli.py` — `skill_home()` joins a given folder to the project root before
+    trying either convention.
+[^noskill]: `src/builder/cli.py` — `sync()` skips the copy when `skill` is false; `main()` puts
+    `--no-skill` and `--skill-dir` in one mutually exclusive group.
 [^record]: `src/builder/config.py` — `record_version()` replaces the
     `version` line under `[tool]`, or appends that table if it is absent.
 [^version]: `src/builder/build.py` — `version_problems()`, called from

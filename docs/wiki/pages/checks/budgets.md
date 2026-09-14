@@ -9,17 +9,31 @@ sitting. A page that outgrows its budget should be split rather than squeezed.
 """
 
 [[infobox]]
+group = "Identity"
+rows = [
+  { label = "Settings", value = "[budget] in wiki.toml" },
+]
+
+[[infobox]]
 group = "Defaults"
 rows = [
-  { label = "Page", value = "500 words" },
-  { label = "Intent", value = "120 words" },
-  { label = "Collected goals", value = "3,500 words" },
+  { label = "Page limit", value = "500 words" },
+  { label = "Intent limit", value = "120 words" },
+  { label = "Goals limit", value = "3,500 words" },
+]
+
+[[infobox]]
+group = "Rules"
+rows = [
+  { label = "Word count", value = "references excluded" },
+  { label = "Page overrun", value = "listed by the check" },
+  { label = "Intent overrun", value = "build stopped" },
 ]
 +++
 
 A wiki has three limits, counted in words: one for a page, one for an intent, and one for the goals page
-that collects every intent.[^defaults] A project can set its own in its settings file, and each must be a
-positive whole number.[^config]
+that collects every intent.[^defaults] A project can set its own under `[budget]` in `wiki.toml`, and
+each must be a positive whole number.[^config]
 
 ## Counting
 

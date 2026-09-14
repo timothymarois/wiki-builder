@@ -89,6 +89,10 @@ what may never appear, and a worked example with the same content written badly 
 **It belongs in your repository rather than inside the package** because agents read it from there, and a
 change to how pages must be written belongs in a diff somebody reviews.
 
+`wiki sync --skill-dir tools/skills` puts it in a folder of your choosing instead, relative to the
+project. `wiki sync --no-skill` records the release without writing the skill at all. Wherever it goes, a
+copy already there is brought up to date with the release.
+
 ## Updating
 
 ```sh

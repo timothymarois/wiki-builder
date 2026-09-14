@@ -137,9 +137,8 @@ From the encyclopedia's own title policy, and they work on headings and categori
 - **A page title** is the thing the page is about. **Refunds.** **Sessions.** **The nightly run.**
 - **A heading** is the same, one level down, and the gate refuses a question or a verdict.
 - **A category** is a plural noun for a set: **Wild animals**, not "Animals that are wild".
-- **An infobox label** is a noun, and the value completes it. Prefer **Expiry**, **Size limit**,
-  **Retries**. A short verb form is allowed where the pair genuinely reads better as a phrase — "Runs
-  every · four hours" — but a label that only works as a sentence is a label doing too much.
+- **An infobox label** is a noun phrase naming a property, and the value gives it: **Expiry** · 30
+  minutes. Never a verb or a question. The infobox section below has the whole of it.
 
 **When no good name exists, the section is wrong, not the name.** A heading you cannot name in two words
 is usually two sections, or one section that has not decided what it is about.
@@ -190,7 +189,7 @@ These are not style preferences. A page carrying any of them has failed its read
 
 | Never | Instead |
 |---|---|
-| A field, constant, function, file or class name | The behaviour it produces |
+| A field, constant, function or class name — anything only the code knows | The behaviour it produces. A name a person uses — a command, a setting, a file they edit — is not this: give it where the page introduces the thing, and in the infobox |
 | Ticks, centimetres, internal ids, requirement numbers | Seconds, metres, kilograms, plain counts |
 | A task, phase, branch or ticket | Nothing. The reader cannot act on it |
 | A gap list, a to-do, "not built yet" as prose | The `{missing}` mark on the claim itself |
@@ -261,13 +260,85 @@ assume the thing exists, and sparingly: a page that is mostly red marks was writ
 
 ## The infobox
 
-A handful of facts a person would actually check, in their language. Not every setting, arranged prettily.
+The infobox is the page's reference card, the way an encyclopedia's is: a reader glances at it to learn
+what the thing is called, the values that govern it and the rules it keeps, without reading the prose. It
+summarises the page. **It never says anything the page does not.**
 
-- **Choose what a reader would verify by watching**, and say it as they would describe it.
-- **Group rows** under a heading that names the question the group answers.
+### Contents
+
+Rows come in three kinds, grouped in this order:
+
+| Group | Holds | Rows, for a page about sessions |
+|---|---|---|
+| **Identity** | The names a person uses to find, run or change the thing, exactly as they type or search for them | Cookie · session_id; Setting · session.timeout |
+| **Values** | The figures that govern it — limits, defaults, durations, counts — in units a reader can feel | Expiry · 30 minutes; Size limit · 4 kB |
+| **Rules** | Its core logic, each in a phrase: what it refuses, what always happens, what never does | Overflow · refused, never truncated; Signing out · this device only |
+
+- **A thing with a name opens with it.** A page about a named thing — a command, a skill, a setting, a
+  service — starts its infobox with a **Name** row giving that name exactly. A reader who knows the name
+  should recognise the page; one who reads the page should come away knowing the name.
+- **Identity holds the names a person uses**: what they type, search for, open or configure. Never a
+  function, a class or an internal id. Those are for whoever reads the code, and live in the references.
+- **A group is named for what it holds.** Identity, Values and Rules by default, or something more precise
+  when every row shares it: **Limits**, **Defaults**, **Exit codes**, **Contents**. Never "Info", which
+  names nothing.
+- **Leave out** what a reader would not look up: every setting there is, a value that needs a sentence to
+  explain, and anything the thing does not do.
+- **Every row is backed by the page.** The infobox carries no citations of its own, so each row repeats
+  something a cited sentence on the page already says. A row the page does not state is an uncited claim
+  in the most visible place on it.
+- **Two to eight rows.** A longer infobox is the prose again, as a table.
+
+### Labels and values
+
+A row is a **label** and a **value**, and together they read as a statement: the label names a property,
+the value gives it. "Expiry · 30 minutes" reads as *the expiry is thirty minutes*.
+
+- **A label is a noun phrase in sentence case**: **Name**, **Expiry**, **Size limit**, **Default port**.
+  Never a verb ("Expires"), a question ("How long it lasts") or a clause ("What happens on overflow").
+  Singular for one value and plural for a list: **Command** · wiki sync, but **Commands** · wiki build,
+  wiki publish.
+- **A value is a name, a figure or a short phrase**, with no full stop.
+  - A **name** is written exactly as it is typed, in its own case and punctuation.
+  - A **figure** carries its unit: 30 minutes, 500 words, 4 kB.
+  - A **rule** is a phrase, not a sentence: "refused, never truncated", "this device only", "build
+    stopped". If it needs a subject and a verb, it belongs in the prose.
+  - A **list** is separated by commas, in the order a reader would use it.
+- **Never a hedge or a yes.** "Configurable", "varies" and "yes" give a reader nothing to check. Give the
+  default or the condition, or leave the row out.
+- **The same property has the same label on every page.** If one page says **Command**, no page says
+  "Run with"; if one says **Page limit**, no page says "Maximum length".
+- **A `note` is the one clause that stops a value being misread**: "after the last request", "until the
+  owner approves it". Never a second value.
+- **`missing = true`** marks a row whose value nothing implements yet, or nobody has found; the red mark
+  renders beside the value.
 - A row may carry `guaranteed = "<requirement id>"`. That identifier is **traceability for whoever next
   checks the page against the code** and is never rendered.
-- A `note` on a row is for the one clause that stops a figure being misread.
+
+```toml
+[[infobox]]
+group = "Identity"
+rows = [
+  { label = "Cookie", value = "session_id" },
+  { label = "Setting", value = "session.timeout" },
+]
+
+[[infobox]]
+group = "Limits"
+rows = [
+  { label = "Expiry", value = "30 minutes", note = "after the last request" },
+  { label = "Size limit", value = "4 kB" },
+]
+
+[[infobox]]
+group = "Rules"
+rows = [
+  { label = "Overflow", value = "refused, never truncated" },
+  { label = "Signing out", value = "this device only" },
+]
+```
+
+[The standard](references/the-standard.md) sets this infobox beside one that fails, and says why.
 
 ## Pictures
 
@@ -313,8 +384,10 @@ carries a sentence serving nothing is still wrong, and a page over it is telling
 
 1. The intent is two to four sentences and says what the system is for, not how it works.
 2. Every sentence serves the intent; anything that did not is gone.
-3. No field name, unit, identifier, file path, task or gap list appears in the prose.
+3. No name only the code knows, no unit a reader cannot feel, and no task or gap list appears in the prose.
 4. Every claim was read from the code; anything uncertain says so; anything uncitable carries `{missing}`.
 5. Mechanism links out rather than being retold, and a subject of its own is a child page.
-6. `wiki check` passes.
-7. Someone who has not read the source can follow the whole page.
+6. The infobox gives the thing's names, values and rules, labelled with nouns, and every row is already
+   stated on the page.
+7. `wiki check` passes.
+8. Someone who has not read the source can follow the whole page.

@@ -7,6 +7,21 @@ intent = """
 Citations exist so that a reader who cannot read the code can still tell a checked sentence from a guess.
 Every statement should lead to the code it came from, or say plainly that nothing was found.
 """
+
+[[infobox]]
+group = "Identity"
+rows = [
+  { label = "Syntax", value = "markdown footnote" },
+  { label = "Mark", value = "{missing}", note = "for no source" },
+]
+
+[[infobox]]
+group = "Rules"
+rows = [
+  { label = "Unit checked", value = "paragraph" },
+  { label = "Refused reference", value = "a link to a markdown document" },
+  { label = "Exempt pages", value = "pages about the wiki itself" },
+]
 +++
 
 A **citation** is a numbered mark at a claim, with its reference listed at the foot of the page. It is

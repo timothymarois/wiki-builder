@@ -7,6 +7,14 @@ intent = """
 Headings exist so that a reader scanning a page finds the section holding their answer without reading the
 others. Every heading should name what its section contains, never ask about it or rate it.
 """
+
+[[infobox]]
+group = "Rules"
+rows = [
+  { label = "Refused openings", value = "how, what, where, why, when, which, who, whether" },
+  { label = "Refused words", value = "matter, important, interesting, note, overview, misc, detail" },
+  { label = "Levels checked", value = "2 to 6" },
+]
 +++
 
 A reader scans headings to find the one holding their answer, so a heading is a label on a drawer. The
@@ -29,7 +37,7 @@ dates" is refused, but "Release notes" passes.**[^verdict]
 
 ## Scope
 
-Every heading from the second level down is checked, but the page title is not.[^reach] A line inside a
+Every heading from the second level to the sixth is checked, but the page title is not.[^reach] A line inside a
 code sample that looks like a heading is checked as one.[^reach]
 
 [^check]: `src/builder/build.py` — `heading_problems()`.

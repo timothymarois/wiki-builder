@@ -50,6 +50,22 @@ That applies here too.
 - **A message names what to do.** Not "invalid configuration": the file, what is wrong, and the command
   that fixes it.
 
+## Documentation duties
+
+`docs/wiki/` says what this tool does and what its owner requires of it. It is kept true in the same change
+as the code, never afterwards.
+
+- **A requirement goes into the wiki when the owner gives it, not when it is built.** A new requirement,
+  or a change to one, is written onto the page it belongs to in the same task, and every statement of it
+  carries `{missing}` until code implements it. A requirement that lives only in a conversation is lost.
+- **`{missing}` is cleared only by a citation to the implementation**: the file and function that do the
+  thing. Not a task, a branch, a test or a plan. The change that implements a requirement replaces its
+  mark with that reference.
+- **A change in behaviour updates the page describing it**, in the same commit. A page still describing
+  the old behaviour is wrong however green `wiki check` is.
+- **A requirement with no page gets one**, drafted where it belongs in the tree. A new intent, or a
+  changed one, is the owner's to approve, and their words are quoted where the work is recorded.
+
 ## Python
 
 - Standard library, plus `mistune`, pinned exactly. **A second dependency is an approval gate.**
@@ -86,5 +102,7 @@ changed in the same commit).
 1. The tests pass, and any new one was watched failing first.
 2. Nothing in the code or the skill names any project.
 3. `docs/CODEMAP.md` matches what is on disk.
-4. The change was proved against a real wiki through the installed command, not only a fixture.
-5. Re-read this file and verify every applicable item with observed evidence.
+4. Every requirement the owner gave is on its wiki page, cited to its implementation or marked
+   `{missing}`, and `wiki check` passes.
+5. The change was proved against a real wiki through the installed command, not only a fixture.
+6. Re-read this file and verify every applicable item with observed evidence.

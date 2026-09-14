@@ -9,14 +9,23 @@ subject moves, someone should have to redraw it, or say why it is still true.
 """
 
 [[infobox]]
-group = "Picture"
+group = "Identity"
 rows = [
   { label = "Record", value = "images/PICTURES.toml" },
   { label = "Command", value = "wiki bless" },
 ]
+
+[[infobox]]
+group = "Rules"
+rows = [
+  { label = "Fingerprint", value = "bytes of every depicted file" },
+  { label = "Blessing", value = "reason required" },
+  { label = "New picture", value = "unguarded until blessed" },
+]
 +++
 
-Every picture has a record naming the files or folders in the project that it shows.[^ledger] The check
+Every picture has a record in `images/PICTURES.toml` naming the files or folders in the project that it
+shows.[^ledger] The check
 fingerprints those files and fails when **they have changed since the picture was made**.[^check] Nothing
 about the files is assumed, so any project can say what a picture shows without adopting a convention for
 its own assets.[^digest]

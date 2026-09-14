@@ -9,16 +9,30 @@ sentences a person can act on.
 """
 
 [[infobox]]
-group = "Exit"
+group = "Identity"
 rows = [
-  { label = "Nothing wrong", value = "0" },
-  { label = "A problem found", value = "1" },
-  { label = "No wiki there", value = "2" },
+  { label = "Command", value = "wiki check" },
+]
+
+[[infobox]]
+group = "Exit codes"
+rows = [
+  { label = "Sound wiki", value = "0" },
+  { label = "Problems", value = "1" },
+  { label = "Misuse", value = "2", note = "such as no wiki at the path" },
+]
+
+[[infobox]]
+group = "Rules"
+rows = [
+  { label = "Reporting", value = "every problem at once" },
+  { label = "Build stoppage", value = "that problem alone" },
 ]
 +++
 
 `wiki check` builds the site in a temporary folder and lists **every problem at once**, not only the
-first.[^check] Each check was added after the failure it prevents had actually happened.{missing}
+first.[^check] It exits with 0 for a sound wiki, 1 when it finds a problem, and 2 when it is
+misused, such as pointed where there is no wiki.[^check] Each check was added after the failure it prevents had actually happened.{missing}
 
 ## Refusals
 
@@ -39,7 +53,7 @@ happens, only that one problem is reported, as a single sentence, and the comman
 
 [^check]: `src/builder/build.py` — `check()` builds into a temporary folder
     and gathers every problem; `src/builder/cli.py` — `main()` prints them
-    and returns 1 if there are any, and 2 when there is no wiki.
+    and returns 1 if there are any, 0 if not, and 2 when there is no wiki.
 [^cited]: `src/builder/build.py` — `uncited_problems()` and
     `citation_problems()`.
 [^headings]: `src/builder/build.py` — `heading_problems()`.

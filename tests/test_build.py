@@ -205,7 +205,7 @@ class WikiTests(unittest.TestCase):
     def test_a_source_view_says_what_it_shows(self):
         self.build()
         source = (self.out / "thing/source/index.html").read_text(encoding="utf-8")
-        self.assertIn('<p class="sub">Markdown source content of this page</p>', source)
+        self.assertIn('<p class="sub">markdown source of this page</p>', source)
 
     def test_a_paragraph_that_states_something_and_cites_nothing_is_refused(self):
         """The rule the whole wiki rests on: a reader uses this instead of the source, so a sentence they
@@ -977,6 +977,69 @@ class PackageTests(unittest.TestCase):
             self.assertTrue((home / "references/the-standard.md").is_file())
             self.assertIn(f'version = "{wiki_version()}"',
                           (root / "docs/wiki" / CONFIG).read_text(encoding="utf-8"))
+
+    def project(self):
+        """A project with a wiki and an `.agents/skills` folder, on an older release of the tool."""
+        work = tempfile.TemporaryDirectory()
+        self.addCleanup(work.cleanup)
+        root = Path(work.name)
+        (root / ".agents/skills").mkdir(parents=True)
+        (root / "docs/wiki").mkdir(parents=True)
+        (root / "docs/wiki" / CONFIG).write_text(
+            CONFIGURATION.replace(f'version = "{wiki_version()}"', 'version = "0.0.0"'), encoding="utf-8")
+        return root
+
+    def sync(self, root, *options):
+        """`wiki sync` as a person types it, and what it said."""
+        import contextlib
+        import io
+        said = io.StringIO()
+        with contextlib.redirect_stdout(said), contextlib.redirect_stderr(said):
+            try:
+                status = cli.main(["--root", str(root), "sync", *options])
+            except SystemExit as refused:
+                status = refused.code
+        return status, said.getvalue()
+
+    def shipped(self, name="SKILL.md"):
+        return (wiki.SKILL / name).read_text(encoding="utf-8")
+
+    def test_sync_puts_the_skill_where_it_is_told(self):
+        root = self.project()
+        status, output = self.sync(root, "--skill-dir", "tools/skills")
+        self.assertEqual(0, status, output)
+        home = root / "tools/skills" / cli.SKILL_NAME
+        self.assertEqual(self.shipped(), (home / "SKILL.md").read_text(encoding="utf-8"))
+        self.assertEqual(self.shipped("references/the-standard.md"),
+                         (home / "references/the-standard.md").read_text(encoding="utf-8"))
+        self.assertFalse((root / ".agents/skills" / cli.SKILL_NAME).exists(),
+                         "the skill went where the tool guessed, not where it was told")
+
+    def test_sync_replaces_a_skill_that_has_fallen_behind(self):
+        root = self.project()
+        home = root / "tools/skills" / cli.SKILL_NAME
+        home.mkdir(parents=True)
+        (home / "SKILL.md").write_text("an older skill", encoding="utf-8")
+        status, output = self.sync(root, "--skill-dir", "tools/skills")
+        self.assertEqual(0, status, output)
+        self.assertEqual(self.shipped(), (home / "SKILL.md").read_text(encoding="utf-8"))
+
+    def test_sync_can_leave_the_skill_out(self):
+        root = self.project()
+        status, output = self.sync(root, "--no-skill")
+        self.assertEqual(0, status, output)
+        self.assertFalse((root / ".agents/skills" / cli.SKILL_NAME).exists())
+        self.assertFalse((root / ".claude").exists())
+        self.assertIn(f'version = "{wiki_version()}"',
+                      (root / "docs/wiki" / CONFIG).read_text(encoding="utf-8"),
+                      "leaving the skill out must still record the release")
+
+    def test_sync_refuses_to_both_leave_the_skill_out_and_place_it(self):
+        root = self.project()
+        status, output = self.sync(root, "--no-skill", "--skill-dir", "tools/skills")
+        self.assertEqual(2, status)
+        self.assertIn("not allowed with", output)
+        self.assertFalse((root / "tools").exists())
 
     def test_the_skill_names_nothing_about_any_project(self):
         # The skill ships to every project too, and its worked example is the part most likely to carry

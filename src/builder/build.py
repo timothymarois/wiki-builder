@@ -804,7 +804,7 @@ def write_site(root, out, audience, link_root, today, record, wiki):
         if with_source:
             source_directory = directory + "source/"
             emit(source_directory, render_page(
-                page["title"], "Markdown source content of this page", "",
+                page["title"], "markdown source of this page", "",
                 render_source(page["raw"]), "", "",
                 render_nav(sections, pages, categories, page_id, source_directory, audience),
                 index_for(source_directory), site, source_directory, template, on_source(),

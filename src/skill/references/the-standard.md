@@ -83,6 +83,66 @@ reader would reach for the thing.
 **Headings name their contents.** Expiry. Size. Signing out. Not "Expiry and timeouts", which says the
 same thing twice, and not "How sessions work", which is the writer wondering what to put there.
 
+## The infobox
+
+The same page's infobox, to the standard:
+
+```toml
+[[infobox]]
+group = "Identity"
+rows = [
+  { label = "Cookie", value = "session_id" },
+  { label = "Setting", value = "session.timeout" },
+]
+
+[[infobox]]
+group = "Limits"
+rows = [
+  { label = "Expiry", value = "30 minutes", note = "after the last request" },
+  { label = "Size limit", value = "4 kB" },
+]
+
+[[infobox]]
+group = "Rules"
+rows = [
+  { label = "Overflow", value = "refused, never truncated" },
+  { label = "Signing out", value = "this device only" },
+]
+```
+
+And the failure:
+
+```toml
+[[infobox]]
+group = "Info"
+rows = [
+  { label = "What it is", value = "Sessions remember who you are between requests." },
+  { label = "Timeout", value = "configurable" },
+  { label = "Expires", value = "yes" },
+  { label = "Class", value = "SessionStore" },
+  { label = "Compression", value = "not currently enabled" },
+]
+```
+
+**Identity comes first, and it holds names a person uses.** The cookie someone finds in their browser, the
+setting an operator changes. Not the class, which only the code knows and nobody reading this will type.
+
+**Every label is a noun, and the value completes it.** "Expiry · 30 minutes" reads as a statement. "What
+it is" is a question with a sentence for an answer, which is the lead's job, and "Expires · yes" is a verb
+with nothing a reader can check.
+
+**The values are figures.** Thirty minutes and 4 kB, not "configurable", which is a fact nobody chased.
+
+**Each group is named for what it holds.** Identity, Limits, Rules. "Info" names nothing; every row is
+information.
+
+**What is absent stays out.** Compression is not something sessions do, and a row for it is a gap list in
+the most visible place on the page.
+
+**Every row is already on the page.** Thirty minutes, 4 kB, the refused write and the second device are
+all in the prose above. The two names are missing only because it is an extract; a real page gives each
+where it introduces the thing, with its reference.
+
 ## The self-edit
 
 Before you call a page done, read it once for each of these. They are quick and they are not optional.
@@ -99,6 +159,8 @@ Before you call a page done, read it once for each of these. They are quick and 
    *instead of* the code and has no way to catch it.
 6. **Read the headings alone, in order.** They are the page's table of contents and most readers will
    read nothing else.
+7. **Read the infobox alone.** Each row should read as a statement a reader could check, and each should
+   already be said on the page.
 
 ## Three conventions this settles
 
