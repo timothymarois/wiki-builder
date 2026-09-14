@@ -27,8 +27,8 @@ needs [Naming and grammar](references/naming-and-grammar.md) rather than the pag
 
 ### New page
 
-1. Read [Page standard](references/page-standard.md). For a command, endpoint, published function, event
-   or settings file, read [Reference pages](references/reference-pages.md) and
+1. Read [Page standard](references/page-standard.md). For a command, endpoint, published function, event,
+   settings file or form, read [Reference pages](references/reference-pages.md) and
    [Reference standard](references/reference-standard.md) too.
 2. Read the code the page describes. Every statement comes from it, the owner's words, or an outside
    service's own documentation.
@@ -110,7 +110,7 @@ Use these words in commits, reviews and conversation. They are the generator's.
 - **Missing citation** — the red mark for a claim with nothing to cite, written `{missing}`.
 - **Category** — a cross-cutting label, in the bar at the foot of a page. Not the sidebar.
 - **Reference page** — a page for something a person calls or configures: a command, an endpoint, a
-  published function, a settings file.
+  published function, a settings file, a form.
 - **Goals page** — every page's intent, collected. Generated, never written.
 - **Source view** — the Source tab, showing a page's own markdown.
 - **Audience** — `internal`, the default, or `user`, which `wiki user` builds.
@@ -176,7 +176,9 @@ From the encyclopedia's title policy, for titles, headings and categories alike.
 - **Recognisable** — a reader who knows the subject, without being expert in it, knows what this is.
 - **Natural** — what they would say aloud, and what another page would link to it as.
 - **Precise** — this subject, not a neighbour. "Limits" is a size on a page about uploads and a rate on
-  one about the API; the page supplies the subject.
+  one about the API; the page supplies the subject. **A nested page's title names only what sets it apart
+  within its parent**: under **Checks**, a page is **Citations**, not "Citation checks", because the
+  sidebar, the trail above the title and search all show the parent.
 - **Concise** — no longer than it takes to identify the thing.
 - **Consistent** — the same kind of thing named the same way on every page. If one page says **Storage**,
   no page says "Where data is kept".
@@ -193,7 +195,9 @@ From the encyclopedia's title policy, for titles, headings and categories alike.
 - **An infobox label** is a noun phrase naming a property, which the value gives: **Expiry** · 30 minutes.
 - **Nothing points; everything is named.** "This site", "Our setup" and "These options" point at the page
   instead of naming the thing: **Domain**, **Setup**, **Options**. In prose, "this repository" or "this
-  wiki" means nothing to a reader who arrived from a search: use the project's name. The gate refuses both.
+  wiki" means nothing to a reader who arrived from a search: name the part of the system that acts, such
+  as the results page, the server or the build, and use the project's name only where no nearer part acts.
+  The gate refuses both.
 
 **When no good name exists, the section is wrong, not the name.** A heading that will not fit in two words
 is usually two sections, or one that has not decided what it is about.
@@ -241,6 +245,9 @@ the section, a sentence's first clause answers the sentence. A reader who stops 
 - **Code longer than one line is a code block**, fenced and with its language named: two commands, a
   command and its output, a settings file, a request. One name or one short command inside a sentence
   stays inline, as code.
+- **Text the software shows is formatted as code**, word for word: a label, a button or a message a person
+  reads on screen. The gate reads no code, so a word it refuses in prose is left alone where the interface
+  itself uses it.
 - **Correct grammar.** Make subjects agree with their verbs, point each pronoun at one thing, and keep
   lists parallel. The rest, and the words that say nothing, are in
   [Naming and grammar](references/naming-and-grammar.md).
@@ -248,7 +255,7 @@ the section, a sentence's first clause answers the sentence. A reader who stops 
 ## Reference pages
 
 A **reference page** documents something a person calls or configures: a command, an endpoint, a
-published function, a settings file. Every rule above applies; the register changes. The names the
+published function, a settings file, a form. Every rule above applies; the register changes. The names the
 software owns are the content, every input has its type, default and meaning, every error is quoted
 exactly, and the bar is that a reader can use the surface correctly from the page alone.
 
@@ -428,19 +435,25 @@ complete, or what you would have built.
 
 ## Coverage
 
-**Code no page mentions is as wrong as a page the code contradicts.** A reader using the wiki instead of
-the source never learns it exists, and nothing on any page warns them. **A task covers the part of the
-code it touches**; an inventory of the whole code is a review, run when the owner asks for one.
+**Behaviour no page mentions is as wrong as a page the code contradicts.** A reader using the wiki instead
+of the source never learns it exists, and nothing on any page warns them. **Coverage means behaviour and
+requirements**: what a person meets when they use the system, and what the owner has said it must do. A
+task covers the part of the code it touches; an inventory of the whole code is a review, run when the
+owner asks for one.
 
-- **Inventory from the code, never from the wiki**, so the wiki cannot hide its own gaps. List everything
-  a person can use, configure or notice: commands and options; endpoints, public functions, events;
-  settings, their keys and environment variables; stored data and fields; refusals, error messages, exit
-  and status codes, limits; jobs, workflows, builds, deployments; outside services; roles and permissions.
+- **Inventory from the code, never from the wiki**, so the wiki cannot hide its own gaps. List the
+  behaviour a person meets: commands and options; endpoints, public functions, events; data a person sees
+  or changes; refusals, error messages, exit and status codes, limits; jobs, workflows, builds,
+  deployments; outside services; roles and permissions. Then add every requirement the owner has stated.
+- **A setting is a sentence, not a page.** It goes on the page whose behaviour it changes, and only when it
+  changes something a person or an outside service notices. Plumbing a reader never meets, such as a
+  connection pool or a log format, is left out. A settings file gets its own page only when the project
+  defines it and a person edits it.
 - **Every item has a home**: a page, or a section of one. An item only mentioned in passing, without its
   behaviour, is not covered.
-- **Walk it the other way too.** A source file with public behaviour that no reference cites is usually an
-  undocumented feature.
-- **A new behaviour gets its page in the same change as its code.** Leave out only internals a reader never
+- **Walk it the other way too.** A source file whose behaviour a person meets, and that no reference cites,
+  is usually an undocumented feature.
+- **A new behaviour gets its page in the same change as its code.** Leave out internals a reader never
   meets, such as private helpers and test code.
 
 ## Reading budget
@@ -473,6 +486,6 @@ serving nothing is still wrong, and a page over it is saying its intent has grow
    footnote the prose cites, or is marked missing.
 7. `wiki check` passes.
 8. A reader who has never read the source can follow the whole page.
-9. Everything the change touched that a person can use, configure or notice has a page or a section.
+9. The behaviour the change touched, and every requirement stated for it, has a page or a section.
 10. Nothing on the page was invented: every statement traces to the code, the owner's words, or an
     outside service's own documentation.

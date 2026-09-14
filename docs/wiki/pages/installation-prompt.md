@@ -46,8 +46,8 @@ Install wiki-builder in this project and start its wiki.
    Wherever it says TAG, use the newest release tag:
    git ls-remote --tags https://github.com/timothymarois/wiki-builder
 3. Once `wiki sync` has run, load the writing-wiki-pages skill it installed and read it in full,
-   references included. Write the first pages by it: a brief, then a page or a section for everything
-   in the code a person can use, configure or notice. Never invent: every statement comes from the
+   references included. Write the first pages by it: a brief, then a page or a section for the behaviour
+   a person meets and every requirement I have stated. Never invent: every statement comes from the
    code or from me, and a fact neither gives is marked {missing}. Anything I describe that is not built
    yet is written on its page too, every statement of it marked {missing} until code does it. New pages
    are drafts; list their intents for me to approve.
@@ -62,8 +62,8 @@ Install wiki-builder in this project and start its wiki.
 
    - Before writing or changing any page under docs/wiki/, load the writing-wiki-pages skill, if it
      is installed, and follow it.
-   - A change in behaviour updates the page that describes it, in the same commit. Something new a
-     person can use, configure or notice gets its page, or a section of one.
+   - A change in behaviour updates the page that describes it, in the same commit. Behaviour a
+     person meets that no page describes gets its page, or a section of one.
    - A requirement the owner gives goes onto its page when it is given, marked {missing} until code
      implements it. The change that builds it replaces the mark with a citation to that code.
    - An intent is the owner's to approve; a new page is a draft until they do.

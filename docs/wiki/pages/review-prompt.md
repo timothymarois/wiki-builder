@@ -88,14 +88,14 @@ describes. Coverage works the other way, from the code to the wiki.
   source is found.
 
 ### 2. Coverage
-Code that no page mentions is as wrong as a page the code contradicts: a reader using the wiki instead
-of the source never learns it exists. Build the list from the code, never from the wiki, so the wiki
-cannot hide its own gaps.
-- Inventory everything in the part under review that a person can use, configure or notice, from the
-  code itself:
+Behaviour that no page mentions is as wrong as a page the code contradicts: a reader using the wiki
+instead of the source never learns it exists. Coverage means behaviour and requirements. Build the list
+from the code, never from the wiki, so the wiki cannot hide its own gaps.
+- Inventory the behaviour a person meets in the part under review, from the code itself:
   - entry points: commands, subcommands, options, arguments, flags;
   - interfaces: endpoints, public functions and classes, events, webhooks, messages;
-  - configuration: settings files and their keys, environment variables, defaults;
+  - configuration: a setting only where it changes behaviour a person notices, and a settings file only
+    where the project defines it and a person edits it;
   - data: stored models and fields, file formats, anything written or read;
   - behaviour: validations and refusals, error messages, exit and status codes, limits, retries;
   - operations: scheduled and background jobs, workflows, builds, deployments;

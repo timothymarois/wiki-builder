@@ -124,7 +124,7 @@ audited = "2026-09-14"
 
 ["installation-prompt"]
 updated = "2026-09-14"
-digest = "b1b8aa785cce4c1b7964d69c41b7cf30d97bc64e92db0e7869c191ed15985208"
+digest = "d3b8e29d79cf55e844e2235158f1b04e5253931ad987db233425b81aa5d52694"
 
 ["pages"]
 updated = "2026-09-14"
@@ -151,7 +151,7 @@ audited = "2026-09-14"
 
 ["review-prompt"]
 updated = "2026-09-14"
-digest = "1ed70c282d223b12956cd9d98d383f8f964759083cb15e5789d999e045634137"
+digest = "d914107637ba248e3ef4c6dbf92dacfb4f4bb3b98eb9a642671654a52ccd1363"
 
 ["serving"]
 updated = "2026-09-14"
