@@ -34,7 +34,8 @@ and the same guide for GitHub on [Deployment (GitHub)](deployment-github.md).
 
 ## Build
 
-The build command is one line.[^git]
+The build command is one line.[^git] It installs from a git address, which needs `git`, and Cloudflare's
+list of build image tools names `pip` but not `git`.[^image]
 
 ```sh
 pip install "git+https://github.com/timothymarois/wiki-builder@TAG" && wiki check && wiki publish _site
@@ -74,7 +75,8 @@ When the domain's zone is already on Cloudflare, adding the custom domain create
 [^output]: Cloudflare Docs — [Build configuration](https://developers.cloudflare.com/pages/configuration/build-configuration/):
     the build output directory is where the build command writes the built version of the site.
 [^image]: Cloudflare Docs — [Build image](https://developers.cloudflare.com/pages/configuration/build-image/):
-    the current image's default Python is 3.13.3, and `PYTHON_VERSION` selects another.
+    the current image's default Python is 3.13.3, and `PYTHON_VERSION` selects another; its tools list
+    `pip` and do not list `git`.
 [^floor]: `pyproject.toml` — `requires-python = ">=3.11"`.
 [^domains]: Cloudflare Docs — [Custom domains](https://developers.cloudflare.com/pages/configuration/custom-domains/):
     when the site is already a Cloudflare zone, its `CNAME` record is added automatically once the DNS

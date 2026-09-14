@@ -1398,13 +1398,25 @@ class WikiTests(unittest.TestCase):
         self.assertIn("Last audited never", self.footer())
 
     def test_auditing_a_page_puts_the_day_in_its_footer(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
         self.build(today="2026-03-04")
         wiki.audit(self.root, ["thing"], today="2026-09-09")
         self.build(today="2026-09-10")
         footer = self.footer()
         self.assertIn("Last updated 4 March 2026", footer, "auditing a page moved the day it was updated")
         self.assertIn("Last audited 9 September 2026", footer)
-        self.assertIn("Last audited never", self.footer("goals"), "auditing one page audited another")
+        self.assertIn("Last audited never", self.footer("thing/part"), "auditing one page audited another")
+
+    def test_a_page_excused_from_citations_has_no_audit_in_its_footer(self):
+        # The owner, 2026-09-14: "if pages that are goals where it doesnt have citations, we dont need
+        # audited on". The front page and the goals page both say goals = false.
+        self.build()
+        for path in (self.out / "index.html", self.out / "goals/index.html"):
+            with self.subTest(page=path.parent.name or "index"):
+                page = path.read_text(encoding="utf-8")
+                footer = page[page.index('<div class="foot">'):page.index("</div>", page.index('<div class="foot">'))]
+                self.assertIn("Last updated", footer)
+                self.assertNotIn("audited", footer)
 
     def test_an_edit_keeps_the_day_a_page_was_last_audited(self):
         self.build(today="2026-03-04")
@@ -1414,6 +1426,14 @@ class WikiTests(unittest.TestCase):
         footer = self.footer()
         self.assertIn("Last updated 9 September 2026", footer)
         self.assertIn("Last audited 5 March 2026", footer)
+
+    def test_auditing_a_page_excused_from_citations_is_refused(self):
+        self.build()
+        with self.assertRaises(wiki.WikiError) as caught:
+            wiki.audit(self.root, ["thing", "goals"], today="2026-01-03")
+        self.assertIn("goals.md", str(caught.exception))
+        self.assertNotIn("audited", wiki.read_dates(self.root / "docs/wiki")["thing"],
+                         "a refused audit recorded the pages beside it")
 
     def test_auditing_a_page_that_does_not_exist_is_refused(self):
         self.build()
@@ -1431,11 +1451,12 @@ class WikiTests(unittest.TestCase):
         self.assertNotIn("audited", wiki.read_dates(self.root / "docs/wiki")["thing"])
 
     def test_an_audit_names_a_page_with_or_without_md_and_leaves_the_check_passing(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
         self.build()
-        wiki.audit(self.root, ["thing", "goals.md"], today="2026-01-03")
+        wiki.audit(self.root, ["thing", "thing/part.md"], today="2026-01-03")
         dates = wiki.read_dates(self.root / "docs/wiki")
         self.assertEqual("2026-01-03", dates["thing"]["audited"])
-        self.assertEqual("2026-01-03", dates["goals"]["audited"])
+        self.assertEqual("2026-01-03", dates["thing/part"]["audited"])
         self.assertEqual([], wiki.date_problems(self.root))
 
     def test_a_user_footer_leaves_out_the_audit(self):
@@ -1466,11 +1487,12 @@ class WikiTests(unittest.TestCase):
         return status, out.getvalue() + err.getvalue()
 
     def test_the_audit_command_names_each_page_it_recorded(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
         self.build()
-        status, output = self.run_main(["--root", str(self.root), "audit", "thing", "goals"])
+        status, output = self.run_main(["--root", str(self.root), "audit", "thing", "thing/part"])
         self.assertEqual(0, status, output)
         self.assertIn("wiki: thing audited", output)
-        self.assertIn("wiki: goals audited", output)
+        self.assertIn("wiki: thing/part audited", output)
 
     def test_the_audit_command_needs_a_page(self):
         status, output = self.run_main(["--root", str(self.root), "audit"])

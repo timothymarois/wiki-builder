@@ -59,7 +59,7 @@ A page that no reader can reach from the sidebar stops the build, whether it is 
 ## Parts
 
 ![The parts of a page: the sidebar with search, the tabs, the title and its subtitle, the infobox, the
-numbered contents, the body, the references, the categories and the date.](../images/page-anatomy.svg)
+numbered contents, the body, the references, the categories and the footer.](../images/page-anatomy.svg)
 
 The **infobox** holds a handful of facts a reader would check, in groups of rows.[^infobox] Every row cites
 a footnote the page's text cites for the same fact, or is marked as having no source.[^rows] A row can

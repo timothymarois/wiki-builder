@@ -51,7 +51,8 @@ wiki serve --port 8791
 ## Output
 
 It prints what `wiki build` prints, then the address it is serving, and an empty line once
-stopped.[^output] Like `wiki build`, it records each changed page's date in `UPDATED.toml`.[^dates] On a
+stopped.[^output] When `--wiki` names a folder outside the project, the address it prints answers with page
+not found, because the server shows only the project.[^outside] Like `wiki build`, it records each changed page's date in `UPDATED.toml`.[^dates] On a
 wiki of three pages, with the folder being wherever the wiki sits:[^output]
 ```text
 wiki: goals                              25 words    0 cited    0 missing
@@ -73,6 +74,7 @@ wiki: serving http://127.0.0.1:8791/docs/wiki/site/  (ctrl-c to stop)
 | `1` | a problem stops the build[^exit] | the problem |
 | `2` | the port is already in use[^exit] | `wiki: cannot serve on port 8787: Address already in use; choose another with --port` |
 | `2` | there is no wiki where it was pointed[^exit] | `wiki: no wiki at nowhere` |
+| `2` | an option it does not know[^exit] | `wiki: error: unrecognized arguments: --unknown` |
 
 [^serve]: `src/builder/cli.py` — `run()` builds once, then calls `serve()`; `src/builder/serve.py` —
     `serve()` binds `127.0.0.1`, opens a browser, serves until `KeyboardInterrupt` and returns 0.
@@ -81,7 +83,10 @@ wiki: serving http://127.0.0.1:8791/docs/wiki/site/  (ctrl-c to stop)
     `PORT`, 8787.
 [^output]: `src/builder/serve.py` — `serve()` prints the address it serves and an empty line on
     `KeyboardInterrupt`, after `run()` in `src/builder/cli.py` prints the build.
+[^outside]: `src/builder/cli.py` — `run()` passes `serve()` the site's full path when the site is not inside
+    the project; `src/builder/serve.py` — `serve()` serves only the project folder, and puts that path in
+    the address.
 [^dates]: `src/builder/cli.py` — `run()` calls `build()`, and `write_site()` in `src/builder/build.py`
     records dates in `UPDATED.toml`.
-[^exit]: `src/builder/cli.py` — `main()` returns 2 with no wiki and 1 for a `WikiError`;
-    `src/builder/serve.py` — `serve()` returns 2 when the port is taken.
+[^exit]: `src/builder/cli.py` — `main()` returns 2 with no wiki and 1 for a `WikiError`, and argparse exits
+    2 on an option it does not know; `src/builder/serve.py` — `serve()` returns 2 when the port is taken.

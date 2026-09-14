@@ -39,12 +39,18 @@ diagram, the way GitHub draws one, and the page's markdown keeps the block as wr
 and only a page with a diagram loads it.[^diagram] How to write one is described on
 [Diagrams](../pages/diagrams.md).
 
+A picture written in the page's markdown is captioned with the title given after its address, or with its
+alt text when it has no title.[^picture] Clicking a picture opens it whole, with its caption, and a click or
+Escape closes it again.[^lightbox] The theme button beside the tabs steps through Auto, Light and Dark, and
+the browser remembers the choice; Auto follows the system.[^theme]
+
 ## Footer
 
-Every page ends with a footer the build writes: when the page last changed, how many words it has, about
-how long it takes to read, how many sources it cites, and how many of its claims have no source.[^footer] A reader-facing
-build leaves out the two citation counts.[^footer] So does a page excused from citations, such as the goals
-page, because it has nothing to count.[^footer] The reading time counts 250 words
+Every page ends with a footer the build writes: when the page last changed, when it was last audited or
+never, how many words it has, about how long it takes to read, how many sources it cites, and how many of
+its claims have no source.[^footer] A reader-facing build leaves out the audit date and the two citation
+counts.[^footer] A page excused from citations, such as the goals page, leaves out the citation counts,
+because it has nothing to count.[^footer] The reading time counts 250 words
 a minute, the pace a 500-word page answering in about two minutes assumes.[^pace]
 
 ## Narrow screens
@@ -68,7 +74,15 @@ button.[^narrow]
     `src/builder/assets/wiki.js` draws every `pre.mermaid` in the page's theme.
 [^footer]: `src/builder/build.py` — `write_site()` gives each page `page_stats()`, built from its word count
     and `citation_counts()`, and leaves the citation counts out for the `"user"` audience and for a page that says `goals = false`; `render_page()`
-    writes them into the footer.
+    writes them into the footer, after `Last updated` and `Last audited`, which `write_site()` passes as
+    none to the `"user"` audience.
+[^picture]: `src/builder/build.py` — `WikiRenderer.image()` captions a picture with its title, or its alt
+    text when it has none.
+[^lightbox]: `src/builder/assets/wiki.js` — the lightbox opens a clicked picture from the page or the
+    infobox with its caption, sized to the window, and a click or Escape closes it.
+[^theme]: `src/builder/assets/wiki.js` — the theme button steps through `auto`, `light` and `dark` and keeps
+    the choice in the browser's storage; `src/builder/assets/template.html` applies it before the page is
+    drawn.
 [^pace]: `src/builder/build.py` — `reading_minutes()` divides by `READING_PACE`, 250, and rounds up to a
     whole minute, never fewer than one.
 [^outside]: `src/builder/build.py` — `rewrite_references()` adds `OUTSIDE` to a link matching

@@ -171,7 +171,8 @@ change before reporting a finding; if you cannot, drop it.
   term used for two things, or two terms for one.
 - Never report: rewording a sentence that is already true, cited and within the skill's rules; a
   synonym you prefer; reordered clauses, sentences or rows; punctuation or style the skill does not rule
-  on; any change whose only effect is that the page reads more the way you would write it.
+  on; a {missing} mark on something the owner asked for that is not built yet, which is correct as it
+  is; any change whose only effect is that the page reads more the way you would write it.
 - A writing finding names the rule it breaks, in the skill's words, and what a reader would get wrong
   because of it. Without both it is a preference, and a preference is not a finding.
 - Report a pattern once, with every place it occurs, not once for each page.
@@ -201,7 +202,8 @@ names.
 Leave out pages with no findings and how each finding was verified. Report nothing you have not checked
 against the code, and no preferences.
 
-Then run `wiki audit` with every page that has no finding. A page with a finding is audited once it is
+Then run `wiki audit` with every page that has no finding, leaving out any page that says
+goals = false, which cites nothing and is never audited. A page with a finding is audited once it is
 fixed.
 ```
 
@@ -209,7 +211,7 @@ fixed.
 
 To have the agent fix what it finds instead of reporting it, replace the fourth step of "Before starting"
 with: "Fix each finding, change nothing a finding does not name, keep `wiki check` passing, run
-`wiki build` and then `wiki audit` on every page reviewed, and list every change you made, one line
+`wiki build` and then `wiki audit` on every page reviewed that cites anything, and list every change you made, one line
 each." An edit that fixes nothing still moves the page's date, and tells every reader
 the page changed when it did not.[^dates] Intents stay out of reach either way, because changing one
 changes what a page is for, and that is the owner's decision.

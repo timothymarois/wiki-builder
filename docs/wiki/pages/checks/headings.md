@@ -41,12 +41,12 @@ on dates" is refused, but "Release notes" passes.**[^verdict]
 A heading that opens with *this*, *that*, *these*, *those*, *our* or *here* is refused.[^pointer] It
 points at the page it sits on instead of naming anything, so "Our setup" should be **Setup**.[^pointer] A
 title or an infobox label that opens the same way is refused as well, as described on
-[Pointing words](pointing.md).
+[Wording](wording.md).
 
 ## Scope
 
 Every heading from the second level to the sixth is checked.[^reach] The page title is held only to the
-pointing words, described on [Pointing words](pointing.md). A line inside a code sample is not a heading,
+pointing words and vague actors, described on [Wording](wording.md). A line inside a code sample is not a heading,
 and is not checked.[^reach]
 
 [^check]: `src/builder/build.py` — `heading_problems()`.

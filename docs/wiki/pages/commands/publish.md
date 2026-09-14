@@ -71,6 +71,8 @@ wiki: /path/to/notes/site-out uses clean addresses and needs a server; the site 
 | `1` | a problem stops the build[^exit] | the problem |
 | `2` | `OUT` is not empty and was not made by the tool[^exit] | `wiki: /path/to/notes/taken is not empty and was not written by this tool; remove it yourself if you meant to replace it` |
 | `2` | there is no wiki where it was pointed[^exit] | `wiki: no wiki at nowhere` |
+| `2` | `OUT` is missing[^exit] | `wiki publish: error: the following arguments are required: OUT` |
+| `2` | an option it does not know[^exit] | `wiki: error: unrecognized arguments: --unknown` |
 
 [^publish]: `src/builder/cli.py` — `run()` builds into `OUT` with `links="clean"`.
 [^usage]: `src/builder/cli.py` — `main()` gives `publish` the positional `out`; `run()` resolves it from
@@ -80,4 +82,4 @@ wiki: /path/to/notes/site-out uses clean addresses and needs a server; the site 
 [^dates]: `src/builder/cli.py` — `run()` calls `build()`, and `write_site()` in `src/builder/build.py`
     records dates in `UPDATED.toml`.
 [^exit]: `src/builder/cli.py` — `run()` returns 2 when `guard_output()` refuses; `main()` returns 2 with no
-    wiki and 1 for a `WikiError`.
+    wiki and 1 for a `WikiError`; argparse exits 2 on a missing argument or an option it does not know.

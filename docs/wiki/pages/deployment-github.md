@@ -39,9 +39,9 @@ flowchart LR
   accTitle: Publishing the wiki to GitHub Pages
   accDescr: A push to main, or a run started by hand, checks the wiki. A problem fails the job and nothing is published; otherwise the site is published, uploaded and deployed to GitHub Pages.
   started(["Push to main, or run by hand"]) --> check["Check the wiki"] --> passed{"Check passed?"}
+  passed -- "Yes" --> publish["Publish the site"] --> upload["Upload the site"]
+  upload --> deploy["Deploy to GitHub Pages"] --> live(["Site published"])
   passed -- "No" --> failed(["Job failed, nothing published"])
-  passed -- "Yes" --> publish["Publish the site"] --> cname["Write the CNAME file"]
-  cname --> upload["Upload the site"] --> deploy["Deploy to GitHub Pages"] --> live(["Site published"])
 ```
 
 The action installs `wiki` and leaves it installed, so a later step in the same job can run it.[^action]
@@ -52,6 +52,7 @@ name: pages
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 permissions:
   contents: read
   pages: write

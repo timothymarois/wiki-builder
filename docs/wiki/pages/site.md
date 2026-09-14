@@ -25,14 +25,15 @@ rows = [
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Search scope", value = "page titles only", cite = "search" },
+  { label = "Search scope", value = "page titles and category names", cite = "search" },
   { label = "Date change", value = "the page's own text only", note = "any intent, for the goals page", cite = ["dates", "goalsdate"] },
   { label = "Link to a missing page", value = "drawn red, refused by the check", cite = "redlink" },
 ]
 +++
 
 `wiki build` turns the pages into a website in `docs/wiki/site`, beside them.[^build] **The site is never
-committed.**[^serve] It is rebuilt each time `wiki serve` starts, and a page edited while the server runs
+committed.**{missing} The tool writes no ignore file, so a project adds
+`docs/wiki/site/` to its own `.gitignore`.[^serve] It is rebuilt each time `wiki serve` starts, and a page edited while the server runs
 appears after `wiki build`.[^serve] What refuses a page is described on [Checks](checks.md), and how the site is served on
 [Local server](serving.md).
 
@@ -45,7 +46,7 @@ is marked `nofollow` and ends in an arrow, without its author writing anything b
 
 The build deletes whatever it no longer makes, so a removed page leaves nothing behind.[^removed] For the
 same reason, **it refuses to write into a folder it did not make**, so it never empties a folder
-made by anything else.[^guard]
+made by anything else.[^guard] Two builds from the same pages and dates write identical files.[^same]
 
 **A link to a wiki page that does not exist is drawn red instead of blue**, and `wiki check` refuses it,
 naming the page and the line.[^redlink] A link to any other file that does not exist is not refused, and
@@ -63,11 +64,12 @@ Instead, `wiki check` refuses a page whose text has changed since its date was r
 page that no longer exists, and says to run `wiki build`.[^stale]
 
 A page's footer also says when the page was last audited against the code, or says never, and an edit
-keeps that day.[^audited] Recording an audit is described on [wiki audit](commands/audit.md).
+keeps that day.[^audited] A page that says `goals = false` cites nothing, so its footer carries no audit
+date.[^audited] Recording an audit is described on [wiki audit](commands/audit.md).
 
 ## Search
 
-The search box matches **page titles only**, not what the pages say, and shows at most eight
+The search box matches **page titles and category names only**, not what the pages say, and shows at most eight
 results.[^search] Its index is written into every page rather than fetched, so search works from disk
 too.[^index]
 
@@ -75,12 +77,14 @@ too.[^index]
 
 `wiki user` builds only the pages marked for users, which say `audience = "user"` in their front
 matter; an infobox group can be marked the same way.[^user] The user build strips every reference,
-every red mark and the Source tab.[^strip] Every field is listed on [Front matter](front-matter.md).
+every red mark and the Source tab.[^strip] A draft marked for users is built too, under its draft
+banner.[^userdraft] Every field is listed on [Front matter](front-matter.md).
 
 [^build]: `src/builder/cli.py` — `run()` builds into `site` beside the pages unless the command is
     `publish` or `user`.
 [^serve]: `src/builder/cli.py` — `run()` builds once, then calls `serve()` in `src/builder/serve.py`,
-    which never rebuilds; the project's `.gitignore` excludes `docs/wiki/site/`.
+    which never rebuilds; wiki-builder's `.gitignore` excludes `docs/wiki/site/`, and nothing in
+    `src/builder` writes a `.gitignore`.
 [^links]: `src/builder/build.py` — `page_directory()` and `relative_directory()`, which end every link in
     `LINK_SUFFIX`, `index.html`.
 [^publish]: `src/builder/build.py` — `build()` empties `LINK_SUFFIX` when `links` is `"clean"`, which
@@ -101,11 +105,12 @@ every red mark and the Source tab.[^strip] Every field is listed on [Front matte
     `check()` builds with `record=False`.
 [^stale]: `src/builder/build.py` — `date_problems()`, called from `check()`.
 [^audited]: `src/builder/build.py` — `render_page()` adds `Last audited` after `Last updated`, with `never`
-    when there is none, and `write_site()` keeps a page's `audited` when its date moves.
-[^goalsdate]: `src/builder/build.py` — `content_of()` in `write_site()` adds every page's intent to the
-    goals page's hash.
+    when there is none, and `write_site()` keeps a page's `audited` when its date moves, and passes none
+    for a page whose front matter says `goals = false`.
+[^goalsdate]: `src/builder/build.py` — `page_digest()` adds every page's intent to the goals page's hash.
 [^search]: `src/builder/assets/wiki.js` — the search listener filters on `page.t`, the title, and keeps
-    eight.
+    eight; `src/builder/build.py` — `write_site()` adds each category to the index as `Category:` and its
+    name.
 [^index]: `src/builder/build.py` — `index_for()` in `write_site()`; `src/builder/assets/template.html`
     inlines it as `WIKI_INDEX`.
 [^user]: `src/builder/cli.py` — `run()` builds with audience `"user"`; `src/builder/build.py` —
@@ -113,3 +118,8 @@ every red mark and the Source tab.[^strip] Every field is listed on [Front matte
     group's own.
 [^strip]: `src/builder/build.py` — `visible_to()` for pages, `for_user()` for references and marks, and
     `with_source` in `write_site()` for the tab.
+[^userdraft]: `src/builder/build.py` — `write_site()` writes every page `visible_to()` the audience,
+    whatever its `status`, and `render_page()` adds the draft banner.
+[^same]: `src/builder/build.py` — `read_pages()` and `write_site()` walk pages, dates, categories and
+    pictures in sorted order, `index_for()` writes the search index with sorted keys, every link is
+    relative, and the clock is read only for the day a changed page is recorded.

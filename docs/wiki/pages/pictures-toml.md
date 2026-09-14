@@ -64,9 +64,9 @@ The record of the picture on [Pages](pages.md), as `wiki bless` last wrote it.[^
 
 ```toml
 ["page-anatomy.svg"]
-digest = "sha256:257c739ae1004fbd84a9d5b1b56221597d3b86ebb29f2b1ccaa20a82eb20917e"
+digest = "sha256:f9c4cbd3da17f352546b89d1b1ae49aae89570f268a71355a6ee094c56aefa6a"
 depicts = ["src/builder/assets/template.html"]
-blessed = "The template's subtitle placeholder was renamed from kicker; the parts of a page and their places are unchanged."
+blessed = "the template gained a placeholder for the diagram script at the foot of the page; nothing a reader sees moved"
 ```
 
 [^read]: `src/builder/build.py` — `read_ledger()` reads `LEDGER` from the `images` folder inside the wiki

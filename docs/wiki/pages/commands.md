@@ -69,9 +69,11 @@ Every command exits with 0 when it did what it was asked, 1 when something is wr
 when it was misused: an option it does not know, no wiki where it was pointed, an output folder the tool
 did not make, or a port already in use.[^exit] A problem is printed as one sentence.[^exit]
 
-Every message names what to do.{missing} Some name only what is wrong, such as `wiki: no wiki at nowhere`,
+Some messages name only what is wrong, such as `wiki: no wiki at nowhere`,
 `wiki: missing.png has no entry in PICTURES.toml` and the parser's own
 `wiki: error: unrecognized arguments: --unknown`.[^messages]
+
+**Planned:** every message names what to do.{missing}
 
 [^program]: `src/builder/cli.py` — `main()` builds the `wiki` parser and its eight commands, and makes the
     command optional; `pyproject.toml` names the program under `[project.scripts]`.

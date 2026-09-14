@@ -41,8 +41,8 @@ flowchart LR
   accTitle: Checking before publishing
   accDescr: A push checks the wiki; a problem stops it with nothing published, otherwise the site is published.
   pushed(["Push to main"]) --> check["Check the wiki"] --> passed{"Check passed?"}
-  passed -- "No" --> stopped(["Nothing published"])
   passed -- "Yes" --> publish["Publish the site"] --> published(["Site published"])
+  passed -- "No" --> stopped(["Nothing published"])
 ```
 ````
 
@@ -50,12 +50,12 @@ Only a page with a mermaid block loads Mermaid, and its block is drawn in three 
 
 ```mermaid
 flowchart LR
-  accTitle: How a diagram is drawn
+  accTitle: Diagram drawing
   accDescr: When a page is built, a page without a mermaid block is shown without Mermaid. A page with one has the block marked as a diagram, loads Mermaid, and has the diagram drawn in its theme.
   built(["Page built"]) --> has{"Mermaid block<br/>on the page?"}
-  has -- "No" --> plain(["Page shown without Mermaid"])
   has -- "Yes" --> mark["Mark it as a diagram"] --> load["Load Mermaid on the page"]
   load --> draw["Draw it in the page's theme"] --> shown(["Diagram shown"])
+  has -- "No" --> plain(["Page shown without Mermaid"])
 ```
 
 ## Drawing

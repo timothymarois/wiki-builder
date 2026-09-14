@@ -56,6 +56,7 @@ deletes nothing, so a file a newer release no longer ships stays where it is.[^o
 an `.agents/skills` folder:[^output]
 ```text
 wiki: wrote .agents/skills/writing-wiki-pages/SKILL.md
+wiki: wrote .agents/skills/writing-wiki-pages/references/flowcharts.md
 wiki: wrote .agents/skills/writing-wiki-pages/references/naming-and-grammar.md
 wiki: wrote .agents/skills/writing-wiki-pages/references/page-standard.md
 wiki: wrote .agents/skills/writing-wiki-pages/references/reference-pages.md
@@ -80,6 +81,7 @@ still says it was.[^record]
 | `1` | there is no `wiki.toml` to record it in; the skill has already been written, and is not listed[^exit] | ``wiki: there is no wiki.toml in /path/to/notes/docs/wiki; write one with a [site] name and at least one [[section]], then run `wiki sync` again`` |
 | `2` | both skill options are given; the one given second is named first[^exit] | `wiki sync: error: argument --skill-dir: not allowed with argument --no-skill` |
 | `2` | there is no wiki where it was pointed[^exit] | `wiki: no wiki at nowhere` |
+| `2` | an option it does not know[^exit] | `wiki: error: unrecognized arguments: --unknown` |
 
 [^sync]: `src/builder/cli.py` — `sync()`, and `record_version()` in `src/builder/config.py`.
 [^group]: `src/builder/cli.py` — `main()` puts `--skill-dir` and `--no-skill` in one mutually exclusive
@@ -91,7 +93,7 @@ still says it was.[^record]
 [^record]: `src/builder/config.py` — `record_version()` replaces the first line starting `version` after
     `[tool]`, and adds nothing when no such line follows.
 [^exit]: `src/builder/cli.py` — `main()` returns 2 with no wiki and 1 for a `WikiError`, and argparse exits
-    2 when both options are given; `sync()` copies the skill before `record_version()` in
+    2 when both options are given or an option it does not know is; `sync()` copies the skill before `record_version()` in
     `src/builder/config.py` raises `WikiError` for a missing `wiki.toml`.
 [^noskill]: `src/builder/cli.py` — `main()` declares `--no-skill` off by default, and `run()` passes
     `skill=not args.no_skill` to `sync()`, which writes the skill only when asked and records the release

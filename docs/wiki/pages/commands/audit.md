@@ -59,7 +59,8 @@ wiki: index audited 14 September 2026
 ```
 
 Each page's footer then says when it was last audited, after the day it was last updated, or says
-never.[^footer] An edit keeps the audit date, and a user build leaves it out.[^footer]
+never.[^footer] An edit keeps the audit date, and a user build leaves it out.[^footer] A page that says
+`goals = false` cites nothing, so it is never audited and its footer carries no audit date.[^footer]
 
 ## Exit codes
 
@@ -69,8 +70,10 @@ Every page is checked before any is recorded, so a refused audit records nothing
 |---|---|---|
 | `0` | every page is recorded[^exit] | `wiki: refunds audited 14 September 2026` |
 | `1` | a page does not exist[^exit] | `wiki: there is no page nope.md to audit; name a page by its path under pages, such as checks/budgets` |
+| `1` | a page says `goals = false`[^exit] | `wiki: goals.md says goals = false, so it cites nothing and has nothing to audit; leave it out` |
 | `1` | a page has changed since its date was recorded[^exit] | ``wiki: refunds.md has changed since its date was recorded; run `wiki build`, then audit it again`` |
 | `2` | no page is named[^exit] | `wiki audit: error: the following arguments are required: PAGE` |
+| `2` | an option it does not know[^exit] | `wiki: error: unrecognized arguments: --unknown` |
 | `2` | there is no wiki where it was pointed[^nowiki] | `wiki: no wiki at nowhere` |
 
 [^record]: `src/builder/build.py` — `audit()` writes `audited` for each page through `write_dates()`, and
@@ -79,9 +82,9 @@ Every page is checked before any is recorded, so a refused audit records nothing
     `PAGE`; `src/builder/build.py` — `audit()` drops a trailing `.md`.
 [^footer]: `src/builder/build.py` — `render_page()` adds `Last audited` after `Last updated`, with `never`
     when there is none; `write_site()` keeps `audited` when a page's date moves, and passes none to a user
-    build.
-[^exit]: `src/builder/build.py` — `audit()` checks that every page exists and matches its recorded digest
-    before `write_dates()`, raising `WikiError`; `src/builder/cli.py` — `main()` returns 1 for it, and
-    argparse exits 2 when no page is named.
+    build or to a page whose front matter says `goals = false`.
+[^exit]: `src/builder/build.py` — `audit()` checks that every page exists, does not say `goals = false`, and
+    matches its recorded digest before `write_dates()`, raising `WikiError`; `src/builder/cli.py` — `main()` returns 1 for it, and
+    argparse exits 2 when no page is named or an option it does not know is given.
 [^nowiki]: `src/builder/cli.py` — `main()` prints `no wiki at` and the path, and returns 2, when the wiki
     folder does not exist.

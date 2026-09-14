@@ -63,6 +63,7 @@ wiki: 3 pages, 1 problem
 | `1` | at least one problem is found[^exit] | each problem, then a last line such as `wiki: 3 pages, 1 problem` |
 | `1` | a problem stops the build | that problem alone[^stop] |
 | `2` | there is no wiki where it was pointed[^exit] | `wiki: no wiki at nowhere` |
+| `2` | an option it does not know[^exit] | `wiki: error: unrecognized arguments: --unknown` |
 
 [^check]: `src/builder/build.py` — `check()` builds into a temporary directory with `record=False`.
 [^usage]: `src/builder/cli.py` — `main()` gives `check` only the shared options.
@@ -71,5 +72,5 @@ wiki: 3 pages, 1 problem
     `uncited_problems()` and `pointing_problems()` name a sentence's page and line.
 [^marks]: `src/builder/cli.py` — `run()` prints `missing_marks()` after the problems.
 [^exit]: `src/builder/cli.py` — `run()` returns 1 when there are problems and 0 when there are none;
-    `main()` returns 2 with no wiki.
+    `main()` returns 2 with no wiki; argparse exits 2 on an option it does not know.
 [^stop]: `src/builder/cli.py` — `main()` catches `WikiError`, prints it, and returns 1.

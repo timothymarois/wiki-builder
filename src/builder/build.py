@@ -1050,8 +1050,10 @@ def write_site(root, out, audience, link_root, today, record, wiki):
             page_stats(page["words"], *(citations.get(page_id, (0, 0))
                                         if with_source and page["meta"].get("goals", True)
                                         else (None, None))),
-            # An audit checks a page against the code, which a user build withholds, so it carries none.
-            audited=dates[page_id].get("audited", "") if with_source else None))
+            # An audit checks a page's citations against the code. A user build withholds them, and a page
+            # excused from citations has none, so neither carries an audit.
+            audited=(dates[page_id].get("audited", "") if with_source and page["meta"].get("goals", True)
+                     else None)))
         if with_source:
             source_directory = directory + "source/"
             emit(source_directory, render_page(
@@ -1595,6 +1597,10 @@ def audit(root, page_names, wiki=None, today=None):
         if name not in pages:
             raise WikiError(f"there is no page {name}.md to audit; name a page by its path under pages, "
                             "such as checks/budgets")
+        # A page excused from citations states nothing traced to the code, so there is nothing to audit.
+        if not pages[name]["meta"].get("goals", True):
+            raise WikiError(f"{name}.md says goals = false, so it cites nothing and has nothing to audit; "
+                            "leave it out")
         if dates.get(name, {}).get("digest") != page_digest(pages, name):
             raise WikiError(f"{name}.md has changed since its date was recorded; run `wiki build`, then "
                             "audit it again")

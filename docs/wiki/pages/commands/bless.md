@@ -67,7 +67,9 @@ than `made`, `digest`, `depicts` and `blessed` is dropped, and an earlier reason
 | `1` | the picture has no record[^exit] | `wiki: missing.png has no entry in PICTURES.toml` |
 | `1` | the reason is empty[^exit] | `wiki: a blessing needs a reason; it is the record that the picture was looked at` |
 | `1` | the record names a path that is not in the project[^exit] | `wiki: a picture says it shows src/gone.py, which is not in this project` |
+| `1` | the record names a folder holding no files[^exit] | `wiki: a picture says it shows src/empty, which holds no files` |
 | `2` | an argument is missing[^exit] | `wiki bless: error: the following arguments are required: REASON` |
+| `2` | an option it does not know[^exit] | `wiki: error: unrecognized arguments: --unknown` |
 | `2` | there is no wiki where it was pointed[^nowiki] | `wiki: no wiki at nowhere` |
 
 [^bless]: `src/builder/build.py` — `bless()` writes `digest` and `blessed` through `write_ledger()`, and
@@ -77,7 +79,7 @@ than `made`, `digest`, `depicts` and `blessed` is dropped, and an earlier reason
 [^ledger]: `src/builder/build.py` — `write_ledger()` writes its own header and, for each picture, only
     `made`, `digest`, `depicts` and `blessed`.
 [^exit]: `src/builder/build.py` — `bless()` raises `WikiError` for an unrecorded picture or an empty
-    reason, and `subject_digest()` for a missing path; `src/builder/cli.py` — `main()` returns 1 for it,
-    and argparse exits 2 on a missing argument.
+    reason, and `subject_digest()` for a missing path or an empty folder; `src/builder/cli.py` — `main()`
+    returns 1 for it, and argparse exits 2 on a missing argument or an option it does not know.
 [^nowiki]: `src/builder/cli.py` — `main()` prints `no wiki at` and the path, and returns 2, when the wiki
     folder does not exist.

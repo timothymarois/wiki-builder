@@ -46,8 +46,9 @@ Install wiki-builder in this project and start its wiki.
 3. Once `wiki sync` has run, load the writing-wiki-pages skill it installed and read it in full,
    references included. Write the first pages by it: a brief, then a page or a section for everything
    in the code a person can use, configure or notice. Never invent: every statement comes from the
-   code or from me, and a fact neither gives is marked {missing}. New pages are drafts; list their
-   intents for me to approve.
+   code or from me, and a fact neither gives is marked {missing}. Anything I describe that is not built
+   yet is written on its page too, every statement of it marked {missing} until code does it. New pages
+   are drafts; list their intents for me to approve.
 4. Finish when `wiki check` reports 0 problems.
 
 Report the release tag used, every file created or changed, the output of the last `wiki check`, each

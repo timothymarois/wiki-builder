@@ -41,7 +41,7 @@ mark as plain text.[^undefined] Each statement passes or is refused this way.[^u
 
 ```mermaid
 flowchart LR
-  accTitle: How a statement is judged
+  accTitle: Statement check
   accDescr: A page that says goals = false is excused. Otherwise each sentence, list item and table row passes if it carries a citation or the red mark outside code, or if it has no letters, links to a markdown file or is only a link; anything else is refused with its page and line.
   page(["Page checked"]) --> exempt{"Says goals = false?"}
   exempt -- "Yes" --> excused(["Page excused"])
@@ -57,8 +57,9 @@ citation**.[^uncited] A version number does not end a sentence, but an abbreviat
 does, so `Dr. Smith` is read as two sentences.[^boundary] A sentence directly under a heading is checked
 like any other.[^heading]
 
-Four things are excused: a sentence linking to any markdown file, even one that does not exist; a list
-item that is only a link; a code sample; and a picture with its caption.[^excused] **Every table row carries a citation, or the red mark, in at
+Five things are excused: a statement with no letters; a sentence linking to any markdown file, even a
+missing page, which the check described on [Site](../site.md) refuses on its own; a list item that is only
+a link; a code sample; and a picture with its caption.[^excused] **Every table row carries a citation, or the red mark, in at
 least one of its cells**; a table whose rows cite nothing is a gap, not an excuse.[^rowcite]
 The header row is exempt.[^rowcite]
 
@@ -76,7 +77,6 @@ counts for nothing.[^code]
 
 Every build and check prints how many sources each page cites and how many claims it marks, with totals
 for the wiki.[^counts] `wiki check` also lists every marked claim by page and line, without failing.[^marks]
-
 ## Documents
 
 A reference whose link contains `.md` anywhere is refused, because a page of prose is only another claim
@@ -97,8 +97,8 @@ without linking to it passes, and so does one that names nothing.[^document]
     bracket, and knows no abbreviations.
 [^heading]: `src/builder/build.py` — `page_statements()` blanks every heading line with `HEADING_ANY`
     before reading the body.
-[^excused]: `src/builder/build.py` — `uncited_problems()` skips a sentence matching `PAGE_LINK`, which
-    looks for no file, or `LINK_ONLY`; `page_statements()` blanks fenced code with `FENCED` and skips a
+[^excused]: `src/builder/build.py` — `uncited_problems()` skips a statement with no letter, and a sentence
+    matching `PAGE_LINK`, which looks for no file, or `LINK_ONLY`; `page_statements()` blanks fenced code with `FENCED` and skips a
     block that starts with `![`; `statements()` reads a block that starts with `|` row by row.
 [^rowcite]: `src/builder/build.py` — `statements()` returns each row of a table after its header and
     `TABLE_SEPARATOR`, and `uncited_problems()` names a row with no citation or mark as a table row.

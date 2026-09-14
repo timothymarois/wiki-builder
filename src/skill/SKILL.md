@@ -284,7 +284,23 @@ To a reader both mean the same — do not take this on faith — so one mark ser
 it.
 
 It is the only sanctioned way to say a thing is not built. Use it where a reader would otherwise assume
-the thing exists, and sparingly: a page that is mostly red marks was written too early.
+the thing exists.
+
+**A requirement the owner gives before it is built is written now, and marked.** The wiki can lead the
+code: an owner may describe a feature, a change or a whole idea so its documentation takes shape before
+anything is built. Each statement of it goes on the page it belongs to, carrying `{missing}` because
+nothing implements it yet. A page written that way, or a whole wiki, can be mostly red marks, and that is
+correct: it is the idea, stated plainly, waiting for its code.
+
+- **Only the owner's words.** A requirement nobody stated is invented, however likely it seems; it is not
+  written, marked or not.
+- **Write it as the behaviour it asks for**, in the present tense and with the same rules as any other
+  sentence, so the page reads the same once it is built and only its marks change.
+- **The mark comes off with a citation** to the code that does the thing, in the change that builds it.
+- **A change to something already built** is one short, marked note at the end of its page, never mixed
+  into the description of what it does today; a thing not built at all is written as its own page.
+- **A command or endpoint that does not exist yet** is written as its contract, as
+  [Reference pages](references/reference-pages.md) describes.
 
 ## Infobox
 
@@ -398,7 +414,9 @@ record that the picture was looked at.
 
 ## Truthfulness
 
-The page describes **what the thing actually does**, and nothing else.
+The page describes **what the thing actually does**, and nothing else — except what the owner has asked
+it to do and nothing does yet, which is written and marked `{missing}`, as
+[Missing citations](#missing-citations) describes.
 
 **Never invent.** Everything on a page comes from one of three places: **the code**, **the owner's own
 words**, or **an outside service's own documentation** for how that service behaves. Nothing else is a
