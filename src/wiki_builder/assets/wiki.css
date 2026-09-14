@@ -1,0 +1,247 @@
+/* The wiki's look. Lifted verbatim from the prototype the owner approved on 2026-09-13; the palette and
+   proportions are Wikipedia's own. Do not restyle without the owner: the sign-off was on these bytes.
+
+   The one block that is not from the prototype is "figures", at the foot. The prototype drew a debug glyph
+   where a picture would go, because it had no pictures; the owner asked for pictures of the real thing on
+   2026-09-13. That block follows the infobox's idiom rather than inventing one. */
+
+:root{
+  --page:#fff; --surface:#f8f9fa; --sunk:#eaecf0; --shade:#f1f3f5;
+  --text:#202122; --soft:#54595d; --faint:#72777d;
+  --border:#a2a9b1; --border-soft:#c8ccd1; --hair:#eaecf0;
+  --link:#3366cc; --visited:#795cb2; --red:#d73333;
+  --ok:#14866d; --warn:#947100; --prop:#54595d;
+  --mark:#fff2a8;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --page:#101418; --surface:#27292d; --sunk:#2e3136; --shade:#1b1e21;
+  --text:#eaecf0; --soft:#a2a9b1; --faint:#889096;
+  --border:#54595d; --border-soft:#43464a; --hair:#2e3136;
+  --link:#88a9f2; --visited:#b39ddb; --red:#fd7e7e;
+  --ok:#5fd3b0; --warn:#d4b54a; --prop:#a2a9b1;
+  --mark:#6b5814;
+}}
+:root[data-theme="dark"]{
+  --page:#101418; --surface:#27292d; --sunk:#2e3136; --shade:#1b1e21;
+  --text:#eaecf0; --soft:#a2a9b1; --faint:#889096;
+  --border:#54595d; --border-soft:#43464a; --hair:#2e3136;
+  --link:#88a9f2; --visited:#b39ddb; --red:#fd7e7e;
+  --ok:#5fd3b0; --warn:#d4b54a; --prop:#a2a9b1;
+  --mark:#6b5814;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text);
+  font:14px/1.6 -apple-system,"Segoe UI",Helvetica,Arial,sans-serif}
+img{max-width:100%}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+a.v{color:var(--visited)}
+a:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--link);outline-offset:1px}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;background:var(--shade);
+  border:1px solid var(--hair);border-radius:2px;padding:0 3px}
+
+/* ===== shell ===== */
+/* The rail keeps its old width as a floor and takes a little more where there is room: nested pages
+   make for longer names, and a wide screen has the space to spend on them. */
+.shell{display:grid;grid-template-columns:clamp(176px,16vw,264px) minmax(0,1fr)}
+/* The rail does not move when the article is scrolled. The padding that used to sit on the column is
+   inside the sticky element instead: with it outside, the sticky box started 12px below the top and
+   slid that far before it pinned, which reads as the whole sidebar twitching on the first scroll.
+   The column keeps its own background so the tint still runs the full height. */
+.rail{background:var(--surface);padding:0 0 60px;font-size:13px}
+.rail-in{position:sticky;top:0;padding:12px 12px 12px 14px;display:flex;flex-direction:column;gap:14px;
+  max-height:100vh;overflow-y:auto;overscroll-behavior:contain}
+.logo{padding:4px 0 12px;border-bottom:1px solid var(--hair)}
+.logo b{display:block;font:400 17px/1.2 'Linux Libertine',Georgia,'Times New Roman',serif}
+.logo span{display:block;font-size:10.5px;color:var(--faint);margin-top:3px;font-style:italic}
+.sbox{position:relative}
+.sbox input{width:100%;padding:5px 7px;border:1px solid var(--border-soft);border-radius:2px;
+  background:var(--page);color:var(--text);font:13px/1.4 inherit}
+.res{position:absolute;z-index:20;inset:30px 0 auto 0;background:var(--page);border:1px solid var(--border-soft);
+  max-height:250px;overflow:auto;box-shadow:0 2px 5px rgba(0,0,0,.12)}
+.res button{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--hair);
+  background:none;cursor:pointer;padding:6px 8px;font:13px/1.3 inherit;color:var(--link)}
+.res button:hover{background:var(--shade)}
+.res em{display:block;font-style:normal;font-size:11px;color:var(--faint)}
+.rail h5{margin:0 0 3px;font:700 11px/1.3 inherit;color:var(--soft)}
+.rail ul{list-style:none;margin:0 0 12px;padding:0}
+.rail li{margin:0 0 1px}
+.rail li a{display:block;padding:1px 0;font-size:12.8px}
+.rail li a.on{font-weight:700;color:var(--text)}
+/* Children nest under their parent page, as deep as the pages themselves go. */
+.rail li ul{margin:1px 0 3px;padding-left:9px;border-left:1px solid var(--hair)}
+
+/* ===== article chrome ===== */
+.doc{border-left:1px solid var(--border-soft);min-height:100vh;background:var(--page)}
+.tabs{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;
+  border-bottom:1px solid var(--border);padding:6px 14px 0;background:var(--surface);flex-wrap:wrap}
+.tabs ul{display:flex;list-style:none;margin:0;padding:0;gap:1px;font-size:12.5px}
+.tabs li a{display:block;padding:5px 11px;border:1px solid var(--border-soft);border-bottom:0;
+  background:var(--shade);border-radius:2px 2px 0 0;color:var(--link)}
+.tabs li a.sel{background:var(--page);color:var(--text);font-weight:700;position:relative;top:1px;
+  border-bottom:1px solid var(--page)}
+.tabs li a.dis{color:var(--faint);cursor:default;background:transparent;border-color:transparent}
+
+.art{padding:14px 22px 70px;max-width:1120px;overflow-wrap:break-word}
+h1{font:400 27px/1.25 'Linux Libertine',Georgia,'Times New Roman',serif;margin:0;
+  padding-bottom:4px;border-bottom:1px solid var(--border-soft);text-wrap:balance}
+.sub{font-size:12.5px;color:var(--faint);font-style:italic;margin:4px 0 0}
+.hat{margin:12px 0;padding-left:26px;font-style:italic;font-size:13px;color:var(--soft)}
+/* A draft says so before it says anything else. */
+.hat.draft{padding:8px 12px;font-style:normal;color:var(--text);background:var(--mark);
+  border-left:4px solid var(--warn)}
+.art h2{font:400 21px/1.3 'Linux Libertine',Georgia,serif;margin:22px 0 9px;padding-bottom:3px;
+  border-bottom:1px solid var(--border-soft);display:flex;justify-content:space-between;
+  align-items:baseline;gap:14px;text-wrap:balance}
+.art h3{font:700 15.5px/1.35 -apple-system,"Segoe UI",Helvetica,Arial,sans-serif;margin:16px 0 6px;
+  display:flex;justify-content:space-between;align-items:baseline;gap:14px}
+.art p{margin:0 0 10px}
+.num{font-variant-numeric:tabular-nums}
+
+/* ===== contents ===== */
+.toc{display:table;max-width:100%;background:var(--surface);border:1px solid var(--border-soft);padding:8px 18px 10px 10px;
+  margin:14px 0;font-size:13px}
+.toc .th{font-weight:700;text-align:center;margin-bottom:5px;font-size:13px}
+.toc .th a{font-weight:400;font-size:11.5px;margin-left:5px}
+.toc ol{list-style:none;margin:0;padding:0 0 0 2px;counter-reset:t}
+.toc ol ol{padding-left:16px}
+.toc li{margin:2px 0}
+.toc .tn{color:var(--text);margin-right:5px;font-variant-numeric:tabular-nums}
+
+/* ===== infobox ===== */
+.ib{float:right;clear:right;width:302px;margin:4px 0 14px 20px;border:1px solid var(--border-soft);
+  background:var(--surface);font-size:12.5px;line-height:1.5}
+.ib .cap{background:var(--sunk);text-align:center;padding:7px 9px;
+  font:400 16px/1.3 'Linux Libertine',Georgia,serif;border-bottom:1px solid var(--border-soft)}
+.ib .pic{text-align:center;padding:12px 9px;border-bottom:1px solid var(--hair);background:var(--page)}
+.ib .pic .g{font:500 38px/1 ui-monospace,Menlo,monospace;display:grid;place-items:center;
+  width:72px;height:72px;margin:0 auto;border:1px solid var(--border-soft);background:var(--surface)}
+.ib .pic .cc{font-size:11.5px;color:var(--faint);margin-top:7px;line-height:1.45}
+.ib .grp{background:var(--sunk);text-align:center;padding:3px 9px;font-weight:700;font-size:12px;
+  border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft)}
+.ib .r{display:grid;grid-template-columns:118px minmax(0,1fr);border-bottom:1px solid var(--hair)}
+.ib .r:last-child{border-bottom:0}
+.ib .r>b{font-weight:700;padding:4px 8px;background:var(--shade);font-size:12px}
+.ib .r>span{padding:4px 8px;font-variant-numeric:tabular-nums;word-break:break-word}
+.ib .r>span i{display:block;font-style:normal;color:var(--faint);font-size:11px}
+.ib .legend{padding:6px 8px;font-size:11px;line-height:1.45;color:var(--faint);
+  border-top:1px solid var(--border-soft)}
+
+/* ===== tables, chips, refs ===== */
+.wt{overflow-x:auto;margin:12px 0}
+table.w{border-collapse:collapse;background:var(--surface);border:1px solid var(--border-soft);
+  font-size:13px;min-width:520px;width:100%}
+table.w th,table.w td{border:1px solid var(--border-soft);padding:5px 9px;text-align:left;vertical-align:top}
+table.w th{background:var(--sunk);font-weight:700;white-space:nowrap}
+table.w td.n{font-variant-numeric:tabular-nums;white-space:nowrap}
+table.w tbody tr:hover{background:var(--shade)}
+sup.ref{font-size:10.5px;line-height:1}
+sup.ref a{padding:0 1px}
+/* A claim with nothing to cite reads exactly like a citation, in red: it sits where the reader already
+   looks for the source, and says there is not one because the game does not do this yet. */
+sup.nocite{color:var(--red);font-weight:700;cursor:help}
+ol.refs{font-size:12.5px;padding-left:22px;margin:8px 0}
+ol.refs li{margin:2px 0;overflow-wrap:anywhere;border-radius:2px;scroll-margin-top:16px}
+/* Follow a citation and the reference it lands on lights up, fading in so the eye is drawn to the change
+   rather than having to find it. A numbered list of eight entries all looks the same; without this the
+   reader arrives at the block and counts.
+
+   The lit state is declared outright and the animation only fades IN to it, so a reader who has asked for
+   reduced motion -- which switches every animation off below -- still gets the highlight, just at once. */
+@keyframes cite-found{from{background:transparent;box-shadow:0 0 0 5px transparent}}
+ol.refs li:target{background:var(--mark);box-shadow:0 0 0 5px var(--mark);
+  animation:cite-found .5s ease-out}
+.art h2:target,.art h3:target{background:var(--mark);box-shadow:0 0 0 5px var(--mark);
+  animation:cite-found .5s ease-out;scroll-margin-top:16px}
+ol.refs code{font-size:11.5px}
+.msg{border:1px solid var(--border-soft);background:var(--surface);border-left:4px solid var(--link);
+  padding:8px 12px;margin:12px 0;font-size:13px}
+.cats{margin-top:32px;border:1px solid var(--border-soft);background:var(--surface);padding:6px 10px;font-size:12.5px}
+.cats b{font-weight:700}
+.stub{color:var(--faint);font-style:italic;font-size:12.5px}
+/* When the page last changed. It is the page's own date, not the day it was rendered: a build that
+   changes nothing writes nothing, so a date here means the words above it moved. */
+.foot{margin-top:28px;padding-top:8px;border-top:1px solid var(--border-soft);
+  font-size:11.5px;color:var(--faint)}
+.gal{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.gal a{flex:1 1 190px;border:1px solid var(--border-soft);background:var(--surface);padding:9px 11px}
+.gal a:hover{background:var(--shade);text-decoration:none}
+.gal b{display:block;font:400 15.5px/1.3 'Linux Libertine',Georgia,serif;color:var(--link)}
+.gal span{display:block;font-size:12px;color:var(--soft);margin-top:2px}
+
+/* ===== figures ===== */
+/* Not from the prototype: it had no pictures. Follows the infobox's idiom -- a thin border, a centred
+   plate, a faint caption -- so a picture sits in the page rather than on top of it. */
+/* A picture spans the column, and the column stops at the infobox. display:flow-root is what does that:
+   an ordinary block box slides UNDER a float -- only its text lines wrap -- so a full-width figure would
+   run behind the infobox. A block formatting context is laid out beside the float instead, which is both
+   what a reader expects and what the infobox is for. Tables, the contents box and the source block
+   already scroll or shrink-to-fit, so each of them establishes one of its own. */
+figure.fig{display:flow-root;margin:14px 0;border:1px solid var(--border-soft);
+  background:var(--surface);padding:8px}
+figure.fig img{display:block;margin:0 auto;background:var(--page);max-width:100%;height:auto}
+figure.fig figcaption{font-size:11.5px;color:var(--faint);line-height:1.45;margin-top:7px;text-align:center}
+.ib .pic img{display:block;margin:0 auto;border:1px solid var(--border-soft);background:var(--page)}
+
+/* ===== the lightbox ===== */
+/* A picture in the page is a thumbnail; this is how the whole of it gets looked at. */
+figure.fig img,.ib .pic img{cursor:zoom-in}
+.lightbox{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;
+  background:rgba(0,0,0,.82);cursor:zoom-out}
+.lightbox img{max-width:96vw;max-height:88vh;box-shadow:0 3px 18px rgba(0,0,0,.5);background:#fff}
+/* The caption spans the picture exactly. The box takes its width from the picture, and the caption is
+   width:0 with min-width:100% so it fills that width without being able to widen it -- a long caption
+   wraps under the picture instead of stretching the box past it. */
+.lightbox .box{display:flex;flex-direction:column;width:max-content;max-width:96vw}
+.lightbox .box img{max-width:100%}
+.lightbox p{width:0;min-width:100%;box-sizing:border-box;margin:10px 0 0;
+  color:#eaecf0;font-size:12.5px;text-align:center}
+.lightbox .shut{position:absolute;top:14px;right:16px;color:#eaecf0;background:none;border:0;
+  font:20px/1 inherit;cursor:pointer;padding:6px 10px}
+
+/* ===== controls ===== */
+.theme,.navtoggle,.copy{font:12.5px/1.3 inherit;color:var(--link);background:var(--shade);
+  border:1px solid var(--border-soft);border-radius:2px;padding:5px 11px;cursor:pointer}
+.theme:hover,.navtoggle:hover,.copy:hover{background:var(--sunk)}
+.theme{align-self:center;margin:0 0 5px;flex:none;min-width:64px}
+.navtoggle{display:none;width:100%;text-align:left}
+.navtoggle[aria-expanded="true"]{background:var(--sunk);color:var(--text);font-weight:700}
+
+/* ===== the source view ===== */
+/* The markdown a page is written in, shown as it is written. Not from the prototype, which had no such
+   view; it borrows the table's frame and the code face already used inline. */
+.srcbox{position:relative;margin:12px 0}
+.srcbox .copy{position:absolute;top:8px;right:8px;z-index:2}
+pre.src{overflow-x:auto;margin:0;padding:12px 14px;background:var(--surface);
+  border:1px solid var(--border-soft);font:12.5px/1.55 ui-monospace,Menlo,Consolas,monospace;
+  color:var(--text);white-space:pre;tab-size:4}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  /* The source view wraps rather than scrolling sideways: markdown lines are written for a wide editor,
+     and a phone cannot usefully pan a code block. The copy button goes above the block instead of
+     floating over the first line of it. */
+  .srcbox .copy{position:static;display:block;width:100%;margin:0 0 6px}
+  pre.src{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;padding:10px 12px;
+    line-height:1.6}
+  .rail{padding:0}
+  .rail-in{position:static;max-height:none;overflow:visible;padding:10px 16px 12px;gap:10px}
+  .doc{border-left:0;border-top:1px solid var(--border-soft)}
+  /* 16px of gutter either side at every width, and slightly larger body text: 14px is comfortable
+     beside a 176px rail on a desktop and tight on a phone. */
+  .art{padding:14px 16px 60px;font-size:15px}
+  .tabs{padding:6px 16px 0}
+  .ib{float:none;width:100%;margin:10px 0 14px}
+  figure.fig{margin:12px 0}
+  h1{font-size:23px}
+  /* Tap targets: a 12.8px link on one line is about 20px tall, under any reasonable minimum. */
+  .rail li a{padding:8px 0;font-size:14px}
+  .rail h5{margin-top:4px}
+  /* Collapsed only where script can open it again; with scripting off the lists stay where they are. */
+  .js .navtoggle{display:block}
+  .js .rail #nav{display:none}
+  .js .rail.open #nav{display:block}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.logo a{color:inherit;display:block}
+.logo a:hover{text-decoration:none}

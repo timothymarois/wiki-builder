@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{tab_title}}</title>
+<link rel="stylesheet" href="{{css}}">
+<script>
+(function(){var r=document.documentElement;r.className+=" js";
+try{var t=localStorage.getItem("wiki-theme");if(t==="dark"||t==="light"){r.setAttribute("data-theme",t);}}catch(e){}})();
+</script>
+</head>
+<body>
+<div class="shell">
+  <nav class="rail"><div class="rail-in">
+    <div class="logo"><a href="{{home}}"><b>{{site_name}}</b></a>{{tagline_line}}</div>
+    <div class="sbox"><input id="q" type="search" placeholder="Search" aria-label="Search" autocomplete="off">
+      <div class="res" id="res" hidden></div></div>
+    <button class="navtoggle" type="button" aria-expanded="false">Menu</button>
+    <div id="nav">{{nav}}</div>
+  </div></nav>
+  <div class="doc">
+    <div class="tabs">
+{{tabs}}
+      <button class="theme" type="button" title="Light, dark, or follow the system">Auto</button>
+    </div>
+    <article class="art">
+      <h1>{{title}}</h1>
+      <p class="sub">{{kicker}}</p>
+{{hatnote}}
+{{infobox}}
+{{contents}}
+{{body}}
+{{categories}}
+{{footer}}
+    </article>
+  </div>
+</div>
+<script>const WIKI_INDEX={{index}};</script>
+<script src="{{js}}"></script>
+</body>
+</html>

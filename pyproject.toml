@@ -1,0 +1,24 @@
+[project]
+name = "wiki-builder"
+version = "0.1.0"
+description = "A wiki a person can read, built from markdown, where every statement is traced to the code."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Tim Marois" }]
+# Pinned exactly. The rendered pages are checked against rules this tool enforces, and a parser that
+# changed its output underneath a project would turn every page red at once for no reason anyone could see.
+dependencies = ["mistune==3.3.4"]
+
+[project.scripts]
+wiki = "wiki_builder.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/timothymarois/wiki-builder"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/wiki_builder"]

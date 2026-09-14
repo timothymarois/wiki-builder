@@ -1,0 +1,115 @@
+# The standard
+
+Somebody's owner approved the page below and asked that pages be written like it. Read both versions
+before writing anything. **The contrast teaches more than either version alone**, and more than the rules
+do: rules tell you what not to do, an example tells you what good looks like.
+
+The subject here is a session in a web application, chosen because every reader has one. Your subject
+will be something else. Nothing about the shape changes.
+
+---
+
+## The standard
+
+> **Sessions** are how the application remembers who you are between requests. They live in
+> [storage](../storage.md), which is where eviction and replication are described — this page covers what
+> a session is for and what it does.
+>
+> ## Expiry
+>
+> A session ends thirty minutes after its last request. Each one carries its own clock, so a hundred
+> people signing in together do not all expire together.
+>
+> A session that expires while you are typing **does not lose the work**. The draft is held for another
+> day and reattached when you sign in again. That is deliberate — expiry is meant to make a stolen
+> session useless, not to punish somebody who went to lunch.
+>
+> ## Size
+>
+> A session holds at most 4 kB. Past that the write is refused and the request fails loudly rather than
+> silently dropping what would not fit.
+>
+> Nothing is compressed. A 4 kB limit on what you actually wrote is easier to reason about than a larger
+> limit on what happens to compress well.
+>
+> ## Signing out
+>
+> Signing out ends that session and no others. **A second device stays signed in** — there is no "sign
+> out everywhere" yet.
+
+## The failure
+
+> Sessions are an important part of the authentication subsystem. They are a core concept in the
+> application and have a number of interesting properties worth understanding.
+>
+> ## Expiry and timeouts
+>
+> Sessions have a timeout. The timeout is configurable per deployment and defaults to a reasonable value.
+> When a session's timeout elapses it will be invalidated and the user will be required to
+> re-authenticate. Draft persistence behaviour may vary depending on configuration.
+>
+> ## Storage and limits
+>
+> Session data is stored in a backing store with a size cap. Writes exceeding the cap are handled
+> according to the configured overflow policy. Compression is not currently enabled.
+
+Everything in the failed version is *true*. That is what makes it worth studying — **it fails without
+lying**. Correct, complete, flat, and nobody reads it.
+
+## The difference
+
+Go through these against your own draft, one at a time.
+
+**The lead says what the page is not about.** "They live in storage, which is where eviction and
+replication are described — this page covers what a session is for and what it does." One sentence stops
+a reader looking here for the wrong thing, and stops this page growing into that one.
+
+**It says the consequence, never the mechanism.** "A session that expires while you are typing does not
+lose the work" is what a person needs. "Draft persistence behaviour may vary depending on configuration"
+describes machinery and leaves the reader arithmetic they have no numbers for.
+
+**The numbers are there, and both halves of a comparison sit together.** "Thirty minutes." "At most
+4 kB." Not "a reasonable value" and not "a size cap" — a figure a reader can check by watching, in a unit
+they would notice being wrong.
+
+**The surprising thing gets its one clause of reason.** "Expiry is meant to make a stolen session
+useless, not to punish somebody who went to lunch." A rule that looks wrong gets reported as a bug; one
+clause ends the question and saves a round trip with whoever has to answer it.
+
+**What is absent is said once, where a reader would look for it.** "A second device stays signed in —
+there is no sign out everywhere yet." Not a section called "Not built yet". One clause, at the point the
+reader would reach for the thing.
+
+**Headings name their contents.** Expiry. Size. Signing out. Not "Expiry and timeouts", which says the
+same thing twice, and not "How sessions work", which is the writer wondering what to put there.
+
+## The self-edit
+
+Before you call a page done, read it once for each of these. They are quick and they are not optional.
+
+1. **Cut every sentence that does not serve the intent.** Not shorten — cut. If that empties a section,
+   the section was the problem.
+2. **Find every hedge and either get the number or say nobody knows.** "Reasonable", "may vary",
+   "generally", "a number of" — each one is a fact you did not chase.
+3. **Read only the first line of each section.** A reader who stopped there should still be right.
+4. **Check every claim against the code again**, not against the draft. A page derived from another page
+   inherits its errors.
+5. **Say where nobody is sure.** Emergent, untested, or you could not determine it — say so. A confident
+   sentence covering a gap is the worst thing you can leave here, because the reader is using this
+   *instead of* the code and has no way to catch it.
+6. **Read the headings alone, in order.** They are the page's table of contents and most readers will
+   read nothing else.
+
+## Three conventions this settles
+
+**A sibling page is linked as `name.md`.** The tool turns it into a clean address. Writing the address by
+hand looks right and breaks the check that every link in the repository resolves.
+
+**A reference names code, never a document.** The extract above carries none only because it is an
+extract; a real page ends with references, and every one points at a file and a function. The gate
+refuses a reference that cites a `.md`, because a page of prose is not an answer to "where does this
+happen" — it is another claim that can be wrong in the same way.
+
+**A page that surprised nobody who wrote it probably was not read carefully enough.** Writing a page from
+the code routinely turns up things the owner believed that are not true. If yours turned up nothing, you
+summarised another document instead of reading what runs.
