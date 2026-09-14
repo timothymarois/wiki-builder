@@ -377,10 +377,27 @@ The page describes **what the thing actually does**.
 4. **When the page and the thing disagree, the page is wrong.** Fix it. A page is never grounds for calling
    the implementation wrong; only the owner says what it ought to do.
 
+## Coverage
+
+**Code no page mentions is as wrong as a page the code contradicts.** A reader using the wiki instead of
+the source never learns it exists, and nothing on any page warns them.
+
+- **Inventory from the code, never from the wiki**, so the wiki cannot hide its own gaps. List everything
+  a person can use, configure or notice: commands and options; endpoints, public functions, events;
+  settings, their keys and environment variables; stored data and fields; refusals, error messages, exit
+  and status codes, limits; jobs, workflows, builds, deployments; outside services; roles and permissions.
+- **Every item has a home**: a page, or a section of one. An item only mentioned in passing, without its
+  behaviour, is not covered.
+- **Walk it the other way too.** A source file with public behaviour that no reference cites is usually an
+  undocumented feature.
+- **A new behaviour gets its page in the same change as its code.** Leave out only internals a reader never
+  meets, such as private helpers and test code.
+
 ## Reading budget
 
 A page must answer in about two minutes, and the goals page must read in one sitting. The gate enforces a
-word count as the proxy, and prints every page's count on every build.
+word count as the proxy, and prints every page's count on every build. References and code blocks are not
+counted: one is followed and the other copied, so neither is read the way prose is.
 
 The count is a backstop; **the intent is the control.** A page inside its budget that carries a sentence
 serving nothing is still wrong, and a page over it is saying its intent has grown.
@@ -406,3 +423,4 @@ serving nothing is still wrong, and a page over it is saying its intent has grow
    footnote the prose cites, or is marked missing.
 7. `wiki check` passes.
 8. Someone who has never read the source can follow the whole page.
+9. Everything in the code a person can use, configure or notice has a page or a section.

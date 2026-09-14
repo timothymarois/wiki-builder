@@ -25,7 +25,7 @@ rows = [
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Word count", value = "references excluded", cite = "count" },
+  { label = "Word count", value = "references and code blocks excluded", cite = "count" },
   { label = "Page overrun", value = "listed by the check", cite = "over" },
   { label = "Intent overrun", value = "build stopped", cite = "intent" },
 ]
@@ -37,7 +37,8 @@ each must be a positive whole number.[^config]
 
 ## Counting
 
-A page is counted from its markdown, **leaving out its references**, so citing costs nothing.[^count]
+A page is counted from its markdown, **leaving out its references and code blocks**, so citing costs
+nothing and a sample to copy, such as a prompt, costs nothing either.[^count]
 Words are split on spaces, so a table's borders and a link's address count as words too.[^count]
 
 The goals page is not held to the page limit.[^goals] What it collects is measured against the goals limit
@@ -57,8 +58,8 @@ measures it.[^calibrated]
 [^defaults]: `src/builder/config.py` — `DEFAULT_BUDGET`.
 [^config]: `src/builder/config.py` — `read_config()` merges
     `[budget]` over the defaults and refuses one that is not a positive integer.
-[^count]: `src/builder/build.py` — `read_pages()` counts
-    `strip_footnote_definitions(body).split()`.
+[^count]: `src/builder/build.py` — `read_pages()` counts the words left after
+    `strip_footnote_definitions()` and `FENCED` remove references and code blocks.
 [^goals]: `src/builder/build.py` — `budget_problems()` skips `GOALS_ID`
     for the page limit and compares `goals_words` with the goals limit.
 [^over]: `src/builder/build.py` — `budget_problems()`.

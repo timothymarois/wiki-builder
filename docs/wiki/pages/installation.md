@@ -30,7 +30,8 @@ rows = [
 
 wiki-builder is one Python package, and its only command is `wiki`.[^package] What each command does is
 described on [Commands](commands.md), and checking a wiki on every push on
-[Continuous integration](continuous-integration.md).
+[Continuous integration](continuous-integration.md). An agent can take a project through every step
+below from the [Installation prompt](installation-prompt.md).
 
 ## Requirements
 
@@ -69,7 +70,8 @@ pages = ["index", "goals"]
 ```
 
 Every wiki needs a `goals.md` page to collect the intents onto, and every page needs a title and an
-intent.[^pages] A page about the wiki itself says `goals = false`.[^exempt]
+intent.[^pages] Every page a section lists must exist, so the example above also needs an
+`index.md`.[^nav] A page about the wiki itself says `goals = false`.[^exempt]
 
 ```markdown
 +++
@@ -107,6 +109,7 @@ An update is a new tag in the script, then `wiki sync` to rewrite the skill and 
     `[[section]]`.
 [^pages]: `src/builder/build.py` — `write_site()` refuses a wiki with no `goals.md`, and `read_pages()`
     refuses a page with no title or intent.
+[^nav]: `src/builder/build.py` — `render_nav()` refuses a section listing a page that does not exist.
 [^exempt]: `src/builder/build.py` — `goals = false` is skipped by `goals_page()` and `uncited_problems()`.
 [^sync]: `src/builder/cli.py` — `sync()` writes the skill and calls `record_version()` in
     `src/builder/config.py`; `src/builder/build.py` — `write_site()` records dates in `UPDATED.toml`.

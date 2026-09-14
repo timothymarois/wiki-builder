@@ -100,6 +100,8 @@ INTERNAL_MARKER = re.compile(r'<sup class="ref[^"]*">.*?</sup>', re.S)
 # same: do not take this on faith. Written {missing} in the prose, or missing = true on an infobox row.
 # Never shown to a player.
 MISSING = re.compile(r"\{missing\}")
+# Rendered code, inline or a block, kept whole when a page is split around it.
+CODE_HTML = re.compile(r"(<pre\b.*?</pre>|<code\b.*?</code>)", re.S)
 MISSING_CITATION = ('<sup class="ref nocite" data-audience="internal" '
                     'title="No source cited: either this is not built yet, or nobody has found where it '
                     'happens">[?]</sup>')
@@ -163,7 +165,9 @@ def read_pages(pages_dir, intent_budget):
             # that is the owner's to decide -- an agent may draft one, and drafting is not deciding.
             "status": meta.get("status", "draft"),
             "categories": list(meta.get("categories", [])),
-            "words": len(strip_footnote_definitions(body).split()),
+            # Neither a reference nor a code block is read the way prose is: one is followed, the other
+            # copied or run. The owner, 2026-09-14, chose not to count code blocks.
+            "words": len(FENCED.sub("", strip_footnote_definitions(body)).split()),
         }
     if not pages:
         raise WikiError(f"{pages_dir} holds no pages; a wiki that renders nothing did not run")
@@ -834,7 +838,9 @@ def write_site(root, out, audience, link_root, today, record, wiki):
         # Only a bare <pre> is markdown's; the source view's own is built elsewhere, with a class.
         body = body.replace("<pre>", '<div class="srcbox"><button class="copy" type="button">Copy</button>'
                                      "<pre>").replace("</pre>", "</pre></div>")
-        body = MISSING.sub(MISSING_CITATION, body)
+        # Outside code only: a sample that shows the mark shows it as written.
+        body = "".join(part if CODE_HTML.fullmatch(part) else MISSING.sub(MISSING_CITATION, part)
+                       for part in CODE_HTML.split(body))
         body = rewrite_references(body, directory, site_root, root, ledger, set(pages),
                                   wiki / "pages", page["path"])
         if audience == "player":
@@ -1105,7 +1111,8 @@ def uncited_problems(root, wiki=None):
         for line, statement in page_statements(path):
             if not re.search(r"[A-Za-z]", statement):
                 continue
-            if CLAIM.search(statement) or PAGE_LINK.search(statement) or LINK_ONLY.match(statement):
+            if (CLAIM.search(INLINE_CODE.sub("", statement)) or PAGE_LINK.search(statement)
+                    or LINK_ONLY.match(statement)):
                 continue
             problems.append("%s:%d: %s states something and cites nothing; give it a reference, or "
                             "{missing} if there is none"
@@ -1126,7 +1133,8 @@ def missing_marks(root, wiki=None):
         text = path.read_text(encoding="utf-8")
         meta, _ = read_front_matter(path)
         found = [(line, "%s:%d: %s is marked as having no source" % (name, line, quoted(statement)))
-                 for line, statement in page_statements(path) if MISSING.search(statement)]
+                 for line, statement in page_statements(path)
+                 if MISSING.search(INLINE_CODE.sub("", statement))]
         for group in meta.get("infobox", []):
             for row in group.get("rows", []):
                 if row.get("missing"):
@@ -1347,7 +1355,7 @@ def citation_counts(root, wiki=None):
         prose = FENCED.sub("", FOOTNOTE.sub("", body))
         cited = {unikey(key) for key in CITED.findall(prose)} & {unikey(key) for key in DEFINED.findall(body)}
         rows = [row for group in meta.get("infobox", []) for row in group.get("rows", [])]
-        missing = len(MISSING.findall(prose)) + sum(1 for row in rows if row.get("missing"))
+        missing = len(MISSING.findall(INLINE_CODE.sub("", prose))) + sum(1 for row in rows if row.get("missing"))
         counts[path.relative_to(pages_dir).with_suffix("").as_posix()] = (len(cited), missing)
     return counts
 

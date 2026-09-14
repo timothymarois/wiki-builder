@@ -33,7 +33,8 @@ rows = [
 `wiki check` builds the site in a temporary folder and lists **every problem at once**, not only the
 first.[^check] It exits with 0 for a sound wiki, 1 when it finds a problem, and 2 when it is misused,
 such as pointed where there is no wiki.[^check] The same check runs on every push and pull request
-through [Continuous integration](continuous-integration.md).
+through [Continuous integration](continuous-integration.md). A check proves that a sentence cites
+something, not that the citation is true; an agent checks that from the [Review prompt](review-prompt.md).
 
 ## Refusals
 

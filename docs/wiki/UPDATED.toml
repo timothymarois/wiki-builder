@@ -10,15 +10,15 @@ digest = "cfd4e928a0ef730f9e65a96ab3363bfc0f26afade8f74d06afe94f5659368da8"
 
 ["checks"]
 updated = "2026-09-14"
-digest = "b17019cb2f47268e44270a93ec0e50d260247bec4692af1dc570d5028325b811"
+digest = "d806a59b6c8b94ac3751d2fea8775ac9dc055f92dd61a1863740c134a511127f"
 
 ["checks/budgets"]
 updated = "2026-09-14"
-digest = "7856858ee3a447df91d3340a61316183d9c8f2b484381f5baacde701eab108d0"
+digest = "43054399e3128cf2f6645262b82a9a56c28ca6b6525161c8507372a3dc0ddd53"
 
 ["checks/citations"]
 updated = "2026-09-14"
-digest = "6a2d89f066c8a52949ef7ad5f31fc925a72400878946678b6069beb97ed6ac90"
+digest = "3bbbb86907e36de38d1c21de388e6efa01bd6fa1f738bfbae9fd8d1efefadfa7"
 
 ["checks/headings"]
 updated = "2026-09-14"
@@ -74,7 +74,7 @@ digest = "0ceabdb60a3de793d723160dced382bf08f5875d347eb9e964b6009cf6852804"
 
 ["goals"]
 updated = "2026-09-14"
-digest = "e6fa0661f41279f559474b4e1dd764569be1fb5504e6bedbd5a373d9112b7428"
+digest = "d4dd8e73b47db984a6b63166b754ad9c712560d42f37c813ce0f649601559521"
 
 ["index"]
 updated = "2026-09-14"
@@ -82,11 +82,19 @@ digest = "ce2047af6bd1d66249db38182d7b42e3debf8bc40b19d3ce21dc1ce46577eaca"
 
 ["installation"]
 updated = "2026-09-14"
-digest = "5e482c3b97100a18fe53ffcc4fe6934b3b614d4bc73363a797a59a81a371e524"
+digest = "801fde0e74a7882e2f03a859b085deceb89b24136c34b2c9c406dea27bcc1bdd"
+
+["installation-prompt"]
+updated = "2026-09-14"
+digest = "6f852f5c8a489dc134239b6336a7982af17cef060bf706605f87e5f02163f1cc"
 
 ["pages"]
 updated = "2026-09-14"
 digest = "bfaca9c53eb692481c46335e14c23bc9b482f4341c8e6f6edbc559e033066265"
+
+["review-prompt"]
+updated = "2026-09-14"
+digest = "6b740041772fb65d34176d814a050056ba435d5f7ab6a2748e68c07a4591a2cc"
 
 ["serving"]
 updated = "2026-09-14"

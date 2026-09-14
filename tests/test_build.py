@@ -611,6 +611,24 @@ class WikiTests(unittest.TestCase):
                 self.assertIn('<a href="%s" class="ext" target="_blank" rel="nofollow noopener noreferrer">' % address, page)
         self.assertEqual(2, page.count('target="_blank"'), "only a link that leaves the wiki opens a new tab")
 
+    def test_the_missing_mark_written_in_code_is_shown_as_written(self):
+        # A page that teaches the mark, or a prompt that tells an agent to use it, shows it in code. Drawn
+        # as a red mark there, the sample said something else and the page counted a claim it never made.
+        sample = "Write `{missing}` after it.[^why]\n\n```text\nMark it {missing} when there is none.\n```\n"
+        self.write("thing", PAGE.replace("## Ground", sample + "\n## Ground"))
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertEqual(1, page.count('class="ref nocite"'), "only the claim in the prose is marked")
+        self.assertIn("<code>{missing}</code>", page)
+        self.assertIn("Mark it {missing} when there is none.", page)
+        self.assertEqual((1, 1), wiki.citation_counts(self.root)["thing"])
+        self.assertEqual(1, sum("thing.md" in mark for mark in wiki.missing_marks(self.root)))
+
+    def test_a_mark_shown_in_code_does_not_mark_its_sentence(self):
+        self.write("thing", PAGE.replace("It does it slowly.[^why]", "It is written `{missing}` or `[^key]`."))
+        problems = wiki.uncited_problems(self.root)
+        self.assertTrue(any("It is written" in problem for problem in problems), problems)
+
     def test_a_markdown_table_is_drawn_as_a_wiki_table(self):
         # Without the class, a page's own table had no borders, no header row and no padding.
         self.write("thing", PAGE.replace("It does it slowly.[^why]", "| a | b |\n|---|---|\n| c[^why] | d |"))
@@ -1009,6 +1027,21 @@ class WikiTests(unittest.TestCase):
         counts, goals_words = self.build()
         self.assertEqual([], wiki.budget_problems(counts, goals_words, self.budget),
                          "citing a source pushed a page over its budget")
+
+    def test_a_code_block_does_not_count_against_the_reading_budget(self):
+        # A sample is copied or run, not read -- a prompt to hand an agent is a page of it. The owner,
+        # 2026-09-14, chose not to count code blocks.
+        sample = "Type it.[^why]\n\n```text\n" + ("word " * 600) + "\n```\n"
+        self.write("thing", PAGE.replace("## Ground", sample + "\n## Ground"))
+        counts, goals_words = self.build()
+        self.assertEqual([], wiki.budget_problems(counts, goals_words, self.budget),
+                         "a code sample pushed a page over its budget")
+        self.assertLess(counts["thing"], 100)
+
+    def test_prose_still_counts_against_the_reading_budget(self):
+        self.write("thing", PAGE.replace("It does it slowly.[^why]", ("word " * 600) + "[^why]"))
+        counts, goals_words = self.build()
+        self.assertTrue(any("thing.md runs to" in p for p in wiki.budget_problems(counts, goals_words, self.budget)))
 
     # --- malformed input ---------------------------------------------------------------------------
 

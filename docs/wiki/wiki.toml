@@ -30,6 +30,10 @@ pages = ["checks"]
 title = "Reference"
 pages = ["commands"]
 
+[[section]]
+title = "Prompts"
+pages = ["installation-prompt", "review-prompt"]
+
 # Written by `wiki sync`. Which release of the tool these pages
 # were written against; `wiki check` says so when they differ.
 [tool]

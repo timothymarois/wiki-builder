@@ -28,9 +28,9 @@ rows = [
 ]
 +++
 
-A **citation** is a numbered mark at a claim, with its reference listed at the foot of the page.[^render]
-It is written as a markdown footnote.[^render] Two checks hold citations to account: one for a sentence
-that cites nothing, and one for a reference that cites the wrong kind of thing.[^uncited]
+A **citation** is a numbered mark at a claim, with its reference at the foot of the page, written as a
+markdown footnote.[^render] Two checks hold citations to account: one for a sentence that cites nothing,
+and one for a reference that cites the wrong kind of thing.[^uncited]
 
 ## Silence
 
@@ -43,8 +43,8 @@ written directly under its heading is checked like any other.[^heading]
 
 A sentence that links to another page is excused, because that page carries the citations, and a table is
 held as a whole.[^excused] A list item that is only a link, such as an entry under External links, states
-nothing and is excused as well.[^excused] A code sample needs no citation, because it is the thing itself rather than a
-claim about it; the sentence introducing it does.[^sample]
+nothing and is excused as well.[^excused] A code sample needs no citation, because it is the thing itself
+rather than a claim about it; the sentence introducing it does.[^sample]
 
 An infobox row is held to the same rule.[^rows] It names a footnote the page's text cites for the same
 fact, and carries that citation's number, or it is marked as having no source; a row with neither is
@@ -58,7 +58,8 @@ Where nothing can be cited, the writer puts the word *missing* in curly braces, 
 question mark in brackets where a citation would go.[^mark] **It is a fine answer; silence is
 not.**[^uncited] It means either that the thing is not built or that nobody has found where it happens,
 and to a reader both mean the same thing: do not take this on faith.[^mark] A reader-facing build removes
-all of them.[^player]
+all of them.[^player] Inside code, the mark is shown as written, and neither counts nor answers for
+its sentence.[^code]
 
 Every build and check prints how many sources each page cites and how many claims it marks as having none,
 with totals for the wiki, so how much of it is taken on faith is visible on every run.[^counts]
@@ -70,8 +71,8 @@ failing.[^marks]
 A reference that links to a markdown document is refused.[^document] A page of prose is only another
 claim, and it can be wrong in exactly the way the citing page is.[^document]
 
-A reference to an outside service's own documentation, such as a host's guide, is a link that does not end
-in `.md`, so it passes; it is how a page cites the behaviour of something outside the project.[^document]
+A reference to an outside service's own documentation is a link that does not end in `.md`, so it
+passes; it is how a page cites the behaviour of something outside the project.[^document]
 
 Only a link is recognised: **a reference that names a document without linking to it passes**, and so does
 a reference that names nothing at all.[^document]
@@ -94,6 +95,8 @@ a reference that names nothing at all.[^document]
     `goals = false`.
 [^mark]: `src/builder/build.py` — `MISSING` and `MISSING_CITATION`, applied in `write_site()`.
 [^player]: `src/builder/build.py` — `for_player()` removes every `INTERNAL_MARKER`.
+[^code]: `src/builder/build.py` — `write_site()` draws the mark only outside `CODE_HTML`; `citation_counts()`,
+    `missing_marks()` and `uncited_problems()` remove `INLINE_CODE` before looking for it.
 [^counts]: `src/builder/build.py` — `citation_counts()`, printed by `report()`.
 [^marks]: `src/builder/build.py` — `missing_marks()`, printed by `run()` in `src/builder/cli.py`.
 [^document]: `src/builder/build.py` — `citation_problems()` matches `DOCUMENT_LINK`, a markdown link
