@@ -15,7 +15,7 @@ audited = "2026-09-14"
 
 ["checks/budgets"]
 updated = "2026-09-14"
-digest = "47f988608698d1cfaba95e0d210ae33b99999ee684aafe214108e2eb84e46b2a"
+digest = "e7e805d6d0ccaf98b5c0f3d49bee27c7509e83e285ab13ac1be8d1dfdd958244"
 audited = "2026-09-14"
 
 ["checks/citations"]
@@ -55,7 +55,7 @@ audited = "2026-09-14"
 
 ["commands/build"]
 updated = "2026-09-14"
-digest = "370431b80e630065a7dbb5ac1accfb61163d8a4b5b0e2b1c714344c0d9556fe7"
+digest = "cf0eaf70ef2ef8265ff7621f9b3a3d898bfc3018a570f9fac158c8908868af3c"
 audited = "2026-09-14"
 
 ["commands/check"]
@@ -160,7 +160,7 @@ audited = "2026-09-14"
 
 ["site"]
 updated = "2026-09-14"
-digest = "7ca55794055c5695981e65256f48bc8f2d7593816f78dbdbc163ca0f07a301f8"
+digest = "90897fbe7985313873207e750905f9e50dab91c112e1036073c06b91f2d08c21"
 audited = "2026-09-14"
 
 ["site/agent-markdown"]

@@ -25,7 +25,8 @@
       }).slice(0, 8);
       results.innerHTML = hits.length
         ? hits.map(function (page) {
-            return '<button data-go="' + escape(page.u) + '">' + escape(page.t) +
+            return '<button data-go="' + escape(page.u) + '">' +
+                   (page.p ? '<span class="pp">' + escape(page.p) + " › </span>" : "") + escape(page.t) +
                    "<em>" + escape(page.s) + "</em></button>";
           }).join("")
         : '<button disabled style="color:var(--faint);cursor:default">No page matches</button>';

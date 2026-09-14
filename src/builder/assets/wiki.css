@@ -81,6 +81,8 @@ code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;backgroun
   background:none;cursor:pointer;padding:6px 8px;font:13px/1.3 inherit;color:var(--link)}
 .res button:hover{background:var(--shade)}
 .res em{display:block;font-style:normal;font-size:11px;color:var(--faint)}
+/* The pages above a result, before its title, so two pages that share a title can be told apart. */
+.res .pp{color:var(--faint)}
 /* A section is set apart from the pages in it: a line above it across the whole rail, and its name in
    small capitals in the text colour. */
 .rail h5{margin:0 calc(-1 * var(--pad-r)) 5px calc(-1 * var(--pad-l));padding:11px var(--pad-r) 0 var(--pad-l);

@@ -39,7 +39,7 @@ each must be a positive whole number.[^config]
 
 A page is counted from its markdown, **leaving out its references and code blocks**, so citing costs
 nothing and a sample to copy, such as a prompt, costs nothing either.[^count]
-Words are split on spaces, so a table's borders count as words too.[^count]
+A table counts only the words in its cells, not its borders.[^count]
 
 The goals page is not held to the page limit.[^goals] What it collects is measured against the goals limit
 instead.[^goals]
@@ -58,8 +58,9 @@ measured.[^calibrated]
 [^defaults]: `src/builder/config.py` — `DEFAULT_BUDGET`.
 [^config]: `src/builder/config.py` — `read_config()` merges
     `[budget]` over the defaults and refuses one that is not a positive integer.
-[^count]: `src/builder/build.py` — `read_pages()` counts the words left after
-    `strip_footnote_definitions()` and `FENCED` remove references and code blocks.
+[^count]: `src/builder/build.py` — `counted_words()` counts the words left after
+    `strip_footnote_definitions()` and `FENCED` remove references and code blocks, and drops a table's
+    `TABLE_SEPARATOR` lines and pipes.
 [^goals]: `src/builder/build.py` — `budget_problems()` skips `GOALS_ID`
     for the page limit and compares `goals_words` with the goals limit.
 [^over]: `src/builder/build.py` — `budget_problems()`.
