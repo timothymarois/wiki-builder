@@ -2,7 +2,6 @@
 title = "Local server"
 subtitle = "reading a wiki with its sources beside it"
 status = "approved"
-categories = ["Commands"]
 intent = """
 The local server exists so that following a citation lands on the code it names, readable in the browser,
 rather than on a download or a dead link. What a person sees should always be what was just built.

@@ -51,15 +51,18 @@ inside it.
 | File | Holds |
 |---|---|
 | `SKILL.md` | How to write a page: the intent contract, naming, what may never appear, the voice |
-| `references/the-standard.md` | The worked example — a page done well, the same content done badly, and the difference |
+| `references/page-standard.md` | The worked example — a page done well, the same content done badly, and the difference |
+| `references/reference-standard.md` | The same for reference pages — a command and an endpoint, each done well and badly |
+| `references/naming-and-grammar.md` | Names a writer chooses and names the software owns, and the grammar pages are held to |
+| `references/reference-pages.md` | How a page documents a command, endpoint, function, settings file or event |
 
-`wiki sync` writes both into the consuming project, where its agents read them. A built wheel carries
+`wiki sync` writes every one of them into the consuming project, where its agents read them. A built wheel carries
 them inside the package; a checkout leaves them where they were written, and `build.skill_dir()` finds
 them either way.
 
-## Tests (`tests/` — 96 cases)
+## Tests (`tests/` — 101 cases)
 
-`tests/test_build.py` (1057 lines). Each case builds a small wiki in a temporary directory, breaks exactly
+`tests/test_build.py` (1103 lines). Each case builds a small wiki in a temporary directory, breaks exactly
 one rule, and asserts the tool names it. Run them with:
 
 ```sh

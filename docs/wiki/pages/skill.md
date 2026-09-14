@@ -2,7 +2,6 @@
 title = "Skill"
 subtitle = "how an agent learns to write a page"
 status = "approved"
-categories = ["Commands"]
 intent = """
 The skill exists so that an agent writing a page, in any project, writes it the way the owner approved
 without each project inventing its own rules. A change to those rules should reach a project only when
@@ -21,7 +20,8 @@ rows = [
 group = "Contents"
 rows = [
   { label = "Instructions", value = "SKILL.md" },
-  { label = "Worked example", value = "references/the-standard.md" },
+  { label = "Worked examples", value = "page-standard.md, reference-standard.md" },
+  { label = "Rules", value = "naming-and-grammar.md, reference-pages.md" },
 ]
 
 [[infobox]]
@@ -33,8 +33,9 @@ rows = [
 +++
 
 The **skill**, `writing-wiki-pages`, is the half of the tool that is not code: instructions for writing
-a page in `SKILL.md`, and a worked example of one page written well and badly in
-`references/the-standard.md`.[^files] `wiki sync` copies it into the project, where agents
+a page in `SKILL.md`, and a `references` folder beside it. That folder holds the rules for naming,
+grammar and reference pages, and two worked examples, one for an ordinary page and one for a reference
+page, each written well and badly.[^files] `wiki sync` copies it into the project, where agents
 read it.[^sync] The rules it teaches are enforced by the [Checks](checks.md).
 
 ## Home
@@ -58,8 +59,8 @@ the release without writing the skill, and asking for both at once is refused.[^
 `wiki sync`.[^version] A newer release can add a check, and a new check finds old pages; the record makes
 that failure expected rather than surprising.[^version]
 
-[^files]: `src/builder/cli.py` — `SKILL_NAME` names the skill; `sync()` copies `SKILL.md` and
-    `references/the-standard.md` from `SKILL`, which
+[^files]: `src/builder/cli.py` — `SKILL_NAME` names the skill; `sync()` copies every markdown file under
+    `SKILL`, which
     `src/builder/build.py` finds with `skill_dir()`.
 [^sync]: `src/builder/cli.py` — `sync()`.
 [^home]: `src/builder/cli.py` — `skill_home()` tries `.agents/skills`, then

@@ -1,11 +1,11 @@
 ---
 name: writing-wiki-pages
-description: Use when writing or changing any page of the wiki under docs/wiki/ — a page, an intent, an infobox, a citation, a picture, or the wording of anything a person reads there. It supplies how the wiki is built, the terms for its parts, the intent contract, what may and may not appear on a page, and the voice. Do not use for engineering documentation written for builders, which follows different rules.
+description: Use when writing or changing any page of the wiki under docs/wiki/ — a page, an intent, an infobox, a citation, a picture, a command or API reference page, or the name or wording of anything a person reads there. It supplies how the wiki is built, the terms for its parts, the intent contract, naming and grammar, how a reference page documents a surface, what may and may not appear on a page, and the voice. Do not use for engineering documentation written for builders, which follows different rules.
 ---
 
-# Write a wiki page
+# Writing wiki pages
 
-**Read [the standard](references/the-standard.md) before you write anything.** It holds the page the owner
+**Read [Page standard](references/page-standard.md) before you write anything.** It holds the page the owner
 approved, the same content written badly, why the difference matters line by line, and a self-edit pass.
 Rules tell you what to avoid; only an example shows what good looks like. A page written from the rules below
 without reading that one comes out **flat and true and unread** — which is the failure this whole skill
@@ -20,7 +20,7 @@ Every rule below serves one job: **the owner sees how the thing works without re
 Nothing here is specific to any one project. The wiki and its generator are meant to be lifted into another
 project whole, and these rules travel with them.
 
-## How the wiki works
+## Wiki structure
 
 You are writing markdown. A generator turns it into a site; you never write HTML.
 
@@ -44,7 +44,7 @@ A project usually runs these through a wrapper script that pins the release; use
 **To add a page**, put the file where it belongs in the tree. Only name it in `wiki.toml` if it starts a
 new branch. To add a page *under* an existing one, put it in a directory named after that page.
 
-## The words for its parts
+## Vocabulary
 
 Use these, in commits, in review and in conversation. They are the names the generator uses.
 
@@ -55,11 +55,13 @@ Use these, in commits, in review and in conversation. They are the names the gen
 - **Citation** — a numbered mark in the prose. **Reference** — its entry at the foot of the page.
 - **Missing citation** — the red mark for a claim with nothing to cite. Written `{missing}`.
 - **Category** — a cross-cutting label; the bar at the foot of a page. Not the sidebar.
+- **Reference page** — a page for something a person calls or configures: a command, an endpoint, a
+  published function, a settings file.
 - **The goals page** — every page's intent, collected. Generated, never written by hand.
 - **Source view** — the Source tab, showing the page's own markdown.
 - **Audience** — `internal` or `player`. Internal is the default; `wiki player` builds the other.
 
-## The intent is the contract
+## Intent
 
 Every page opens with an `intent`: what this system is **for**, and what outcome it should produce. Not
 how it works.
@@ -86,7 +88,7 @@ Then the rule that governs everything else:
 Write the intent first. It decides what the page contains, so writing it last means writing the page
 twice.
 
-## Naming things
+## Naming
 
 Naming is most of what makes a page readable, and it is the thing that goes wrong first. Two settled
 conventions agree, from either side of this problem:
@@ -99,7 +101,12 @@ A wiki has no actions in it. Every name in one — a page, a heading, a category
 a **thing a reader might want**. So every name is a noun phrase, and the failure is always the same: the
 writer names their own question instead of its answer.
 
-### Ask the question, then name the answer
+**Read [Naming and grammar](references/naming-and-grammar.md) before naming anything, before describing a
+name the software owns — a field, an option, a setting — and before the last pass over any page.** It
+holds the rules for each kind of name, the difference between a name you choose and one the software
+owns, and the grammar every page is held to.
+
+### Method
 
 This is the whole method. The question is how you find the section; the answer is what you call it.
 
@@ -114,12 +121,12 @@ This is the whole method. The question is how you find the section; the answer i
 | What is it for? | "What they are for" | **Yield**, **Use**, **Purpose** |
 | What makes it different? | "Two differences, and only two" | **Differences** |
 | Is it any good? | "Fast enough to matter" | Name the subject — **Speed** |
-| What does this file show? | "A worked page" | **The standard** |
+| What does this file show? | "A worked page" | **Page standard** |
 
 A gerund is a noun and is fine: **Spreading**, **Hunting**, **Breeding**. A gerund *phrase* is usually
 the question in disguise — "Growing up" wants to be **Growth**.
 
-### Five tests for a name
+### Tests for a name
 
 From the encyclopedia's own title policy, and they work on headings and categories too. A name should be:
 
@@ -132,9 +139,10 @@ From the encyclopedia's own title policy, and they work on headings and categori
 - **Consistent** — the same kind of thing is named the same way across pages. If one page calls it
   **Ground**, another does not call it "Terrain it accepts".
 
-### Where this applies
+### Names on a page
 
-- **A page title** is the thing the page is about. **Refunds.** **Sessions.** **The nightly run.**
+- **A page title** is the thing the page is about. **Refunds.** **Sessions.** **Nightly run.** No leading
+  "The" unless it is part of what people call the thing.
 - **A heading** is the same, one level down, and the gate refuses a question or a verdict.
 - **A category** is a plural noun for a set: **Wild animals**, not "Animals that are wild".
 - **An infobox label** is a noun phrase naming a property, and the value gives it: **Expiry** · 30
@@ -143,7 +151,7 @@ From the encyclopedia's own title policy, and they work on headings and categori
 **When no good name exists, the section is wrong, not the name.** A heading you cannot name in two words
 is usually two sections, or one section that has not decided what it is about.
 
-## How a page is shaped
+## Page shape
 
 **Answer first, detail after.** This holds at every level: the lead answers the page, the first line of a
 section answers the section, the first clause of a sentence answers the sentence. A reader who stops
@@ -163,7 +171,7 @@ early should still be right.
 - **Split rather than swell.** A subject that needs its own treatment becomes a child page and a link,
   not another heading. The sidebar nests it for you.
 
-## How it reads
+## Voice
 
 - **Say the consequence, not the mechanism.** "An expired session does not lose your draft" — not that
   one configuration value outlives another.
@@ -182,8 +190,22 @@ early should still be right.
   `name.md`, which the tool turns into a clean address.
 - **Plain present tense, no hedging.** "A tree seeds about once every eight days", not "trees will
   generally tend to".
+- **Correct grammar, held across the wiki.** Name the actor, make subjects agree with their verbs, point
+  every pronoun at one thing, and keep lists parallel. The full set, and the words that say nothing, are
+  in [Naming and grammar](references/naming-and-grammar.md).
 
-## Never on a page
+## Reference pages
+
+A page for something a person calls or configures — a command, an endpoint, a function a project
+publishes, a settings file — is a **reference page**. Everything above still applies. The reader and the
+register change: the names the software owns are the content, every input has its type, default and
+meaning, every error is quoted exactly, and the bar is that someone can use the surface correctly from
+the page alone.
+
+**Read [Reference pages](references/reference-pages.md) and [Reference standard](references/reference-standard.md)
+before writing one.**
+
+## Exclusions
 
 These are not style preferences. A page carrying any of them has failed its readers.
 
@@ -204,7 +226,7 @@ nobody and rot fastest.
 **A planned change may appear, clearly marked and never mixed into the description** — one short note, at
 the end. A reader must never have to work out whether a sentence describes today or next month.
 
-## Citing sources
+## Citations
 
 Sources are cited the way an encyclopedia cites them: a numbered mark at the claim, the reference at the
 foot. Write them as markdown footnotes and the generator does the numbering.
@@ -233,7 +255,7 @@ A tree is full-grown six days after it takes root.[^growth]
 - **Links to other pages and pictures are written relative to your own file**, so they resolve while
   reading the markdown *and* in the browser.
 
-## Everything is cited, or marked as uncited
+## Citation coverage
 
 **Every statement of fact, behaviour, rule or consequence carries a reference.** Not most of them, not the
 surprising ones — every one. The owner, 2026-09-14: *"every statement, fact, requirement, logic, beahvior
@@ -246,7 +268,7 @@ The reason is the whole point of the wiki. A reader is using this **instead of**
 sentence they cannot trace is a sentence they must take on faith — and it looks exactly like one that was
 checked. Silence is the failure; **"no source" is a fine answer and silence is not.**
 
-## When there is nothing to cite
+## Missing citations
 
 Write `{missing}` after the claim, or `missing = true` on an infobox row. It renders as a red mark where
 the citation would be.
@@ -258,7 +280,7 @@ why one mark serves both. It is never shown to a player.
 It is also the only sanctioned way to say a thing is not built. Use it where a reader would otherwise
 assume the thing exists, and sparingly: a page that is mostly red marks was written too early.
 
-## The infobox
+## Infobox
 
 The infobox is the page's reference card, the way an encyclopedia's is: a reader glances at it to learn
 what the thing is called, the values that govern it and the rules it keeps, without reading the prose. It
@@ -338,7 +360,7 @@ rows = [
 ]
 ```
 
-[The standard](references/the-standard.md) sets this infobox beside one that fails, and says why.
+[Page standard](references/page-standard.md) sets this infobox beside one that fails, and says why.
 
 ## Pictures
 
@@ -350,7 +372,7 @@ the picture has not been re-made, the gate fails.** Clear it by re-rendering, or
 `wiki bless <picture> "<why it is still true>"` when the change did not alter what the picture
 shows. The reason is the record that someone looked.
 
-## Writing a page truthfully
+## Truthfulness
 
 The page describes **what the thing actually does**, so:
 
@@ -363,7 +385,7 @@ The page describes **what the thing actually does**, so:
 4. **A page and the thing disagreeing means the page is wrong.** It is stale; fix it. A page is never
    grounds for calling the implementation wrong — only the owner says what it ought to do.
 
-## The reading budget
+## Reading budget
 
 A page you consult must answer in about two minutes, and the goals page must be readable in one sitting.
 The gate enforces a word count as the proxy and prints every page's count on every build.
@@ -371,7 +393,7 @@ The gate enforces a word count as the proxy and prints every page's count on eve
 The number is a backstop, not the control. **The control is the intent**: a page inside the budget that
 carries a sentence serving nothing is still wrong, and a page over it is telling you its intent has grown.
 
-## What needs the owner, and what does not
+## Owner approval
 
 - **Changing an intent needs the owner's approval**, quoted where the work is recorded. It changes what
   the thing is trying to be.
@@ -380,7 +402,7 @@ carries a sentence serving nothing is still wrong, and a page over it is telling
 - **If you cannot make your change without altering an intent, stop and ask.** You have found a design
   decision rather than an implementation detail, and it is not yours to make.
 
-## A page is done when
+## Definition of done
 
 1. The intent is two to four sentences and says what the system is for, not how it works.
 2. Every sentence serves the intent; anything that did not is gone.

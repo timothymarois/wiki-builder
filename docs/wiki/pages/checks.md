@@ -17,7 +17,7 @@ rows = [
 [[infobox]]
 group = "Exit codes"
 rows = [
-  { label = "Sound wiki", value = "0" },
+  { label = "Success", value = "0" },
   { label = "Problems", value = "1" },
   { label = "Misuse", value = "2", note = "such as no wiki at the path" },
 ]

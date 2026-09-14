@@ -1,4 +1,4 @@
-# The standard
+# Page standard
 
 Somebody's owner approved the page below and asked that pages be written like it. Read both versions
 before writing anything. **The contrast teaches more than either version alone**, and more than the rules
@@ -9,7 +9,7 @@ will be something else. Nothing about the shape changes.
 
 ---
 
-## The standard
+## Done well
 
 > **Sessions** are how the application remembers who you are between requests. They live in
 > [storage](../storage.md), which is where eviction and replication are described — this page covers what
@@ -37,7 +37,7 @@ will be something else. Nothing about the shape changes.
 > Signing out ends that session and no others. **A second device stays signed in** — there is no "sign
 > out everywhere" yet.
 
-## The failure
+## Done badly
 
 > Sessions are an important part of the authentication subsystem. They are a core concept in the
 > application and have a number of interesting properties worth understanding.
@@ -56,7 +56,7 @@ will be something else. Nothing about the shape changes.
 Everything in the failed version is *true*. That is what makes it worth studying — **it fails without
 lying**. Correct, complete, flat, and nobody reads it.
 
-## The difference
+## Differences
 
 Go through these against your own draft, one at a time.
 
@@ -83,7 +83,7 @@ reader would reach for the thing.
 **Headings name their contents.** Expiry. Size. Signing out. Not "Expiry and timeouts", which says the
 same thing twice, and not "How sessions work", which is the writer wondering what to put there.
 
-## The infobox
+## Infobox
 
 The same page's infobox, to the standard:
 
@@ -143,7 +143,7 @@ the most visible place on the page.
 all in the prose above. The two names are missing only because it is an extract; a real page gives each
 where it introduces the thing, with its reference.
 
-## The self-edit
+## Self-edit
 
 Before you call a page done, read it once for each of these. They are quick and they are not optional.
 
@@ -162,7 +162,7 @@ Before you call a page done, read it once for each of these. They are quick and 
 7. **Read the infobox alone.** Each row should read as a statement a reader could check, and each should
    already be said on the page.
 
-## Three conventions this settles
+## Conventions
 
 **A sibling page is linked as `name.md`.** The tool turns it into a clean address. Writing the address by
 hand looks right, and works in only one of the places a site is read: off disk or published.

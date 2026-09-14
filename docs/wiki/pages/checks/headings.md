@@ -38,12 +38,12 @@ dates" is refused, but "Release notes" passes.**[^verdict]
 ## Scope
 
 Every heading from the second level to the sixth is checked, but the page title is not.[^reach] A line inside a
-code sample that looks like a heading is checked as one.[^reach]
+code sample is not a heading, and is not checked.[^reach]
 
 [^check]: `src/builder/build.py` — `heading_problems()`.
 [^question]: `src/builder/build.py` — `QUESTION_WORD`, matched at the
     start of the heading and ending on a word boundary.
 [^verdict]: `src/builder/build.py` — `EDITORIAL`, which lists
     `matters?`, `note` and `details?` between word boundaries.
-[^reach]: `src/builder/build.py` — `HEADING_LINE` matches two to six `#`
-    at the start of any line of the body, fenced code included; the title is front matter.
+[^reach]: `src/builder/build.py` — `heading_problems()` removes fenced code with `FENCED`, then
+    `HEADING_LINE` matches two to six `#` at the start of a line; the title is front matter.

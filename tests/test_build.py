@@ -247,6 +247,20 @@ class WikiTests(unittest.TestCase):
                 self.write("thing", PAGE.replace("## Speed", "## " + good))
                 self.assertEqual([], wiki.heading_problems(self.root))
 
+    SAMPLE = "Type it like this.[^why]\n\n```sh\nwiki build\n\n## What it prints\n```\n"
+
+    def test_a_code_sample_is_not_prose(self):
+        # A sample is the thing itself, not a claim about it: a blank line inside one does not start a
+        # paragraph that cites nothing, and a line in one that starts with # is not a heading.
+        self.write("thing", PAGE.replace("## Ground", self.SAMPLE + "\n## Ground"))
+        self.assertEqual([], wiki.uncited_problems(self.root))
+        self.assertEqual([], wiki.heading_problems(self.root))
+
+    def test_prose_after_a_code_sample_is_still_checked(self):
+        self.write("thing", PAGE.replace("## Ground", self.SAMPLE + "\nThis says something.\n\n## Ground"))
+        problems = wiki.uncited_problems(self.root)
+        self.assertTrue(any("This says something" in problem for problem in problems), problems)
+
     def test_a_page_with_no_intent_is_refused(self):
         self.write("thing", PAGE.replace('intent = """\nA thing exists so that something else can '
                                          'happen. It should be plain what it is for.\n"""', ""))
@@ -838,6 +852,15 @@ class WikiTests(unittest.TestCase):
                                         "--wiki", str(self.root / "docs/wiki")])
         self.assertEqual(0, status, output)
 
+    def test_the_program_alone_builds_and_serves(self):
+        # `wiki` with no command is `wiki serve`, and serve is the only command that declares a port.
+        from unittest import mock
+        served = []
+        with mock.patch.object(cli, "serve", lambda root, site, port: served.append(port) or 0):
+            status, output = self.run_main(["--root", str(self.root)])
+        self.assertEqual(0, status, output)
+        self.assertEqual([cli.PORT], served)
+
     def test_building_over_a_directory_this_tool_did_not_write_is_refused(self):
         precious = self.root / "precious"
         precious.mkdir()
@@ -974,7 +997,7 @@ class PackageTests(unittest.TestCase):
             cli.sync(root, root / "docs/wiki")
             home = root / ".agents/skills" / cli.SKILL_NAME
             self.assertTrue((home / "SKILL.md").is_file())
-            self.assertTrue((home / "references/the-standard.md").is_file())
+            self.assertTrue((home / "references/page-standard.md").is_file())
             self.assertIn(f'version = "{wiki_version()}"',
                           (root / "docs/wiki" / CONFIG).read_text(encoding="utf-8"))
 
@@ -1010,8 +1033,8 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(0, status, output)
         home = root / "tools/skills" / cli.SKILL_NAME
         self.assertEqual(self.shipped(), (home / "SKILL.md").read_text(encoding="utf-8"))
-        self.assertEqual(self.shipped("references/the-standard.md"),
-                         (home / "references/the-standard.md").read_text(encoding="utf-8"))
+        self.assertEqual(self.shipped("references/page-standard.md"),
+                         (home / "references/page-standard.md").read_text(encoding="utf-8"))
         self.assertFalse((root / ".agents/skills" / cli.SKILL_NAME).exists(),
                          "the skill went where the tool guessed, not where it was told")
 
@@ -1023,6 +1046,19 @@ class PackageTests(unittest.TestCase):
         status, output = self.sync(root, "--skill-dir", "tools/skills")
         self.assertEqual(0, status, output)
         self.assertEqual(self.shipped(), (home / "SKILL.md").read_text(encoding="utf-8"))
+
+    def test_sync_writes_every_file_the_skill_ships(self):
+        root = self.project()
+        status, output = self.sync(root)
+        self.assertEqual(0, status, output)
+        home = root / ".agents/skills" / cli.SKILL_NAME
+        shipped = sorted(path.relative_to(wiki.SKILL) for path in wiki.SKILL.rglob("*.md"))
+        self.assertTrue(shipped, "the skill ships no files")
+        for name in shipped:
+            written = home / name
+            self.assertTrue(written.is_file(), f"sync did not write {name}")
+            self.assertEqual((wiki.SKILL / name).read_text(encoding="utf-8"),
+                             written.read_text(encoding="utf-8"))
 
     def test_sync_can_leave_the_skill_out(self):
         root = self.project()
@@ -1041,13 +1077,23 @@ class PackageTests(unittest.TestCase):
         self.assertIn("not allowed with", output)
         self.assertFalse((root / "tools").exists())
 
+    def test_sync_with_no_settings_file_is_a_sentence_not_a_traceback(self):
+        root = self.project()
+        (root / "docs/wiki" / CONFIG).unlink()
+        status, output = self.sync(root, "--no-skill")
+        self.assertEqual(1, status, output)
+        self.assertIn(f"there is no {CONFIG}", output)
+
     def test_the_skill_names_nothing_about_any_project(self):
         # The skill ships to every project too, and its worked example is the part most likely to carry
         # somebody's animals in it.
         # Asked of the tool rather than assumed: the skill sits beside the builder in a checkout and
         # inside it in a built wheel, and this property has to hold in both.
-        for name in ("SKILL.md", "references/the-standard.md"):
-            text = (wiki.SKILL / name).read_text(encoding="utf-8").lower()
+        shipped = sorted(wiki.SKILL.rglob("*.md"))
+        self.assertGreaterEqual(len(shipped), 2, "no skill files were found to scan")
+        for path in shipped:
+            name = path.relative_to(wiki.SKILL)
+            text = path.read_text(encoding="utf-8").lower()
             for word in self.SOMEBODY_ELSES:
                 self.assertIsNone(re.search(r"\b" + word + r"\b", text),
                                   f"{name} names {word!r}; this package must not know it")

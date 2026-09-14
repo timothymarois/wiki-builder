@@ -942,6 +942,9 @@ def citation_problems(root, wiki=None):
 
 
 HEADING_LINE = re.compile(r"^#{2,6}\s+(.+?)\s*$", re.M)
+# A fenced code sample. It is the thing itself, shown rather than described, so neither its blank lines
+# nor its lines that start with # are prose -- and a reference page is mostly samples.
+FENCED = re.compile(r"^(`{3,}|~{3,})[^\n]*\n.*?^\1[ \t]*$", re.M | re.S)
 # A heading that opens with one of these is a question, and a question is the writer thinking aloud about
 # what to put in the section. Name the thing instead.
 QUESTION_WORD = re.compile(r"^(how|what|where|why|when|which|who|whether)\b", re.I)
@@ -970,7 +973,7 @@ def uncited_problems(root, wiki=None):
         # will. `goals = false` already marks exactly those pages.
         if not meta.get("goals", True):
             continue
-        body = FOOTNOTE.sub("", body)
+        body = FENCED.sub("", FOOTNOTE.sub("", body))
         for block in body.split("\n\n"):
             block = block.strip()
             if not block or block.startswith("#") or block.startswith("!["):
@@ -994,7 +997,7 @@ def heading_problems(root, wiki=None):
     problems = []
     for path in sorted(pages_dir.rglob("*.md")):
         _, body = read_front_matter(path)
-        for heading in HEADING_LINE.finditer(body):
+        for heading in HEADING_LINE.finditer(FENCED.sub("", body)):
             title = heading.group(1)
             if QUESTION_WORD.match(title):
                 problems.append(f"{path.relative_to(pages_dir)}: the heading {title!r} asks a question; "

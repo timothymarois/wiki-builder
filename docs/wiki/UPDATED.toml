@@ -10,7 +10,7 @@ digest = "5233e4e58ab2e2b9e0b1d5fed2e2795bd208069b01c8d731e1de69430a9c7dc6"
 
 ["checks"]
 updated = "2026-09-14"
-digest = "b928d9994947fbc36f2d49d6a34c9fd54f3c2611e8c6cbf676ef1f31cd4ccdd0"
+digest = "08aa8b8249e3b339ae70cf29fb89dd519ceac3ae84c047ac289a13d85551656c"
 
 ["checks/budgets"]
 updated = "2026-09-14"
@@ -18,23 +18,55 @@ digest = "2b54162e7c78c54d12ff17dac29666bff78fe2b19ba935f1e065a4dbea47607d"
 
 ["checks/citations"]
 updated = "2026-09-14"
-digest = "20c6cf66421a4a307a87328b20abffd0f95e121dafbf3f30d243f5c9abf608a2"
+digest = "51daa0dcb6f8bae1a323785d0d447d914e1910f6dbfed01e48e64da784a3f255"
 
 ["checks/headings"]
 updated = "2026-09-14"
-digest = "b59a24a054dae72c8977e35955d199272a198c15a9e41e628e0bbd0b6d17dfe4"
+digest = "cb523e168067dbaf1dd0d8476f57ddfac65ddfef930556d601b89b10a249c58c"
 
 ["checks/pictures"]
 updated = "2026-09-14"
 digest = "377c9412188c61d840262f773f34342e01ed3386f412fba387c98a7e6889c3d3"
 
+["commands"]
+updated = "2026-09-14"
+digest = "5526ba798983aaf581f65d77561a8ab2368cf1311cab58ea5af26e5126cef118"
+
+["commands/bless"]
+updated = "2026-09-14"
+digest = "5e27caa5f7302a303ea80bdcdb108ffcfef86648c0939e9f75b685193e661dea"
+
+["commands/build"]
+updated = "2026-09-14"
+digest = "ce48cab86389be07f6ec6b3c27c1f65d66d89524238a91ef23e28a5560305a80"
+
+["commands/check"]
+updated = "2026-09-14"
+digest = "1ed6aa89e63525c4ad55876b8eb6c4ee60d04ff92ddac05c21001f5c87406859"
+
+["commands/player"]
+updated = "2026-09-14"
+digest = "0e3b1eb9db451713a7729e5968f20aa5789635c96014c4bb5b28ac01f3d1f17a"
+
+["commands/publish"]
+updated = "2026-09-14"
+digest = "33d37d1360f7aaf1c8e80456d0c312b902a5b62d778ef4da1fd82b3c7ceea6c6"
+
+["commands/serve"]
+updated = "2026-09-14"
+digest = "8900c52c99277cf017b6010ca6aa4a890fe78fe6e5b164a28ed817cb8a2f60d9"
+
+["commands/sync"]
+updated = "2026-09-14"
+digest = "b2898c941b486befc66c5d5a5e3a5b62c23eced6c3ea362afb479c03f4fd826d"
+
 ["goals"]
 updated = "2026-09-14"
-digest = "9f45e61683a3c4c884f7cc18dee33289204a9f5fd7d95cca5ce77c516c623e68"
+digest = "e4da15cf536a93c2cb994b2eee07563c37649fe0d635111f3b271d77212b783e"
 
 ["index"]
 updated = "2026-09-14"
-digest = "2c22626a3c90f70462ab579d38242fe76ba6e321c0dfabe3d61911c6ef28afcc"
+digest = "eb03f6e19952b36f0931d23b7fd9b76e57f9aa86476a921cf6b97313493d14da"
 
 ["pages"]
 updated = "2026-09-14"
@@ -42,12 +74,12 @@ digest = "8c17119e893149b2e5804c749e7fda55fcdf912de8ae071eefa3748e48ab8afa"
 
 ["serving"]
 updated = "2026-09-14"
-digest = "21d5f2f1270a335de3d77a90126d856748477d21970e9fb0fe69a3ae6379a17b"
+digest = "3b34cd8a140a87f256fd3976a05b62b9817a499bb37a831a3a68281833906dbc"
 
 ["site"]
 updated = "2026-09-14"
-digest = "d817d32ea3662612ad1ac02c17c5afc328658204addad67fa53ec3930ad07cc6"
+digest = "a6504c0c422ff9ab143fdb5417ce0c3b1fa265d45fe1ffaa227aadae36b15737"
 
 ["skill"]
 updated = "2026-09-14"
-digest = "9e9ca228df4d14612c9e632f5553f5b335cdea3c81db5dac3667cd0e6f51725b"
+digest = "bbabc0974908914af15bf9ff2e76ea19cc12abb2cc4e3618ec47e71805e08aa6"

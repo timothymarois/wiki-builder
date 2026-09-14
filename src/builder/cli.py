@@ -50,10 +50,11 @@ def sync(root, wiki, skill=True, directory=None):
     written = []
     if skill:
         home = skill_home(root, directory)
-        (home / "references").mkdir(parents=True, exist_ok=True)
-        for source, destination in ((SKILL / "SKILL.md", home / "SKILL.md"),
-                                    (SKILL / "references" / "the-standard.md",
-                                     home / "references" / "the-standard.md")):
+        # Every file the skill ships, found rather than listed: a reference added to the skill and
+        # missing from a list here would never reach a project, and nothing would say so.
+        for source in sorted(SKILL.rglob("*.md")):
+            destination = home / source.relative_to(SKILL)
+            destination.parent.mkdir(parents=True, exist_ok=True)
             text = source.read_text(encoding="utf-8")
             if not destination.is_file() or destination.read_text(encoding="utf-8") != text:
                 destination.write_text(text, encoding="utf-8", newline="\n")
@@ -105,22 +106,24 @@ def main(argv=None):
     synced = commands.add_parser("sync", parents=[place],
                                  help="write the skill into this project and record the release")
     skill = synced.add_mutually_exclusive_group()
-    skill.add_argument("--skill-dir", type=Path, default=None,
+    skill.add_argument("--skill-dir", type=Path, default=None, metavar="DIR",
                        help="the folder to put the skill in, relative to the project; defaults to "
                             ".agents/skills, or .claude/skills")
     skill.add_argument("--no-skill", action="store_true",
                        help="record the release without writing the skill")
     served = commands.add_parser("serve", parents=[place], help="build, serve, and open a browser at it")
-    served.add_argument("--port", type=int, default=PORT)
+    served.add_argument("--port", type=int, default=PORT, help=f"the port to serve on; defaults to {PORT}")
     published = commands.add_parser("publish", parents=[place],
                                      help="build with clean addresses, for a host")
-    published.add_argument("out", type=Path)
+    published.add_argument("out", type=Path, metavar="OUT",
+                           help="the folder to build into, relative to the working directory")
     player = commands.add_parser("player", parents=[place], help="build the player's view into a directory")
-    player.add_argument("out", type=Path)
+    player.add_argument("out", type=Path, metavar="OUT",
+                        help="the folder to build into, relative to the working directory")
     blessed = commands.add_parser("bless", parents=[place],
                                   help="record that a picture is still true, and why")
-    blessed.add_argument("picture")
-    blessed.add_argument("reason")
+    blessed.add_argument("picture", metavar="PICTURE", help="the picture's file name, as its record names it")
+    blessed.add_argument("reason", metavar="REASON", help="why the picture is still true; it cannot be empty")
 
     args = parser.parse_args(argv)
     root = args.root.resolve()
@@ -170,5 +173,7 @@ def run(args, root, wiki):
     if command == "publish":
         print(f"wiki: {out} uses clean addresses and needs a server; the site itself opens without one")
     if command == "serve":
-        return serve(root, out.relative_to(root) if out.is_relative_to(root) else out, args.port)
+        # `wiki` with no command serves too, and only the serve command declares a port.
+        return serve(root, out.relative_to(root) if out.is_relative_to(root) else out,
+                     getattr(args, "port", PORT))
     return 0

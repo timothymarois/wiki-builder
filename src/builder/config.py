@@ -50,8 +50,11 @@ def record_version(wiki_dir, version):
     tool that reformats it every time it touches it is a tool people stop running.
     """
     path = wiki_dir / CONFIG
+    if not path.is_file():
+        raise WikiError(f"there is no {CONFIG} in {wiki_dir}; write one with a [site] name and at least one "
+                        "[[section]], then run `wiki sync` again")
     text = path.read_text(encoding="utf-8")
-    line = 'version = "%s"' % version
+    line ='version = "%s"' % version
     if "[tool]" in text:
         out, seen = [], False
         for row in text.splitlines():

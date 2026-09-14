@@ -2,7 +2,6 @@
 title = "Site"
 subtitle = "what a build makes"
 status = "approved"
-categories = ["Commands"]
 intent = """
 The site exists so that pages can be read by someone who will never open the markdown, wherever they
 happen to open it. It should be impossible for the site to be out of date, and nothing a reader sees

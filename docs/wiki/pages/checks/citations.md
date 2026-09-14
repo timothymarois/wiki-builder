@@ -19,6 +19,7 @@ rows = [
 group = "Rules"
 rows = [
   { label = "Unit checked", value = "paragraph" },
+  { label = "Code samples", value = "not checked" },
   { label = "Refused reference", value = "a link to a markdown document" },
   { label = "Exempt pages", value = "pages about the wiki itself" },
 ]
@@ -35,7 +36,8 @@ If one does not, the check names the page and quotes the start of the paragraph.
 
 The check works **by paragraph, not by sentence**: one citation anywhere in a paragraph covers all of
 it.[^uncited] A paragraph written directly under its heading, with no blank line between them, is not
-checked at all.[^heading]
+checked at all.[^heading] A code sample needs no citation, because it is the thing itself rather than a
+claim about it; the sentence introducing it does.[^sample]
 
 Pages about the wiki itself, such as the front page, are excused.[^exempt]
 
@@ -60,6 +62,8 @@ a reference that names nothing at all.[^document]
     body on blank lines and accepts a block containing any footnote or `CLAIM` match.
 [^heading]: `src/builder/build.py` — `uncited_problems()` skips any block
     that starts with `#`.
+[^sample]: `src/builder/build.py` — `uncited_problems()` removes fenced code with `FENCED` before
+    splitting the body.
 [^exempt]: `src/builder/build.py` — `uncited_problems()` skips a page
     whose front matter says `goals = false`.
 [^mark]: `src/builder/build.py` — `MISSING` and `MISSING_CITATION`,
