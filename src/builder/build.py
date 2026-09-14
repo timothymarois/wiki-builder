@@ -106,7 +106,7 @@ FOOTNOTE_DEFINITION = re.compile(r"^\[\^[^\]]+\]:.*(?:\n(?:[ \t]+.*|))*", re.M)
 # wrapper, or raw HTML someone pasted -- and the strip would then truncate and leak the rest of the
 # block into a user build. Nothing this renderer emits ever nests an <aside>.
 INTERNAL_BLOCK = re.compile(r'<aside class="cites"[^>]*>.*?</aside>', re.S)
-INTERNAL_MARKER = re.compile(r'<sup class="ref[^"]*">.*?</sup>', re.S)
+INTERNAL_MARKER = re.compile(r'<sup class="ref[^"]*"[^>]*>.*?</sup>', re.S)
 
 # A missing citation. Every statement on a page is either traced to the code or marked here, in the place
 # a reader already looks for a source. The owner, 2026-09-14: "every statement, fact, requirement, logic,

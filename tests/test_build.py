@@ -1266,6 +1266,16 @@ class WikiTests(unittest.TestCase):
         self.assertNotIn('class="ref"', page)
         self.assertFalse((self.out / "thing/source/index.html").exists())
 
+    def test_a_user_build_carries_no_missing_mark(self):
+        # The red mark carries a title and an audience beside its class, so a pattern that expects the class
+        # to end the tag misses it, and a user reads a mark the wiki promises they never see.
+        self.write("thing", PAGE.replace('categories = ["Things"]',
+                                         'categories = ["Things"]\naudience = "user"'))
+        self.build("user")
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertNotIn("nocite", page)
+        self.assertNotIn("[?]", page)
+
     # --- the build itself ------------------------------------------------------------------------
 
     def test_the_generator_never_writes_to_a_page(self):
