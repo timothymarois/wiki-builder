@@ -12,7 +12,11 @@ pages = ["index", "brief", "goals"]
 
 [[section]]
 title = "Guides"
-pages = ["installation", "continuous-integration", "deployment-github", "deployment-cloudflare"]
+pages = ["installation", "continuous-integration"]
+
+[[section]]
+title = "Deployment"
+pages = ["deployment-github", "deployment-cloudflare"]
 
 [[section]]
 title = "Writing"
