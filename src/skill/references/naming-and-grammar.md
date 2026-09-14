@@ -84,6 +84,9 @@ In prose and tables, a name the software owns is formatted as code — `retry_li
 punctuation even at the start of a sentence; better, rewrite the sentence so it does not start with one.
 Infobox values render as plain text, so write them there exactly as typed and without backticks.
 
+Text the software shows a person is formatted the same way, word for word: a label, a button, a message.
+The gate reads no code, so a word it refuses in prose is left alone where the interface uses it.
+
 Anything longer than one line — two commands, a command and its output, a settings file, a request — is a
 fenced code block with its language named, never a run of inline code one line at a time.
 
@@ -188,9 +191,10 @@ two ways. These rules settle most cases.
   it", not "When a reader cannot reach it, a draft is refused."
 - **One idea per sentence.** A sentence that needs reading twice is two sentences.
 - **A pronoun points at one thing.** When "it" or "this" could mean either of two nouns, name the noun.
-- **Name the project; never point at it.** "This repository", "this wiki", "this tool" and "our site" mean
-  nothing to a reader who arrived from a search or a link: write the project's name. The gate refuses
-  them outside code, where a message the software prints is quoted as it is.
+- **Name the nearest actor; never point at the project.** "This repository", "this wiki", "this tool" and
+  "our site" mean nothing to a reader who arrived from a search or a link. Name the part of the system
+  that acts, such as the results page or the server, and write the project's name only where no nearer
+  part acts. The gate refuses them outside code, where a message the software prints is quoted as it is.
 - **No fragments in prose.** A fragment is right in a table cell, an infobox value or a caption, and wrong
   in a paragraph.
 - **Parallel lists.** Every item in a list starts with the same part of speech and has the same shape.

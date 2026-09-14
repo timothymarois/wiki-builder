@@ -1,7 +1,7 @@
 # Reference pages
 
 Read this before writing a page for something a person calls or configures: a command, an HTTP
-endpoint, a function a project publishes, an event, or a settings file. [Reference
+endpoint, a function a project publishes, an event, a settings file, or a form. [Reference
 standard](reference-standard.md) shows a command page and an endpoint page done well and done badly,
 and [Naming and grammar](naming-and-grammar.md) holds the rules for the names these pages are made of.
 
@@ -62,6 +62,9 @@ Sections in this order. Leave out a section that does not apply; never write an 
 
 ### Settings file
 
+Only for a file the project defines and a person edits. A setting of anything else is a sentence on the
+page whose behaviour it changes.
+
 | Section | Holds |
 |---|---|
 | Location | where the file lives, and its format |
@@ -76,6 +79,16 @@ Sections in this order. Leave out a section that does not apply; never write an 
 | Trigger | what has happened when it is sent |
 | Payload | Field · Type · Meaning |
 | Delivery | ordering, repeats and retention, only as far as the code establishes them |
+
+### Form
+
+A form, or a flow of questions. Every question, answer and message is copied from the interface, word for
+word, in code formatting.
+
+| Section | Holds |
+|---|---|
+| Flow | one diagram of the question groups in order, then one diagram per group for its branches, so each stays within about ten steps |
+| Groups | a table per question group: # · Question · Answers · Required · Shown when · Field |
 
 ## Contract
 
