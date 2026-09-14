@@ -1,14 +1,15 @@
 ---
 name: writing-wiki-pages
-description: Use when writing or changing any page of the wiki under docs/wiki/ — a page, an intent, an infobox, a citation, a picture, a command or API reference page, or the name or wording of anything a person reads there. It supplies how the wiki is built, its vocabulary, the intent contract, naming and grammar, reference pages, what a page may never carry, and the voice. Do not use for engineering documentation written for builders, which follows different rules.
+description: Use when writing, updating, reviewing or fixing the pages of a wiki that the `wiki` command builds and checks — a folder holding `wiki.toml` and `pages/` — including a new page, a page the code has moved on from, an owner's requirement not built yet, a failing `wiki check`, or the name or wording of anything a reader sees there. It supplies the page contract, citations, naming, voice, and the steps for each of those tasks. Do not use for documentation written for builders, such as a README, codemap or contributing guide.
 ---
 
 # Writing wiki pages
 
-**Read [Page standard](references/page-standard.md) before writing anything.** It holds a page written to the
-standard, the same content written badly, and why the difference matters. Rules say what to avoid; only an
-example shows what good looks like. A page written from these rules alone comes out **flat, true and
-unread** — the failure this skill exists to prevent, and the one that does not announce itself.
+**Read [Page standard](references/page-standard.md) before writing a page or restructuring one.** It holds
+a page written to the standard, the same content written badly, and why the difference matters. Rules say
+what to avoid; only an example shows what good looks like. A page written from these rules alone comes out
+**flat, true and unread** — the failure this skill exists to prevent, and the one that does not announce
+itself.
 
 **The wiki is for people, not builders.** Its readers are the project's owner, and later its users and
 product people. They do not read code and must never need to. A reader who has read the source learns
@@ -18,26 +19,81 @@ nothing new from a page; a reader who never has understands all of it. Every rul
 Nothing here is specific to one project. These rules travel with the wiki into any project that installs
 it.
 
+## Tasks
+
+Find the task, follow its steps, and apply the sections below as each step needs them. Run `wiki` through
+the project's wrapper script if it has one. A change of a few words — a label, a heading, one sentence —
+needs [Naming and grammar](references/naming-and-grammar.md) rather than the page standard.
+
+### New page
+
+1. Read [Page standard](references/page-standard.md). For a command, endpoint, published function, event
+   or settings file, read [Reference pages](references/reference-pages.md) and
+   [Reference standard](references/reference-standard.md) too.
+2. Read the code the page describes. Every statement comes from it, the owner's words, or an outside
+   service's own documentation.
+3. Write the intent first, from the owner's words, set `status = "draft"`, and ask the owner to approve it.
+4. Put the file where it nests, cite every sentence, and add a row to any page that lists its siblings.
+5. Run `wiki check`, then the self-edit at the end of Page standard.
+
+### Change in the code
+
+1. Find the pages the change affects: search the pages for each changed file's path, and for each name
+   the change touched that a person uses, such as a command, option or setting.
+2. Read each sentence that cites the changed code against the code as it is now, and correct both what the
+   sentence says and what its reference names.
+3. Give anything new a person can use, configure or notice its page or a section, in the same change.
+4. Replace each `{missing}` the change implements with a citation to the code that does it.
+5. Run `wiki check`.
+
+### Requirement not built yet
+
+1. Write each statement the owner gave on the page it belongs to, marked `{missing}`, as
+   [Missing citations](#missing-citations) describes. A thing not built at all gets its own draft page.
+2. Write nothing the owner did not say. List what they left undecided, and ask.
+3. Run `wiki check`.
+
+### Failing check
+
+1. Read every problem `wiki check` names; each says what to change.
+2. Give a sentence with no citation the reference that establishes it, or `{missing}`, or cut it when it
+   serves nothing in the intent. A reference that does not establish its sentence is not a citation.
+3. Change nothing the problems do not name, and run `wiki check` again.
+
+### Review
+
+1. Read this skill and every reference in full: they are the standard. Report findings, and edit a page
+   only when the owner asked for fixes.
+2. Run `wiki check` and record its result. It proves that every sentence cites something, not that what
+   it cites is true.
+3. Open every file and function each page cites, and confirm it does exactly what the sentence says:
+   numbers, defaults, names, messages and exit codes.
+4. Inventory the part of the code under review, as [Coverage](#coverage) describes, and name what no page
+   covers.
+5. Report each finding by page and line, with what is wrong and the fix, most severe first: false,
+   undocumented, uncited, stale, writing.
+6. Run `wiki audit` with every page reviewed that had no finding, leaving out any page that says
+   `goals = false`.
+
 ## Wiki structure
 
-You write markdown; the generator writes the site.
+You write markdown; the generator writes the site. The wiki is `docs/wiki` unless the project passes
+`--wiki`, and `<wiki>` below means that folder.
 
 | Thing | Where | What it does |
 |---|---|---|
-| A page | `docs/wiki/pages/**.md` | TOML front matter between `+++` fences, then markdown |
+| A page | `<wiki>/pages/**.md` | TOML front matter between `+++` fences, then markdown |
 | Its address | its path | `pages/billing/invoices/refunds.md` is `/billing/invoices/refunds/` |
 | Its place | its path | it nests under `pages/billing/invoices.md` in the sidebar |
-| The sidebar | `docs/wiki/wiki.toml` | sections name only the pages that **start** a branch |
-| Pictures | `docs/wiki/images/` | with `PICTURES.toml`, recording what each shows |
-| The site | `docs/wiki/site/` | generated, ignored by git, rebuilt before it is served |
-| Dates | `docs/wiki/UPDATED.toml` | written by the build; a date moves only when its page does, and an audit date only with `wiki audit` |
+| The sidebar | `<wiki>/wiki.toml` | sections name only the pages that **start** a branch |
+| Pictures | `<wiki>/images/` | with `PICTURES.toml`, recording what each shows |
+| The site | `<wiki>/site/` | generated, ignored by git, rebuilt before it is served |
+| Dates | `<wiki>/UPDATED.toml` | written by the build; a date moves only when its page does, and an audit date only with `wiki audit` |
 
 ```sh
 wiki serve    # build, serve, open a browser
 wiki check    # what the gate runs
 ```
-
-Run them through the project's wrapper script if it has one.
 
 **To add a page**, put its file where it belongs: a page in a folder named after another page nests under
 it. Name it in `wiki.toml` only when it starts a new branch.
@@ -66,8 +122,8 @@ it works.
 
 ```toml
 intent = """
-Refunds exist so that a customer who was charged wrongly gets their money back without the customer having to
-ask us twice. A refund that needs a support conversation has failed. It should be possible to issue one
+Refunds exist so that a customer who was charged wrongly gets their money back without having to ask
+twice. A refund that needs a support conversation has failed. It should be possible to issue one
 in seconds and impossible to issue one by accident.
 """
 ```
@@ -129,7 +185,10 @@ From the encyclopedia's title policy, for titles, headings and categories alike.
 
 - **A page title** is the thing the page is about: **Refunds**, **Sessions**, **Nightly run**. No leading
   "The" unless it is part of the name.
-- **A heading** is the same, one level down. The gate refuses a question or a verdict.
+- **A heading** is the same, one level down. It is never a question: "Where it is stored" is the writer
+  wondering what belongs there, and the reader wanted **Storage**. It is never a verdict: "Fast enough to
+  matter", "Important notes" and "Overview" rate the contents instead of naming them. The gate refuses a
+  heading opening How, What, Where, Why or When, and one that rates itself.
 - **A category** is a plural noun for a set: **Background jobs**, not "Jobs that run in the background".
 - **An infobox label** is a noun phrase naming a property, which the value gives: **Expiry** · 30 minutes.
 - **Nothing points; everything is named.** "This site", "Our setup" and "These options" point at the page
@@ -147,12 +206,7 @@ the section, a sentence's first clause answers the sentence. A reader who stops 
 - **The lead stands alone.** Whoever reads only the first paragraph gets the true shape of the thing,
   surprising fact included.
 - **A heading is a label on a drawer**: it names what is inside, so a scanning reader knows whether to stop.
-  One or two plain words is usually right.
-  - **Never a question.** "Where it is stored" is the writer wondering what belongs there; the reader
-    wanted **Storage**. A heading opening How, What, Where, Why or When makes this mistake, and **the gate
-    refuses it.**
-  - **Never a verdict.** "Fast enough to matter", "Important notes" and "Overview" rate the contents
-    instead of naming them. **The gate refuses these too.**
+  One or two plain words is usually right, named as [Naming](#naming) describes.
 - **Three to five sections.** More, and the page is two pages.
 - **Split rather than swell.** A subject that needs its own treatment becomes a child page and a link, not
   another heading; the sidebar nests it.
@@ -187,8 +241,8 @@ the section, a sentence's first clause answers the sentence. A reader who stops 
 - **Code longer than one line is a code block**, fenced and with its language named: two commands, a
   command and its output, a settings file, a request. One name or one short command inside a sentence
   stays inline, as code.
-- **Correct grammar.** Name the actor, make subjects agree with their verbs, point each pronoun at one
-  thing, keep lists parallel. The rest, and the words that say nothing, are in
+- **Correct grammar.** Make subjects agree with their verbs, point each pronoun at one thing, and keep
+  lists parallel. The rest, and the words that say nothing, are in
   [Naming and grammar](references/naming-and-grammar.md).
 
 ## Reference pages
@@ -304,80 +358,19 @@ correct: it is the idea, stated plainly, waiting for its code.
 
 ## Infobox
 
-The infobox is the page's reference card: a reader glances at it for the thing's name, the values that
-govern it and the rules it keeps. It summarises the page, and **never says anything the page does not.**
+The infobox is the page's reference card: the thing's names, the values that govern it and the rules it
+keeps. It summarises the page, and **never says anything the page does not.**
 
-### Contents
-
-Rows come in three groups, in this order:
-
-| Group | Holds | Rows, for a page about sessions |
-|---|---|---|
-| **Identity** | The names a person uses to find, run or change the thing, exactly as they type or search for them | Cookie · session_id; Setting · session.timeout |
-| **Values** | The figures that govern it — limits, defaults, durations, counts — in units a reader can feel | Expiry · 30 minutes; Size limit · 4 kB |
-| **Rules** | Its core logic, each in a phrase: what it refuses, what always happens, what never does | Overflow · refused, never truncated; Signing out · this device only |
-
-- **A named thing opens with its name.** A page about a command, a skill, a setting or a service starts
-  with a **Name** row giving the name exactly, so a reader who knows it recognises the page.
-- **Identity holds the names a person uses**: what they type, search for, open or configure. Never a
-  function, class or internal id; those belong in the references.
-- **A group is named for what it holds**: Identity, Values and Rules, or something more precise when every
-  row shares it — **Limits**, **Defaults**, **Exit codes**, **Contents**. Never "Info", which names nothing.
-- **Leave out** what a reader never looks up: every setting there is, a value that needs a sentence, anything the
-  thing does not do.
-- **Every row cites.** A row carries `cite = "<footnote>"`, naming a footnote the page's prose cites for
-  the same fact, and renders with that citation's number. A row with nothing to cite carries
-  `missing = true`. **The gate refuses a row with neither, or one citing a footnote no sentence uses**: a
-  row is a claim in the most visible place on the page.
+- **Groups, in order**: Identity, the names a person types or searches for; Values, the figures that
+  govern it, in units a reader can feel; Rules, what it refuses, always does or never does.
+- **A label is a noun phrase and its value completes it**: "Expiry · 30 minutes". The gate refuses a value
+  that is only yes, configurable, varies or depends.
+- **Every row cites** a footnote the prose cites for the same fact, or carries `missing = true`. The gate
+  refuses a row with neither, or one citing a footnote no sentence uses.
 - **Two to eight rows.** More is the prose again, as a table.
 
-### Labels and values
-
-A label names a property and its value gives it, so the pair reads as a statement: "Expiry · 30 minutes"
-is *the expiry is thirty minutes*.
-
-- **A label is a noun phrase in sentence case**: **Name**, **Expiry**, **Size limit**, **Default port**.
-  Never a verb ("Expires"), a question ("How long it lasts") or a clause. Singular for one value, plural
-  for a list: **Command** · wiki sync; **Commands** · wiki build, wiki publish.
-- **A value is a name, a figure or a short phrase**, with no full stop: a name exactly as typed; a figure
-  with its unit, such as 30 minutes or 4 kB; a rule as a phrase, such as "refused, never truncated"; a list
-  separated by commas. A value that needs a subject and a verb belongs in the prose.
-- **Never a hedge or a yes.** "Configurable", "varies" and "yes" give a reader nothing to check. Give the
-  default or the condition, or drop the row. The gate refuses a value that is only yes, configurable,
-  varies or depends.
-- **One property, one label, on every page.** If one page says **Command**, no page says "Run with".
-- **A `note`** is the one clause that stops a value being misread, such as "after the last request".
-  Never a second value.
-- **`link = "https://…"`** links the value to an address outside the wiki, such as an author's site. A
-  page is linked from the text, never from a row.
-- **`missing = true`** renders the red mark beside a value nothing implements, or whose implementation has not been found.
-- **`guaranteed = "<requirement id>"`** records the requirement a row satisfies, for whoever next checks
-  the page against the code. It is never rendered.
-
-```toml
-[[infobox]]
-group = "Identity"
-rows = [
-  { label = "Cookie", value = "session_id", cite = "cookie" },
-  { label = "Setting", value = "session.timeout", cite = "timeout" },
-]
-
-[[infobox]]
-group = "Limits"
-rows = [
-  { label = "Expiry", value = "30 minutes", note = "after the last request", cite = "expiry" },
-  { label = "Size limit", value = "4 kB", cite = "size" },
-]
-
-[[infobox]]
-group = "Rules"
-rows = [
-  { label = "Overflow", value = "refused, never truncated", cite = "size" },
-  { label = "Signing out", value = "this device only", cite = "signout" },
-]
-```
-
-[Page standard](references/page-standard.md) sets this infobox beside one that fails, and says why.
+**Read [Infobox](references/infobox.md) before writing or changing one.** It holds each group, label and
+value, the keys a row takes, and an example.
 
 ## Diagrams
 
@@ -391,17 +384,6 @@ place, which kind to draw, its shapes, direction and labels, and a draft beside 
   arrow is something the cited code does. Never draw a step the code does not have.
 - **Name its parts as the page does**: the same words for the same things.
 - **One question per diagram**, answered in about ten steps at most.
-
-````markdown
-A refund is issued only once its charge is found; otherwise the request is refused.[^refund]
-
-```mermaid
-flowchart LR
-  requested(["Refund requested"]) --> find["Find the charge"] --> found{"Charge found?"}
-  found -- "Yes" --> issue["Issue the refund"] --> issued(["Refund issued"])
-  found -- "No" --> refused(["Request refused"])
-```
-````
 
 ## Pictures
 
@@ -447,7 +429,8 @@ complete, or what you would have built.
 ## Coverage
 
 **Code no page mentions is as wrong as a page the code contradicts.** A reader using the wiki instead of
-the source never learns it exists, and nothing on any page warns them.
+the source never learns it exists, and nothing on any page warns them. **A task covers the part of the
+code it touches**; an inventory of the whole code is a review, run when the owner asks for one.
 
 - **Inventory from the code, never from the wiki**, so the wiki cannot hide its own gaps. List everything
   a person can use, configure or notice: commands and options; endpoints, public functions, events;
@@ -490,6 +473,6 @@ serving nothing is still wrong, and a page over it is saying its intent has grow
    footnote the prose cites, or is marked missing.
 7. `wiki check` passes.
 8. A reader who has never read the source can follow the whole page.
-9. Everything in the code a person can use, configure or notice has a page or a section.
+9. Everything the change touched that a person can use, configure or notice has a page or a section.
 10. Nothing on the page was invented: every statement traces to the code, the owner's words, or an
     outside service's own documentation.

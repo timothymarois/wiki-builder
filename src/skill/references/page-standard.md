@@ -34,8 +34,7 @@ will be something else. Nothing about the shape changes.
 >
 > ## Signing out
 >
-> Signing out ends that session and no others. **A second device stays signed in** — there is no "sign
-> out everywhere" yet.
+> Signing out ends that session and no others, so **a second device stays signed in**.
 
 ## Done badly
 
@@ -76,9 +75,9 @@ they would notice being wrong.
 useless, not to punish a user who went to lunch." A rule that looks wrong gets reported as a bug; one
 clause ends the question and saves a round trip with whoever has to answer it.
 
-**What is absent is said once, where a reader would look for it.** "A second device stays signed in —
-there is no sign out everywhere yet." Not a section called "Not built yet". One clause, at the point the
-reader would reach for the thing.
+**A consequence a reader would not expect is stated where they would look for it.** "A second device
+stays signed in." It says what signing out does today, at the point the reader would reach for it — not a
+section called "Not built yet", and no promise about what comes next.
 
 **Headings name their contents.** Expiry. Size. Signing out. Not "Expiry and timeouts", which says the
 same thing twice, and not "How sessions work", which is the writer wondering what to put there.
