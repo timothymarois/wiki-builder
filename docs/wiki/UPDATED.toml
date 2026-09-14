@@ -111,7 +111,7 @@ audited = "2026-09-14"
 
 ["goals"]
 updated = "2026-09-14"
-digest = "deb69e55c8a36a448c628f64c89f7989e86dc73218d08f72c9c52d80e997d9b0"
+digest = "a17971ca4f9dc8e4c9b53da0736ffea1279bf73401dc352e93d9f2fef0b2b4ef"
 
 ["index"]
 updated = "2026-09-14"
@@ -128,13 +128,21 @@ digest = "b1b8aa785cce4c1b7964d69c41b7cf30d97bc64e92db0e7869c191ed15985208"
 
 ["pages"]
 updated = "2026-09-14"
-digest = "12307b3c2f3a4e9e3b07fb86d7188372dc239d3e2814b070dc77a04a6133a2a1"
+digest = "384c2ca9cf3e9b636b3c3d57d8d5fd6105d89d864a749b17d5938dd144873646"
 audited = "2026-09-14"
 
 ["pages/diagrams"]
 updated = "2026-09-14"
 digest = "ca473bd0228fc6e2a948b4e45c8f0528051f14b989fb0594762d5acd6ac06aa1"
 audited = "2026-09-14"
+
+["pages/markdown"]
+updated = "2026-09-14"
+digest = "0958fb8d7a16b45429fb26661114219cf6c44cd1be10becf615cc0fc09503479"
+
+["pages/pictures"]
+updated = "2026-09-14"
+digest = "aece51e65bfa1c6a8e1380a948792c1fd407837bf0aa73f625e17da9cc5d3752"
 
 ["pictures-toml"]
 updated = "2026-09-14"
