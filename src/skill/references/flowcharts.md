@@ -14,7 +14,7 @@ their own case leaves it.
 - **Draw when the thing branches, loops, or passes between parts.** A decision that takes three clauses to
   say, a retry, a hand-off between two services: those are what a drawing shows better than prose. A
   straight run of steps with no choice in it is a numbered list, not a diagram.
-- **Decide the one question the diagram answers before drawing it** — "what happens to a refund request",
+- **Decide the single question the diagram answers before drawing it** — "what happens to a refund request",
   "how a session ends" — and say it in the sentence that introduces it. A diagram that answers two
   questions is two diagrams.
 - **Chart one level of detail.** Do not chart every step the code takes: a reader who wants every detail
@@ -80,7 +80,7 @@ difference for decisions.
 
 - **A step is a verb and its object**, in sentence case and the present tense: "Find the charge", "Write
   the site". Not a noun alone ("Charge"), and not a sentence with a full stop.
-- **A decision is a short yes-or-no question**, ending in a question mark: "Charge found?". It is the one
+- **A decision is a short yes-or-no question**, ending in a question mark: "Charge found?". It is the only
   place a question is the right name, because the reader is choosing which way to go. Where the outcomes
   are not yes and no, label the exits with the outcomes instead: "Charge OK", "Charge declined".
 - **Every exit from a decision is labelled**, and yes and no leave in the same order in every diagram.

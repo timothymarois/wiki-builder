@@ -18,7 +18,7 @@ rows = [
 ]
 +++
 
-A reader scans headings to find the one holding their answer, so a heading is a label on a
+A reader scans headings to find the section holding their answer, so a heading is a label on a
 drawer.[^check] The check refuses the three kinds of heading that name nothing.[^check]
 
 ## Questions

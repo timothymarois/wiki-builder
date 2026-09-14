@@ -25,7 +25,7 @@ audited = "2026-09-14"
 
 ["checks/headings"]
 updated = "2026-09-14"
-digest = "44646356d0395440efdffd8f10a0807fdb6c36005d6f2b2d3a5bd4707a1232bc"
+digest = "d2e5b8d7d01e2b18fef0fa54879c9b6bf1c56077c6cad864989a2ff61a5f58d1"
 audited = "2026-09-14"
 
 ["checks/pictures"]
@@ -35,12 +35,12 @@ audited = "2026-09-14"
 
 ["checks/wording"]
 updated = "2026-09-14"
-digest = "6e19c78b7145c794b50b7819a9808f406d69e9e724c8e97c0e719c06e2cd5131"
+digest = "ebe9cb0674215ec3069bbeb1692faf6192497c2b960ffdb5c6f0327428dea990"
 audited = "2026-09-14"
 
 ["commands"]
 updated = "2026-09-14"
-digest = "d35c37ba712d665864a43b52f7794029d351236105e05dbc18d80ad6805a960a"
+digest = "678904e252d880c0684449f46b7f9af1696589132e8f5011c31c0786ba21630a"
 audited = "2026-09-14"
 
 ["commands/audit"]
@@ -55,7 +55,7 @@ audited = "2026-09-14"
 
 ["commands/build"]
 updated = "2026-09-14"
-digest = "361564766a744323213a22275670187d909d250e823c185997a3c69c91b548a1"
+digest = "370431b80e630065a7dbb5ac1accfb61163d8a4b5b0e2b1c714344c0d9556fe7"
 audited = "2026-09-14"
 
 ["commands/check"]
@@ -75,7 +75,7 @@ audited = "2026-09-14"
 
 ["commands/sync"]
 updated = "2026-09-14"
-digest = "2da917f5dd467e4eebdfa71e3255d838cbdfeb8119e7d3507551540ed9469c16"
+digest = "04afc9dacf832f29b646fb447a92aa8eb2ff73596b97a12dc4d4a83d2d3f9f0c"
 audited = "2026-09-14"
 
 ["commands/user"]
@@ -84,7 +84,7 @@ digest = "efe0ad0654a224e450899d0e0eee2fafedf873cb6452da12c1f33b296412e881"
 
 ["continuous-integration"]
 updated = "2026-09-14"
-digest = "9198c031d924040b7a13b5bbf5f710beb09cc62ae38acf96093603cc3f201e66"
+digest = "0587eb3fa0aee5fbb72970720f9b72e0fc705bfda90d9e63673a9712bf4d62ef"
 audited = "2026-09-14"
 
 ["deployment-cloudflare"]
@@ -101,7 +101,7 @@ digest = "c253b4e4b3f80ec3bd3f19cc9dc8688db0dbec268425a0865ba7886b39b0a33d"
 
 ["front-matter"]
 updated = "2026-09-14"
-digest = "702d75e42a64269565049d8149b9d7099e5caf04518d244259f6007f9c589515"
+digest = "863600e91524a097db139361d8f7cf6f46c6cfee0632bae1534060bc5939921e"
 audited = "2026-09-14"
 
 ["front-matter/infobox"]
@@ -143,7 +143,7 @@ audited = "2026-09-14"
 
 ["review-prompt"]
 updated = "2026-09-14"
-digest = "f39c07c59ba7986ae368db032f48b8963443417e4935db50a2e3d73f6386fe49"
+digest = "1ed70c282d223b12956cd9d98d383f8f964759083cb15e5789d999e045634137"
 
 ["serving"]
 updated = "2026-09-14"
@@ -157,7 +157,7 @@ audited = "2026-09-14"
 
 ["site/agent-markdown"]
 updated = "2026-09-14"
-digest = "d8d5650ffb7ff158d4067eb84f9d18029cbcafbddf2ab645da85d1a0db13f85d"
+digest = "1ffe1797ac975216b211d7b9865d3e1cf6462f417805cd4be5731347c8c4363c"
 audited = "2026-09-14"
 
 ["site/layout"]

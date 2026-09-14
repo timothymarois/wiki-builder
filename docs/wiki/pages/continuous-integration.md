@@ -27,7 +27,7 @@ rows = [
 group = "Rules"
 rows = [
   { label = "Failure", value = "any problem wiki check reports", cite = "action" },
-  { label = "Release checked", value = "the one named in uses", cite = "install" },
+  { label = "Release checked", value = "the tag named in uses", cite = "install" },
 ]
 +++
 
@@ -57,7 +57,7 @@ jobs:
 | `python-version` | the Python that runs the check, 3.11 or newer[^inputs] | `3.12` |
 
 The action installs the tool from its own copy, at the release named in `uses:`, so the check that runs is
-the one that release ships.[^install] A wiki synced against a different release fails, and the check says
+the check that release ships.[^install] A wiki synced against a different release fails, and the check says
 to run `wiki sync`.[^version]
 
 ## Repository workflows

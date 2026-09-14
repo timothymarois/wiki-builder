@@ -113,7 +113,7 @@ program accepts.
 
 **The failures are named.** Each exit code, the condition behind it, and the message word for word. "An
 error and a non-zero status" is the half of the contract the reader needed, left out, and the `1` — a file
-already there — is the one they will meet on their second export.
+already there — is the code they will meet on their second export.
 
 **The side effect is bounded.** "Writes nothing outside it" is a promise a reader relies on before
 pointing the command at a folder, and the standard makes it only because the code keeps it, cited.
@@ -258,7 +258,7 @@ is required, and hides its three accepted values. A caller discovers them by col
 client cannot tell whether the call worked without fetching the invoice again.
 
 **Every error is listed, with its condition and its message.** "Standard error responses" hides four
-failures, each with a different recovery. The `409` is the one an integrator meets in production, and
+failures, each with a different recovery. The `409` is the error an integrator meets in production, and
 nothing in the failure tells them it exists.
 
 **Repeating a call is answered.** A client whose request timed out needs to know whether retrying is safe.

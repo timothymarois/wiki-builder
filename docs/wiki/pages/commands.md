@@ -25,7 +25,7 @@ rows = [
 ]
 +++
 
-`wiki` is the one program the tool installs, and each job it does is a command typed after it.[^program]
+`wiki` is the only program the tool installs, and each job it does is a command typed after it.[^program]
 The settings files it reads are described on [wiki.toml](wiki-toml.md), [Front matter](front-matter.md)
 and [PICTURES.toml](pictures-toml.md).
 

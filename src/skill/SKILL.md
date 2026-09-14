@@ -8,7 +8,7 @@ description: Use when writing, updating, reviewing or fixing the pages of a wiki
 **Read [Page standard](references/page-standard.md) before writing a page or restructuring one.** It holds
 a page written to the standard, the same content written badly, and why the difference matters. Rules say
 what to avoid; only an example shows what good looks like. A page written from these rules alone comes out
-**flat, true and unread** — the failure this skill exists to prevent, and the one that does not announce
+**flat, true and unread** — the failure this skill exists to prevent, and a failure that does not announce
 itself.
 
 **The wiki is for people, not builders.** Its readers are the project's owner, and later its users and
@@ -216,7 +216,7 @@ the section, a sentence's first clause answers the sentence. A reader who stops 
 - **The consequence, not the mechanism.** "An expired session does not lose your draft" — not that one
   setting outlives another.
 - **Short sentences, ordinary words.** A sentence that needs reading twice is the sentence's fault.
-- **Name who acts.** "Nobody has approved it", "someone must bless it" and "anyone can run it" hide the one
+- **Name who acts.** "Nobody has approved it", "someone must bless it" and "anyone can run it" hide the
   fact a reader needs. Say the reader, the owner, an agent, or the part of the system that acts. The gate
   refuses nobody, somebody, someone, anyone, everyone and no one.
 - **Say what a thing is and does.** Framing such as "the half of the tool that is not code" or "at its
@@ -296,12 +296,12 @@ A session ends thirty minutes after its last request.[^expiry]
 - **How an outside service behaves is cited to its own documentation** — a host's settings, a platform's
   defaults: the thing the project does not run. Name the publisher, link the page by its title, and say
   what it states. A `{missing}` on such a claim means that documentation has not been checked yet.
-- **A reference marks the code; it never links to it.** Outside documentation is the one linked reference. Write `` `src/session/expiry.py` — `sweep()` ``,
+- **A reference marks the code; it never links to it.** Outside documentation is the only linked reference. Write `` `src/session/expiry.py` — `sweep()` ``,
   not a markdown link. A link to a source file works only while the site is served from inside the
   repository, and is dead wherever the site is published.
 - **Configuration counts as code** where a number lives there: name the function that reads it *and* the
   row.
-- **References are the one place a path belongs**, and a user build strips them.
+- **References are the only place a path belongs**, and a user build strips them.
 - **Link other pages and pictures relative to your own file**, so the link works in the markdown and in
   the browser. A link to a page the wiki does not have is drawn red, and the gate refuses it: write the
   page, or link to one that exists.
