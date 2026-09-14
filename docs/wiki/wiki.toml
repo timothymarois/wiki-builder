@@ -37,4 +37,4 @@ pages = ["installation-prompt", "review-prompt"]
 # Written by `wiki sync`. Which release of the tool these pages
 # were written against; `wiki check` says so when they differ.
 [tool]
-version = "0.1.0"
+version = "0.2.0"
