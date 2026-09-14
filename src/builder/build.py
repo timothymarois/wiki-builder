@@ -1434,6 +1434,33 @@ def heading_problems(root, wiki=None):
     return problems
 
 
+# Every front-matter field a reader reads as words.
+WORDED_FIELDS = ("title", "subtitle", "intent", "infobox group", "infobox label", "infobox value",
+                 "infobox note")
+
+
+def wording_places(path, pages_dir, fields=WORDED_FIELDS):
+    """Each field and sentence of a page, named the way a problem names it, with its code removed.
+
+    Every check that refuses a word reads a page through this, so each names a place the same way, and none
+    reads a code sample, which shows text as written.
+    """
+    meta, _ = read_front_matter(path)
+    name = path.relative_to(pages_dir)
+    found = [("title", meta.get("title", "")), ("subtitle", meta.get("subtitle", "")),
+             ("intent", meta.get("intent", ""))]
+    for group in meta.get("infobox", []):
+        found.append(("infobox group", group.get("group", "")))
+        for row in group.get("rows", []):
+            found += [("infobox label", row.get("label", "")), ("infobox value", row.get("value", "")),
+                      ("infobox note", row.get("note", ""))]
+    places = [(f"{name}: the {field}", INLINE_CODE.sub("", str(text)))
+              for field, text in found if field in fields]
+    places += [(f"{name}:{line}: {quoted(statement)}", INLINE_CODE.sub("", statement))
+               for line, statement in page_statements(path)]
+    return places
+
+
 # A rule told as something somebody said: a dated quote of the owner, or "the owner said". A reader wants the
 # rule; a page that quotes whoever asked for it dates itself and argues instead of describing.
 ATTRIBUTION = re.compile(r"\bthe owner(?:'s ruling)?,?\s+\d{4}-\d{2}-\d{2}|\bthe owner (?:said|says|asked|wrote|ruled)\b",
@@ -1449,15 +1476,9 @@ def attribution_problems(root, wiki=None):
     pages_dir = wiki_of(root, wiki) / "pages"
     problems = []
     for path in sorted(pages_dir.rglob("*.md")):
-        meta, _ = read_front_matter(path)
-        name = path.relative_to(pages_dir)
-        for field in ("subtitle", "intent"):
-            if ATTRIBUTION.search(INLINE_CODE.sub("", str(meta.get(field, "")))):
-                problems.append(f"{name}: the {field} attributes a rule to the owner; state the rule itself")
-        for line, statement in page_statements(path):
-            if ATTRIBUTION.search(INLINE_CODE.sub("", statement)):
-                problems.append(f"{name}:{line}: {quoted(statement)} attributes a rule to the owner; state "
-                                "the rule itself")
+        for place, text in wording_places(path, pages_dir, ("subtitle", "intent")):
+            if ATTRIBUTION.search(text):
+                problems.append(f"{place} attributes a rule to the owner; state the rule itself")
     return problems
 
 
@@ -1474,25 +1495,61 @@ def vague_actor_problems(root, wiki=None):
     pages_dir = wiki_of(root, wiki) / "pages"
     problems = []
     for path in sorted(pages_dir.rglob("*.md")):
+        for place, text in wording_places(path, pages_dir):
+            found = VAGUE_ACTOR.search(text)
+            if found:
+                problems.append(f"{place} says {found.group(0).lower()!r} instead of naming who acts; name the "
+                                "reader, the owner, an agent or the part that acts")
+    return problems
+
+
+# Words that carry no fact a reader can check, each with what it does to a sentence and what to write
+# instead. Only words with no plain use in a description are listed: "may" grants permission as often as it
+# hedges, "just" also means a moment ago, and "some", "new" and "will" state facts, so a word list cannot
+# tell their uses apart and they are left to the writer.
+EMPTY_WORDS = (
+    (re.compile(r"\b(powerful|seamless(?:ly)?|robust|cutting-edge|best-in-class)\b", re.I),
+     "which sells instead of describing", "say what it does"),
+    (re.compile(r"\b(simply|easily|obviously|of course|clearly)\b", re.I),
+     "which makes light of what it describes", "delete the word"),
+    (re.compile(r"\b(appears? to|seems? to|typically|usually|generally|probably|likely|in some cases|"
+                r"tends? to)\b", re.I),
+     "which hedges", "say what happens, or mark the claim {missing}"),
+    (re.compile(r"\b(note that|it is worth noting|please be aware|in order to)\b", re.I),
+     "which frames the fact instead of stating it", "keep the fact and drop the frame"),
+    (re.compile(r"\b(etc\b\.?|and so on\b|and/or\b|various\b)", re.I),
+     "which leaves a list open", "give the whole list, or the one thing"),
+    (re.compile(r"\b(currently|at the moment|for now)\b", re.I),
+     "which dates the sentence", "say what it does, and put a planned change in a note at the end of the page"),
+    (re.compile(r"\b(a number of|reasonable)\b", re.I),
+     "which gives no figure", "give the number, or the condition"),
+)
+# An infobox value that is nothing but one of these gives a reader nothing to check.
+EMPTY_VALUE = re.compile(r"yes|configurable|varies|depends", re.I)
+
+
+def empty_word_problems(root, wiki=None):
+    """Words that carry no fact a reader can check, each refused with what to write instead.
+
+    They are looked for wherever a vague actor is, and an infobox value that is nothing but an empty word is
+    refused as well: a reader cannot check "configurable", only the default or the condition.
+    """
+    pages_dir = wiki_of(root, wiki) / "pages"
+    problems = []
+    for path in sorted(pages_dir.rglob("*.md")):
+        for place, text in wording_places(path, pages_dir):
+            for pattern, effect, instead in EMPTY_WORDS:
+                found = pattern.search(text)
+                if found:
+                    problems.append(f"{place} says {found.group(0).lower()!r}, {effect}; {instead}")
         meta, _ = read_front_matter(path)
-        name = path.relative_to(pages_dir)
-        fields = [("title", meta.get("title", "")), ("subtitle", meta.get("subtitle", "")),
-                  ("intent", meta.get("intent", ""))]
         for group in meta.get("infobox", []):
-            fields.append(("infobox group", group.get("group", "")))
             for row in group.get("rows", []):
-                fields += [("infobox label", row.get("label", "")), ("infobox value", row.get("value", "")),
-                           ("infobox note", row.get("note", ""))]
-        for field, text in fields:
-            found = VAGUE_ACTOR.search(INLINE_CODE.sub("", str(text)))
-            if found:
-                problems.append(f"{name}: the {field} says {found.group(0).lower()!r} instead of naming who "
-                                "acts; name the reader, the owner, an agent or the part that acts")
-        for line, statement in page_statements(path):
-            found = VAGUE_ACTOR.search(INLINE_CODE.sub("", statement))
-            if found:
-                problems.append(f"{name}:{line}: {quoted(statement)} says {found.group(0).lower()!r} instead of "
-                                "naming who acts; name the reader, the owner, an agent or the part that acts")
+                value = str(row.get("value", "")).strip()
+                if EMPTY_VALUE.fullmatch(value):
+                    problems.append(f"{path.relative_to(pages_dir)}: the infobox row {row.get('label', '')!r} "
+                                    f"gives {value!r} as its value, which a reader cannot check; give the "
+                                    "default or the condition, or drop the row")
     return problems
 
 
@@ -1556,16 +1613,11 @@ def pointing_problems(root, wiki=None):
             if DEMONSTRATIVE.match(text):
                 problems.append(f"{name}: the {kind} {text!r} points at the page instead of naming "
                                 "anything; name the thing itself")
-        for field in ("subtitle", "intent"):
-            found = POINTING.search(INLINE_CODE.sub("", meta.get(field, "")))
+        for place, text in wording_places(path, pages_dir, ("subtitle", "intent")):
+            found = POINTING.search(text)
             if found:
-                problems.append(f"{name}: the {field} points at the project with "
-                                f"{found.group(0)!r} instead of naming it; use its name")
-        for line, statement in page_statements(path):
-            found = POINTING.search(INLINE_CODE.sub("", statement))
-            if found:
-                problems.append(f"{name}:{line}: {quoted(statement)} points at the project with "
-                                f"{found.group(0)!r} instead of naming it; use its name")
+                problems.append(f"{place} points at the project with {found.group(0)!r} instead of naming it; "
+                                "use its name")
     return problems
 
 
@@ -1682,6 +1734,7 @@ def check(root, wiki=None, version=None):
         problems += dead_link_problems(root, wiki)
         problems += attribution_problems(root, wiki)
         problems += vague_actor_problems(root, wiki)
+        problems += empty_word_problems(root, wiki)
         problems += uncited_problems(root, wiki)
         problems += infobox_problems(root, wiki)
         if version:

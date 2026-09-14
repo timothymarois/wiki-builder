@@ -343,7 +343,8 @@ is *the expiry is thirty minutes*.
   with its unit, such as 30 minutes or 4 kB; a rule as a phrase, such as "refused, never truncated"; a list
   separated by commas. A value that needs a subject and a verb belongs in the prose.
 - **Never a hedge or a yes.** "Configurable", "varies" and "yes" give a reader nothing to check. Give the
-  default or the condition, or drop the row.
+  default or the condition, or drop the row. The gate refuses a value that is only yes, configurable,
+  varies or depends.
 - **One property, one label, on every page.** If one page says **Command**, no page says "Run with".
 - **A `note`** is the one clause that stops a value being misread, such as "after the last request".
   Never a second value.

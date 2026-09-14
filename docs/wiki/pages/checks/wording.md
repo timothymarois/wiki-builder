@@ -12,18 +12,18 @@ rule plainly rather than quoting who asked for it.
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Checks", value = "pointing words, vague actors, attribution", cite = "checks" },
+  { label = "Checks", value = "pointing words, vague actors, attribution, empty words", cite = "checks" },
   { label = "Refused openings", value = "this, that, these, those, our, here", note = "in a title or infobox name", cite = "names" },
   { label = "Pages checked", value = "every page, including one excused from citations", cite = "pages" },
   { label = "Code", value = "not checked", cite = "code" },
 ]
 +++
 
-The wording checks refuse a name or a sentence that says nothing to a reader who arrived from a search or a
-link: one that points at the page instead of naming a thing, one that hides who acts, and one that quotes
-the owner instead of stating a rule.[^checks] Each names the field it found, or the page and line of the
-sentence.[^checks] Every page is checked, including one excused from citations.[^pages] Words inside code
-are left alone, because a sample shows text as written.[^code] Headings are held to the pointing words on
+The wording checks refuse a name or a sentence that points at the page, hides who acts, quotes the owner
+instead of stating a rule, or uses a word that carries no fact.[^checks] Each names the field it found, or
+the page and line of the sentence.[^checks] Every page is checked, including one excused from
+citations.[^pages] Words inside code are left alone, because a sample shows text as written, and capital
+letters make no difference.[^code] Headings are held to the pointing words on
 [Headings](headings.md).
 
 ## Pointing words
@@ -39,7 +39,7 @@ all.[^prose]
 
 A word that says an unnamed person acts is refused wherever it stands whole: `nobody`, `somebody`,
 `someone`, `anyone`, `anybody`, `everyone`, `everybody`, and `no one` written with a space or a
-hyphen.[^actors] Capital letters make no difference.[^actors] The check reads the title, subtitle and
+hyphen.[^actors] The check reads the title, subtitle and
 intent, every infobox group, label, value and note, and every sentence, but no heading.[^actors] Such a
 word hides the one fact a reader needs, so a page names the reader, the owner, an agent or the part of the
 system that acts.[^actors]
@@ -50,16 +50,36 @@ A page that tells a rule as a quote of the owner is refused, because the quote d
 instead of describing.[^attribution] Where a requirement came from is recorded with the work that
 implements it.[^attribution] Two kinds of wording are refused: `the owner` or `the owner's ruling`, with or
 without a comma, followed by a date written as year, month and day, such as `the owner, 2026-09-14`; and
-`the owner` followed by `said`, `says`, `asked`, `wrote` or `ruled`.[^attribution] Capital letters make no
-difference.[^attribution] The check reads the subtitle, intent and every sentence, but no title, heading or
+`the owner` followed by `said`, `says`, `asked`, `wrote` or `ruled`.[^attribution] The check reads the subtitle, intent and every sentence, but no title, heading or
 infobox row.[^attribution]
 
-[^checks]: `src/builder/build.py` — `pointing_problems()`, `vague_actor_problems()` and
-    `attribution_problems()`, each called from `check()`, and each naming the field, or the page and line.
-[^pages]: `src/builder/build.py` — none of `pointing_problems()`, `vague_actor_problems()` and
-    `attribution_problems()` skips a page whose front matter says `goals = false`.
-[^code]: `src/builder/build.py` — each of the three removes `INLINE_CODE` before matching, and
-    `page_statements()` has already blanked fenced code.
+## Empty words
+
+A word that carries no fact is refused wherever the vague-actor check looks, and the problem says what to
+write instead.[^empty] `may`, `just`, `some` and `new` have plain uses too, so the writer
+judges them.[^empty]
+
+| Kind | Words refused |
+|---|---|
+| Marketing | `powerful`, `seamless`, `robust`, `cutting-edge`, `best-in-class`[^empty] |
+| Minimisers | `simply`, `easily`, `obviously`, `of course`, `clearly`[^empty] |
+| Hedges | `appears to`, `seems to`, `typically`, `usually`, `generally`, `probably`, `likely`, `in some cases`, `tends to`[^empty] |
+| Preamble | `note that`, `it is worth noting`, `please be aware`, `in order to`[^empty] |
+| Open lists | `etc.`, `and so on`, `and/or`, `various`[^empty] |
+| Time words | `currently`, `at the moment`, `for now`[^empty] |
+| Empty amounts | `a number of`, `reasonable`[^empty] |
+| Infobox values | a value that is only `yes`, `configurable`, `varies` or `depends`[^values] |
+
+[^checks]: `src/builder/build.py` — `pointing_problems()`, `vague_actor_problems()`, `attribution_problems()`
+    and `empty_word_problems()`, each called from `check()`, and each naming the field, or the page and line.
+[^pages]: `src/builder/build.py` — none of the four skips a page whose front matter says `goals = false`.
+[^code]: `src/builder/build.py` — `wording_places()` removes `INLINE_CODE` before a sentence or field is
+    matched, `page_statements()` has already blanked fenced code, and every pattern ignores case.
+[^empty]: `src/builder/build.py` — `empty_word_problems()` matches each pattern in `EMPTY_WORDS` against the
+    places `wording_places()` gives the vague-actor check, and names what to write instead; the comment on
+    `EMPTY_WORDS` gives the reason for the words left out.
+[^values]: `src/builder/build.py` — `empty_word_problems()` refuses an infobox value that `EMPTY_VALUE`
+    matches whole.
 [^names]: `src/builder/build.py` — `pointing_problems()` matches `DEMONSTRATIVE` against the title and
     every infobox group and label; the comment on `DEMONSTRATIVE` gives the reason.
 [^prose]: `src/builder/build.py` — `pointing_problems()` matches `POINTING` against the subtitle, the

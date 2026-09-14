@@ -577,6 +577,65 @@ class WikiTests(unittest.TestCase):
         problems, *_ = wiki.check(self.root)
         self.assertTrue(any("instead of naming who acts" in problem for problem in problems), problems)
 
+    def test_a_word_that_says_nothing_is_refused_where_it_is_written(self):
+        # The owner, 2026-09-14: "add those additional bad words that are meaningless for our documentation".
+        # One word from each list, each refused with the line it is on and what to write instead.
+        cases = {
+            "powerful": "say what it does",
+            "Simply": "delete the word",
+            "typically": "say what happens",
+            "note that": "keep the fact and drop the frame",
+            "etc.": "give the whole list",
+            "currently": "note at the end of the page",
+            "a number of": "give the number",
+        }
+        for word, fix in cases.items():
+            with self.subTest(word=word):
+                self.write("thing", PAGE.replace("It does it slowly.[^why]", "It does it %s slowly.[^why]" % word))
+                problems = wiki.empty_word_problems(self.root)
+                self.assertEqual(1, len(problems), problems)
+                self.assertTrue(problems[0].startswith("thing.md:%d: " % self.line_of("thing", "It does it")),
+                                problems)
+                self.assertIn("says %r" % word.lower(), problems[0])
+                self.assertIn(fix, problems[0])
+
+    def test_a_word_that_says_nothing_in_the_front_matter_is_refused(self):
+        for old, new, place in (
+                ('subtitle = "what it is"', 'subtitle = "a powerful thing"', "the subtitle"),
+                ("It should be plain", "It should generally be plain", "the intent"),
+                ('value = "a promise"', 'value = "a robust promise"', "the infobox value"),
+                ('label = "Today"', 'label = "Currently"', "the infobox label")):
+            with self.subTest(place=place):
+                self.write("thing", PAGE.replace(old, new))
+                problems = wiki.empty_word_problems(self.root)
+                self.assertTrue(any(problem.startswith("thing.md: %s says" % place) for problem in problems),
+                                problems)
+
+    def test_an_infobox_value_that_says_nothing_is_refused(self):
+        for value in ("yes", "Configurable", "varies", "depends"):
+            with self.subTest(value=value):
+                self.write("thing", PAGE.replace('value = "a number"', 'value = "%s"' % value))
+                self.assertEqual(["thing.md: the infobox row 'Today' gives %r as its value, which a reader "
+                                  "cannot check; give the default or the condition, or drop the row" % value],
+                                 wiki.empty_word_problems(self.root))
+
+    def test_a_word_with_a_plain_meaning_passes(self):
+        # "may" grants permission, "just" can mean a moment ago, and "some" and "new" state facts: a word list
+        # cannot tell those uses from empty ones, so they are left to the writer.
+        for text in ("Either option may be given.[^why]",
+                     "It shows what was just built.[^why]",
+                     "Some pages are drafts, and a new page is one of them.[^why]",
+                     "It lists every problem, not only the first, and a failure is unlikely.[^why]",
+                     "The flag is `--simply`, and the value `yes` is quoted.[^why]"):
+            with self.subTest(text=text):
+                self.write("thing", PAGE.replace("It does it slowly.[^why]", text))
+                self.assertEqual([], wiki.empty_word_problems(self.root))
+
+    def test_the_check_refuses_a_word_that_says_nothing(self):
+        self.write("thing", PAGE.replace("It does it slowly.[^why]", "It simply does it slowly.[^why]"))
+        problems, *_ = wiki.check(self.root)
+        self.assertTrue(any("says 'simply'" in problem for problem in problems), problems)
+
     def test_the_check_refuses_a_name_that_points_at_the_page(self):
         self.write("thing", PAGE.replace('label = "Today"', 'label = "This site"'))
         problems, *_ = wiki.check(self.root)

@@ -10,7 +10,7 @@ digest = "8bd23125e35407c4d62fb1d1f4aeea067b4e82a5a8ab9f6edad91f997ea00dbb"
 
 ["checks"]
 updated = "2026-09-14"
-digest = "cef12f6558f8dde7b2a0057004ef9cf13bf1a48d6d22875a77e3bdc26ecca237"
+digest = "230a4083034ff09fae2a490cc675fa38c9dbfead0f69e880a2b607cd371559b2"
 audited = "2026-09-14"
 
 ["checks/budgets"]
@@ -35,7 +35,7 @@ audited = "2026-09-14"
 
 ["checks/wording"]
 updated = "2026-09-14"
-digest = "4702907a2c85e22cdf2e4943e8cc659c6bb5f7794a01413f459d1e600481a2e3"
+digest = "5f5707006f048a1b2d05624216a7ad1a6e7f2125b0cc4bf8cfef0e73c8fb34cf"
 audited = "2026-09-14"
 
 ["commands"]

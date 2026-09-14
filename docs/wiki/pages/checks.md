@@ -59,7 +59,7 @@ flowchart LR
 | A sentence that cites nothing, or a reference to a document[^cited] | [Citations](checks/citations.md) |
 | An infobox row that cites nothing[^rows] | [Citations](checks/citations.md) |
 | A heading that asks a question, rates its contents or points at the page[^headings] | [Headings](checks/headings.md) |
-| A name or sentence that points at the page, hides who acts or quotes the owner[^wording] | [Wording](checks/wording.md) |
+| A name or sentence that points at the page, hides who acts, quotes the owner or carries no fact[^wording] | [Wording](checks/wording.md) |
 | A link to a wiki page that does not exist[^deadlinks] | [Site](site.md) |
 | A page longer than its budget[^budget] | [Reading budgets](checks/budgets.md) |
 | A picture whose subject has changed[^pictures] | [Pictures](checks/pictures.md) |
@@ -78,8 +78,8 @@ sentence, and the command exits with 1.[^caught]
 [^cited]: `src/builder/build.py` — `uncited_problems()` and `citation_problems()`.
 [^rows]: `src/builder/build.py` — `infobox_problems()`.
 [^headings]: `src/builder/build.py` — `heading_problems()`.
-[^wording]: `src/builder/build.py` — `pointing_problems()`, `vague_actor_problems()` and
-    `attribution_problems()`.
+[^wording]: `src/builder/build.py` — `pointing_problems()`, `vague_actor_problems()`,
+    `attribution_problems()` and `empty_word_problems()`.
 [^deadlinks]: `src/builder/build.py` — `dead_link_problems()`.
 [^budget]: `src/builder/build.py` — `budget_problems()`.
 [^pictures]: `src/builder/build.py` — `picture_problems()`.

@@ -180,7 +180,8 @@ two ways. These rules settle most cases.
 - **Name the actor.** "`wiki check` refuses the page", not "the page is refused". The actor is usually the
   fact the reader came for. Passive voice is right only when the actor genuinely does not matter.
 - **Present tense for what exists.** No "will", "currently", "new" or "now" in a claim about behaviour.
-  A planned change is one marked note at the end of the page.
+  A planned change is one marked note at the end of the page. The gate refuses "currently", "at the
+  moment" and "for now".
 - **Subject and verb agree**, across whatever sits between them: "the goals page collects", "a list of
   pages is", "neither option is".
 - **The fact first.** Lead with the result, then the condition: "A draft is refused when a reader cannot reach
@@ -231,15 +232,16 @@ Each of these survives a first draft and carries no fact.
 
 | Pattern | Examples | Instead |
 |---|---|---|
-| Hedges | appears to, should generally, may, typically, in some cases | state what the code does, or mark it `{missing}` |
-| Minimizers | simply, just, easily, of course, obviously | delete the word |
-| Marketing | powerful, seamless, robust, cutting-edge, best-in-class | delete the clause |
-| Preamble | note that, it is worth noting, please be aware, in order to | keep the fact, drop the frame |
+| Hedges | appears to, should generally, may, typically, in some cases | state what the code does, or mark it `{missing}`. The gate refuses all but may |
+| Minimizers | simply, just, easily, of course, obviously | delete the word. The gate refuses all but just |
+| Marketing | powerful, seamless, robust, cutting-edge, best-in-class | delete the clause. The gate refuses them |
+| Preamble | note that, it is worth noting, please be aware, in order to | keep the fact, drop the frame. The gate refuses them |
+| Empty amounts | a number of, reasonable | the number, or the condition. The gate refuses them |
 | Stacked connectives | moreover, furthermore, additionally | say the actual relationship, or nothing |
 | Contrast by denial | it is not just X, it is Y | say Y |
 | Vague verbs | handle, manage, deal with, process, support | the verb that happens: refuses, writes, retries |
 | Intentions for machines | the check wants, the server tries to | what it does, and under what condition |
-| Open lists | etc., and so on, various, and/or | the list, or the one thing |
+| Open lists | etc., and so on, various, and/or | the list, or the one thing. The gate refuses them |
 | Pointing elsewhere | see the documentation for details | link the exact page, or state the fact |
 | Vague actors | nobody, somebody, someone, anyone, everyone, no one | name who acts: the reader, the owner, an agent, the build. The gate refuses them |
 | Empty framing | "the half of the tool that is not code", "at its heart", "the other side of" | say what the thing is and what it does |
