@@ -78,4 +78,4 @@ It refuses to write into a folder that is not empty and was not made by an earli
 [^exit]: `src/builder/cli.py` — `main()` returns 2 with no wiki and prints a `WikiError` before returning 1;
     `run()` returns 2 when `guard_output()` refuses; argparse exits 2 on an option it does not know.
 [^stop]: `src/builder/cli.py` — `main()` prints a `WikiError` and returns 1; `src/builder/build.py` —
-    `write_site()` raises the one for a wiki with no `goals.md`.
+    `write_site()` raises a `WikiError` for a wiki with no `goals.md`.

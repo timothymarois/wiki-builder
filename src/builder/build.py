@@ -1524,6 +1524,9 @@ EMPTY_WORDS = (
      "which leaves a list open", "give the whole list, or the one thing"),
     (re.compile(r"\b(currently|at the moment|for now)\b", re.I),
      "which dates the sentence", "say what it does, and put a planned change in a note at the end of the page"),
+    # "the one" stands in for a thing the sentence never names; "the one-time" is a different word.
+    (re.compile(r"\b(the ones?)\b(?!-)", re.I),
+     "which points at a thing instead of naming it", "name the thing"),
     (re.compile(r"\b(a number of|reasonable)\b", re.I),
      "which gives no figure", "give the number, or the condition"),
 )

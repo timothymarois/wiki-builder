@@ -37,7 +37,7 @@ the file itself, so a person or an agent can read the page as pure markdown.[^ta
 ## Index
 
 The root of the site holds `llms.txt`, listing every page's copy with its subtitle, in sidebar
-order.[^index] Its shape is the one the llms.txt proposal describes: a heading with the site's name, then
+order.[^index] It takes the shape the llms.txt proposal describes: a heading with the site's name, then
 sections of links.[^proposal]
 
 Every rendered page names its copy with `rel="alternate" type="text/markdown"`, and the index with

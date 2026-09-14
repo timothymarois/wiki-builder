@@ -241,7 +241,8 @@ Each of these survives a first draft and carries no fact.
 | Contrast by denial | it is not just X, it is Y | say Y |
 | Vague verbs | handle, manage, deal with, process, support | the verb that happens: refuses, writes, retries |
 | Intentions for machines | the check wants, the server tries to | what it does, and under what condition |
-| Open lists | etc., and so on, various, and/or | the list, or the one thing. The gate refuses them |
+| Open lists | etc., and so on, various, and/or | the whole list, or the single thing. The gate refuses them |
+| Vague references | the one, the ones | the thing itself: the tag, the section, the error. The gate refuses them |
 | Pointing elsewhere | see the documentation for details | link the exact page, or state the fact |
 | Vague actors | nobody, somebody, someone, anyone, everyone, no one | name who acts: the reader, the owner, an agent, the build. The gate refuses them |
 | Empty framing | "the half of the tool that is not code", "at its heart", "the other side of" | say what the thing is and what it does |

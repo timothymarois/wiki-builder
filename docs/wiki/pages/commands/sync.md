@@ -79,7 +79,7 @@ still says it was.[^record]
 |---|---|---|
 | `0` | the release is recorded[^exit] | `wiki: wiki.toml records wiki-builder 0.1.0` |
 | `1` | there is no `wiki.toml` to record it in; the skill has already been written, and is not listed[^exit] | ``wiki: there is no wiki.toml in /path/to/notes/docs/wiki; write one with a [site] name and at least one [[section]], then run `wiki sync` again`` |
-| `2` | both skill options are given; the one given second is named first[^exit] | `wiki sync: error: argument --skill-dir: not allowed with argument --no-skill` |
+| `2` | both skill options are given; the message names the option given second first[^exit] | `wiki sync: error: argument --skill-dir: not allowed with argument --no-skill` |
 | `2` | there is no wiki where it was pointed[^exit] | `wiki: no wiki at nowhere` |
 | `2` | an option it does not know[^exit] | `wiki: error: unrecognized arguments: --unknown` |
 

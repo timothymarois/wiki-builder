@@ -54,7 +54,7 @@ Every problem below stops the build, and names the page's file.[^validation]
 | the page does not open with `+++`[^validation] | `wiki: refunds.md does not open with a +++ front-matter fence` |
 | the front matter never closes | `wiki: refunds.md never closes its +++ front-matter fence`[^fences] |
 | the TOML cannot be read | `wiki: refunds.md has unreadable front matter:` and the parser's error[^fences] |
-| `title` or `intent` is missing or empty | `wiki: refunds.md has no intent; every page must say what it is for`, naming `title` instead when that is the one missing[^refusals] |
+| `title` or `intent` is missing or empty | `wiki: refunds.md has no intent; every page must say what it is for`, naming `title` instead when the title is missing[^refusals] |
 | the intent is over its budget | `wiki: refunds.md's intent runs to 130 words, over the 120 an intent may use; say what the system is for, not how it works`[^refusals] |
 | the page gives `kicker` | `wiki: refunds.md gives its subtitle as kicker, which is now called subtitle; rename kicker to subtitle`[^refusals] |
 | `audience` is not `"internal"` or `"user"` | `wiki: refunds.md gives its audience as 'reader'; an audience is "internal" or "user"`[^refusals] |

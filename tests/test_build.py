@@ -588,6 +588,8 @@ class WikiTests(unittest.TestCase):
             "etc.": "give the whole list",
             "currently": "note at the end of the page",
             "a number of": "give the number",
+            "the one": "name the thing",
+            "the ones": "name the thing",
         }
         for word, fix in cases.items():
             with self.subTest(word=word):
@@ -626,7 +628,8 @@ class WikiTests(unittest.TestCase):
                      "It shows what was just built.[^why]",
                      "Some pages are drafts, and a new page is one of them.[^why]",
                      "It lists every problem, not only the first, and a failure is unlikely.[^why]",
-                     "The flag is `--simply`, and the value `yes` is quoted.[^why]"):
+                     "The flag is `--simply`, and the value `yes` is quoted.[^why]",
+                     "It sends the one-time code, and one is enough.[^why]"):
             with self.subTest(text=text):
                 self.write("thing", PAGE.replace("It does it slowly.[^why]", text))
                 self.assertEqual([], wiki.empty_word_problems(self.root))

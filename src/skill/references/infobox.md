@@ -45,7 +45,7 @@ is *the expiry is thirty minutes*.
   default or the condition, or drop the row. The gate refuses a value that is only yes, configurable,
   varies or depends.
 - **One property, one label, on every page.** If one page says **Command**, no page says "Run with".
-- **A `note`** is the one clause that stops a value being misread, such as "after the last request".
+- **A `note`** is the single clause that stops a value being misread, such as "after the last request".
   Never a second value.
 - **`link = "https://…"`** links the value to an address outside the wiki, such as an author's site. A
   page is linked from the text, never from a row.

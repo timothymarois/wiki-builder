@@ -29,8 +29,7 @@ letters make no difference.[^code] Headings are held to the pointing words on
 ## Pointing words
 
 A page title, infobox group or infobox label that opens with *this*, *that*, *these*, *those*, *our* or
-*here* is refused, and the check asks for the thing itself.[^names] `This site` reads as nothing in a
-contents box.[^names] A sentence, subtitle or intent is refused when *this*, *these* or *our* comes directly
+*here* is refused, and the check asks for the thing itself.[^names] A sentence, subtitle or intent is refused when *this*, *these* or *our* comes directly
 before *repository*, *repositories*, *repo*, *project*, *site*, *website*, *wiki*, *tool*, *package* or
 *codebase*, because to a reader who arrived from a search, `this repository` is no repository at
 all.[^prose]
@@ -41,7 +40,7 @@ A word that says an unnamed person acts is refused wherever it stands whole: `no
 `someone`, `anyone`, `anybody`, `everyone`, `everybody`, and `no one` written with a space or a
 hyphen.[^actors] The check reads the title, subtitle and
 intent, every infobox group, label, value and note, and every sentence, but no heading.[^actors] Such a
-word hides the one fact a reader needs, so a page names the reader, the owner, an agent or the part of the
+word hides the fact a reader needs, so a page names the reader, the owner, an agent or the part of the
 system that acts.[^actors]
 
 ## Attribution
@@ -55,8 +54,8 @@ infobox row.[^attribution]
 
 ## Empty words
 
-A word that carries no fact is refused wherever the vague-actor check looks, and the problem says what to
-write instead.[^empty] `may`, `just`, `some` and `new` have plain uses too, so the writer
+A word that carries no fact is refused wherever the vague-actor check looks, with what to write
+instead.[^empty] `may`, `just`, `some` and `new` have plain uses too, so the writer
 judges them.[^empty]
 
 | Kind | Words refused |
@@ -68,6 +67,7 @@ judges them.[^empty]
 | Open lists | `etc.`, `and so on`, `and/or`, `various`[^empty] |
 | Time words | `currently`, `at the moment`, `for now`[^empty] |
 | Empty amounts | `a number of`, `reasonable`[^empty] |
+| Vague references | `the one`, `the ones`[^empty] |
 | Infobox values | a value that is only `yes`, `configurable`, `varies` or `depends`[^values] |
 
 [^checks]: `src/builder/build.py` — `pointing_problems()`, `vague_actor_problems()`, `attribution_problems()`

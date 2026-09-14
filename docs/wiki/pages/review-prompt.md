@@ -29,7 +29,7 @@ any footnote passes, and the check never opens the file the footnote names.[^pre
 covers the rest, by having an agent read each cited source against its sentence, and list what the code
 does that no page mentions. The check never reads inside a code block, so the prompt is also the only
 check a diagram gets.[^fenced] It works in any project
-that uses wiki-builder, and names nothing about the one it is used in. Installing the tool in the first
+that uses wiki-builder, and names nothing about the project it is used in. Installing the tool in the first
 place has its own [Installation prompt](installation-prompt.md).
 
 Before handing the prompt to an agent, replace `PART` with the part to review: a sidebar section, a page
@@ -62,7 +62,7 @@ audited as the oldest. Review the whole wiki only when the owner asks for it.
    starts, not a verdict. `wiki check` writes nothing; run every other command, and every experiment,
    in a scratch copy of the project, because a build rewrites the site and the page dates, and serving
    opens a browser.
-4. Do not edit any page. Report findings; the owner decides what changes. The one thing a review
+4. Do not edit any page. Report findings; the owner decides what changes. The only thing a review
    writes is its audit record, once the report is done.
 5. Note the commit you are reviewing. A file that changes while you work is read again before you
    report on it.
