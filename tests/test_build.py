@@ -16,12 +16,12 @@ import tempfile
 import threading
 import unittest
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+from builder import build as wiki
+from builder import cli, serve as serving
+from builder.config import CONFIG, WikiError
 
-from wiki_builder import build as wiki                      # noqa: E402
-from wiki_builder import cli, serve as serving              # noqa: E402
-from wiki_builder.config import CONFIG, WikiError           # noqa: E402
-
+# The installed package, wherever it is: the tests prove what a project gets, not what the source tree
+# happens to hold.
 PACKAGE = Path(wiki.__file__).resolve().parent
 
 CONFIGURATION = """
@@ -44,7 +44,7 @@ pages = ["thing"]
 
 [tool]
 version = "VERSION"
-""".replace("VERSION", __import__("wiki_builder").__version__)
+""".replace("VERSION", __import__("builder").__version__)
 
 PAGE = '''+++
 title = "A thing"
@@ -892,8 +892,10 @@ class PackageTests(unittest.TestCase):
     def test_the_skill_names_nothing_about_any_project(self):
         # The skill ships to every project too, and its worked example is the part most likely to carry
         # somebody's animals in it.
-        for name in ("skill/SKILL.md", "skill/references/the-standard.md"):
-            text = (PACKAGE / name).read_text(encoding="utf-8").lower()
+        # Asked of the tool rather than assumed: the skill sits beside the builder in a checkout and
+        # inside it in a built wheel, and this property has to hold in both.
+        for name in ("SKILL.md", "references/the-standard.md"):
+            text = (wiki.SKILL / name).read_text(encoding="utf-8").lower()
             for word in self.SOMEBODY_ELSES:
                 self.assertIsNone(re.search(r"\b" + word + r"\b", text),
                                   f"{name} names {word!r}; this package must not know it")

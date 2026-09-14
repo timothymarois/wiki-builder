@@ -40,7 +40,22 @@ FENCE = "+++"
 # Where the tool's own files live, so it runs from anywhere rather than only inside a repository laid
 # out the way the first one was.
 ASSETS = resources.files(__package__) / "assets"
-SKILL = resources.files(__package__) / "skill"
+
+
+def skill_dir():
+    """Where the skill is, whether this is an installed copy or a source checkout.
+
+    The skill lives beside the builder in the source tree rather than inside it, because it is not a
+    feature of the builder -- it is prose the builder carries to whoever installs it. A built wheel puts
+    it inside the package; an editable install leaves it where it was written.
+    """
+    packaged = Path(str(resources.files(__package__))) / "skill"
+    if packaged.is_dir():
+        return packaged
+    return Path(__file__).resolve().parents[1] / "skill"
+
+
+SKILL = skill_dir()
 
 # The collected-intent page. Generated, never written, because it is the surface a change is approved
 # against and a maintained copy would drift from the intents it claims to collect.
