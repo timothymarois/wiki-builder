@@ -57,7 +57,8 @@ wiki: these budgets are PROVISIONAL -- 500 words a page, 3500 for the collected 
 wiki: 3 pages written to /path/to/notes/docs/wiki/site
 ```
 
-It refuses to write into a folder that is not empty and was not made by an earlier build.[^guard]
+It refuses to write into a folder that is not empty and was not made by an earlier build.[^guard] A build
+that stops partway has already copied its stylesheet, so the next build still accepts the folder.[^partway]
 
 ## Exit codes
 
@@ -75,6 +76,8 @@ It refuses to write into a folder that is not empty and was not made by an earli
 [^report]: `src/builder/build.py` — `report()`, with `citation_counts()`; `src/builder/cli.py` — `run()`
     prints the page count and the folder.
 [^guard]: `src/builder/cli.py` — `guard_output()`.
+[^partway]: `src/builder/build.py` — `write_site()` copies `wiki.css` into `assets` before it writes any
+    page, and `src/builder/cli.py` — `guard_output()` accepts a folder that holds it.
 [^exit]: `src/builder/cli.py` — `main()` returns 2 with no wiki and prints a `WikiError` before returning 1;
     `run()` returns 2 when `guard_output()` refuses; argparse exits 2 on an option it does not know.
 [^stop]: `src/builder/cli.py` — `main()` prints a `WikiError` and returns 1; `src/builder/build.py` —

@@ -70,7 +70,7 @@ date.[^audited] Recording an audit is described on [wiki audit](commands/audit.m
 ## Search
 
 The search box matches **page titles and category names only**, not what the pages say, and shows at most eight
-results.[^search] Its index is written into every page rather than fetched, so search works from disk
+results, each after the pages above it.[^search][^path] Its index is written into every page rather than fetched, so search works from disk
 too.[^index]
 
 ## Audiences
@@ -123,3 +123,5 @@ banner.[^userdraft] Every field is listed on [Front matter](front-matter.md).
 [^same]: `src/builder/build.py` — `read_pages()` and `write_site()` walk pages, dates, categories and
     pictures in sorted order, `index_for()` writes the search index with sorted keys, every link is
     relative, and the clock is read only for the day a changed page is recorded.
+[^path]: `src/builder/build.py` — `write_site()` gives each search entry the titles `ancestors_of()` finds;
+    `src/builder/assets/wiki.js` shows them before the result's title.

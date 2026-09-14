@@ -1066,6 +1066,18 @@ class WikiTests(unittest.TestCase):
         index = front[front.index("const WIKI_INDEX="):]
         self.assertNotIn("proposal/", index[:index.index("</script>")])
 
+    def test_search_names_the_pages_above_a_child_page(self):
+        # A child page's title names only what sets it apart within its parent, so two children can share
+        # one; each result says where its page sits.
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        self.build()
+        front = (self.out / "index.html").read_text(encoding="utf-8")
+        start = front.index("const WIKI_INDEX=") + len("const WIKI_INDEX=")
+        index = json.loads(front[start:front.index(";</script>", start)])
+        by_title = {entry["t"]: entry for entry in index}
+        self.assertEqual("A thing", by_title["A part"]["p"])
+        self.assertEqual("", by_title["A thing"]["p"])
+
     def test_a_draft_is_not_in_the_collected_goals(self):
         self.write("proposal", PAGE.replace('status = "approved"\n', "")
                    .replace("A thing exists so that something else can happen.", "A proposal is made."))
@@ -1442,6 +1454,15 @@ class WikiTests(unittest.TestCase):
         counts, goals_words = self.build()
         self.assertTrue(any("thing.md runs to" in p for p in wiki.budget_problems(counts, goals_words, self.budget)))
 
+    def test_a_tables_borders_do_not_count_against_the_reading_budget(self):
+        # A table's pipes and dashed line are how it is drawn, not what it says: only its cells are read.
+        table = "| A | B |\n|---|---|\n| one | two |\n"
+        self.write("thing", PAGE.replace("## Ground", table + "\n## Ground"))
+        with_table, _ = self.build()
+        self.write("thing", PAGE.replace("## Ground", "A B\n\none two\n\n## Ground"))
+        with_prose, _ = self.build()
+        self.assertEqual(with_prose["thing"], with_table["thing"])
+
     # --- malformed input ---------------------------------------------------------------------------
 
     def test_a_page_with_no_front_matter_fence_is_refused(self):
@@ -1626,6 +1647,20 @@ class WikiTests(unittest.TestCase):
                 # argparse refuses a command line by exiting, which is how a person meets it too.
                 status = refused.code
         return status, out.getvalue() + err.getvalue()
+
+    def test_a_build_that_stopped_partway_does_not_block_the_next(self):
+        # A build that stops on one page has already written the pages before it. The next build must know
+        # the folder for its own, or one failure refuses every build after it until a person clears it.
+        self.write("thing", PAGE.replace("It does it slowly.[^why]",
+                                         "It is drawn ![here](../images/nope.png).[^why]"))
+        status, output = self.run_main(["--root", str(self.root), "build"])
+        self.assertEqual(1, status, output)
+        site = self.root / "docs/wiki/site"
+        self.assertTrue(site.is_dir() and any(site.iterdir()),
+                        "the failed build wrote nothing, so it proves nothing about the next one")
+        self.write("thing", PAGE)
+        status, output = self.run_main(["--root", str(self.root), "build"])
+        self.assertEqual(0, status, output)
 
     def test_the_audit_command_names_each_page_it_recorded(self):
         self.write("thing/part", PAGE.replace("A thing", "A part"))

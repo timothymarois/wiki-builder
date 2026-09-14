@@ -77,9 +77,9 @@ inside it.
 them inside the package; a checkout leaves them where they were written, and `build.skill_dir()` finds
 them either way.
 
-## Tests (`tests/` — 186 cases)
+## Tests (`tests/` — 189 cases)
 
-`tests/test_build.py` (1932 lines). Each case builds a small wiki in a temporary directory, breaks exactly
+`tests/test_build.py` (1967 lines). Each case builds a small wiki in a temporary directory, breaks exactly
 one rule, and asserts the tool names it. Run them with:
 
 ```sh

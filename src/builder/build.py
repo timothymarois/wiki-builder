@@ -142,6 +142,17 @@ def read_front_matter(path):
     return meta, rest[end + len(FENCE) + 2:]
 
 
+def counted_words(body):
+    """The words a reader reads on a page.
+
+    A reference is followed and a code block copied, so neither is read the way prose is; and a table's
+    pipes and dashed line are how it is drawn, not what it says, so only the words in its cells count.
+    """
+    text = FENCED.sub("", strip_footnote_definitions(body))
+    lines = [line for line in text.splitlines() if not TABLE_SEPARATOR.match(line)]
+    return len("\n".join(lines).replace("|", " ").split())
+
+
 def read_pages(pages_dir, intent_budget):
     """Every page in the directory, by id, sorted so two runs agree."""
     if not pages_dir.is_dir():
@@ -187,7 +198,7 @@ def read_pages(pages_dir, intent_budget):
             "categories": list(meta.get("categories", [])),
             # Neither a reference nor a code block is read the way prose is: one is followed, the other
             # copied or run. The owner, 2026-09-14, chose not to count code blocks.
-            "words": len(FENCED.sub("", strip_footnote_definitions(body)).split()),
+            "words": counted_words(body),
         }
     if not pages:
         raise WikiError(f"{pages_dir} holds no pages; a wiki that renders nothing did not run")
@@ -640,18 +651,23 @@ def render_nav(sections, pages, categories, current, directory, audience):
     return "".join(markup)
 
 
+def ancestors_of(page_id, pages, audience):
+    """The pages above this one that a build for this audience has, from the top down."""
+    parts = page_id.split("/")
+    above = ["/".join(parts[:depth]) for depth in range(1, len(parts))]
+    return [ancestor for ancestor in above
+            if ancestor in pages and visible_to(audience, pages[ancestor]["audience"])]
+
+
 def render_crumbs(page_id, pages, directory, audience):
     """The pages above this one, each a link, so a reader on a child page sees where it sits and can climb.
 
     A page this build does not have is left out, as the sidebar leaves it out; with nothing left above the
     page there is no trail at all, and a top page never has one.
     """
-    parts = page_id.split("/")
-    above = ["/".join(parts[:depth]) for depth in range(1, len(parts))]
     links = ['<a href="%s">%s</a>' % (relative_directory(directory, page_directory(ancestor)),
                                       html_module.escape(pages[ancestor]["title"]))
-             for ancestor in above
-             if ancestor in pages and visible_to(audience, pages[ancestor]["audience"])]
+             for ancestor in ancestors_of(page_id, pages, audience)]
     if not links:
         return ""
     return ('      <nav class="crumbs" aria-label="Breadcrumb">%s › <span aria-current="page">%s</span></nav>\n'
@@ -968,11 +984,15 @@ def write_site(root, out, audience, link_root, today, record, wiki):
     index_entries = []
     linked = [page_id for page_id in emitted if pages[page_id]["status"] == "approved"]
     for page_id in linked:
+        # A child page's title names only what sets it apart within its parent, so a result says where the
+        # page sits.
         index_entries.append({"u": page_directory(page_id), "t": pages[page_id]["title"],
-                              "s": pages[page_id]["subtitle"]})
+                              "s": pages[page_id]["subtitle"],
+                              "p": " › ".join(pages[ancestor]["title"]
+                                              for ancestor in ancestors_of(page_id, pages, audience))})
     for slug in sorted(categories):
         index_entries.append({"u": category_directory(slug),
-                              "t": "Category: " + categories[slug]["name"], "s": "a category page"})
+                              "t": "Category: " + categories[slug]["name"], "s": "a category page", "p": ""})
 
     def index_for(directory):
         """The search index as this page must address it: every other page relative to this one.
@@ -982,7 +1002,7 @@ def write_site(root, out, audience, link_root, today, record, wiki):
         shared index sends every result clicked on /a/ to /a/b/, and every one of them is a miss.
         """
         return json.dumps([{"u": relative_directory(directory, entry["u"]), "t": entry["t"],
-                            "s": entry["s"]} for entry in index_entries],
+                            "s": entry["s"], "p": entry["p"]} for entry in index_entries],
                           sort_keys=True, separators=(",", ":"))
 
     changed = []
@@ -1009,6 +1029,13 @@ def write_site(root, out, audience, link_root, today, record, wiki):
         if not destination.is_file() or destination.read_text(encoding="utf-8") != markup:
             destination.write_text(markup, encoding="utf-8", newline="\n")
         written.append(destination)
+
+    # The stylesheet goes in before any page: it is how a later build knows this folder for its own, so a
+    # build that stops partway leaves a folder the next build still accepts.
+    assets = out / "assets"
+    assets.mkdir(parents=True, exist_ok=True)
+    for name in ("wiki.css", "wiki.js"):
+        written.append(copy_if_changed(ASSETS / name, assets / name))
 
     # Counted from the pages as written, once, for every footer.
     citations = citation_counts(root, wiki)
@@ -1108,10 +1135,6 @@ def write_site(root, out, audience, link_root, today, record, wiki):
         order = agent_order(sections, pages, emitted)
         emit("", agent_index(site, order, pages), AGENT_INDEX)
 
-    assets = out / "assets"
-    assets.mkdir(parents=True, exist_ok=True)
-    for name in ("wiki.css", "wiki.js"):
-        written.append(copy_if_changed(ASSETS / name, assets / name))
     # Only a wiki that draws a diagram carries the script, and its licence beside it.
     if diagrams_used:
         for name in (MERMAID, MERMAID_LICENSE):
