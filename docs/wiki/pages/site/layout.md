@@ -28,9 +28,11 @@ stay at its top, and only the list of pages beneath them scrolls.[^rail] Scrolli
 the article, and scrolling the article never moves the sidebar.[^rail] A page far down a long list opens
 with its own link scrolled into view.[^current]
 
-Pages beneath another hang from it as a tree, in slightly smaller text: a line runs down beside them and
-a leg reaches each one.[^nest] **The sidebar shows which branch the reader is in**: every page above the
-current one is bold, and the line and legs beneath it are drawn in the link colour.[^branch]
+Pages beneath another hang from it as a tree, with a leg to each.[^nest] **The sidebar marks where the
+reader is**: every page above the current one is bold, and its tree lines take the link colour.[^branch]
+A line across the sidebar sits below the logo, below the search box and above each section, whose name is
+in capitals,
+and the list's scroll bar sits at the sidebar's edge.[^section]
 
 ## Article
 
@@ -74,6 +76,12 @@ button.[^narrow]
     class `up`, and the list beneath the current page or a page above it the class `here`;
     `src/builder/assets/wiki.css` makes `a.up` bold and draws the line and legs of `ul.here` in the link
     colour.
+[^section]: `src/builder/assets/wiki.css` — `.logo::after` and `.sbox::after` draw the lines below the
+    logo and the search box, and
+    `.rail h5` draws each section's name in capitals under a
+    line that reaches both edges of the rail, `.rail #nav > h5:first-child` leaves the line off the first,
+    and `.rail #nav` reaches the rail's edges and carries its padding inside, so its scroll bar is on the
+    edge.
 [^copy]: `src/builder/build.py` — `write_site()` wraps every code block in `srcbox` with a Copy button;
     `src/builder/assets/wiki.js` copies the block when it is pressed.
 [^beside]: `src/builder/assets/wiki.css` — `.srcbox` sets `display: flow-root`.
