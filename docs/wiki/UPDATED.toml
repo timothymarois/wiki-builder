@@ -138,11 +138,11 @@ audited = "2026-09-14"
 
 ["pages/markdown"]
 updated = "2026-09-14"
-digest = "0958fb8d7a16b45429fb26661114219cf6c44cd1be10becf615cc0fc09503479"
+digest = "83b2e1f1e4bcffaa6dc74910f366d70a621e5221b9f53e53ca5a2db704c3621b"
 
 ["pages/pictures"]
 updated = "2026-09-14"
-digest = "aece51e65bfa1c6a8e1380a948792c1fd407837bf0aa73f625e17da9cc5d3752"
+digest = "e708bc99a079f5d2bfede37a7ff310f34e589a467ea9d32a90d5af4e0d3b4f17"
 
 ["pictures-toml"]
 updated = "2026-09-14"
