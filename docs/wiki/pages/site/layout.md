@@ -34,7 +34,8 @@ Every code block has a Copy button in its top right corner.[^copy] A code block 
 narrowed to fit beside it, so its button is never hidden underneath.[^beside] A table in a page is drawn
 as a wiki table, and scrolls inside its own frame when it is wider than the screen.[^table] A list is
 indented and spaced like the references at the foot of the page.[^lists] A link that leaves the wiki
-opens in a new tab and ends in an arrow.[^outside]
+opens in a new tab and ends in an arrow.[^outside] A flowchart or other diagram written in a `mermaid` code block is drawn as a
+diagram, the way GitHub draws one, and the page's markdown keeps the block as written.{missing}
 
 ## Narrow screens
 

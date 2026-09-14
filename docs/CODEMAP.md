@@ -44,7 +44,7 @@ The kind of CI other projects include is `action.yml` at the root.
 | `assets/wiki.js` | Search over an inlined index, the theme switch, the mobile menu, the lightbox, copy |
 | `assets/template.html` | The page, as named holes |
 
-## Skills (`.agents/skills/` — 3, linked from `.claude/skills/`)
+## Skills (`.agents/skills/` — 4, linked from `.claude/skills/`)
 
 What an agent working here must load. The repository owns each one, and none of them references a skill
 it does not own.
@@ -54,6 +54,7 @@ it does not own.
 | `using-python` | Any Python: boundaries, naming, errors, resources, testing mechanics, traps |
 | `testing-code` | Any change in behaviour: which boundary holds the risk, and proving a test has teeth |
 | `writing-wiki-pages` | A link to `src/skill/` — the copy that ships, so there is only one of it |
+| `managing-github` | Issues, pull requests, reviews, releases and tags on GitHub, and reading their stored state back |
 
 ## The skill (`src/skill/` — not a builder feature)
 
