@@ -78,8 +78,19 @@ code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;backgroun
 .rail li{margin:0 0 1px}
 .rail li a{display:block;padding:1px 0;font-size:12.8px}
 .rail li a.on{font-weight:700;color:var(--text)}
-/* Children nest under their parent page, as deep as the pages themselves go. */
-.rail li ul{margin:1px 0 3px;padding-left:9px;border-left:1px solid var(--hair)}
+/* Children nest under their parent page, as deep as the pages themselves go, drawn as a tree: a line runs
+   down beside them, a leg reaches each one, and the line stops at the last leg. The leg sits at the
+   middle of an 18px line, 1px of padding plus 9px. */
+.rail li ul{margin:1px 0 4px 5px;padding:0}
+.rail li li{position:relative;margin:0;padding-left:14px}
+.rail li li::before{content:"";position:absolute;left:0;top:0;bottom:0;border-left:1.5px solid var(--border)}
+.rail li li:last-child::before{bottom:auto;height:10px}
+.rail li li::after{content:"";position:absolute;left:0;top:10px;width:9px;border-top:1.5px solid var(--border)}
+.rail li li a{font-size:12.3px;line-height:18px}
+/* The branch the reader is in: every page above the current one is bold, and its line and legs take the
+   link colour. */
+.rail li a.up{font-weight:700}
+.rail ul.here > li::before,.rail ul.here > li::after{border-color:var(--link)}
 
 /* ===== article chrome ===== */
 .doc{border-left:1px solid var(--border-soft);min-height:100vh;background:var(--page)}

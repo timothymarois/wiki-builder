@@ -28,6 +28,10 @@ stay at its top, and only the list of pages beneath them scrolls.[^rail] Scrolli
 the article, and scrolling the article never moves the sidebar.[^rail] A page far down a long list opens
 with its own link scrolled into view.[^current]
 
+Pages beneath another hang from it as a tree, in slightly smaller text: a line runs down beside them and
+a leg reaches each one.[^nest] **The sidebar shows which branch the reader is in**: every page above the
+current one is bold, and the line and legs beneath it are drawn in the link colour.[^branch]
+
 ## Article
 
 Every code block has a Copy button in its top right corner.[^copy] A code block beside the infobox is
@@ -63,6 +67,13 @@ button.[^narrow]
     `overscroll-behavior: contain`.
 [^current]: `src/builder/assets/wiki.js` — scrolls `#nav` so its `a.on` link is in view, without moving
     the article.
+[^nest]: `src/builder/assets/wiki.css` — `.rail li li::before` draws the line beside a nested page and
+    stops it at the leg on `:last-child`, `.rail li li::after` draws the leg, and `.rail li li a` sets
+    the link smaller.
+[^branch]: `src/builder/build.py` — `render_nav()` gives the link of every page above the current one the
+    class `up`, and the list beneath the current page or a page above it the class `here`;
+    `src/builder/assets/wiki.css` makes `a.up` bold and draws the line and legs of `ul.here` in the link
+    colour.
 [^copy]: `src/builder/build.py` — `write_site()` wraps every code block in `srcbox` with a Copy button;
     `src/builder/assets/wiki.js` copies the block when it is pressed.
 [^beside]: `src/builder/assets/wiki.css` — `.srcbox` sets `display: flow-root`.
