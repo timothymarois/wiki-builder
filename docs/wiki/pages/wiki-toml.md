@@ -74,7 +74,7 @@ wiki-builder's own wiki runs on the default budgets; two of its sections are sho
 
 ```toml
 [site]
-name = "wiki-builder"
+name = "Wiki Builder"
 tagline = "the tool's own wiki"
 
 [[section]]

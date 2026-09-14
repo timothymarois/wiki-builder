@@ -1,6 +1,6 @@
 +++
 title = "Checks"
-subtitle = "every reason the wiki is not fit to read"
+subtitle = "what a wiki may not do"
 status = "approved"
 intent = """
 The checks exist so that a wiki read instead of the code cannot quietly stop being true. Each one refuses

@@ -77,7 +77,7 @@ against the page's reading budget.[^budget]
 ## Copies
 
 A page's markdown copy keeps a diagram as the block it was written as, which is how an agent reads
-it.[^copy] The copies are described on [Agent markdown](../site/agent-markdown.md), and wiki-builder's own
+it.[^copy] The copies are described on [Markdown copies](../site/agent-markdown.md), and wiki-builder's own
 diagrams are on [Checks](../checks.md), [Citations](../checks/citations.md) and
 [GitHub Pages](../deployment-github.md).
 

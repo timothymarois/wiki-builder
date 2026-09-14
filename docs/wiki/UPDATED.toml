@@ -10,7 +10,7 @@ digest = "8bd23125e35407c4d62fb1d1f4aeea067b4e82a5a8ab9f6edad91f997ea00dbb"
 
 ["checks"]
 updated = "2026-09-14"
-digest = "a3c6c277f8a88266b4a9f72aeecad95102aade26ba0a116c6b5a630ebe50a03f"
+digest = "9c04540b75f09c2898990080e440e392268daa0ac763d08e2fa1f3f8378d5a72"
 audited = "2026-09-14"
 
 ["checks/budgets"]
@@ -111,11 +111,11 @@ audited = "2026-09-14"
 
 ["goals"]
 updated = "2026-09-14"
-digest = "a17971ca4f9dc8e4c9b53da0736ffea1279bf73401dc352e93d9f2fef0b2b4ef"
+digest = "292454bf34039b98a01064b515e4bf44fafe5a118d44a7750fcc0b02a92f2822"
 
 ["index"]
 updated = "2026-09-14"
-digest = "22ae116d97a5c082e4e13e6b9ac66e07557375a93af40cc6aa5b698619d886ab"
+digest = "7af7c069457c6071ba313defd73ad6dfa77eb625ad63b6feeb05a8dd2a4b4e77"
 
 ["installation"]
 updated = "2026-09-14"
@@ -133,7 +133,7 @@ audited = "2026-09-14"
 
 ["pages/diagrams"]
 updated = "2026-09-14"
-digest = "ca473bd0228fc6e2a948b4e45c8f0528051f14b989fb0594762d5acd6ac06aa1"
+digest = "584f013f4d88cfa4987ccb7ba1926c52cae58afeb3505235739c9b100755f048"
 audited = "2026-09-14"
 
 ["pages/markdown"]
@@ -165,7 +165,7 @@ audited = "2026-09-14"
 
 ["site/agent-markdown"]
 updated = "2026-09-14"
-digest = "1ffe1797ac975216b211d7b9865d3e1cf6462f417805cd4be5731347c8c4363c"
+digest = "edd5a672031b5da2500aa9b9988cc873d6f856816f66924991f701a5c3be8ac8"
 audited = "2026-09-14"
 
 ["site/layout"]
@@ -180,5 +180,5 @@ audited = "2026-09-14"
 
 ["wiki-toml"]
 updated = "2026-09-14"
-digest = "1536b4736fe3027689cd2ffa20913e24b8750f7485941bf6f180148dc62d7057"
+digest = "bbec839d656fdcd7e894ea745d23710dcd5c5f8ea464737f7ff639012030767d"
 audited = "2026-09-14"

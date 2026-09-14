@@ -1,9 +1,9 @@
 +++
-title = "Agent markdown"
-subtitle = "what an agent reads instead of the rendered page"
+title = "Markdown copies"
+subtitle = "each page as a markdown file"
 status = "approved"
 intent = """
-Agent markdown exists so that an agent reading the wiki gets each page as it was written, not as text
+The markdown copies exist so that an agent reading the wiki gets each page as it was written, not as text
 picked back out of HTML. An agent should find every page from one index, without a person pointing it there.
 """
 
