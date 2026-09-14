@@ -86,6 +86,22 @@ uv run --with mistune==3.3.4 python -m unittest discover -s tests -t tests
 - Tests import the installed package. They prove what a project gets, not what the source tree holds.
 - An empty result is a failure, never a pass: a check that found nothing did not run.
 
+## Commits
+
+Every branch and commit follows these conventions.
+
+- **Type**, by what the change does, not which files it touched: `feat` a new capability, `fix` a defect
+  corrected, `docs` documentation only, `test` tests only, `refactor` behaviour unchanged, `perf` a
+  measured speed-up, `chore` housekeeping, `build` dependencies or toolchain, `ci` workflows.
+- **Branch:** `<type>/<short-kebab-slug>` naming the change, such as `feat/wiki-audit`. No ticket number,
+  date, initials or `wip`.
+- **Commit:** `<type>(optional-scope): <imperative summary>`, under 72 characters with no full stop, such
+  as `feat(audit): record the day a page was last audited`. The scope names an area, not a file. A body,
+  after a blank line, says why when the diff does not.
+- **No machine-authorship branding** in a name or body: no provider, model, agent or tool name,
+  generated-by footer or co-author trailer. Remove any a runtime adds before the commit lands.
+- Commit only when the owner asks, and only the files the change touched.
+
 ## Releases
 
 - `pyproject.toml` and `src/builder/__init__.py` carry the version; they change together.
@@ -105,4 +121,5 @@ changed in the same commit).
 4. Every requirement the owner gave is on its wiki page, cited to its implementation or marked
    `{missing}`, and `wiki check` passes.
 5. The change was proved against a real wiki through the installed command, not only a fixture.
-6. Re-read this file and verify every applicable item with observed evidence.
+6. Every commit message follows [Commits](#commits).
+7. Re-read this file and verify every applicable item with observed evidence.
