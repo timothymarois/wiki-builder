@@ -5,7 +5,7 @@ description = "A wiki a person can read, built from markdown, where every statem
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
-authors = [{ name = "Tim Marois" }]
+authors = [{ name = "Timothy Marois" }]
 # Pinned exactly. The rendered pages are checked against rules this tool enforces, and a parser that
 # changed its output underneath a project would turn every page red at once for no reason anyone could see.
 dependencies = ["mistune==3.3.4"]

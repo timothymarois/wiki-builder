@@ -63,7 +63,8 @@ numbered contents, the body, the references, the categories and the date.](../im
 The **infobox** holds a handful of facts a reader would check, in groups of rows.[^infobox] Every row cites
 a footnote the page's text cites for the same fact, or is marked as having no source.[^rows] A row can
 also record the requirement it satisfies, which is kept for whoever checks the page but never
-shown.[^infobox]
+shown.[^infobox] A row's value can link to an address outside the wiki, and opens the way any outside
+link does.[^infobox]
 
 A page with more than two headings gets a **numbered contents** box.[^contents] A page's **categories**
 appear at its foot, and each links to a generated page listing everything in that category.[^categories]
@@ -88,7 +89,8 @@ named "source".[^source]
     `write_site()` take approved pages only.
 [^reach]: `src/builder/build.py` — `write_site()` refuses any page that is in no section and beneath no
     page that is.
-[^infobox]: `src/builder/build.py` — `render_infobox()` renders groups of rows and never renders a row's
+[^infobox]: `src/builder/build.py` — `render_infobox()` renders groups of rows, links a value to its row's
+    `link` with `OUTSIDE`, refuses a `link` that `OUTSIDE_LINK` does not match, and never renders a row's
     `guaranteed`.
 [^rows]: `src/builder/build.py` — `infobox_problems()` refuses a row with neither a `cite` nor
     `missing = true`, and `render_infobox()` shows the cited footnote's number.

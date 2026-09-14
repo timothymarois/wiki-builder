@@ -40,7 +40,8 @@ pages.[^serve] What refuses a page is described on [Checks](checks.md), and how 
 
 Every page is a folder holding one file, `index.html`, and every link names that file.[^links] That way the
 same site works both through a server and opened straight from disk.[^links] `wiki publish` builds it with
-clean addresses instead, which work only on a host.[^publish]
+clean addresses instead, which work only on a host.[^publish] A link that leaves the wiki opens in a new tab,
+is marked `nofollow`, and ends in an arrow, without its author writing anything but the link.[^outside]
 
 The build deletes whatever it no longer makes, so a removed page leaves nothing behind.[^removed] For the
 same reason, **it refuses to write into a folder it did not make**, so it never empties someone
@@ -77,6 +78,8 @@ for players, and it strips every reference, every red mark and the Source tab.[^
     `LINK_SUFFIX`, `index.html`.
 [^publish]: `src/builder/build.py` — `build()` empties `LINK_SUFFIX` when `links` is `"clean"`, which
     `src/builder/cli.py` passes for `publish`.
+[^outside]: `src/builder/build.py` — `rewrite_references()` adds `OUTSIDE` to a link matching `OUTSIDE_LINK`;
+    `src/builder/assets/wiki.css` draws the arrow on `a.ext`.
 [^removed]: `src/builder/build.py` — the end of `write_site()` unlinks every file the build did not write.
 [^guard]: `src/builder/cli.py` — `guard_output()` refuses a non-empty folder with no stylesheet from an
     earlier build.

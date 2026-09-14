@@ -105,7 +105,7 @@ def main(argv=None):
     commands.add_parser("build", parents=[place], help="render the pages into the site")
     commands.add_parser("check", parents=[place], help="every reason the wiki is not fit to read")
     synced = commands.add_parser("sync", parents=[place],
-                                 help="write the skill into this project and record the release")
+                                 help="write the skill into the project and record the release")
     skill = synced.add_mutually_exclusive_group()
     skill.add_argument("--skill-dir", type=Path, default=None, metavar="DIR",
                        help="the folder to put the skill in, relative to the project; defaults to "

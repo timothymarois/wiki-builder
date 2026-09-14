@@ -11,6 +11,10 @@ title = "Start"
 pages = ["index", "brief", "goals"]
 
 [[section]]
+title = "Guides"
+pages = ["installation", "continuous-integration", "deployment-github", "deployment-cloudflare"]
+
+[[section]]
 title = "Writing"
 pages = ["pages", "skill"]
 
@@ -20,7 +24,7 @@ pages = ["site", "serving"]
 
 [[section]]
 title = "Checking"
-pages = ["checks", "continuous-integration"]
+pages = ["checks"]
 
 [[section]]
 title = "Reference"

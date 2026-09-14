@@ -168,8 +168,9 @@ Before you call a page done, read it once for each of these. They are quick and 
 **A sibling page is linked as `name.md`.** The tool turns it into a clean address. Writing the address by
 hand looks right, and works in only one of the places a site is read: off disk or published.
 
-**A reference names code, never a document.** The extract above carries none only because it is an
-extract; a real page ends with references, and every one points at a file and a function. The gate
+**A reference names code, never a project document.** The extract above carries none only because it is
+an extract; a real page ends with references, and every one points at a file and a function — or, for how
+an outside service behaves, at that service's own documentation. The gate
 refuses a reference that cites a `.md`, because a page of prose is not an answer to "where does this
 happen" — it is another claim that can be wrong in the same way.
 

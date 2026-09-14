@@ -31,13 +31,13 @@ rows = [
 ]
 +++
 
-This repository is also a GitHub Action that installs wiki-builder and runs `wiki check` on a project's
+wiki-builder is also a GitHub Action that installs wiki-builder and runs `wiki check` on a project's
 wiki, failing the job on any problem the check reports.[^action] What the check refuses is described on
 [Checks](checks.md).
 
 ## Action
 
-A project adds one step after checking out its code, naming a release tag of this repository.[^action]
+A project adds one step after checking out its code, naming a wiki-builder release tag.[^action]
 ```yaml
 # .github/workflows/wiki.yml
 name: wiki
@@ -60,11 +60,12 @@ The action installs the tool from its own copy, at the release named in `uses:`,
 the one that release ships.[^install] A wiki synced against a different release fails, and the check says
 to run `wiki sync`.[^version]
 
-## This repository
+## Repository workflows
 
-Every push to `main` and every pull request runs two workflows here.[^ci] One runs the tool's own tests on
-Python 3.11 and 3.12, against the installed package.[^tests] The other checks this wiki with the same
-action a project uses, so the action is exercised on every change to it.[^wiki]
+Every push to `main` and every pull request runs two workflows in the wiki-builder repository.[^ci] One runs the tool's own tests on
+Python 3.11 and 3.12, against the installed package.[^tests] The other checks wiki-builder's own wiki with the same
+action a project uses, so the action is exercised on every change to it.[^wiki] Publishing that wiki once
+it passes is described on [Deployment (GitHub)](deployment-github.md).
 
 [^action]: `action.yml` — a composite action whose last step runs `wiki check` in the project's folder.
 [^inputs]: `action.yml` — `inputs`: `root`, `wiki` and `python-version`, with their defaults.

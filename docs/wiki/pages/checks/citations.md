@@ -1,11 +1,12 @@
 +++
 title = "Citations"
-subtitle = "every statement traced to the code"
+subtitle = "every statement traced to its source"
 status = "approved"
 categories = ["Refusals"]
 intent = """
 Citations exist so that a reader who cannot read the code can still tell a checked sentence from a guess.
-Every statement should lead to the code it came from, or say plainly that nothing was found.
+Every statement should lead to the code it came from, or to the documentation of the outside service it
+describes, or say plainly that nothing was found.
 """
 
 [[infobox]]
@@ -22,6 +23,7 @@ rows = [
   { label = "Infobox rows", value = "cited, or marked missing", cite = "rows" },
   { label = "Code samples", value = "not checked", cite = "sample" },
   { label = "Refused reference", value = "a link to a markdown document", cite = "document" },
+  { label = "Outside documentation", value = "allowed, as a link", cite = "document" },
   { label = "Exempt pages", value = "pages about the wiki itself", cite = "exempt" },
 ]
 +++
@@ -40,7 +42,8 @@ citation**.[^uncited] A version number or an abbreviation does not end a sentenc
 written directly under its heading is checked like any other.[^heading]
 
 A sentence that links to another page is excused, because that page carries the citations, and a table is
-held as a whole.[^excused] A code sample needs no citation, because it is the thing itself rather than a
+held as a whole.[^excused] A list item that is only a link, such as an entry under External links, states
+nothing and is excused as well.[^excused] A code sample needs no citation, because it is the thing itself rather than a
 claim about it; the sentence introducing it does.[^sample]
 
 An infobox row is held to the same rule.[^rows] It names a footnote the page's text cites for the same
@@ -67,6 +70,9 @@ failing.[^marks]
 A reference that links to a markdown document is refused.[^document] A page of prose is only another
 claim, and it can be wrong in exactly the way the citing page is.[^document]
 
+A reference to an outside service's own documentation, such as a host's guide, is a link that does not end
+in `.md`, so it passes; it is how a page cites the behaviour of something outside the project.[^document]
+
 Only a link is recognised: **a reference that names a document without linking to it passes**, and so does
 a reference that names nothing at all.[^document]
 
@@ -78,7 +84,7 @@ a reference that names nothing at all.[^document]
     exclamation mark followed by a space and a capital, a digit, code, emphasis or an opening bracket.
 [^heading]: `src/builder/build.py` — `page_statements()` blanks every heading line with `HEADING_ANY`
     before reading the body.
-[^excused]: `src/builder/build.py` — `uncited_problems()` skips a sentence matching `PAGE_LINK`, and
+[^excused]: `src/builder/build.py` — `uncited_problems()` skips a sentence matching `PAGE_LINK` or `LINK_ONLY`, and
     `statements()` returns a block that starts with `|` whole.
 [^sample]: `src/builder/build.py` — `page_statements()` blanks fenced code with `FENCED`, so a sample is
     never read as sentences.

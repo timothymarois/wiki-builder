@@ -9,19 +9,21 @@ Counts are of lines, and are meant to show shape and growth at a glance.
 
 - `pyproject.toml` — the package: distribution `wiki-builder`, command `wiki`, `mistune` pinned exactly,
   Python 3.11 or newer for `tomllib`.
-- `action.yml` — the GitHub Action a project uses to check its wiki in CI: installs this package from the
+- `action.yml` — the GitHub Action a project uses to check its wiki in CI: installs wiki-builder from the
   action's own copy, then runs `wiki check`.
 - `README.md` — what it is, how a project installs it, and how a project updates.
 - `AGENTS.md` / `CLAUDE.md` — the rules. Byte-identical, changed in the same commit.
 - `.gitignore` — generated output, environments, caches.
 
-## Continuous integration (`.github/workflows/` — 2 workflows)
+## Continuous integration (`.github/workflows/` — 3 workflows)
 
-Both run on every push to `main` and every pull request. The third kind of CI, the one other projects
-include, is `action.yml` at the root.
+The first two run on every push to `main` and every pull request; `pages.yml` runs on pushes to `main`.
+The kind of CI other projects include is `action.yml` at the root.
 
 - `tests.yml` — the tool's tests on Python 3.11 and 3.12, installed rather than run from the tree.
-- `wiki.yml` — this repository's own `docs/wiki`, checked through `action.yml`.
+- `wiki.yml` — wiki-builder's own `docs/wiki`, checked through `action.yml`.
+- `pages.yml` — checks the wiki through `action.yml`, publishes it, and deploys it to GitHub Pages at
+  `wiki-builder.marois.dev`.
 
 ## Documentation (`docs/`)
 
@@ -70,9 +72,9 @@ inside it.
 them inside the package; a checkout leaves them where they were written, and `build.skill_dir()` finds
 them either way.
 
-## Tests (`tests/` — 117 cases)
+## Tests (`tests/` — 132 cases)
 
-`tests/test_build.py` (1287 lines). Each case builds a small wiki in a temporary directory, breaks exactly
+`tests/test_build.py` (1410 lines). Each case builds a small wiki in a temporary directory, breaks exactly
 one rule, and asserts the tool names it. Run them with:
 
 ```sh
@@ -85,7 +87,7 @@ anything about any project.
 
 ## What a project looks like
 
-The shape the tool expects to find, and the shape of this repository's own `docs/wiki/`.
+The shape the tool expects to find, and the shape of wiki-builder's own `docs/wiki/`.
 
 ```
 docs/wiki/

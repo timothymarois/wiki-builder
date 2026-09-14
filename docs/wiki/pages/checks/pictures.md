@@ -45,8 +45,8 @@ until it is blessed for the first time.**[^unguarded]
 
 ## Page anatomy
 
-The picture of a page's parts shows the page template.[^here] If the template changes, this wiki's own
-check fails until the picture is redrawn or blessed.[^here]
+The picture of a page's parts shows the page template.[^here] If the template changes, the check on wiki-builder's
+own wiki fails until the picture is redrawn or blessed.[^here]
 
 [^ledger]: `src/builder/build.py` — `read_ledger()` reads `LEDGER` from the images folder.
 [^check]: `src/builder/build.py` — `picture_problems()` compares each recorded `digest` with

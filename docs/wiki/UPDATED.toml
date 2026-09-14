@@ -6,7 +6,7 @@
 
 ["brief"]
 updated = "2026-09-14"
-digest = "7d38c5b289cb7e6aa632ea94331789c3bed6a6e010b08dcab841d1c048955fec"
+digest = "cfd4e928a0ef730f9e65a96ab3363bfc0f26afade8f74d06afe94f5659368da8"
 
 ["checks"]
 updated = "2026-09-14"
@@ -18,7 +18,7 @@ digest = "7856858ee3a447df91d3340a61316183d9c8f2b484381f5baacde701eab108d0"
 
 ["checks/citations"]
 updated = "2026-09-14"
-digest = "9f5ecd9f2bb0c9e37a73115874f959787b0d7a42f700fb85109b4f8d78528287"
+digest = "6a2d89f066c8a52949ef7ad5f31fc925a72400878946678b6069beb97ed6ac90"
 
 ["checks/headings"]
 updated = "2026-09-14"
@@ -26,7 +26,7 @@ digest = "3a1d8ca65cc99b888c827f02323ff9e7ed01c35dd97e8f04e253dbd182db72f8"
 
 ["checks/pictures"]
 updated = "2026-09-14"
-digest = "37b12dd07e272c88d06bf0126de487282080f1d3070bdb00f71c362a8e9c30a3"
+digest = "1c9305880d31d0a6a9131aca9f5683ea50695bb158067fb53896dc0a7b78a1fb"
 
 ["commands"]
 updated = "2026-09-14"
@@ -62,19 +62,31 @@ digest = "08bf09546154eda0d76533a39857448632452761874c3494bf44c6f18a55a59a"
 
 ["continuous-integration"]
 updated = "2026-09-14"
-digest = "0aa29dcb08516eea28d3cebe81434666bdcceeef334b839caa979f17a8716e93"
+digest = "47559dea7d28e5b6c66e180722e71fd74303ebddeb1e0a52490f585690609262"
+
+["deployment-cloudflare"]
+updated = "2026-09-14"
+digest = "aca90422c0acd04741b498864d4bde34169104a427cef6ce4079c1e2303ee4d9"
+
+["deployment-github"]
+updated = "2026-09-14"
+digest = "0ceabdb60a3de793d723160dced382bf08f5875d347eb9e964b6009cf6852804"
 
 ["goals"]
 updated = "2026-09-14"
-digest = "847faa6b621f42d814d44580a43978da327598124c5ead6856dbb59d5d771327"
+digest = "e6fa0661f41279f559474b4e1dd764569be1fb5504e6bedbd5a373d9112b7428"
 
 ["index"]
 updated = "2026-09-14"
-digest = "b2e4b160ce030a099effe1c93d1046eeb16c9bf4cc0616a4d90be1d8359f0698"
+digest = "ce2047af6bd1d66249db38182d7b42e3debf8bc40b19d3ce21dc1ce46577eaca"
+
+["installation"]
+updated = "2026-09-14"
+digest = "5e482c3b97100a18fe53ffcc4fe6934b3b614d4bc73363a797a59a81a371e524"
 
 ["pages"]
 updated = "2026-09-14"
-digest = "06e4b0cba2c6126d73bcb2a299413b04776eb98cd97cb8a05d15bb5f46e8dca4"
+digest = "bfaca9c53eb692481c46335e14c23bc9b482f4341c8e6f6edbc559e033066265"
 
 ["serving"]
 updated = "2026-09-14"
@@ -82,7 +94,7 @@ digest = "5e54592e2f626ff4dfd482d21739ab9404f46f308ef034aff15d36da5624795b"
 
 ["site"]
 updated = "2026-09-14"
-digest = "48f2d0ebab99e93cef512292c4753e69747343fe6cc8cd65e4c7a5d5ed739636"
+digest = "9b0d27baebc9cb548a91e33be499f246ced62cf670af69b1edee83176b057ba4"
 
 ["skill"]
 updated = "2026-09-14"

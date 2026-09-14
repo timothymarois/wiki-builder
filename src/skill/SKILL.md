@@ -130,6 +130,9 @@ From the encyclopedia's title policy, for titles, headings and categories alike.
 - **A heading** is the same, one level down. The gate refuses a question or a verdict.
 - **A category** is a plural noun for a set: **Background jobs**, not "Jobs that run in the background".
 - **An infobox label** is a noun phrase naming a property, which the value gives: **Expiry** · 30 minutes.
+- **Nothing points; everything is named.** "This site", "Our setup" and "These options" point at the page
+  instead of naming the thing: **Domain**, **Setup**, **Options**. In prose, "this repository" or "this
+  wiki" means nothing to a reader who arrived from a search: use the project's name. The gate refuses both.
 
 **When no good name exists, the section is wrong, not the name.** A heading that will not fit in two words
 is usually two sections, or one that has not decided what it is about.
@@ -223,12 +226,16 @@ A session ends thirty minutes after its last request.[^expiry]
     and holds its draft for a day afterwards.
 ```
 
-- **A reference names code, and only code**: the file and function where the thing happens — not a
-  requirements page, a concepts page or another wiki page. The owner's ruling, 2026-09-14: *"sources must
-  be code, where in the code is the source of this reference that satisfies the requirement"*. **The gate
-  refuses a reference to a document**: a page of prose is another claim that can be wrong exactly as yours
-  is, and citing it turns one error into two.
-- **A reference marks the code; it never links to it.** Write `` `src/session/expiry.py` — `sweep()` ``,
+- **A reference names code**: the file and function where the thing happens — not a requirements page, a
+  concepts page or another wiki page. The owner's ruling, 2026-09-14: *"sources must be code, where in the
+  code is the source of this reference that satisfies the requirement"*. **The gate refuses a reference to
+  a markdown document**: a page of prose is another claim that can be wrong exactly as yours is, and
+  citing it turns one error into two.
+- **How an outside service behaves is cited to its own documentation** — a host's settings, a platform's
+  defaults: the thing the project does not run. Name the publisher, link the page by its title, and say
+  what it states. The owner, 2026-09-14: *"references can use external documentation to cite how it
+  is"*. A `{missing}` on such a claim means nobody looked in that documentation yet.
+- **A reference marks the code; it never links to it.** Outside documentation is the one linked reference. Write `` `src/session/expiry.py` — `sweep()` ``,
   not a markdown link. A link to a source file works only while the site is served from inside the
   repository, and is dead wherever the site is published.
 - **Configuration counts as code** where a number lives there: name the function that reads it *and* the
@@ -247,7 +254,9 @@ mentions all require a citation or unknown citation."*
 
 **The gate refuses a sentence that cites nothing.** A citation after the full stop belongs to its
 sentence. A sentence that links to another page is excused, because that page carries the citations,
-and a table is held as a whole. Only a page about the wiki itself is exempt, because it describes no
+and a table is held as a whole. A list item that is a bare link — the host's own guides, under **External
+links** at the end of a page — states nothing and is excused too. Write an outside link as a plain link; the build
+opens it in a new tab, marks it `nofollow` and adds the arrow. Only a page about the wiki itself is exempt, because it describes no
 behaviour.
 
 A reader uses the wiki **instead of** the source, so a sentence they cannot trace must be taken on faith —
@@ -314,6 +323,8 @@ is *the expiry is thirty minutes*.
 - **One property, one label, on every page.** If one page says **Command**, no page says "Run with".
 - **A `note`** is the one clause that stops a value being misread, such as "after the last request".
   Never a second value.
+- **`link = "https://…"`** links the value to an address outside the wiki, such as an author's site. A
+  page is linked from the text, never from a row.
 - **`missing = true`** renders the red mark beside a value nothing implements, or nobody has found.
 - **`guaranteed = "<requirement id>"`** records the requirement a row satisfies, for whoever next checks
   the page against the code. It is never rendered.

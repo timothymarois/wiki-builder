@@ -42,6 +42,9 @@ grammar.
 - **Sentence case**, no full stop: **Reading budgets**, not "Reading Budgets."
 - **One subject.** A heading joined with "and" is usually two sections.
 - **No numbers or counts** ("Three limits"). The count changes; the subject does not.
+- **No demonstratives.** "This site", "Our setup" and "These options" point at the page they sit on
+  instead of naming anything, and read as nothing in a contents box or a search result: **Example**,
+  **Setup**, **Options**.
 - **A gerund is a noun and is fine** (**Spreading**). A gerund phrase is usually the question in
   disguise ("Getting started" wants to be **Setup**).
 - **On a reference page, name the part of the contract**: **Usage**, **Options**, **Errors**, **Exit
@@ -62,6 +65,7 @@ A noun phrase naming a property; the value or the cell gives it.
 | A label "Why it was archived" | **Reason** |
 | A label "Expires" with the value "yes" | **Expiry** · 30 minutes |
 | A label carrying its own explanation | The noun, with the explanation in a `note` or the cell |
+| A label "This site", with the site's address as its value | **Domain** |
 
 Put a unit in the label only when every value shares it: **Timeout (seconds)**. Otherwise the unit goes
 with each value.
@@ -183,6 +187,9 @@ two ways. These rules settle most cases.
   it", not "When nobody can reach it, a draft is refused."
 - **One idea per sentence.** A sentence that needs reading twice is two sentences.
 - **A pronoun points at one thing.** When "it" or "this" could mean either of two nouns, name the noun.
+- **Name the project; never point at it.** "This repository", "this wiki", "this tool" and "our site" mean
+  nothing to a reader who arrived from a search or a link: write the project's name. The gate refuses
+  them outside code, where a message the software prints is quoted as it is.
 - **No fragments in prose.** A fragment is right in a table cell, an infobox value or a caption, and wrong
   in a paragraph.
 - **Parallel lists.** Every item in a list starts with the same part of speech and has the same shape.

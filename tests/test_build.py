@@ -338,6 +338,20 @@ class WikiTests(unittest.TestCase):
         problems = wiki.uncited_problems(self.root)
         self.assertTrue(any("It does it slowly" in problem for problem in problems), problems)
 
+    def test_a_list_of_bare_links_states_nothing_to_cite(self):
+        links = ("## Ground\n\n- [Host guide](https://example.com/guide)\n"
+                 "- [Custom domains](https://example.com/domains/)\n")
+        self.write("thing", PAGE.replace("## Ground\n\nBecause speed would change it. {missing}", links))
+        self.assertEqual([], [p for p in wiki.uncited_problems(self.root) if "thing.md" in p])
+
+    def test_a_sentence_around_an_outside_link_still_needs_a_citation(self):
+        for text in ("- [Host guide](https://example.com/guide) serves every folder.",
+                     "The [host guide](https://example.com/guide) says so."):
+            with self.subTest(text=text):
+                self.write("thing", PAGE.replace("Because speed would change it. {missing}", text))
+                problems = wiki.uncited_problems(self.root)
+                self.assertTrue(any("thing.md" in p and "cites nothing" in p for p in problems), problems)
+
     def test_a_page_about_the_wiki_itself_needs_no_citations(self):
         # index.md and goals.md carry `goals = false`: they describe no behaviour, so there is nothing
         # for them to cite and the rule would be noise.
@@ -363,7 +377,82 @@ class WikiTests(unittest.TestCase):
                 self.write("thing", PAGE.replace("## Speed", "## " + good))
                 self.assertEqual([], wiki.heading_problems(self.root))
 
-    SAMPLE = "Type it like this.[^why]\n\n```sh\nwiki build\n\n## What it prints\n```\n"
+    def test_a_heading_that_points_at_the_page_is_refused(self):
+        # "This site" names nothing in a contents box or a search result. The reader wanted "Domain".
+        for bad in ("This site", "This repository", "Our setup", "These options", "Here"):
+            with self.subTest(heading=bad):
+                self.write("thing", PAGE.replace("## Speed", "## " + bad))
+                problems = wiki.heading_problems(self.root)
+                self.assertTrue(any(repr(bad) in problem and "points at" in problem for problem in problems),
+                                problems)
+
+    def test_a_heading_that_only_starts_like_a_demonstrative_passes(self):
+        for good in ("Thistle", "Hereford", "Outcome"):
+            with self.subTest(heading=good):
+                self.write("thing", PAGE.replace("## Speed", "## " + good))
+                self.assertEqual([], wiki.heading_problems(self.root))
+
+    def test_a_name_in_the_front_matter_that_points_at_the_page_is_refused(self):
+        cases = {
+            "title": ('title = "A thing"', 'title = "This tool"', "the title 'This tool'"),
+            "group": ('group = "Facts"', 'group = "Our facts"', "the infobox group 'Our facts'"),
+            "label": ('label = "Today"', 'label = "This site"', "the infobox label 'This site'"),
+        }
+        for kind, (old, new, expected) in cases.items():
+            with self.subTest(kind=kind):
+                self.write("thing", PAGE.replace(old, new))
+                problems = wiki.pointing_problems(self.root)
+                self.assertTrue(any(problem.startswith("thing.md: " + expected) for problem in problems),
+                                problems)
+
+    def test_prose_that_points_at_the_project_is_refused_where_it_is_written(self):
+        self.write("thing", PAGE.replace("It does it slowly.[^why]",
+                                         "It does it slowly, as this repository does.[^why]"))
+        problems = wiki.pointing_problems(self.root)
+        self.assertIn("thing.md:%d: “It does it slowly, as this repository does.[^why]” points at the "
+                      "project with 'this repository' instead of naming it; use its name"
+                      % self.line_of("thing", "It does it slowly"), problems)
+
+    def test_front_matter_prose_that_points_at_the_project_is_refused(self):
+        for old, new, field in (
+                ('subtitle = "what it is"', 'subtitle = "the tool that builds this wiki"', "subtitle"),
+                ("It should be plain", "This site should make it plain", "intent")):
+            with self.subTest(field=field):
+                self.write("thing", PAGE.replace(old, new))
+                problems = wiki.pointing_problems(self.root)
+                self.assertTrue(any(problem.startswith("thing.md: the %s points at the project" % field)
+                                    for problem in problems), problems)
+
+    def test_prose_that_names_the_project_or_quotes_code_passes(self):
+        for sentence in ("wiki-builder deploys its own wiki.[^why]",
+                         "The message reads `not written by this tool`.[^why]",
+                         "This page covers speed, and that wiki covers ground.[^why]",
+                         "Thistle grows beside this pathway.[^why]"):
+            with self.subTest(sentence=sentence):
+                self.write("thing", PAGE.replace("It does it slowly.[^why]", sentence))
+                self.assertEqual([], wiki.pointing_problems(self.root))
+
+    def test_a_reference_to_a_markdown_document_is_refused(self):
+        self.write("thing", PAGE.replace("[^why]: The reason — `Source/Thing.h`.",
+                                         "[^why]: The reason — [the design](../design.md)."))
+        problems = wiki.citation_problems(self.root)
+        self.assertEqual(["thing.md cites ../design.md, which is a document; a reference names the code that "
+                          "does the thing, or an outside service's own documentation"], problems)
+
+    def test_a_reference_to_an_outside_services_documentation_passes(self):
+        # The owner, 2026-09-14: "references can use external documentation to cite how it is".
+        self.write("thing", PAGE.replace(
+            "[^why]: The reason — `Source/Thing.h`.",
+            "[^why]: Host Docs — [Custom domains](https://docs.example.com/pages/custom-domains/): a\n"
+            "    subdomain needs a `CNAME` record."))
+        self.assertEqual([], wiki.citation_problems(self.root))
+
+    def test_the_check_refuses_a_name_that_points_at_the_page(self):
+        self.write("thing", PAGE.replace('label = "Today"', 'label = "This site"'))
+        problems, *_ = wiki.check(self.root)
+        self.assertTrue(any("'This site'" in problem for problem in problems), problems)
+
+    SAMPLE ="Type it like this.[^why]\n\n```sh\nwiki build\n\n## What it prints\n```\n"
 
     def test_a_code_sample_is_not_prose(self):
         # A sample is the thing itself, not a claim about it: a blank line inside one does not start a
@@ -465,6 +554,22 @@ class WikiTests(unittest.TestCase):
         infobox = page[page.index('<aside class="ib">'):page.index("</aside>")]
         self.assertIn('<sup class="ref">[<a href="#cite-1">1</a>]</sup>', infobox)
 
+    def test_an_infobox_value_links_outside_the_wiki(self):
+        self.write("thing", PAGE.replace('{ label = "Today", value = "a number", cite = "why" }',
+                                         '{ label = "Today", value = "a number", cite = "why", '
+                                         'link = "https://example.com/" }'))
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertIn('<b>Today</b><span><a href="https://example.com/" class="ext" target="_blank" '
+                      'rel="nofollow noopener noreferrer">a number</a>', page)
+
+    def test_an_infobox_value_linking_inside_the_wiki_is_refused(self):
+        # A row's link is written into the page as it stands, so a page address in one would resolve from
+        # nowhere in particular. A page is linked from the text.
+        self.write("thing", PAGE.replace('{ label = "Today", value = "a number", cite = "why" }',
+                                         '{ label = "Today", value = "a number", cite = "why", link = "front.md" }'))
+        self.refused("not an address outside the wiki")
+
     def test_a_player_build_carries_no_infobox_citation(self):
         self.write("thing", PAGE.replace('categories = ["Things"]',
                                          'categories = ["Things"]\naudience = "player"'))
@@ -487,6 +592,24 @@ class WikiTests(unittest.TestCase):
                 _, output = self.run_main(["--root", str(self.root), command])
                 self.assertRegex(output, r"wiki: thing\s+\d+ words\s+1 cited\s+1 missing")
                 self.assertIn("wiki: 1 source cited, 1 claim marked as having no source", output)
+
+    def test_a_code_block_carries_a_copy_button(self):
+        # The same button the source view has, which the page's script already knows how to work.
+        self.write("thing", PAGE.replace("## Ground", self.SAMPLE + "\n## Ground"))
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertIn('<div class="srcbox"><button class="copy" type="button">Copy</button><pre><code', page)
+        self.assertIn("</code></pre></div>", page)
+
+    def test_an_outside_link_opens_in_a_new_tab_and_is_not_followed(self):
+        links = "- [Host guide](https://example.com/guide)\n- [Other host](//example.org/)\n- [A thing](thing.md)\n"
+        self.write("thing", PAGE.replace("## Ground", links + "\n## Ground"))
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        for address in ("https://example.com/guide", "//example.org/"):
+            with self.subTest(address=address):
+                self.assertIn('<a href="%s" class="ext" target="_blank" rel="nofollow noopener noreferrer">' % address, page)
+        self.assertEqual(2, page.count('target="_blank"'), "only a link that leaves the wiki opens a new tab")
 
     def test_a_markdown_table_is_drawn_as_a_wiki_table(self):
         # Without the class, a page's own table had no borders, no header row and no padding.

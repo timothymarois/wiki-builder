@@ -73,6 +73,10 @@ MONTHS = ("January", "February", "March", "April", "May", "June",
 
 # A link the renderer must not touch: it already points where it means to.
 SETTLED_LINK = re.compile(r"^(?:[a-z][a-z0-9+.-]*:|#|//)")
+# A link that leaves the wiki. It opens in a new tab so the reader keeps their place, carries nofollow so a
+# published wiki lends no standing to what it points at, and is marked so the reader knows before following.
+OUTSIDE_LINK = re.compile(r"^(?:https?:)?//", re.I)
+OUTSIDE = ' class="ext" target="_blank" rel="nofollow noopener noreferrer"'
 
 HEADING = re.compile(r"<(h2|h3)>(.*?)</\1>", re.S)
 TAG = re.compile(r"<[^>]+>")
@@ -416,6 +420,8 @@ def rewrite_references(body, directory, site_root, root, images, page_ids, pages
     def replace(match):
         attribute, target = match.group(1), match.group(2)
         if SETTLED_LINK.match(target):
+            if attribute == "href" and OUTSIDE_LINK.match(target):
+                return match.group(0) + OUTSIDE
             return match.group(0)
         address, _, fragment = target.partition("#")
         if attribute == "src":
@@ -493,6 +499,15 @@ def render_infobox(page, audience, directory, images, cited=None):
         parts.append('<div class="grp">%s</div>' % html_module.escape(group.get("group", "")))
         for row in group.get("rows", []):
             value = html_module.escape(str(row.get("value", "")))
+            link = row.get("link")
+            if link:
+                # A value may link outside the wiki, such as to an author's site. A page is linked from
+                # the text instead, where its address is rewritten to resolve from wherever it is read.
+                if not OUTSIDE_LINK.match(str(link)):
+                    raise WikiError(f"{page['id']}.md links the infobox row {row.get('label', '')!r} to "
+                                    f"{link}, which is not an address outside the wiki; link a page from "
+                                    "the text instead")
+                value = '<a href="%s"%s>%s</a>' % (html_module.escape(str(link), quote=True), OUTSIDE, value)
             # A row may name the requirement that promises it. That identifier is traceability for
             # whoever next checks the page against the code, and it is never rendered: the owner did not
             # want a badge beside the rows that carry one.
@@ -815,6 +830,10 @@ def write_site(root, out, audience, link_root, today, record, wiki):
         # screen rather than widening the page.
         body = body.replace("<table>", '<div class="wt"><table class="w">').replace("</table>",
                                                                                     "</table></div>")
+        # A code block gets the source view's box and copy button, which the page's script already works.
+        # Only a bare <pre> is markdown's; the source view's own is built elsewhere, with a class.
+        body = body.replace("<pre>", '<div class="srcbox"><button class="copy" type="button">Copy</button>'
+                                     "<pre>").replace("</pre>", "</pre></div>")
         body = MISSING.sub(MISSING_CITATION, body)
         body = rewrite_references(body, directory, site_root, root, ledger, set(pages),
                                   wiki / "pages", page["path"])
@@ -966,7 +985,7 @@ def citation_problems(root, wiki=None):
             for link in DOCUMENT_LINK.finditer(note.group(1)):
                 problems.append(
                     f"{path.relative_to(pages_dir)} cites {link.group(1)}, which is a document; "
-                    "a reference must name the code that does the thing")
+                    "a reference names the code that does the thing, or an outside service's own documentation")
     return problems
 
 
@@ -979,6 +998,13 @@ FENCED = re.compile(r"^(`{3,}|~{3,})[^\n]*\n.*?^\1[ \t]*$", re.M | re.S)
 QUESTION_WORD = re.compile(r"^(how|what|where|why|when|which|who|whether)\b", re.I)
 # Editorialising: a heading that rates its own contents rather than naming them.
 EDITORIAL = re.compile(r"\b(matters?|important|interesting|note|overview|misc|details?)\b", re.I)
+# A name that opens with one of these points at the page it sits on instead of naming anything: "This site"
+# reads as nothing in a contents box, a search result, or a page quoted somewhere else. Name it: Domain.
+DEMONSTRATIVE = re.compile(r"^(this|that|these|those|our|here)\b", re.I)
+# Prose that points at the project instead of naming it. A published page is read by people who did not
+# arrive from the project, and to them "this repository" is no repository at all.
+POINTING = re.compile(r"\b(?:this|these|our)\s+(?:repository|repositories|repo|project|site|website|wiki|"
+                      r"tool|package|codebase)\b", re.I)
 
 
 # What says where a statement came from: a citation, or the mark that says there is none.
@@ -999,6 +1025,9 @@ INLINE_CODE = re.compile(r"`[^`\n]*`")
 BLOCK = re.compile(r"^(?![ \t]*$).+(?:\n(?![ \t]*$).*)*", re.M)
 # A link to another page. The page it points at carries the citations.
 PAGE_LINK = re.compile(r"\]\([^)\s]*\.md(?:#[^)\s]*)?\)")
+# A list item that is a link and nothing else, as under External links: it names somewhere to read, and
+# states nothing that could be cited.
+LINK_ONLY = re.compile(r"^\s*(?:(?:[-*+]|\d+\.)\s+)?\[[^\]]+\]\([^)\s]+\)\s*$")
 
 
 def statements(block):
@@ -1076,7 +1105,7 @@ def uncited_problems(root, wiki=None):
         for line, statement in page_statements(path):
             if not re.search(r"[A-Za-z]", statement):
                 continue
-            if CLAIM.search(statement) or PAGE_LINK.search(statement):
+            if CLAIM.search(statement) or PAGE_LINK.search(statement) or LINK_ONLY.match(statement):
                 continue
             problems.append("%s:%d: %s states something and cites nothing; give it a reference, or "
                             "{missing} if there is none"
@@ -1169,6 +1198,43 @@ def heading_problems(root, wiki=None):
             elif EDITORIAL.search(title):
                 problems.append(f"{path.relative_to(pages_dir)}: the heading {title!r} rates its own "
                                 "contents; name them instead")
+            elif DEMONSTRATIVE.match(title):
+                problems.append(f"{path.relative_to(pages_dir)}: the heading {title!r} points at the page "
+                                "instead of naming anything; name the thing the section is about")
+    return problems
+
+
+def pointing_problems(root, wiki=None):
+    """Names and sentences that point at the project instead of naming it.
+
+    A title, infobox group or label that opens "This" or "Our" names nothing outside the page it sits on,
+    and "this repository" in a sentence means nothing to a reader who arrived from a search or a link. The
+    owner's ruling, 2026-09-14, on "This site" and "This repository": never this kind of wording. Code is
+    left alone, because a message the software prints is quoted as it is.
+    """
+    pages_dir = wiki_of(root, wiki) / "pages"
+    problems = []
+    for path in sorted(pages_dir.rglob("*.md")):
+        meta, _ = read_front_matter(path)
+        name = path.relative_to(pages_dir)
+        names = [("title", meta.get("title", ""))]
+        for group in meta.get("infobox", []):
+            names.append(("infobox group", group.get("group", "")))
+            names += [("infobox label", row.get("label", "")) for row in group.get("rows", [])]
+        for kind, text in names:
+            if DEMONSTRATIVE.match(text):
+                problems.append(f"{name}: the {kind} {text!r} points at the page instead of naming "
+                                "anything; name the thing itself")
+        for field in ("subtitle", "intent"):
+            found = POINTING.search(INLINE_CODE.sub("", meta.get(field, "")))
+            if found:
+                problems.append(f"{name}: the {field} points at the project with "
+                                f"{found.group(0)!r} instead of naming it; use its name")
+        for line, statement in page_statements(path):
+            found = POINTING.search(INLINE_CODE.sub("", statement))
+            if found:
+                problems.append(f"{name}:{line}: {quoted(statement)} points at the project with "
+                                f"{found.group(0)!r} instead of naming it; use its name")
     return problems
 
 
@@ -1244,6 +1310,7 @@ def check(root, wiki=None, version=None):
         problems += date_problems(root, wiki)
         problems += citation_problems(root, wiki)
         problems += heading_problems(root, wiki)
+        problems += pointing_problems(root, wiki)
         problems += uncited_problems(root, wiki)
         problems += infobox_problems(root, wiki)
         if version:

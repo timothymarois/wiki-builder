@@ -12,6 +12,8 @@ is, who it is for and what it refuses. It stays short and stable, and names noth
 group = "Identity"
 rows = [
   { label = "Name", value = "wiki-builder" },
+  { label = "Author", value = "Timothy Marois" },
+  { label = "Website", value = "marois.dev", link = "https://marois.dev" },
 ]
 
 [[infobox]]
@@ -34,17 +36,17 @@ It has two halves, and the second is the reason it exists:
 - **A generator.** Pages with TOML front matter become a static site with a sidebar, infobox, contents,
   citations, search and pictures, that works served or from disk.
 - **A set of refusals.** A sentence or an infobox row that states something and cites nothing. A reference
-  that cites a document rather than code. A heading that asks a question instead of naming its section. A
+  that cites a project document rather than code. A heading that asks a question instead of naming its section. A
   page longer than anyone will read. A page edited since its date was recorded. A picture whose subject
   has changed. A page nobody can reach.
 
 ## Reasoning
 
 Documentation dies the same way every time: it grows faster than anyone reads it, nobody can tell which
-sentences were checked, and by the time it is wrong it still looks authoritative. The wiki this tool was
+sentences were checked, and by the time it is wrong it still looks authoritative. The wiki wiki-builder was
 extracted from had grown to 75,000 words that its owner had stopped reading.
 
-This tool is for the case where **somebody reads the wiki instead of the source.** There, an untraceable
+wiki-builder is for the case where **somebody reads the wiki instead of the source.** There, an untraceable
 sentence is worse than a missing one, because it looks exactly like a verified one. So every sentence is
 cited to the code it came from, or marked as uncited.
 
@@ -63,11 +65,12 @@ them.
 
 - **Covers:** rendering; the checks; the skill; a local server that shows the site and the project's
   files; a published build with clean addresses; a reader-facing build with everything internal removed;
-  carrying rule changes into a project; a GitHub Action for a project's CI.
+  carrying rule changes into a project; a GitHub Action for a project's CI; guides to installing and
+  deploying a wiki.
 - **Refuses:** knowing anything about the project it documents, which a test over the code and the skill
   enforces: no project name, no domain word, no assumption about its assets. Generating pages from the
   code they describe, since such a page agrees with the code whatever it does. Updating itself silently.
-  Scaffolding, opinions about hosting, and anything a second project has not yet asked for.
+  Scaffolding, and anything a second project has not yet asked for.
 
 ## External systems
 
