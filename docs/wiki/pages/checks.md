@@ -84,7 +84,8 @@ sentence, and the command exits with 1.[^caught]
 [^budget]: `src/builder/build.py` — `budget_problems()`.
 [^pictures]: `src/builder/build.py` — `picture_problems()`.
 [^dates]: `src/builder/build.py` — `date_problems()`.
-[^version]: `src/builder/build.py` — `version_problems()`.[^stop]: `src/builder/config.py` — `read_config()`; `src/builder/build.py` — `read_pages()`,
+[^version]: `src/builder/build.py` — `version_problems()`.
+[^stop]: `src/builder/config.py` — `read_config()`; `src/builder/build.py` — `read_pages()`,
     `write_site()`, `render_nav()`, `render_infobox()`, `rewrite_references()` and `subject_digest()`
     raise `WikiError`.
 [^caught]: `src/builder/cli.py` — `main()` catches `WikiError`, prints it, and returns 1.

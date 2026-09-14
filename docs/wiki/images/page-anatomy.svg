@@ -47,5 +47,6 @@
   <!-- categories and footer -->
   <rect x="216" y="360" width="472" height="26" rx="4" fill="#f8f9fa" stroke="#c8ccd1"/>
   <text x="226" y="378" font-size="12" fill="#202122"><tspan font-weight="700">Categories:</tspan> <tspan fill="#3366cc">A category</tspan></text>
-  <text x="216" y="408" font-size="12" fill="#54595d">Last updated 14 September 2026 · Last audited never · 380 words</text>
+  <text x="216" y="406" font-size="12" fill="#54595d">Last updated 14 September 2026 · Last audited never · 380 words</text>
+  <text x="216" y="423" font-size="12" fill="#54595d">about 2 minutes to read · 8 sources cited · 0 claims with no source</text>
 </svg>

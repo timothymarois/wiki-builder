@@ -10,7 +10,7 @@ digest = "8bd23125e35407c4d62fb1d1f4aeea067b4e82a5a8ab9f6edad91f997ea00dbb"
 
 ["checks"]
 updated = "2026-09-14"
-digest = "230a4083034ff09fae2a490cc675fa38c9dbfead0f69e880a2b607cd371559b2"
+digest = "a3c6c277f8a88266b4a9f72aeecad95102aade26ba0a116c6b5a630ebe50a03f"
 audited = "2026-09-14"
 
 ["checks/budgets"]
@@ -124,12 +124,13 @@ digest = "b1b8aa785cce4c1b7964d69c41b7cf30d97bc64e92db0e7869c191ed15985208"
 
 ["pages"]
 updated = "2026-09-14"
-digest = "08d0587fd91376ed17430fcd970d6159122b7d5be2ed214968c05e16f0cb60fe"
+digest = "12307b3c2f3a4e9e3b07fb86d7188372dc239d3e2814b070dc77a04a6133a2a1"
 audited = "2026-09-14"
 
 ["pages/diagrams"]
 updated = "2026-09-14"
-digest = "afdedc9d333f9f138a572b23847defb161d953269b5ded57d9146bc945f2c148"
+digest = "a6efe426dc00b0bbfa488c08c253f07d6c0f5ef1c5b154b66d0cba6e27d67e19"
+audited = "2026-09-14"
 
 ["pictures-toml"]
 updated = "2026-09-14"
@@ -162,7 +163,8 @@ audited = "2026-09-14"
 
 ["skill"]
 updated = "2026-09-14"
-digest = "710f8bd1d892a315fe9135aff987952b760c3af5416f15e4de422f8dc06511c4"
+digest = "b86223409e3eaa06c10fc3e1eaeda128b61030cbcc749f705f2d8c637c706ca0"
+audited = "2026-09-14"
 
 ["wiki-toml"]
 updated = "2026-09-14"

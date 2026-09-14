@@ -19,9 +19,9 @@ rows = [
 [[infobox]]
 group = "Contents"
 rows = [
-  { label = "Instructions", value = "SKILL.md", cite = "files" },
-  { label = "Worked examples", value = "page-standard.md, reference-standard.md", cite = "files" },
-  { label = "Rule files", value = "naming-and-grammar.md, reference-pages.md, flowcharts.md", cite = "files" },
+  { label = "Instructions", value = "SKILL.md", cite = "contents" },
+  { label = "Worked examples", value = "page-standard.md, reference-standard.md", cite = "contents" },
+  { label = "Rule files", value = "naming-and-grammar.md, reference-pages.md, flowcharts.md", cite = "contents" },
 ]
 
 [[infobox]]
@@ -34,12 +34,11 @@ rows = [
 
 The **skill**, `writing-wiki-pages`, is the instructions an agent follows to write a page: `SKILL.md`,
 and a `references` folder beside it.[^files] That folder holds the rules for naming, grammar, reference
-pages and flowcharts, and two worked examples, one for an ordinary page and one for a reference
-page, each written well and badly.[^files] `wiki sync` copies it into the project, where agents read
-it.[^sync] Some of the rules it teaches are enforced by the [Checks](checks.md): citations, headings,
-pointing words, reading budgets and pictures. **It forbids an agent to invent**: everything on a page comes
-from the code, the owner's own words, or an outside service's own documentation, and a fact none of these
-gives is marked `{missing}` or left out.[^invent]
+pages and flowcharts, and worked examples of an ordinary page and of two reference pages, a command and an
+endpoint, each written well and badly.[^contents] `wiki sync` copies it into the project, where agents read
+it.[^sync] Some of the rules it teaches are enforced by the [Checks](checks.md). **It forbids an agent to
+invent**: everything on a page comes from the code, the owner's own words, or an outside service's own
+documentation, and a fact none of these gives is marked `{missing}` or left out.[^invent]
 
 ## Home
 
@@ -57,10 +56,11 @@ the release without writing the skill, and asking for both at once is refused.[^
 
 ## Release
 
-`wiki sync` also records, in `wiki.toml`, which release of the tool the project is on.[^record] It replaces
-the first `version` line after `[tool]`, or adds that table when there is none, and leaves the rest of the
-hand-written file alone.[^record] A `[tool]` table with no `version` line gets none, although `wiki sync`
-still prints that the release was recorded.[^record]
+`wiki sync` also records, in `wiki.toml`, which release of the tool the project is on.[^record] It
+overwrites the first line starting `version` after a `[tool]` line, even one in a later table, and appends
+a `[tool]` table only when `[tool]` appears nowhere in the file, not even in a comment.[^record] When
+`[tool]` appears but no such line follows it, nothing is recorded, although `wiki sync` still prints that
+the release was recorded.[^record]
 
 **`wiki check` fails while that record is missing or names a different release**, and it says to run
 `wiki sync`.[^version] A newer release can add a check, and a new check finds old pages; the record makes
@@ -68,6 +68,9 @@ that failure expected rather than surprising.[^version]
 
 [^files]: `src/builder/cli.py` — `SKILL_NAME` names the skill; `sync()` copies every markdown file under
     `SKILL`, which `src/builder/build.py` finds with `skill_dir()`.
+[^contents]: `src/skill/` — `SKILL.md`, and in `references/` the rule files `naming-and-grammar.md`,
+    `reference-pages.md` and `flowcharts.md` and the worked examples `page-standard.md`, one ordinary page,
+    and `reference-standard.md`, a command and an endpoint.
 [^sync]: `src/builder/cli.py` — `sync()`.
 [^invent]: `src/skill/SKILL.md` — the Truthfulness section, whose first rule is never to invent, and the
     last item of its definition of done.
@@ -79,7 +82,7 @@ that failure expected rather than surprising.[^version]
     either convention.
 [^noskill]: `src/builder/cli.py` — `sync()` skips the copy when `skill` is false; `main()` puts
     `--no-skill` and `--skill-dir` in one mutually exclusive group.
-[^record]: `src/builder/config.py` — `record_version()` replaces the first line starting `version` after
-    `[tool]`, adds nothing when no such line follows, and appends the table when `[tool]` is absent;
-    `src/builder/cli.py` — `sync()` prints the release either way.
+[^record]: `src/builder/config.py` — `record_version()` overwrites the first line starting `version` after
+    a line that is `[tool]`, without stopping at the next table, and appends the table only when the text
+    `[tool]` is absent from the file; `src/builder/cli.py` — `sync()` prints the release either way.
 [^version]: `src/builder/build.py` — `version_problems()`, called from `check()`.

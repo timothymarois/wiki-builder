@@ -12,14 +12,14 @@ without a network.
 group = "Identity"
 rows = [
   { label = "Syntax", value = "a mermaid code block", cite = "block" },
-  { label = "Drawn by", value = "Mermaid 12.0.0", cite = "script" },
+  { label = "Renderer", value = "Mermaid 12.0.0", cite = "script" },
 ]
 
 [[infobox]]
 group = "Rules"
 rows = [
   { label = "Network", value = "none needed", cite = "script" },
-  { label = "Citation", value = "on the sentence before it", cite = "rules" },
+  { label = "Citation", value = "on the sentence before it", note = "the skill's rule, which no check enforces", cite = "rules" },
   { label = "Reading budget", value = "not counted", cite = "budget" },
 ]
 +++
@@ -46,7 +46,9 @@ flowchart LR
 ```
 ````
 
-Only a page with a mermaid block loads Mermaid, and its block is drawn in three steps.[^block][^script]
+## Drawing
+
+Only a page with a mermaid block loads Mermaid, and its block is drawn in three steps.[^block][^script][^theme]
 
 ```mermaid
 flowchart LR
@@ -58,20 +60,19 @@ flowchart LR
   has -- "No" --> plain(["Page shown without Mermaid"])
 ```
 
-## Drawing
-
 **A diagram needs no network**: Mermaid ships inside wiki-builder, and a build copies it, with its
-licence, into a site only when some page has a diagram.[^script] Only a page with a diagram loads
-it.[^script] A diagram is drawn in the page's theme, light or dark, and is drawn again whenever the theme changes,
-whether the reader switches it or the system does.[^theme] It sits centred without a frame, and scrolls sideways
-inside itself when it is wider than the page.[^style]
+licence, into a site only when some page has a diagram.[^script] A diagram is drawn in the page's theme,
+light or dark, and is drawn again whenever the theme changes, whether the reader switches it or the system
+does.[^theme] It sits centred without a frame, and shrinks to fit when it is wider than the
+page.[^style][^width] A diagram Mermaid cannot read passes `wiki check`, and the page shows Mermaid's error
+in its place.[^cite][^error]
 
 ## Citations
 
-A diagram states what something does, so the sentence introducing it carries the citation, and every box
-and arrow must be something the cited code does.[^rules] The check does not read inside a code block, so a
-diagram is never refused for citing nothing.[^cite] It costs nothing against the page's reading
-budget.[^budget]
+The skill tells an agent that the sentence introducing a diagram carries the citation, and that every box
+and arrow is something the cited code does; no check enforces either.[^rules][^cite] The check does not
+read inside a code block, so a diagram is never refused for citing nothing.[^cite] It costs nothing
+against the page's reading budget.[^budget]
 
 ## Copies
 
@@ -91,8 +92,14 @@ diagrams are on [Checks](../checks.md), [Citations](../checks/citations.md) and
     to dark when the page's theme is dark or follows a dark system, and draws every `pre.mermaid`; the
     theme button and a change in the system's colour scheme call it again.
 [^style]: `src/builder/assets/wiki.css` — `.art pre.mermaid`.
+[^width]: Mermaid — [Mermaid Config Schema](https://mermaid.js.org/config/schema-docs/config.html):
+    `useMaxWidth`, true by default, sets a diagram's width to 100% and scales it with the available space;
+    `src/builder/assets/wiki.js` — `drawDiagrams()` leaves it unset.
+[^error]: Mermaid — [Mermaid Config Schema](https://mermaid.js.org/config/schema-docs/config.html):
+    `suppressErrorRendering` is what stops Mermaid inserting its "Syntax error" diagram;
+    `src/builder/assets/wiki.js` — `drawDiagrams()` leaves it unset.
 [^rules]: `src/skill/SKILL.md` — the Diagrams section.
 [^cite]: `src/builder/build.py` — `page_statements()` blanks fenced code with `FENCED` before reading
-    sentences.
+    sentences, and no check looks for the sentence before a code block.
 [^budget]: `src/builder/build.py` — `read_pages()` counts words after `FENCED` removes code blocks.
 [^copy]: `src/builder/build.py` — `markdown_copy()` passes fenced code through `outside_code()` unchanged.
