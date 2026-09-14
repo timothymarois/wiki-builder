@@ -89,7 +89,11 @@ audited = "2026-09-14"
 
 ["deployment-cloudflare"]
 updated = "2026-09-14"
-digest = "3bdfdfeebd446581126c44054e94015cb8e561a3ce9e4698054d58cf1da194b9"
+digest = "9fa65e7e1154812806c46a239d818085375964fe6878183a78a934838b32c6da"
+
+["deployment-cloudflare/authentication"]
+updated = "2026-09-14"
+digest = "06a203da56b6c3b8c6f2c6871d410bb145b1091820dd177ebeea505889560b78"
 
 ["deployment-github"]
 updated = "2026-09-14"
@@ -107,7 +111,7 @@ audited = "2026-09-14"
 
 ["goals"]
 updated = "2026-09-14"
-digest = "624ef98f0b8f3936f8bd4b39ac472b0ae9b4d4de72a64abc4da5791d6dcab5cb"
+digest = "deb69e55c8a36a448c628f64c89f7989e86dc73218d08f72c9c52d80e997d9b0"
 
 ["index"]
 updated = "2026-09-14"

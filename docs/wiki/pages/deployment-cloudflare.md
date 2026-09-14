@@ -30,7 +30,8 @@ rows = [
 Cloudflare Pages builds a project's wiki from its repository with one build command, which installs
 wiki-builder, checks the wiki and runs `wiki publish`.[^git] If the check fails, the command stops and
 nothing is published.[^exit] What `wiki publish` makes is described on [wiki publish](commands/publish.md),
-and the same guide for GitHub on [Deployment (GitHub)](deployment-github.md).
+and the same guide for GitHub on [Deployment (GitHub)](deployment-github.md). A sign-in in front of the
+published wiki is described on [Authentication (Cloudflare)](deployment-cloudflare/authentication.md).
 
 ## Build
 
