@@ -120,6 +120,9 @@ code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;backgroun
 h1{font:400 27px/1.25 'Linux Libertine',Georgia,'Times New Roman',serif;margin:0;
   padding-bottom:4px;border-bottom:1px solid var(--border-soft);text-wrap:balance}
 .sub{font-size:12.5px;color:var(--faint);font-style:italic;margin:4px 0 0}
+/* The trail of pages above a child page, over its title: small, so the title still reads first. */
+.crumbs{font-size:12.5px;line-height:1.4;color:var(--faint);margin:0 0 4px}
+.crumbs span{color:var(--soft)}
 .hat{margin:12px 0;padding-left:26px;font-style:italic;font-size:13px;color:var(--soft)}
 /* A draft says so before it says anything else. */
 .hat.draft{padding:8px 12px;font-style:normal;color:var(--text);background:var(--mark);

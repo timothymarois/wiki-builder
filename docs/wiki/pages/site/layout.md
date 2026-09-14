@@ -28,13 +28,14 @@ stay at its top, and only the list of pages beneath them scrolls.[^rail] Scrolli
 the article, and scrolling the article never moves the sidebar.[^rail] A page far down a long list opens
 with its own link scrolled into view.[^current]
 
-Pages beneath another hang from it as a tree, with a leg to each.[^nest] **The sidebar marks where the
-reader is**: every page above the current one is bold, and its tree lines take the link colour.[^branch]
-A line across the sidebar sits below the logo, below the search box and above each section, whose name is
-in capitals,
-and the list's scroll bar sits at the sidebar's edge.[^section]
+Pages beneath another hang from it as a tree.[^nest] **The sidebar marks where the reader is**: pages
+above the current one are bold, and its tree lines take the link colour.[^branch] Lines across the
+sidebar set off the logo, the search box and each section, whose name is in capitals, and the scroll bar
+sits at the edge.[^section]
 
 ## Article
+
+A page beneath another shows the pages above it, as links, over its title.[^crumbs]
 
 Every code block has a Copy button in its top right corner.[^copy] A code block beside the infobox is
 narrowed to fit beside it, so its button is never hidden underneath.[^beside] A table in a page is drawn
@@ -69,6 +70,8 @@ button.[^narrow]
     `overscroll-behavior: contain`.
 [^current]: `src/builder/assets/wiki.js` — scrolls `#nav` so its `a.on` link is in view, without moving
     the article.
+[^crumbs]: `src/builder/build.py` — `render_crumbs()` links each page above the current one that the build
+    has, in order, and `render_page()` fills it into `src/builder/assets/template.html` before the title.
 [^nest]: `src/builder/assets/wiki.css` — `.rail li li::before` draws the line beside a nested page and
     stops it at the leg on `:last-child`, `.rail li li::after` draws the leg, and `.rail li li a` sets
     the link smaller.

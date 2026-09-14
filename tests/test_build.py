@@ -1168,6 +1168,32 @@ class WikiTests(unittest.TestCase):
         self.assertNotIn('class="up"', nav)
         self.assertNotIn('class="here"', nav)
 
+    def test_a_child_page_shows_the_pages_above_it_as_a_trail(self):
+        # A reader on a child page, on a narrow screen especially, sees where it sits and can climb back up.
+        # A top page has nothing above it, so it shows no trail.
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        self.write("thing/part/bit", PAGE.replace("A thing", "A bit"))
+        self.build()
+        page = (self.out / "thing/part/bit/index.html").read_text(encoding="utf-8")
+        self.assertRegex(page, r'<nav class="crumbs" aria-label="Breadcrumb"><a href="[^"]*">A thing</a> › '
+                               r'<a href="[^"]*">A part</a> › <span aria-current="page">A bit</span></nav>')
+        top = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertNotIn('class="crumbs"', top)
+
+    def test_a_trail_leaves_out_a_page_a_user_build_does_not_have(self):
+        # The trail follows the sidebar: a page hidden from users is skipped, and with nothing left above a
+        # page, no trail is shown at all.
+        user = 'categories = ["Things"]\naudience = "user"'
+        self.write("thing/part", PAGE.replace("A thing", "A part").replace('categories = ["Things"]', user))
+        self.write("thing/part/bit", PAGE.replace("A thing", "A bit").replace('categories = ["Things"]', user))
+        self.build("user")
+        bit = (self.out / "thing/part/bit/index.html").read_text(encoding="utf-8")
+        self.assertRegex(bit, r'<nav class="crumbs" aria-label="Breadcrumb"><a href="[^"]*">A part</a> › '
+                              r'<span aria-current="page">A bit</span></nav>')
+        self.assertNotIn(">A thing</a> ›", bit)
+        part = (self.out / "thing/part/index.html").read_text(encoding="utf-8")
+        self.assertNotIn('class="crumbs"', part)
+
     def test_a_page_beneath_nothing_listed_is_still_refused(self):
         self.write("elsewhere/lost", PAGE.replace("A thing", "Lost"))
         self.refused("navigation section")

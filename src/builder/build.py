@@ -640,6 +640,24 @@ def render_nav(sections, pages, categories, current, directory, audience):
     return "".join(markup)
 
 
+def render_crumbs(page_id, pages, directory, audience):
+    """The pages above this one, each a link, so a reader on a child page sees where it sits and can climb.
+
+    A page this build does not have is left out, as the sidebar leaves it out; with nothing left above the
+    page there is no trail at all, and a top page never has one.
+    """
+    parts = page_id.split("/")
+    above = ["/".join(parts[:depth]) for depth in range(1, len(parts))]
+    links = ['<a href="%s">%s</a>' % (relative_directory(directory, page_directory(ancestor)),
+                                      html_module.escape(pages[ancestor]["title"]))
+             for ancestor in above
+             if ancestor in pages and visible_to(audience, pages[ancestor]["audience"])]
+    if not links:
+        return ""
+    return ('      <nav class="crumbs" aria-label="Breadcrumb">%s › <span aria-current="page">%s</span></nav>\n'
+            % (" › ".join(links), html_module.escape(pages[page_id]["title"])))
+
+
 def render_categories(page, directory, categories):
     names = [name for name in page["categories"] if slugify(name) in categories]
     if not names:
@@ -746,10 +764,11 @@ def page_stats(words, cited=None, missing=None):
 
 def render_page(title, subtitle, hatnote, body_html, infobox, categories_bar, nav, index, site,
                 directory, template, tabs=ARTICLE_ONLY, updated="", stamp_css="", stamp_js="",
-                draft=False, llm_links="", diagram_script="", stats=(), audited=None):
+                draft=False, llm_links="", diagram_script="", stats=(), audited=None, crumbs=""):
     body_html, entries = number_headings(body_html)
     filled = {
         "tabs": tabs,
+        "crumbs": crumbs,
         "tab_title": html_module.escape("%s — %s" % (title, site["name"])),
         "css": relative_file(directory, "assets/wiki.css") + stamp_css,
         "js": relative_file(directory, "assets/wiki.js") + stamp_js,
@@ -1056,7 +1075,8 @@ def write_site(root, out, audience, link_root, today, record, wiki):
             # An audit checks a page's citations against the code. A user build withholds them, and a page
             # excused from citations has none, so neither carries an audit.
             audited=(dates[page_id].get("audited", "") if with_source and page["meta"].get("goals", True)
-                     else None)))
+                     else None),
+            crumbs=render_crumbs(page_id, pages, directory, audience)))
         if with_source:
             source_directory = directory + "source/"
             emit(source_directory, render_page(
