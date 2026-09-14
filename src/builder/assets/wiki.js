@@ -149,6 +149,18 @@
       '<div class="box"><img src="' + escape(picture.getAttribute("src")) + '" alt="' + escape(picture.alt) + '">' +
       (caption ? "<p>" + escape(caption.textContent) + "</p>" : "") + "</div>";
     document.body.appendChild(open);
+    // A picture with no size of its own, such as an SVG that gives only a viewBox, leaves the box nothing to
+    // take its width from, and is drawn at nothing. It takes the thumbnail's shape instead, as large as the
+    // window allows.
+    var whole = open.querySelector(".box img");
+    var shape = picture.getBoundingClientRect();
+    var fit = function () {
+      if (whole.getBoundingClientRect().width || !shape.width) { return; }
+      var width = Math.min(window.innerWidth * 0.96, window.innerHeight * 0.88 * shape.width / shape.height);
+      whole.parentNode.style.width = Math.round(width) + "px";
+      whole.style.width = "100%";
+    };
+    if (whole.complete) { fit(); } else { whole.addEventListener("load", fit); }
     open.querySelector(".shut").focus();
   });
 

@@ -114,7 +114,7 @@ digest = "ada73f34dea5234204dc020a0b3c9fc6c50046ecb79d8b64d508f93493dc0dc0"
 
 ["review-prompt"]
 updated = "2026-09-14"
-digest = "d7c9275076c37ba5379484a9766aad7061b34d68c51abb65b6a7396466938d68"
+digest = "36f40d71b21412ff4a6e82272167b7c9ceed2e80c944fd2db463f6b28163404c"
 
 ["serving"]
 updated = "2026-09-14"

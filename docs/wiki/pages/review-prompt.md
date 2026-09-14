@@ -27,7 +27,8 @@ rows = [
 `wiki check` proves that every sentence carries a citation, not that the citation is true: a sentence with
 any footnote passes, and the check never opens the file the footnote names.[^presence] The prompt below
 covers the rest, by having an agent read each cited source against its sentence, and list what the code
-does that no page mentions. It works in any project
+does that no page mentions. The check never reads inside a code block, so the prompt is also the only
+check a diagram gets.[^fenced] It works in any project
 that uses wiki-builder, and names nothing about the one it is used in. Installing the tool in the first
 place has its own [Installation prompt](installation-prompt.md).
 
@@ -40,14 +41,18 @@ worse than no page. When they disagree, the page is wrong, unless the owner says
 
 ## Before starting
 
-1. Load the writing-wiki-pages skill and read its references in full: page standard, naming and
-   grammar, reference pages, reference standard. They are the standard you are reviewing against.
+1. Load the writing-wiki-pages skill, and read SKILL.md and every file in its references folder in
+   full, flowcharts included. They are the standard you are reviewing against.
 2. Read the project's agent instructions (AGENTS.md, CLAUDE.md or similar), the wiki's brief, and
    docs/wiki/wiki.toml.
 3. Run `wiki check`, through the project's wrapper script if it has one, and record the result:
    problems, sources cited, claims marked as having no source. A passing check is where the review
-   starts, not a verdict.
+   starts, not a verdict. `wiki check` writes nothing; run every other command, and every experiment,
+   in a scratch copy of the project, because a build rewrites the site and the page dates, and serving
+   opens a browser.
 4. Do not edit anything. Report findings; the owner decides what changes.
+5. Note the commit you are reviewing. A file that changes while you work is read again before you
+   report on it.
 
 ## What to check
 
@@ -62,6 +67,12 @@ describes. Coverage works the other way, from the code to the wiki.
 - Every command, option, field, setting and message is spelled exactly as the software spells it. Run
   --help, or the command itself where that is safe, and compare.
 - Code samples and example output: run or trace them, and confirm they still work and match.
+- Every claim that a check refuses or accepts something: build a small wiki in the scratch copy that
+  breaks the rule, and watch what the check does. Pages go wrong at the edges: abbreviations, links,
+  empty values, a file that does not exist.
+- Nothing is invented. Every behaviour, reason, example and name traces to the code, the owner's own
+  words or an outside service's own documentation; a sentence with none of those is false until a
+  source is found.
 
 ### 2. Coverage
 Code that no page mentions is as wrong as a page the code contradicts: a reader using the wiki instead
@@ -100,7 +111,25 @@ cannot hide its own gaps.
 - Every infobox row cites a footnote the page's text cites for the same fact, or is marked missing.
 - A reference that exists but does not establish its claim is uncited. Say so.
 
-### 5. Writing
+### 5. Diagrams
+The check never reads inside a code block, so a mermaid diagram is checked only here, against the
+Flowcharts reference.
+- Truth: every box is a step the cited code takes, every diamond a condition it tests, and every arrow
+  the order it runs in. Nothing is drawn that the code does not do. The sentence before the diagram
+  carries the citation, and the page's text still says everything the diagram shows.
+- Shape: one question, answered in about ten steps; the right kind, a flowchart, sequence or state
+  diagram; each shape used only for its one meaning; top to bottom or left to right, the main path
+  straight, no crossing lines, every loop labelled; one start, an end for each outcome, and every path
+  reaching an end.
+- Labels and grammar: a step is a verb and its object in sentence case, with no full stop; a decision is
+  a short yes-or-no question, every exit is labelled, and yes and no leave in the same order in every
+  diagram; an end is an outcome, as a noun phrase; labels use the page's own words, no abbreviations,
+  in about five words; `accTitle` is a noun phrase and `accDescr` is whole sentences, spelled like the
+  rest of the wiki; a label says `End`, never `end`.
+- Drawing: where a browser is available, open the built page and confirm the diagram draws; say so if
+  you could not.
+
+### 6. Writing
 - The intent says what the thing is for, not how it works, in two to four sentences, and every sentence
   on the page serves it. Report sentences that serve nothing, and intents that have outgrown one page.
 - The lead answers the page on its own; each section's first line answers the section.
@@ -113,11 +142,26 @@ cannot hide its own gaps.
 - Grammar and spelling, in one English variant.
 - A subject that lives on another page is linked, not retold.
 
-### 6. Structure
+### 7. Structure
 - Every page is reachable from the sidebar. Unfinished pages are drafts; nothing unfinished is approved.
 - A page sits in the section a reader would look in first.
 - Reference pages (commands, endpoints, settings files) follow the reference standard: usage, every
   option or field with its type and default, output, errors and exit codes, and an example.
+
+## Threshold
+
+A finding earns its place only if fixing it changes what a reader believes, does or can find. Name that
+change before reporting a finding; if you cannot, drop it.
+- Report: a false or untraceable claim; something a reader needs that no page says; a name, heading,
+  label or diagram that breaks a named rule of the skill; wording a reader could take two ways; one
+  term used for two things, or two terms for one.
+- Never report: rewording a sentence that is already true, cited and within the skill's rules; a
+  synonym you prefer; reordered clauses, sentences or rows; punctuation or style the skill does not rule
+  on; any change whose only effect is that the page reads more the way you would write it.
+- A writing finding names the rule it breaks, in the skill's words, and what a reader would get wrong
+  because of it. Without both it is a preference, and a preference is not a finding.
+- Report a pattern once, with every place it occurs, not once for each page.
+- The fix is the smallest change that corrects the fault. The sentences around it stay as they are.
 
 ## Report
 
@@ -128,14 +172,17 @@ Group findings by page, most severe first:
    belongs on.
 3. Uncited: a claim with no citation, or a citation that does not support it.
 4. Stale: a {missing} mark that can now be cited, or something renamed or removed.
-5. Writing: naming, grammar, structure, voice.
+5. Writing: a name, sentence or diagram that breaks a named rule of the skill.
 
 For each finding give the page and line; the sentence or row, quoted; what the code or source actually
-shows, with its file and function or outside page; and the fix, as the corrected sentence or the
-citation to add. Say which findings you verified by running something and which by reading alone, and
+shows, with its file and function or outside page; the fix, as the corrected sentence or the citation
+to add; and, for a writing finding, the rule it breaks and what a reader would get wrong.
+
+Apart from the findings, list what is the owner's to decide: code that may be what is wrong, an intent a
+page now contradicts, and anything that needs an approval. Say which findings you verified by running something and which by reading alone, and
 what you did not review and why.
 
-End with: pages reviewed; the coverage inventory as counts (items found, documented, mentioned only,
+End with: the commit reviewed; pages reviewed; the coverage inventory as counts (items found, documented, mentioned only,
 undocumented); findings at each severity; {missing} marks that could be cleared; and whether
 `wiki check` passed. Report nothing you have not checked against the code, and no preferences. A page
 that is accurate, current, cited and well written gets one line saying so.
@@ -144,11 +191,17 @@ that is accurate, current, cited and well written gets one line saying so.
 ## Fixing
 
 To have the agent fix what it finds instead of reporting it, replace the fourth step of "Before starting"
-with: "Fix each finding, keep `wiki check` passing, and list every change you made." Intents stay out of
-reach either way, because changing one changes what a page is for, and that is the owner's decision.
+with: "Fix each finding, change nothing a finding does not name, keep `wiki check` passing, and list
+every change you made." An edit that fixes nothing still moves the page's date, and tells every reader
+the page changed when it did not.[^dates] Intents stay out of reach either way, because changing one
+changes what a page is for, and that is the owner's decision.
 
 [^presence]: `src/builder/build.py` — `uncited_problems()` accepts a sentence containing any footnote or
     the missing mark, and reads nothing the footnote names.
+[^fenced]: `src/builder/build.py` — `page_statements()` blanks fenced code with `FENCED` before reading
+    sentences.
+[^dates]: `src/builder/build.py` — `write_site()` moves a page's date in `UPDATED.toml` whenever its
+    markdown changes.
 [^skill]: `src/builder/cli.py` — `SKILL_NAME` names the skill, and `sync()` copies `SKILL.md` and its
     `references` into the project.
 [^check]: `src/builder/build.py` — `check()` gathers every problem; `citation_counts()` and
