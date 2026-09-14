@@ -6,6 +6,6 @@
 # when the change did not alter what the picture shows.
 
 ["page-anatomy.svg"]
-digest = "sha256:f9c4cbd3da17f352546b89d1b1ae49aae89570f268a71355a6ee094c56aefa6a"
+digest = "sha256:946976250433ee89e85c968e72b162ed90a797704af7a1ed9281b42bbea1bf9e"
 depicts = ["src/builder/assets/template.html"]
-blessed = "the template gained a placeholder for the diagram script at the foot of the page; nothing a reader sees moved"
+blessed = "the template gained a trail of the pages above a child page; the picture draws a top page, which has none"
