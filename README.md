@@ -61,6 +61,7 @@ wiki sync        write the skill into the project, and record the release
 wiki bless       a picture whose subject moved, with why it is still true
 wiki publish     build with clean addresses, for a host
 wiki user      build the reader-facing view, with everything internal removed
+wiki audit       record that pages were checked against the code today
 ```
 
 A project looks like this:
@@ -70,7 +71,7 @@ docs/wiki/
   wiki.toml          the site's name, the reading budgets, the sidebar
   pages/**.md        the pages. A page's path is its address and its place in the sidebar
   images/            pictures, and PICTURES.toml recording what each one shows
-  UPDATED.toml       when each page last changed. Written by the tool
+  UPDATED.toml       when each page last changed and was last audited. Written by the tool
   site/              the rendered site. Generated; do not commit it
 ```
 

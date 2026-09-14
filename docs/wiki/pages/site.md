@@ -62,6 +62,9 @@ forever.[^dates] Every command that builds the site records dates, and `wiki che
 Instead, `wiki check` refuses a page whose text has changed since its date was recorded, and a record of a
 page that no longer exists, and says to run `wiki build`.[^stale]
 
+A page's footer also says when the page was last audited against the code, or says never, and an edit
+keeps that day.[^audited] Recording an audit is described on [wiki audit](commands/audit.md).
+
 ## Search
 
 The search box matches **page titles only**, not what the pages say, and shows at most eight
@@ -97,6 +100,8 @@ every red mark and the Source tab.[^strip] Every field is listed on [Front matte
 [^record]: `src/builder/cli.py` — `run()` calls `build()`, which records dates; `src/builder/build.py` —
     `check()` builds with `record=False`.
 [^stale]: `src/builder/build.py` — `date_problems()`, called from `check()`.
+[^audited]: `src/builder/build.py` — `render_page()` adds `Last audited` after `Last updated`, with `never`
+    when there is none, and `write_site()` keeps a page's `audited` when its date moves.
 [^goalsdate]: `src/builder/build.py` — `content_of()` in `write_site()` adds every page's intent to the
     goals page's hash.
 [^search]: `src/builder/assets/wiki.js` — the search listener filters on `page.t`, the title, and keeps

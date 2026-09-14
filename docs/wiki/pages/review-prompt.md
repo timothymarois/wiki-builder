@@ -32,12 +32,24 @@ check a diagram gets.[^fenced] It works in any project
 that uses wiki-builder, and names nothing about the one it is used in. Installing the tool in the first
 place has its own [Installation prompt](installation-prompt.md).
 
+Before handing the prompt to an agent, replace `PART` with the part to review: a sidebar section, a page
+with the pages beneath it, or a component of the project. Left as it is, the prompt has the agent choose
+the section audited longest ago, which keeps a large wiki to one careful review at a time. Pages are
+audited with [wiki audit](commands/audit.md).
+
 ## Prompt
 
 ```text
 Review this project's wiki against the project itself, and report what is wrong, undocumented, out of
 date, uncited or badly written. The wiki is read instead of the source, so a page that disagrees with the code is
 worse than no page. When they disagree, the page is wrong, unless the owner says otherwise.
+
+## Scope
+
+Review only PART, and the code it describes: a sidebar section, a page with the pages beneath it, or one
+component of the project. If PART was left as it is, choose the part yourself: read docs/wiki/UPDATED.toml
+and wiki.toml, and take the sidebar section whose pages were audited longest ago, counting a page never
+audited as the oldest. Review the whole wiki only when the owner asks for it.
 
 ## Before starting
 
@@ -50,7 +62,8 @@ worse than no page. When they disagree, the page is wrong, unless the owner says
    starts, not a verdict. `wiki check` writes nothing; run every other command, and every experiment,
    in a scratch copy of the project, because a build rewrites the site and the page dates, and serving
    opens a browser.
-4. Do not edit anything. Report findings; the owner decides what changes.
+4. Do not edit any page. Report findings; the owner decides what changes. The one thing a review
+   writes is its audit record, once the report is done.
 5. Note the commit you are reviewing. A file that changes while you work is read again before you
    report on it.
 
@@ -78,7 +91,8 @@ describes. Coverage works the other way, from the code to the wiki.
 Code that no page mentions is as wrong as a page the code contradicts: a reader using the wiki instead
 of the source never learns it exists. Build the list from the code, never from the wiki, so the wiki
 cannot hide its own gaps.
-- Inventory everything a person can use, configure or notice, from the code itself:
+- Inventory everything in the part under review that a person can use, configure or notice, from the
+  code itself:
   - entry points: commands, subcommands, options, arguments, flags;
   - interfaces: endpoints, public functions and classes, events, webhooks, messages;
   - configuration: settings files and their keys, environment variables, defaults;
@@ -165,34 +179,38 @@ change before reporting a finding; if you cannot, drop it.
 
 ## Report
 
-Group findings by page, most severe first:
-1. False: the page says something the code does not do.
-2. Undocumented: the code does something a reader needs that no page says, or a requirement is
-   absent. List each item from the coverage inventory, with where it lives in the code and the page it
-   belongs on.
-3. Uncited: a claim with no citation, or a citation that does not support it.
-4. Stale: a {missing} mark that can now be cited, or something renamed or removed.
-5. Writing: a name, sentence or diagram that breaks a named rule of the skill.
+Keep it short. The owner reads it to decide what to fix, not to follow your work: no preamble, no
+method, no quoted evidence.
 
-For each finding give the page and line; the sentence or row, quoted; what the code or source actually
-shows, with its file and function or outside page; the fix, as the corrected sentence or the citation
-to add; and, for a writing finding, the rule it breaks and what a reader would get wrong.
+1. One line: the part reviewed, and why if you chose it; the commit; whether `wiki check` passed; and
+   how many findings of each severity.
+2. What to fix, most severe first, one line each:
+   page.md:line — severity — what is wrong — the fix, as the corrected text or the citation to add.
+   Name the code or the outside page only where the fix needs it. A pattern is one line, listing every
+   place it occurs.
+3. For the owner, one line each: code that may be what is wrong, an intent a page now contradicts, and
+   anything that needs an approval.
+4. Not reviewed, one line each, with why.
 
-Apart from the findings, list what is the owner's to decide: code that may be what is wrong, an intent a
-page now contradicts, and anything that needs an approval. Say which findings you verified by running something and which by reading alone, and
-what you did not review and why.
+Severities, most severe first: false, the page says what the code does not do; undocumented, a reader
+needs something no page says, or a stated requirement is on no page; uncited, a claim with no citation
+or one that does not support it; stale, a {missing} mark that can now be cited, or something renamed or
+removed; writing, a name, sentence or diagram that breaks a named rule of the skill, which the line
+names.
 
-End with: the commit reviewed; pages reviewed; the coverage inventory as counts (items found, documented, mentioned only,
-undocumented); findings at each severity; {missing} marks that could be cleared; and whether
-`wiki check` passed. Report nothing you have not checked against the code, and no preferences. A page
-that is accurate, current, cited and well written gets one line saying so.
+Leave out pages with no findings and how each finding was verified. Report nothing you have not checked
+against the code, and no preferences.
+
+Then run `wiki audit` with every page that has no finding. A page with a finding is audited once it is
+fixed.
 ```
 
 ## Fixing
 
 To have the agent fix what it finds instead of reporting it, replace the fourth step of "Before starting"
-with: "Fix each finding, change nothing a finding does not name, keep `wiki check` passing, and list
-every change you made." An edit that fixes nothing still moves the page's date, and tells every reader
+with: "Fix each finding, change nothing a finding does not name, keep `wiki check` passing, run
+`wiki build` and then `wiki audit` on every page reviewed, and list every change you made, one line
+each." An edit that fixes nothing still moves the page's date, and tells every reader
 the page changed when it did not.[^dates] Intents stay out of reach either way, because changing one
 changes what a page is for, and that is the owner's decision.
 

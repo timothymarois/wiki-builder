@@ -30,7 +30,7 @@ You write markdown; the generator writes the site.
 | The sidebar | `docs/wiki/wiki.toml` | sections name only the pages that **start** a branch |
 | Pictures | `docs/wiki/images/` | with `PICTURES.toml`, recording what each shows |
 | The site | `docs/wiki/site/` | generated, ignored by git, rebuilt before it is served |
-| Dates | `docs/wiki/UPDATED.toml` | written by the build; a date moves only when its page does |
+| Dates | `docs/wiki/UPDATED.toml` | written by the build; a date moves only when its page does, and an audit date only with `wiki audit` |
 
 ```sh
 wiki serve    # build, serve, open a browser

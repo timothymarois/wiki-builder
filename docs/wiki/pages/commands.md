@@ -12,7 +12,7 @@ should be here, and nothing it does not.
 group = "Identity"
 rows = [
   { label = "Program", value = "wiki", cite = "program" },
-  { label = "Commands", value = "build, check, serve, sync, bless, publish, user", cite = "commands" },
+  { label = "Commands", value = "build, check, serve, sync, bless, publish, user, audit", cite = "commands" },
   { label = "Shared options", value = "--root, --wiki, --help", cite = "place" },
 ]
 
@@ -34,7 +34,7 @@ and [PICTURES.toml](pictures-toml.md).
 Every command is typed the same way, as the program's help prints it.[^program]
 ```sh
 wiki [-h] [--version] [--root ROOT] [--wiki WIKI]
-            {build,check,sync,serve,publish,user,bless} ...
+            {build,check,sync,serve,publish,user,bless,audit} ...
 ```
 
 ## Commands
@@ -48,6 +48,7 @@ wiki [-h] [--version] [--root ROOT] [--wiki WIKI]
 | [`wiki bless`](commands/bless.md) | records that a picture is still true, and why |
 | [`wiki publish`](commands/publish.md) | builds the site with clean addresses, for a host |
 | [`wiki user`](commands/user.md) | builds only the pages marked for users, with everything internal removed |
+| [`wiki audit`](commands/audit.md) | records that pages were checked against the code today |
 
 Typing `wiki` with no command is the same as `wiki serve`.[^alone]
 
@@ -72,7 +73,7 @@ Every message names what to do.{missing} Some name only what is wrong, such as `
 `wiki: missing.png has no entry in PICTURES.toml` and the parser's own
 `wiki: error: unrecognized arguments: --unknown`.[^messages]
 
-[^program]: `src/builder/cli.py` — `main()` builds the `wiki` parser and its seven commands, and makes the
+[^program]: `src/builder/cli.py` — `main()` builds the `wiki` parser and its eight commands, and makes the
     command optional; `pyproject.toml` names the program under `[project.scripts]`.
 [^commands]: `src/builder/cli.py` — each command's `help` in `main()`, and what `run()` does for it.
 [^alone]: `src/builder/cli.py` — `run()` treats no command as `"serve"`.

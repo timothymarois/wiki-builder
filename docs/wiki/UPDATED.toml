@@ -1,8 +1,8 @@
-# When each page last changed, and what it hashed to then.
+# When each page last changed, what it hashed to then, and when it was last audited.
 #
-# Written by `wiki build`, never by hand. A page is re-rendered, and its date moves,
-# only when its own content has changed -- so the date on a page means something, and a build
-# that changed nothing writes nothing.
+# Written by `wiki build` and `wiki audit`, never by hand. A page is re-rendered, and its date
+# moves, only when its own content has changed -- so the date on a page means something, and a
+# build that changed nothing writes nothing. An audit keeps its day through later edits.
 
 ["brief"]
 updated = "2026-09-14"
@@ -34,7 +34,11 @@ digest = "b90225cf70091dd010a7de0a64ea496491772b55f22d68ae9e40ec6636775c56"
 
 ["commands"]
 updated = "2026-09-14"
-digest = "ea3cbb88f162e93821e2b070eb390cb8363c960183c954f0b40d4507a99381b5"
+digest = "780249e41968067123d6418ef43191f67ca68e81001806411b9108afc338c1ea"
+
+["commands/audit"]
+updated = "2026-09-14"
+digest = "7f7c0d6b5d788d63505b5b413857fe14c00ff88c9f13d8c4dc67254788142638"
 
 ["commands/bless"]
 updated = "2026-09-14"
@@ -86,7 +90,7 @@ digest = "6d2fc369995b7f34f8e78d81051f11074d2c64b8d5845c3c8716fe5d3a7b103c"
 
 ["goals"]
 updated = "2026-09-14"
-digest = "d131b250e7331be0e42a1f7a702af7a1049f365c4eefa04f117496528defaee6"
+digest = "bbe2792e9e8be3e2576e1bc7ea95c157c9058db2b628ec51d8c203b2927a98c3"
 
 ["index"]
 updated = "2026-09-14"
@@ -114,7 +118,7 @@ digest = "ada73f34dea5234204dc020a0b3c9fc6c50046ecb79d8b64d508f93493dc0dc0"
 
 ["review-prompt"]
 updated = "2026-09-14"
-digest = "36f40d71b21412ff4a6e82272167b7c9ceed2e80c944fd2db463f6b28163404c"
+digest = "dfc93d1b098556a1dae3a18924d958d5fac09ea4ca35524f42a6d4354653d838"
 
 ["serving"]
 updated = "2026-09-14"
@@ -122,7 +126,7 @@ digest = "cb68a21debceab7746b3e9eb87b29d5534fb6cdc89eb1d298ab09f25754e5f37"
 
 ["site"]
 updated = "2026-09-14"
-digest = "1cb0fb30be4f82fcfbbc5d6aa6424fa208b0764442b0f26a77b3c0868bdc576d"
+digest = "6b6744bfb06be1a5ba15ad912b780ed1a6e7acc77b74e438d9fa39ff481eb931"
 
 ["site/agent-markdown"]
 updated = "2026-09-14"

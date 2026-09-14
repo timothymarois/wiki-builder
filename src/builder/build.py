@@ -209,17 +209,19 @@ def read_dates(wiki):
 
 def write_dates(wiki, dates):
     lines = [
-        "# When each page last changed, and what it hashed to then.",
+        "# When each page last changed, what it hashed to then, and when it was last audited.",
         "#",
-        "# Written by `wiki build`, never by hand. A page is re-rendered, and its date moves,",
-        "# only when its own content has changed -- so the date on a page means something, and a build",
-        "# that changed nothing writes nothing.",
+        "# Written by `wiki build` and `wiki audit`, never by hand. A page is re-rendered, and its date",
+        "# moves, only when its own content has changed -- so the date on a page means something, and a",
+        "# build that changed nothing writes nothing. An audit keeps its day through later edits.",
         "",
     ]
     for page_id in sorted(dates):
         lines.append("[%s]" % toml_key(page_id))
         lines.append("updated = %s" % toml_string(dates[page_id]["updated"]))
         lines.append("digest = %s" % toml_string(dates[page_id]["digest"]))
+        if dates[page_id].get("audited"):
+            lines.append("audited = %s" % toml_string(dates[page_id]["audited"]))
         lines.append("")
     (wiki / DATES).write_text("\n".join(lines), encoding="utf-8", newline="\n")
 
@@ -741,7 +743,7 @@ def page_stats(words, cited=None, missing=None):
 
 def render_page(title, subtitle, hatnote, body_html, infobox, categories_bar, nav, index, site,
                 directory, template, tabs=ARTICLE_ONLY, updated="", stamp_css="", stamp_js="",
-                draft=False, llm_links="", diagram_script="", stats=()):
+                draft=False, llm_links="", diagram_script="", stats=(), audited=None):
     body_html, entries = number_headings(body_html)
     filled = {
         "tabs": tabs,
@@ -762,9 +764,14 @@ def render_page(title, subtitle, hatnote, body_html, infobox, categories_bar, na
         "contents": render_contents(entries),
         "body": body_html,
         "categories": categories_bar,
+        # The day a page was last audited follows the day it was updated, and says never when it has not
+        # been; None leaves it out, as a user build and a generated page do.
         "footer": ('      <div class="foot">%s</div>' % "".join(
             "<span>%s</span>" % html_module.escape(part)
-            for part in (["Last updated " + spoken_date(updated)] if updated else []) + list(stats))
+            for part in (["Last updated " + spoken_date(updated)] if updated else [])
+            + (["Last audited " + (spoken_date(audited) if audited else "never")]
+               if updated and audited is not None else [])
+            + list(stats))
                    ) if updated or stats else "",
         "index": index,
         "llm_links": llm_links,
@@ -956,21 +963,13 @@ def write_site(root, out, audience, link_root, today, record, wiki):
                             "s": entry["s"]} for entry in index_entries],
                           sort_keys=True, separators=(",", ":"))
 
-    # What a page is, for the purpose of "has it changed": its own markdown, and for the page generated
-    # from other pages' intents, those intents too. The template and the stylesheet are deliberately not
-    # part of it -- restyling the site is not the page being updated.
-    def content_of(page_id):
-        if page_id == GOALS_ID:
-            return pages[page_id]["raw"] + "\n".join(
-                pages[other]["intent"] for other in sorted(pages))
-        return pages[page_id]["raw"]
-
     changed = []
     for page_id in sorted(pages):
-        digest = hashlib.sha256(content_of(page_id).encode("utf-8")).hexdigest()
+        digest = page_digest(pages, page_id)
         if dates.get(page_id, {}).get("digest") != digest:
             changed.append(page_id)
-            dates[page_id] = {"updated": today, "digest": digest}
+            # Updated, not replaced: the day the page was last audited stays true after an edit.
+            dates.setdefault(page_id, {}).update(updated=today, digest=digest)
     for gone in sorted(set(dates) - set(pages)):
         del dates[gone]
         changed.append(gone)
@@ -1050,7 +1049,9 @@ def write_site(root, out, audience, link_root, today, record, wiki):
             # excused from citations, which has nothing to count.
             page_stats(page["words"], *(citations.get(page_id, (0, 0))
                                         if with_source and page["meta"].get("goals", True)
-                                        else (None, None)))))
+                                        else (None, None))),
+            # An audit checks a page against the code, which a user build withholds, so it carries none.
+            audited=dates[page_id].get("audited", "") if with_source else None))
         if with_source:
             source_directory = directory + "source/"
             emit(source_directory, render_page(
@@ -1566,6 +1567,43 @@ def pointing_problems(root, wiki=None):
     return problems
 
 
+def page_digest(pages, page_id):
+    """What a page is, for the purpose of "has it changed": its own markdown, and for the page generated
+    from other pages' intents, those intents too. The template and the stylesheet are deliberately not
+    part of it -- restyling the site is not the page being updated."""
+    content = pages[page_id]["raw"]
+    if page_id == GOALS_ID:
+        content += "\n".join(pages[other]["intent"] for other in sorted(pages))
+    return hashlib.sha256(content.encode("utf-8")).hexdigest()
+
+
+def audit(root, page_names, wiki=None, today=None):
+    """Record the day each page was checked against the code, and return the line to print for each.
+
+    The day sits beside the page's date rather than in the page, because editing the page would move the
+    day it was updated. It is recorded only against the page its date describes: a page edited since has
+    not been built, so what readers are about to see is not what was checked. Every page is checked
+    before any is recorded, so a refused audit records nothing.
+    """
+    wiki = wiki_of(root, wiki)
+    _, budget, _ = read_config(wiki)
+    pages = read_pages(wiki / "pages", budget["intent"])
+    dates = read_dates(wiki)
+    today = today or datetime.date.today().isoformat()
+    names = [name[:-len(".md")] if name.endswith(".md") else name for name in page_names]
+    for name in names:
+        if name not in pages:
+            raise WikiError(f"there is no page {name}.md to audit; name a page by its path under pages, "
+                            "such as checks/budgets")
+        if dates.get(name, {}).get("digest") != page_digest(pages, name):
+            raise WikiError(f"{name}.md has changed since its date was recorded; run `wiki build`, then "
+                            "audit it again")
+    for name in names:
+        dates[name]["audited"] = today
+    write_dates(wiki, dates)
+    return [f"wiki: {name} audited {spoken_date(today)}" for name in names]
+
+
 def date_problems(root, wiki=None):
     """Pages whose content has moved since the record was written.
 
@@ -1578,11 +1616,7 @@ def date_problems(root, wiki=None):
     dates = read_dates(wiki)
     problems = []
     for page_id in sorted(pages):
-        content = pages[page_id]["raw"]
-        if page_id == GOALS_ID:
-            content += "\n".join(pages[other]["intent"] for other in sorted(pages))
-        digest = hashlib.sha256(content.encode("utf-8")).hexdigest()
-        if dates.get(page_id, {}).get("digest") != digest:
+        if dates.get(page_id, {}).get("digest") != page_digest(pages, page_id):
             problems.append(f"{page_id}.md has changed since its date was recorded; "
                             "run `wiki build`")
     for gone in sorted(set(dates) - set(pages)):

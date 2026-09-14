@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 from . import __version__
-from .build import (ASSETS, SKILL, bless, build, check, citation_counts, missing_marks, report,
+from .build import (ASSETS, SKILL, audit, bless, build, check, citation_counts, missing_marks, report,
                     wiki_of)
 from .config import CONFIG, WikiError, record_version
 from .serve import serve
@@ -125,6 +125,10 @@ def main(argv=None):
                                   help="record that a picture is still true, and why")
     blessed.add_argument("picture", metavar="PICTURE", help="the picture's file name, as its record names it")
     blessed.add_argument("reason", metavar="REASON", help="why the picture is still true; it cannot be empty")
+    audited = commands.add_parser("audit", parents=[place],
+                                  help="record that pages were checked against the code today")
+    audited.add_argument("pages", nargs="+", metavar="PAGE",
+                         help="a page's path under pages, with or without .md, such as checks/budgets")
 
     args = parser.parse_args(argv)
     root = args.root.resolve()
@@ -150,6 +154,11 @@ def run(args, root, wiki):
 
     if command == "bless":
         print(bless(root, args.picture, args.reason, wiki))
+        return 0
+
+    if command == "audit":
+        for line in audit(root, args.pages, wiki):
+            print(line)
         return 0
 
     if command == "check":

@@ -1390,6 +1390,62 @@ class WikiTests(unittest.TestCase):
         self.assertNotIn("thing/part", wiki.read_dates(self.root / "docs/wiki"))
         self.assertEqual([], wiki.date_problems(self.root))
 
+    # An audit is the page checked against the code. The owner, 2026-09-14: "Last Audited date in the stats
+    # after last updated ... if not there it just says never."
+
+    def test_a_page_never_audited_says_so_in_its_footer(self):
+        self.build()
+        self.assertIn("Last audited never", self.footer())
+
+    def test_auditing_a_page_puts_the_day_in_its_footer(self):
+        self.build(today="2026-03-04")
+        wiki.audit(self.root, ["thing"], today="2026-09-09")
+        self.build(today="2026-09-10")
+        footer = self.footer()
+        self.assertIn("Last updated 4 March 2026", footer, "auditing a page moved the day it was updated")
+        self.assertIn("Last audited 9 September 2026", footer)
+        self.assertIn("Last audited never", self.footer("goals"), "auditing one page audited another")
+
+    def test_an_edit_keeps_the_day_a_page_was_last_audited(self):
+        self.build(today="2026-03-04")
+        wiki.audit(self.root, ["thing"], today="2026-03-05")
+        self.write("thing", PAGE.replace("It does it slowly.", "It does it quickly."))
+        self.build(today="2026-09-09")
+        footer = self.footer()
+        self.assertIn("Last updated 9 September 2026", footer)
+        self.assertIn("Last audited 5 March 2026", footer)
+
+    def test_auditing_a_page_that_does_not_exist_is_refused(self):
+        self.build()
+        with self.assertRaises(wiki.WikiError) as caught:
+            wiki.audit(self.root, ["nothing"])
+        self.assertIn("nothing.md", str(caught.exception))
+
+    def test_auditing_a_page_edited_since_its_date_was_recorded_is_refused(self):
+        # An audit is of the page its date records. One edited since has not been built, let alone checked.
+        self.build(today="2026-03-04")
+        self.write("thing", PAGE.replace("It does it slowly.", "It does it quickly."))
+        with self.assertRaises(wiki.WikiError) as caught:
+            wiki.audit(self.root, ["thing"], today="2026-03-05")
+        self.assertIn("wiki build", str(caught.exception))
+        self.assertNotIn("audited", wiki.read_dates(self.root / "docs/wiki")["thing"])
+
+    def test_an_audit_names_a_page_with_or_without_md_and_leaves_the_check_passing(self):
+        self.build()
+        wiki.audit(self.root, ["thing", "goals.md"], today="2026-01-03")
+        dates = wiki.read_dates(self.root / "docs/wiki")
+        self.assertEqual("2026-01-03", dates["thing"]["audited"])
+        self.assertEqual("2026-01-03", dates["goals"]["audited"])
+        self.assertEqual([], wiki.date_problems(self.root))
+
+    def test_a_user_footer_leaves_out_the_audit(self):
+        self.write("thing", PAGE.replace('categories = ["Things"]',
+                                         'categories = ["Things"]\naudience = "user"'))
+        self.build("user")
+        footer = self.footer()
+        self.assertIn("Last updated", footer)
+        self.assertNotIn("audited", footer)
+
     # --- the command line ---------------------------------------------------------------------------
 
     def run_main(self, argv):
@@ -1408,6 +1464,18 @@ class WikiTests(unittest.TestCase):
                 # argparse refuses a command line by exiting, which is how a person meets it too.
                 status = refused.code
         return status, out.getvalue() + err.getvalue()
+
+    def test_the_audit_command_names_each_page_it_recorded(self):
+        self.build()
+        status, output = self.run_main(["--root", str(self.root), "audit", "thing", "goals"])
+        self.assertEqual(0, status, output)
+        self.assertIn("wiki: thing audited", output)
+        self.assertIn("wiki: goals audited", output)
+
+    def test_the_audit_command_needs_a_page(self):
+        status, output = self.run_main(["--root", str(self.root), "audit"])
+        self.assertEqual(2, status)
+        self.assertIn("PAGE", output)
 
     def test_check_passes_on_a_sound_wiki(self):
         # Built first: a wiki that has never been built has recorded no dates, and the check says so.
