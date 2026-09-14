@@ -1,5 +1,5 @@
 +++
-title = "wiki-builder"
+title = "Wiki Builder"
 subtitle = "a tool that renders markdown into a wiki, and refuses what makes documentation rot"
 status = "approved"
 goals = false

@@ -1,7 +1,7 @@
 # The wiki this tool keeps about itself: written with it, built by it, and held to its own checks.
 
 [site]
-name = "wiki-builder"
+name = "Wiki Builder"
 tagline = "the tool's own wiki"
 
 # No [budget]: these pages run on the defaults, and nobody has measured them against a reader yet.
@@ -20,7 +20,7 @@ pages = ["deployment-github", "deployment-cloudflare"]
 
 [[section]]
 title = "Writing"
-pages = ["pages", "skill"]
+pages = ["pages"]
 
 [[section]]
 title = "Reading"
@@ -35,8 +35,8 @@ title = "Reference"
 pages = ["commands", "wiki-toml", "front-matter", "pictures-toml"]
 
 [[section]]
-title = "Agent prompts"
-pages = ["installation-prompt", "review-prompt"]
+title = "Agents"
+pages = ["skill", "installation-prompt", "review-prompt"]
 
 # Written by `wiki sync`. Which release of the tool these pages
 # were written against; `wiki check` says so when they differ.
