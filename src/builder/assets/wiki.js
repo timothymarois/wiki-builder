@@ -68,6 +68,7 @@
       var next = ORDER[(ORDER.indexOf(stored()) + 1) % ORDER.length];
       try { localStorage.setItem("wiki-theme", next); } catch (e) { /* a private window; this page still switches */ }
       showTheme(next);
+      drawDiagrams();
     });
   }
 
@@ -94,14 +95,32 @@
   }
 
   // --- diagrams ------------------------------------------------------------------------------------------
-  // Mermaid is loaded only on a page that has a diagram. It draws in the theme the page opened in: dark
-  // when the reader chose dark, or chose nothing and their system is dark.
-  if (window.mermaid) {
-    var chosen = document.documentElement.getAttribute("data-theme");
+  // Mermaid is loaded only on a page that has a diagram. It draws in the page's theme -- dark when the reader
+  // chose dark, or chose nothing and their system is dark -- and draws again whenever that changes. A drawn
+  // diagram no longer holds the text it was written in, so each one's text is kept before the first drawing.
+  var diagrams = window.mermaid ? Array.prototype.slice.call(document.querySelectorAll("pre.mermaid")) : [];
+  var diagramText = diagrams.map(function (pre) { return pre.textContent; });
+
+  function drawDiagrams() {
+    if (!diagrams.length) { return; }
+    var chosen = root.getAttribute("data-theme");
     var dark = chosen === "dark" ||
       (!chosen && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    diagrams.forEach(function (pre, index) {
+      pre.removeAttribute("data-processed");
+      pre.textContent = diagramText[index];
+    });
     window.mermaid.initialize({ startOnLoad: false, theme: dark ? "dark" : "default", securityLevel: "strict" });
-    window.mermaid.run({ querySelector: "pre.mermaid" });
+    window.mermaid.run({ nodes: diagrams });
+  }
+
+  drawDiagrams();
+  if (diagrams.length && window.matchMedia) {
+    // In the automatic theme the system decides, so a system change redraws too.
+    var system = window.matchMedia("(prefers-color-scheme: dark)");
+    var followSystem = function () { if (!root.getAttribute("data-theme")) { drawDiagrams(); } };
+    if (system.addEventListener) { system.addEventListener("change", followSystem); }
+    else if (system.addListener) { system.addListener(followSystem); }
   }
 
   // --- the lightbox ---------------------------------------------------------------------------------

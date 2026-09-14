@@ -62,8 +62,8 @@ flowchart LR
 
 **A diagram needs no network**: Mermaid ships inside wiki-builder, and a build copies it, with its
 licence, into a site only when some page has a diagram.[^script] Only a page with a diagram loads
-it.[^script] A diagram is drawn in the theme the page opened in, light or dark, and switching the theme
-redraws it only when the page is reloaded.[^theme] It sits centred without a frame, and scrolls sideways
+it.[^script] A diagram is drawn in the page's theme, light or dark, and is drawn again whenever the theme changes,
+whether the reader switches it or the system does.[^theme] It sits centred without a frame, and scrolls sideways
 inside itself when it is wider than the page.[^style]
 
 ## Citations
@@ -87,8 +87,9 @@ diagrams are on [Checks](../checks.md), [Citations](../checks/citations.md) and
 [^script]: `src/builder/build.py` — `MERMAID` and `MERMAID_LICENSE` sit in the package's assets;
     `write_site()` gives a page the script only when it has a diagram, and copies both into the site only
     when some page does.
-[^theme]: `src/builder/assets/wiki.js` — sets Mermaid's theme once, dark when the page's theme is dark or
-    follows a dark system, then draws every `pre.mermaid`.
+[^theme]: `src/builder/assets/wiki.js` — `drawDiagrams()` keeps each diagram's text, sets Mermaid's theme
+    to dark when the page's theme is dark or follows a dark system, and draws every `pre.mermaid`; the
+    theme button and a change in the system's colour scheme call it again.
 [^style]: `src/builder/assets/wiki.css` — `.art pre.mermaid`.
 [^rules]: `src/skill/SKILL.md` — the Diagrams section.
 [^cite]: `src/builder/build.py` — `page_statements()` blanks fenced code with `FENCED` before reading
