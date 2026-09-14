@@ -90,14 +90,14 @@ INTERNAL_MARKER = re.compile(r'<sup class="ref[^"]*">.*?</sup>', re.S)
 
 # A missing citation. Every statement on a page is either traced to the code or marked here, in the place
 # a reader already looks for a source. The owner, 2026-09-14: "every statement, fact, requirement, logic,
-# beahvior mentions all require a citation or unknown citation." Two things put the mark there -- the game
-# does not do this yet, or nobody has found where it does -- and for a reader the consequence is the same:
-# do not take this on faith. Written {missing} in the prose, or missing = true on an infobox row. Never
-# shown to a player.
+# beahvior mentions all require a citation or unknown citation." Two things put the mark there -- the
+# thing is not built yet, or nobody has found where it happens -- and for a reader the consequence is the
+# same: do not take this on faith. Written {missing} in the prose, or missing = true on an infobox row.
+# Never shown to a player.
 MISSING = re.compile(r"\{missing\}")
 MISSING_CITATION = ('<sup class="ref nocite" data-audience="internal" '
-                    'title="No source cited: either the game does not do this yet, or nobody has found '
-                    'where it does">[?]</sup>')
+                    'title="No source cited: either this is not built yet, or nobody has found where it '
+                    'happens">[?]</sup>')
 
 
 # --------------------------------------------------------------------------------------------------
@@ -131,6 +131,11 @@ def read_pages(pages_dir, intent_budget):
         page_id = path.relative_to(pages_dir).with_suffix("").as_posix()
         if page_id.rsplit("/", 1)[-1] == "source":
             raise WikiError("a page may not be called source.md: every page's source view lives there")
+        # The subtitle was called kicker before. Read as nothing, every page that still says kicker
+        # would lose its subtitle and no build would say so.
+        if "kicker" in meta:
+            raise WikiError(f"{path.name} gives its subtitle as kicker, which is now called subtitle; "
+                            "rename kicker to subtitle")
         for required in ("title", "intent"):
             if not str(meta.get(required, "")).strip():
                 raise WikiError(f"{path.name} has no {required}; every page must say what it is for")
@@ -146,7 +151,7 @@ def read_pages(pages_dir, intent_budget):
             "raw": path.read_text(encoding="utf-8"),
             "title": meta["title"],
             "intent": " ".join(meta["intent"].split()),
-            "kicker": meta.get("kicker", ""),
+            "subtitle": meta.get("subtitle", ""),
             "hatnote": meta.get("hatnote", ""),
             "audience": meta.get("audience", "internal"),
             # Draft until the owner says otherwise. A page states what part of the system is for, and
@@ -479,8 +484,8 @@ def render_infobox(page, audience, directory, images):
                          % (html_module.escape(str(row.get("label", ""))), value,
                             "<i>%s</i>" % html_module.escape(str(note)) if note else ""))
     if shown and missing:
-        parts.append('<div class="legend">A row marked %s has no source to cite, because the game does '
-                     "not do it yet.</div>" % MISSING_CITATION)
+        parts.append('<div class="legend">A row marked %s has no source to cite: either it is not built '
+                     "yet, or nobody has found where it happens.</div>" % MISSING_CITATION)
     parts.append("</aside>")
     return "\n".join(parts)
 
@@ -515,11 +520,11 @@ def render_nav(sections, pages, categories, current, directory, audience):
     because a page that lives at a/b/c is a child of the page at a/b. Nothing has to be listed twice, and
     a new page appears in the right place by being put in the right directory.
     """
-    # A draft is built so it can be read and argued with, and linked from nowhere: it is not part of the
-    # wiki until its intent is approved.
+    # Every page is in the sidebar, draft or not. The owner, 2026-09-14: "all pages should always be on
+    # the nav regardless of status". A draft still says so above everything else on it, and search, the
+    # categories and the goals still offer only what has been approved.
     visible = {page_id for page_id in pages
-               if visible_to(audience, pages[page_id]["audience"])
-               and pages[page_id]["status"] == "approved"}
+               if visible_to(audience, pages[page_id]["audience"])}
 
     def branch(page_id):
         # Children are gathered from every page, not only the visible ones: a page hidden from this
@@ -599,8 +604,8 @@ def goals_page(pages, sections, audience):
                     continue
                 if pages[page_id]["status"] != "approved":
                     continue
-                # A page about the wiki itself states no goal of the game, and would only dilute the one
-                # page whose whole job is to read as the game's goals in one sitting.
+                # A page about the wiki itself states no goal of the system, and would only dilute the one
+                # page whose whole job is to read as the system's goals in one sitting.
                 if not pages[page_id]["meta"].get("goals", True):
                     continue
                 ordered.append(page_id)
@@ -631,7 +636,7 @@ def on_source():
             '<li><a class="sel">Source</a></li></ul>' % LINK_SUFFIX)
 
 
-def render_page(title, kicker, hatnote, body_html, infobox, categories_bar, nav, index, site,
+def render_page(title, subtitle, hatnote, body_html, infobox, categories_bar, nav, index, site,
                 directory, template, tabs=ARTICLE_ONLY, updated="", stamp_css="", stamp_js="",
                 draft=False):
     body_html, entries = number_headings(body_html)
@@ -645,7 +650,7 @@ def render_page(title, kicker, hatnote, body_html, infobox, categories_bar, nav,
         "tagline_line": ("<span>%s</span>" % html_module.escape(site["tagline"])) if site.get("tagline") else "",
         "nav": nav,
         "title": html_module.escape(title),
-        "kicker": html_module.escape(kicker),
+        "subtitle": html_module.escape(subtitle),
         "hatnote": (('      <p class="hat draft"><b>This page is a draft.</b> Nobody has agreed that what '
                      'it says this part of the system is for is what it should be for, so read it as a '
                      'proposal rather than as the wiki.</p>\n' if draft else "")
@@ -707,13 +712,11 @@ def write_site(root, out, audience, link_root, today, record, wiki):
               for top in listed
               for reachable in descendants_of(top, set(pages))}
     for page_id in sorted(pages):
-        if pages[page_id]["status"] != "approved":
-            continue
         if page_id not in in_nav:
             raise WikiError(f"{page_id}.md is in no navigation section and beneath no page that is, "
                             "so nobody could reach it")
     # A category needs no navigation entry: every page carrying one links to it from its own foot, which
-    # is the only direction anyone travels. Listing one in nav.toml still works, and still has to name a
+    # is the only direction anyone travels. Listing one in wiki.toml still works, and still has to name a
     # category some page belongs to.
     categories = collect_categories(pages, audience)
 
@@ -725,7 +728,7 @@ def write_site(root, out, audience, link_root, today, record, wiki):
     linked = [page_id for page_id in emitted if pages[page_id]["status"] == "approved"]
     for page_id in linked:
         index_entries.append({"u": page_directory(page_id), "t": pages[page_id]["title"],
-                              "s": pages[page_id]["kicker"]})
+                              "s": pages[page_id]["subtitle"]})
     for slug in sorted(categories):
         index_entries.append({"u": category_directory(slug),
                               "t": "Category: " + categories[slug]["name"], "s": "a category page"})
@@ -791,7 +794,7 @@ def write_site(root, out, audience, link_root, today, record, wiki):
         # The source view names paths and internal identifiers by its nature, so it is internal only.
         with_source = audience != "player"
         emit(directory, render_page(
-            page["title"], page["kicker"], page["hatnote"], body,
+            page["title"], page["subtitle"], page["hatnote"], body,
             render_infobox(page, audience, directory, ledger),
             render_categories(page, directory, categories),
             render_nav(sections, pages, categories, page_id, directory, audience),
@@ -801,7 +804,7 @@ def write_site(root, out, audience, link_root, today, record, wiki):
         if with_source:
             source_directory = directory + "source/"
             emit(source_directory, render_page(
-                page["title"], "the markdown this page is written in", "",
+                page["title"], "Markdown source content of this page", "",
                 render_source(page["raw"]), "", "",
                 render_nav(sections, pages, categories, page_id, source_directory, audience),
                 index_for(source_directory), site, source_directory, template, on_source(),
@@ -815,7 +818,7 @@ def write_site(root, out, audience, link_root, today, record, wiki):
             '<a href="%s"><b>%s</b><span>%s</span></a>'
             % (relative_directory(directory, page_directory(page_id)),
                html_module.escape(pages[page_id]["title"]),
-               html_module.escape(pages[page_id]["kicker"]))
+               html_module.escape(pages[page_id]["subtitle"]))
             for page_id in listed["pages"])
         body = "<p>%d page%s in this category.</p><div class=\"gal\">%s</div>" % (
             len(listed["pages"]), "" if len(listed["pages"]) == 1 else "s", rows)
@@ -1101,7 +1104,8 @@ def report(counts, goals_words, budget, drafts=()):
         print("wiki: %-32s %4d words" % (page_id, counts[page_id]))
     print("wiki: the collected goals read in %d words" % goals_words)
     if drafts:
-        print("wiki: %d page%s waiting on the owner, built but linked from nowhere: %s"
+        print("wiki: %d page%s waiting on the owner, in the sidebar but not in search, the categories "
+              "or the goals: %s"
               % (len(drafts), "" if len(drafts) == 1 else "s", ", ".join(drafts)))
     if not budget.get("calibrated"):
         print("wiki: these budgets are PROVISIONAL -- %d words a page, %d for the collected goals. "

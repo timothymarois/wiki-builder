@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 440" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13">
+  <rect width="720" height="440" rx="10" fill="#f8f9fa"/>
+  <!-- the rail -->
+  <rect x="16" y="16" width="170" height="408" rx="6" fill="#ffffff" stroke="#c8ccd1"/>
+  <text x="30" y="44" font-weight="700" fill="#202122">Site name</text>
+  <rect x="30" y="58" width="142" height="24" rx="4" fill="#f8f9fa" stroke="#a2a9b1"/>
+  <text x="40" y="75" fill="#72777d">Search</text>
+  <text x="30" y="108" font-size="11" fill="#54595d" letter-spacing="1">SECTION</text>
+  <text x="30" y="130" fill="#3366cc">A page</text>
+  <text x="46" y="150" fill="#3366cc">Its child</text>
+  <text x="30" y="170" fill="#3366cc">Another page</text>
+  <text x="30" y="404" font-size="12" fill="#54595d">Sidebar: nested from paths</text>
+  <!-- the tabs -->
+  <rect x="200" y="16" width="504" height="32" rx="6" fill="#ffffff" stroke="#c8ccd1"/>
+  <text x="214" y="37" font-weight="700" fill="#202122">Article</text>
+  <text x="272" y="37" fill="#3366cc">Source</text>
+  <text x="656" y="37" fill="#54595d">Auto</text>
+  <!-- the article -->
+  <rect x="200" y="58" width="504" height="366" rx="6" fill="#ffffff" stroke="#c8ccd1"/>
+  <text x="216" y="90" font-size="22" font-family="Georgia, serif" fill="#202122">Title</text>
+  <text x="216" y="110" fill="#54595d">the subtitle</text>
+  <line x1="216" y1="120" x2="486" y2="120" stroke="#c8ccd1"/>
+  <!-- the infobox -->
+  <rect x="500" y="80" width="188" height="150" rx="4" fill="#f8f9fa" stroke="#a2a9b1"/>
+  <text x="594" y="102" text-anchor="middle" font-weight="700" fill="#202122">Infobox</text>
+  <rect x="510" y="112" width="168" height="18" fill="#eaecf0"/>
+  <text x="516" y="125" font-size="12" font-weight="700" fill="#202122">Group</text>
+  <text x="516" y="150" font-size="12" font-weight="700" fill="#202122">Label</text>
+  <text x="600" y="150" font-size="12" fill="#202122">value</text>
+  <text x="516" y="172" font-size="12" font-weight="700" fill="#202122">Label</text>
+  <text x="600" y="172" font-size="12" fill="#202122">value</text>
+  <text x="662" y="168" font-size="10" fill="#d33">[?]</text>
+  <!-- contents -->
+  <rect x="216" y="134" width="150" height="72" rx="4" fill="#f8f9fa" stroke="#a2a9b1"/>
+  <text x="228" y="154" font-weight="700" fill="#202122">Contents</text>
+  <text x="228" y="174" font-size="12" fill="#3366cc">1  Section</text>
+  <text x="228" y="192" font-size="12" fill="#3366cc">2  Section</text>
+  <!-- body -->
+  <text x="216" y="238" font-size="16" font-family="Georgia, serif" fill="#202122">1  Section</text>
+  <rect x="216" y="252" width="270" height="8" rx="2" fill="#dfe2e6"/>
+  <rect x="216" y="268" width="250" height="8" rx="2" fill="#dfe2e6"/>
+  <text x="470" y="276" font-size="10" fill="#3366cc">[1]</text>
+  <rect x="216" y="284" width="200" height="8" rx="2" fill="#dfe2e6"/>
+  <!-- references -->
+  <text x="216" y="322" font-size="16" font-family="Georgia, serif" fill="#202122">References</text>
+  <text x="216" y="342" font-size="12" fill="#202122">1.  the file and function, in the code</text>
+  <!-- categories and date -->
+  <rect x="216" y="360" width="472" height="26" rx="4" fill="#f8f9fa" stroke="#c8ccd1"/>
+  <text x="226" y="378" font-size="12" fill="#202122"><tspan font-weight="700">Categories:</tspan> <tspan fill="#3366cc">A category</tspan></text>
+  <text x="216" y="408" font-size="12" fill="#54595d">Last updated 14 September 2026</text>
+</svg>

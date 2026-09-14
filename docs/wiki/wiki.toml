@@ -1,0 +1,28 @@
+# The wiki this tool keeps about itself: written with it, built by it, and held to its own checks.
+
+[site]
+name = "wiki-builder"
+tagline = "the tool's own wiki"
+
+# No [budget]: these pages run on the defaults, and nobody has measured them against a reader yet.
+
+[[section]]
+title = "Start"
+pages = ["index", "brief", "goals"]
+
+[[section]]
+title = "Writing"
+pages = ["pages", "skill"]
+
+[[section]]
+title = "Reading"
+pages = ["site", "serving"]
+
+[[section]]
+title = "Checking"
+pages = ["checks"]
+
+# Written by `wiki sync`. Which release of the tool these pages
+# were written against; `wiki check` says so when they differ.
+[tool]
+version = "0.1.0"

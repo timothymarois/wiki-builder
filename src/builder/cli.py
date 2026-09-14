@@ -72,24 +72,37 @@ def guard_output(out):
 
 
 def main(argv=None):
+    # Where the project and its wiki are, accepted before the command or after it. A wrapper that passes
+    # them after whatever command it was handed is the natural one to write, and the README's does. They
+    # are suppressed rather than defaulted on each command, so that leaving them off there does not undo
+    # what was given before it. The top level declares its own: a parent's arguments are shared objects,
+    # and giving them a default there would give it to every command too.
+    place = argparse.ArgumentParser(add_help=False)
+    place.add_argument("--root", type=Path, default=argparse.SUPPRESS,
+                       help="the project; defaults to the working directory")
+    place.add_argument("--wiki", type=Path, default=argparse.SUPPRESS,
+                       help="where the wiki lives; defaults to <root>/docs/wiki")
     parser = argparse.ArgumentParser(prog="wiki", description=__doc__.splitlines()[0])
     parser.add_argument("--version", action="version", version=f"wiki-builder {__version__}")
     parser.add_argument("--root", type=Path, default=Path.cwd(),
                         help="the project; defaults to the working directory")
     parser.add_argument("--wiki", type=Path, default=None,
-                        help=f"where the wiki lives; defaults to <root>/docs/wiki")
+                        help="where the wiki lives; defaults to <root>/docs/wiki")
     commands = parser.add_subparsers(dest="command")
 
-    commands.add_parser("build", help="render the pages into the site")
-    commands.add_parser("check", help="every reason the wiki is not fit to read")
-    commands.add_parser("sync", help="write the skill into this project and record the release")
-    served = commands.add_parser("serve", help="build, serve, and open a browser at it")
+    commands.add_parser("build", parents=[place], help="render the pages into the site")
+    commands.add_parser("check", parents=[place], help="every reason the wiki is not fit to read")
+    commands.add_parser("sync", parents=[place],
+                        help="write the skill into this project and record the release")
+    served = commands.add_parser("serve", parents=[place], help="build, serve, and open a browser at it")
     served.add_argument("--port", type=int, default=PORT)
-    published = commands.add_parser("publish", help="build with clean addresses, for a host")
+    published = commands.add_parser("publish", parents=[place],
+                                     help="build with clean addresses, for a host")
     published.add_argument("out", type=Path)
-    player = commands.add_parser("player", help="build the player's view into a directory")
+    player = commands.add_parser("player", parents=[place], help="build the player's view into a directory")
     player.add_argument("out", type=Path)
-    blessed = commands.add_parser("bless", help="record that a picture is still true, and why")
+    blessed = commands.add_parser("bless", parents=[place],
+                                  help="record that a picture is still true, and why")
     blessed.add_argument("picture")
     blessed.add_argument("reason")
 
@@ -99,6 +112,17 @@ def main(argv=None):
     if not wiki.is_dir():
         print(f"wiki: no wiki at {wiki}", file=sys.stderr)
         return 2
+    # A problem that stops the build is already a sentence for a person. Let it escape and they get a
+    # traceback with that sentence buried in its last line.
+    try:
+        return run(args, root, wiki)
+    except WikiError as error:
+        print(f"wiki: {error}", file=sys.stderr)
+        return 1
+
+
+def run(args, root, wiki):
+    """Do the one command asked for, and return its exit status."""
     command = args.command or "serve"
 
     if command == "sync":

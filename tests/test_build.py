@@ -53,7 +53,7 @@ version = "VERSION"
 
 PAGE = '''+++
 title = "A thing"
-kicker = "what it is"
+subtitle = "what it is"
 categories = ["Things"]
 status = "approved"
 intent = """
@@ -83,7 +83,7 @@ Because speed would change it. {missing}
 
 INDEX = '''+++
 title = "Front"
-kicker = "the front"
+subtitle = "the front"
 goals = false
 status = "approved"
 intent = """
@@ -96,7 +96,7 @@ Go to [a thing](thing.md).
 
 GOALS = '''+++
 title = "Goals"
-kicker = "every purpose"
+subtitle = "every purpose"
 goals = false
 status = "approved"
 intent = """
@@ -195,7 +195,17 @@ class WikiTests(unittest.TestCase):
         self.build()
         page = (self.out / "thing/index.html").read_text(encoding="utf-8")
         self.assertIn("<h1>A thing</h1>", page)
-        self.assertIn("what it is", page)
+        self.assertIn('<p class="sub">what it is</p>', page)
+
+    def test_a_page_still_using_kicker_is_told_to_rename_it(self):
+        # The subtitle was called kicker before. Reading it silently as nothing would lose every one.
+        self.write("thing", PAGE.replace('subtitle = "what it is"', 'kicker = "what it is"'))
+        self.refused("rename kicker to subtitle")
+
+    def test_a_source_view_says_what_it_shows(self):
+        self.build()
+        source = (self.out / "thing/source/index.html").read_text(encoding="utf-8")
+        self.assertIn('<p class="sub">Markdown source content of this page</p>', source)
 
     def test_a_paragraph_that_states_something_and_cites_nothing_is_refused(self):
         """The rule the whole wiki rests on: a reader uses this instead of the source, so a sentence they
@@ -339,32 +349,44 @@ class WikiTests(unittest.TestCase):
 
     # --- what an agent may not decide ---------------------------------------------------------------
 
+    def draft(self):
+        """A proposal nobody has approved, listed in the navigation like any other page."""
+        self.write("proposal", PAGE.replace('status = "approved"\n', "").replace("A thing", "A proposal"))
+        self.nav(CONFIGURATION.replace('pages = ["thing"]', 'pages = ["thing", "proposal"]'))
+
     def test_a_page_is_a_draft_unless_it_says_otherwise(self):
         """An agent may write a page. Deciding that it belongs in the wiki is the owner's."""
-        self.write("proposal", PAGE.replace('status = "approved"\n', "").replace("A thing", "A proposal"))
+        self.draft()
         self.build()
         self.assertIn("proposal", self.drafts)
 
     def test_a_draft_is_built_so_it_can_be_read(self):
-        self.write("proposal", PAGE.replace('status = "approved"\n', "").replace("A thing", "A proposal"))
+        self.draft()
         self.build()
         self.assertTrue((self.out / "proposal/index.html").is_file())
 
     def test_a_draft_says_it_is_one_before_it_says_anything_else(self):
-        self.write("proposal", PAGE.replace('status = "approved"\n', "").replace("A thing", "A proposal"))
+        self.draft()
         self.build()
         page = (self.out / "proposal/index.html").read_text(encoding="utf-8")
         self.assertIn("This page is a draft", page)
         self.assertLess(page.index("This page is a draft"), page.index("<h2"))
 
-    def test_a_draft_is_linked_from_nowhere(self):
-        self.write("proposal", PAGE.replace('status = "approved"\n', "").replace("A thing", "A proposal"))
+    def test_a_draft_is_in_the_sidebar(self):
+        """The owner's ruling, 2026-09-14: "all pages should always be on the nav regardless of status"."""
+        self.draft()
         self.build()
-        for path in sorted(self.out.rglob("*.html")):
-            if path.parent.name == "proposal" or path.parent.parent.name == "proposal":
-                continue
-            self.assertNotIn("proposal/", path.read_text(encoding="utf-8"),
-                             f"{path.name} links to a page nobody has approved")
+        front = (self.out / "index.html").read_text(encoding="utf-8")
+        sidebar = front[front.index('<div id="nav">'):front.index("</nav>")]
+        self.assertIn('href="proposal/index.html"', sidebar)
+
+    def test_a_draft_is_not_offered_by_search(self):
+        # The sidebar shows every page; search, like the categories and the goals, offers approved ones.
+        self.draft()
+        self.build()
+        front = (self.out / "index.html").read_text(encoding="utf-8")
+        index = front[front.index("const WIKI_INDEX="):]
+        self.assertNotIn("proposal/", index[:index.index("</script>")])
 
     def test_a_draft_is_not_in_the_collected_goals(self):
         self.write("proposal", PAGE.replace('status = "approved"\n', "")
@@ -374,11 +396,10 @@ class WikiTests(unittest.TestCase):
         goals = (self.out / "goals/index.html").read_text(encoding="utf-8")
         self.assertNotIn("A proposal is made.", goals)
 
-    def test_a_draft_need_not_be_reachable(self):
-        # It is deliberately in no navigation section; that must not be an error.
+    def test_a_draft_in_no_navigation_section_is_refused(self):
+        # Every page is in the sidebar, so a draft nobody could reach is refused like any other page.
         self.write("proposal", PAGE.replace('status = "approved"\n', "").replace("A thing", "A proposal"))
-        self.assertEqual([], [p for p in wiki.uncited_problems(self.root) if "proposal" in p])
-        self.build()
+        self.refused("navigation section")
 
     # --- opening it off disk ------------------------------------------------------------------------
 
@@ -657,8 +678,8 @@ class WikiTests(unittest.TestCase):
         self.assertTrue((self.out / "images/thing.png").is_file(), "the picture was not copied")
 
     def test_an_infobox_picture_with_no_ledger_entry_is_refused(self):
-        self.write("thing", PAGE.replace('kicker = "what it is"',
-                                         'kicker = "what it is"\nimage = "absent.png"'))
+        self.write("thing", PAGE.replace('subtitle = "what it is"',
+                                         'subtitle = "what it is"\nimage = "absent.png"'))
         self.refused("pictures.toml")
 
     def test_a_citation_does_not_count_against_the_reading_budget(self):
@@ -760,16 +781,20 @@ class WikiTests(unittest.TestCase):
     # --- the command line ---------------------------------------------------------------------------
 
     def run_main(self, argv):
-        """The entry point dev-check.sh and dev-wiki.sh actually call, and the status they act on."""
+        """The entry point a project's wrapper actually calls, and the status it acts on.
+
+        Nothing `main` should catch is caught here: a problem that escaped it would reach a person as a
+        traceback, and a helper that tidied it away would hide exactly that.
+        """
         import contextlib
         import io
         out, err = io.StringIO(), io.StringIO()
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
             try:
                 status = cli.main(argv)
-            except wiki.WikiError as error:
-                print(f"build-wiki: {error}", file=err)
-                status = 1
+            except SystemExit as refused:
+                # argparse refuses a command line by exiting, which is how a person meets it too.
+                status = refused.code
         return status, out.getvalue() + err.getvalue()
 
     def test_check_passes_on_a_sound_wiki(self):
@@ -799,6 +824,19 @@ class WikiTests(unittest.TestCase):
         status, output = self.run_main(["--root", str(self.root / "docs"), "check"])
         self.assertEqual(2, status, "a wrong root must be misuse, not a failed check")
         self.assertIn("no wiki at", output)
+
+    def test_a_problem_that_stops_the_build_is_a_sentence_not_a_traceback(self):
+        (self.pages / "goals.md").unlink()
+        status, output = self.run_main(["--root", str(self.root), "check"])
+        self.assertEqual(1, status)
+        self.assertIn("wiki: there is no goals.md", output)
+
+    def test_the_root_may_follow_the_command(self):
+        # The wrapper the README gives a project passes --root after whatever command it was handed.
+        self.build()
+        status, output = self.run_main(["check", "--root", str(self.root),
+                                        "--wiki", str(self.root / "docs/wiki")])
+        self.assertEqual(0, status, output)
 
     def test_building_over_a_directory_this_tool_did_not_write_is_refused(self):
         precious = self.root / "precious"
@@ -868,6 +906,27 @@ class ServingTests(unittest.TestCase):
         self.assertEqual(200, response.status)
         self.assertIn("no-store", response.getheader("Cache-Control") or "")
 
+    def test_a_port_in_use_is_a_sentence_not_a_traceback(self):
+        import contextlib
+        import io
+        import socket
+        from unittest import mock
+
+        taken = socket.socket()
+        self.addCleanup(taken.close)
+        taken.bind(("127.0.0.1", 0))
+        taken.listen()
+        port = taken.getsockname()[1]
+        err = io.StringIO()
+        # Should the port somehow be bound anyway, fail rather than serve forever or open a browser.
+        with mock.patch.object(serving.http.server.ThreadingHTTPServer, "serve_forever",
+                               side_effect=AssertionError("a port already in use was bound")), \
+                mock.patch("webbrowser.open"), contextlib.redirect_stderr(err):
+            status = serving.serve(Path(tempfile.gettempdir()), "site", port)
+        self.assertEqual(2, status)
+        self.assertIn(f"port {port}", err.getvalue())
+        self.assertIn("--port", err.getvalue())
+
     def test_the_site_itself_keeps_its_own_types(self):
         for name in ("docs/wiki/site/index.html", "docs/wiki/site/assets/wiki.css",
                      "docs/wiki/site/images/a-picture.png"):
@@ -882,7 +941,8 @@ class PackageTests(unittest.TestCase):
     # Words that would tie the tool to whatever it happens to document. It is meant to be installed by
     # any project, and a single one of these in it makes that a rewrite rather than an install.
     SOMEBODY_ELSES = ("deer", "wolf", "wolves", "pine", "settlement", "colonial", "wildlife", "herd",
-                      "pasture", "villager", "unreal", "blueprint", "laravel", "django", "rails")
+                      "pasture", "villager", "unreal", "blueprint", "laravel", "django", "rails",
+                      "game", "games")
 
     def test_the_tool_names_nothing_about_any_project(self):
         # Whole words only: "DecodeError" is not a deer, and a directory tree is not a pine. A word that

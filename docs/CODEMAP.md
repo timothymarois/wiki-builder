@@ -1,18 +1,24 @@
 # Codemap
 
-*Where each kind of thing lives. Inventory, not explanation — the reasoning is in* [BRIEF.md](./BRIEF.md)
+*Where each kind of thing lives. Inventory, not explanation — the reasoning is in* [the brief](./wiki/pages/brief.md)
 *and the rules are in* [../AGENTS.md](../AGENTS.md).
 
 Counts are of lines, and are meant to show shape and growth at a glance.
 
-## Project (root — 7 tracked files)
+## Project (root — 5 tracked files)
 
 - `pyproject.toml` — the package: distribution `wiki-builder`, command `wiki`, `mistune` pinned exactly,
   Python 3.11 or newer for `tomllib`.
 - `README.md` — what it is, how a project installs it, and how a project updates.
-- `CHANGELOG.md` — every release, and for one that adds a check, which pages it will fail.
 - `AGENTS.md` / `CLAUDE.md` — the rules. Byte-identical, changed in the same commit.
 - `.gitignore` — generated output, environments, caches.
+
+## Documentation (`docs/`)
+
+- `CODEMAP.md` — this file.
+- `wiki/` — the tool's own wiki, written with it and held to its own checks. `uv run wiki serve` reads it.
+  `wiki/pages/brief.md` is the brief — what the tool is, who it is for, and what it refuses — kept there
+  so people read it on the wiki and agents read the same file.
 
 ## The builder (`src/builder/` — the package)
 
@@ -51,9 +57,9 @@ inside it.
 them inside the package; a checkout leaves them where they were written, and `build.skill_dir()` finds
 them either way.
 
-## Tests (`tests/` — 84 cases)
+## Tests (`tests/` — 92 cases)
 
-`tests/test_build.py` (     903 lines). Each case builds a small wiki in a temporary directory, breaks exactly
+`tests/test_build.py` (994 lines). Each case builds a small wiki in a temporary directory, breaks exactly
 one rule, and asserts the tool names it. Run them with:
 
 ```sh
@@ -66,7 +72,7 @@ anything about any project.
 
 ## What a project looks like
 
-Not in this repository — this is the shape the tool expects to find.
+The shape the tool expects to find, and the shape of this repository's own `docs/wiki/`.
 
 ```
 docs/wiki/

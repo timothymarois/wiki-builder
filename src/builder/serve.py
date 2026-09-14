@@ -68,8 +68,14 @@ def serve(root, site, port):
 
     url = f"http://127.0.0.1:{port}/{Path(site).as_posix().strip('/')}/"
     handler = functools.partial(Handler, directory=str(root))
+    try:
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
+    except OSError as error:
+        print(f"wiki: cannot serve on port {port}: {error.strerror or error}; choose another with --port",
+              file=sys.stderr)
+        return 2
     print(f"wiki: serving {url}  (ctrl-c to stop)")
-    with http.server.ThreadingHTTPServer(("127.0.0.1", port), handler) as server:
+    with server:
         try:
             webbrowser.open(url)
         except Exception:  # pragma: no cover - a machine with no browser still serves

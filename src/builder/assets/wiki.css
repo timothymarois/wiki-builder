@@ -138,7 +138,7 @@ table.w tbody tr:hover{background:var(--shade)}
 sup.ref{font-size:10.5px;line-height:1}
 sup.ref a{padding:0 1px}
 /* A claim with nothing to cite reads exactly like a citation, in red: it sits where the reader already
-   looks for the source, and says there is not one because the game does not do this yet. */
+   looks for the source, and says there is not one: it is not built yet, or nobody has found where it happens. */
 sup.nocite{color:var(--red);font-weight:700;cursor:help}
 ol.refs{font-size:12.5px;padding-left:22px;margin:8px 0}
 ol.refs li{margin:2px 0;overflow-wrap:anywhere;border-radius:2px;scroll-margin-top:16px}

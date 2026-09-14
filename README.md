@@ -24,7 +24,7 @@ So it refuses:
 | A page longer than anyone will read | Budgets you set, that nag until you have measured them |
 | A page edited since its date was recorded | So a date on a page means something |
 | A picture whose subject has changed | Re-render it, or bless it with a reason |
-| A page nobody approved | An agent may draft; only a person decides one belongs |
+| A page nobody can reach | Every page is in the sidebar, and a draft says it is one |
 
 Each of those was added after the failure it prevents actually happened.
 
@@ -77,6 +77,9 @@ docs/wiki/
 `docs/wiki/site/index.html` opens straight off disk — no server — because links end in `index.html`.
 `wiki publish` builds the same site with clean addresses for a host that can serve them.
 
+This repository keeps its own wiki in `docs/wiki/`, written with the tool and held to its checks. From a
+checkout, `uv run wiki serve` builds it and opens it.
+
 ## The skill
 
 Half of this tool is not code. `wiki sync` writes a skill into your repository — `.agents/skills/` or
@@ -95,8 +98,7 @@ change to how pages must be written belongs in a diff somebody reviews.
 ```
 
 **A release that adds a check is a breaking release.** New rules find old pages — that is what they are
-for — so the changelog says which pages a release will fail, and `check` names every one rather than
-stopping at the first. Nothing updates itself: a documentation build that goes red on a morning you
+for — so `check` names every page a release will fail, rather than stopping at the first. Nothing updates itself: a documentation build that goes red on a morning you
 changed nothing is how people stop trusting the build.
 
 ## Requirements

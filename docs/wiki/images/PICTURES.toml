@@ -1,0 +1,11 @@
+# What each picture shows, and what its subject hashed to when the picture was made.
+#
+# The gate fails when a depicted asset has moved and its picture has not been re-made, because a
+# wiki the owner reads instead of the source cannot afford a picture of something that no longer
+# exists. Clear it by re-rendering, or by `wiki bless <picture> "<reason>"`
+# when the change did not alter what the picture shows.
+
+["page-anatomy.svg"]
+digest = "sha256:257c739ae1004fbd84a9d5b1b56221597d3b86ebb29f2b1ccaa20a82eb20917e"
+depicts = ["src/builder/assets/template.html"]
+blessed = "The template's subtitle placeholder was renamed from kicker; the parts of a page and their places are unchanged."

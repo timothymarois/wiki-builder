@@ -17,7 +17,7 @@ learn nothing new from a page; someone who never has should understand the whole
 
 Every rule below serves one job: **the owner sees how the thing works without reading it.**
 
-Nothing here is specific to any one game. The wiki and its generator are meant to be lifted into another
+Nothing here is specific to any one project. The wiki and its generator are meant to be lifted into another
 project whole, and these rules travel with them.
 
 ## How the wiki works
@@ -29,17 +29,19 @@ You are writing markdown. A generator turns it into a site; you never write HTML
 | A page | `docs/wiki/pages/**.md` | TOML front matter between `+++` fences, then markdown |
 | Its address | derived from its path | `pages/billing/invoices/refunds.md` is `/billing/invoices/refunds/` |
 | Its place | derived from its path | it nests under the page at `pages/billing/invoices.md` in the sidebar |
-| The sidebar | `docs/wiki/nav.toml` | names only the pages that **start** a branch; children nest by themselves |
+| The sidebar | `docs/wiki/wiki.toml` | its sections name only the pages that **start** a branch; children nest by themselves |
 | Pictures | `docs/wiki/images/` | plus `PICTURES.toml`, recording what each shows |
 | The site | `docs/wiki/site/` | generated, ignored by git, rebuilt before it is served |
 | When it changed | `docs/wiki/UPDATED.toml` | written by the build; a page's date moves only when its own content does |
 
 ```sh
-./scripts/dev-wiki.sh          # build, serve, open a browser
-./scripts/dev-wiki.sh --check  # what the gate runs
+wiki serve    # build, serve, open a browser
+wiki check    # what the gate runs
 ```
 
-**To add a page**, put the file where it belongs in the tree. Only name it in `nav.toml` if it starts a
+A project usually runs these through a wrapper script that pins the release; use it if there is one.
+
+**To add a page**, put the file where it belongs in the tree. Only name it in `wiki.toml` if it starts a
 new branch. To add a page *under* an existing one, put it in a directory named after that page.
 
 ## The words for its parts
@@ -55,7 +57,7 @@ Use these, in commits, in review and in conversation. They are the names the gen
 - **Category** — a cross-cutting label; the bar at the foot of a page. Not the sidebar.
 - **The goals page** — every page's intent, collected. Generated, never written by hand.
 - **Source view** — the Source tab, showing the page's own markdown.
-- **Audience** — `internal` or `player`. Internal is the default and the only one built today.
+- **Audience** — `internal` or `player`. Internal is the default; `wiki player` builds the other.
 
 ## The intent is the contract
 
@@ -222,11 +224,15 @@ A tree is full-grown six days after it takes root.[^growth]
 - **Why that rule and not a friendlier one.** A page of prose is not an answer to "where does this happen";
   it is another claim, written by someone else, that can be wrong in exactly the way your page is wrong.
   Citing it launders one document's error into two. Following a reference must land in the thing that runs.
+- **A reference marks the code; it never links to it.** Write the file and the function as code —
+  `` `src/session/expiry.py` — `sweep()` `` — not as a markdown link. A relative link to a source file
+  resolves only while the site is served from inside the repository. Published anywhere else, a site is
+  not beside its code, and every such link is dead.
 - **Configuration counts as code** where a number lives there. Name the function that reads it *and* the row.
 - **The references are the one place a path belongs**, and they are stripped from a player build.
 - **Every non-obvious claim gets one.** If you cannot cite it, see below.
-- **Links are written relative to your own file**, so they resolve while reading the markdown *and* in the
-  browser. The gate checks every one of them.
+- **Links to other pages and pictures are written relative to your own file**, so they resolve while
+  reading the markdown *and* in the browser.
 
 ## Everything is cited, or marked as uncited
 
@@ -235,7 +241,7 @@ surprising ones — every one. The owner, 2026-09-14: *"every statement, fact, r
 mentions all require a citation or unknown citation."*
 
 **The gate refuses a paragraph that states something and cites nothing.** A page about the wiki itself is
-exempt, because it describes no behaviour; everything describing the game is not.
+exempt, because it describes no behaviour; everything describing the system is not.
 
 The reason is the whole point of the wiki. A reader is using this **instead of** reading the source, so a
 sentence they cannot trace is a sentence they must take on faith — and it looks exactly like one that was
@@ -246,9 +252,9 @@ checked. Silence is the failure; **"no source" is a fine answer and silence is n
 Write `{missing}` after the claim, or `missing = true` on an infobox row. It renders as a red mark where
 the citation would be.
 
-It means **nothing was cited**, for either of two reasons: the game does not do this yet, or nobody has
-found where it does. To a reader the consequence is the same — do not take this on faith — which is why one
-mark serves both. It is never shown to a player.
+It means **nothing was cited**, for either of two reasons: the system does not do this yet, or nobody
+has found where it does. To a reader the consequence is the same — do not take this on faith — which is
+why one mark serves both. It is never shown to a player.
 
 It is also the only sanctioned way to say a thing is not built. Use it where a reader would otherwise
 assume the thing exists, and sparingly: a page that is mostly red marks was written too early.
@@ -270,7 +276,7 @@ relative path, and give every one a caption — the caption is prose and obeys e
 
 Each picture has an entry in `PICTURES.toml` saying what it depicts. **When a depicted asset changes and
 the picture has not been re-made, the gate fails.** Clear it by re-rendering, or by
-`dev-wiki.sh --bless <picture> "<why it is still true>"` when the change did not alter what the picture
+`wiki bless <picture> "<why it is still true>"` when the change did not alter what the picture
 shows. The reason is the record that someone looked.
 
 ## Writing a page truthfully
@@ -310,5 +316,5 @@ carries a sentence serving nothing is still wrong, and a page over it is telling
 3. No field name, unit, identifier, file path, task or gap list appears in the prose.
 4. Every claim was read from the code; anything uncertain says so; anything uncitable carries `{missing}`.
 5. Mechanism links out rather than being retold, and a subject of its own is a child page.
-6. `./scripts/dev-wiki.sh --check` passes.
+6. `wiki check` passes.
 7. Someone who has not read the source can follow the whole page.

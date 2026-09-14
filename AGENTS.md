@@ -1,8 +1,8 @@
 # AGENTS
 
 Rules for every agent in this repository. This is **wiki-builder**: a tool that renders markdown into a
-wiki a person can read, and refuses the things that make documentation rot. `docs/BRIEF.md` says what it
-is and why; `docs/CODEMAP.md` says where everything lives.
+wiki a person can read, and refuses the things that make documentation rot. `docs/wiki/pages/brief.md`
+says what it is and why; `docs/CODEMAP.md` says where everything lives.
 
 ## What this repository is
 
@@ -32,7 +32,7 @@ being true. Every rule below follows from that one fact.
    follow. `writing-wiki-pages` is a link to `src/skill/`, which is the copy that ships — there is one of
    it, and editing it changes what every project receives on its next `wiki sync`.
 
-2. Read this file, `docs/BRIEF.md`, and the task you were handed in full.
+2. Read this file, `docs/wiki/pages/brief.md`, and the task you were handed in full.
 3. State the outcome and the observable proof. Check `git status` before editing.
 4. Read each file before editing it. Search for existing behaviour before adding logic.
 5. **Make the smallest change that does the job.** Touch nothing adjacent.
@@ -47,7 +47,6 @@ That applies here too.
 - **Watch it fail before you believe it.** Break the thing on purpose, see the gate go red, then restore.
   A check nobody has seen fail is a check that reports success.
 - **A new check is a breaking release.** It will find pages that already exist — that is what it is for.
-  Say in `CHANGELOG.md` what it will fail.
 - **A message names what to do.** Not "invalid configuration": the file, what is wrong, and the command
   that fixes it.
 
@@ -75,7 +74,6 @@ uv run --with mistune==3.3.4 python -m unittest discover -s tests -t tests
 
 - `pyproject.toml` and `src/builder/__init__.py` carry the version; they change together.
 - Tag only when the owner says. **Never push without the owner's yes.**
-- `CHANGELOG.md` is written in the same commit as the change, not afterwards.
 
 ## Approval gates
 
@@ -87,6 +85,6 @@ changed in the same commit).
 
 1. The tests pass, and any new one was watched failing first.
 2. Nothing in the code or the skill names any project.
-3. `docs/CODEMAP.md` matches what is on disk; `CHANGELOG.md` records behaviour that changed.
+3. `docs/CODEMAP.md` matches what is on disk.
 4. The change was proved against a real wiki through the installed command, not only a fixture.
 5. Re-read this file and verify every applicable item with observed evidence.

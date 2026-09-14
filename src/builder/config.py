@@ -2,8 +2,8 @@
 
 It carries what the site is called, how long a page may be, and which pages start a branch of the
 sidebar. Budgets live here rather than in this tool because a reading budget is a property of who reads
-it -- a game's wiki and an interface reference plausibly want different limits, and a number nobody has
-measured against a real reader should be easy for that reader to change.
+it -- a guide for customers and a reference for engineers plausibly want different limits, and a
+number nobody has measured against a real reader should be easy for that reader to change.
 """
 
 import tomllib

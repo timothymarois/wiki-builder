@@ -1,0 +1,53 @@
+# When each page last changed, and what it hashed to then.
+#
+# Written by `wiki build`, never by hand. A page is re-rendered, and its date moves,
+# only when its own content has changed -- so the date on a page means something, and a build
+# that changed nothing writes nothing.
+
+["brief"]
+updated = "2026-09-14"
+digest = "18735dd6b8aad28ff1054884b46ab340e94c0bf528e817003d9cded4e9fd0f86"
+
+["checks"]
+updated = "2026-09-14"
+digest = "1486a5841585fd9fcd954f3966c88472775741ac26dec191ef5de2dde38e6c18"
+
+["checks/budgets"]
+updated = "2026-09-14"
+digest = "576093db5dce05a7aa242523d8416c9034698f6ed32d28f2f086c79726e4d0ff"
+
+["checks/citations"]
+updated = "2026-09-14"
+digest = "a7e02627d5799d9c0320d471376ef1cae120135906b63a6d72d9092f56f60ad1"
+
+["checks/headings"]
+updated = "2026-09-14"
+digest = "d58b43b15247b3f9df2dfd392b1751533187b9e975ea237cf87f87193b17adb7"
+
+["checks/pictures"]
+updated = "2026-09-14"
+digest = "fe6bf8ca27d69ddd2796eb300a75bbe07ab5f5a17a7713623930288dabdc9dc8"
+
+["goals"]
+updated = "2026-09-14"
+digest = "9f45e61683a3c4c884f7cc18dee33289204a9f5fd7d95cca5ce77c516c623e68"
+
+["index"]
+updated = "2026-09-14"
+digest = "2c22626a3c90f70462ab579d38242fe76ba6e321c0dfabe3d61911c6ef28afcc"
+
+["pages"]
+updated = "2026-09-14"
+digest = "79bc952f8b87d73642a56a18b444b2d858d7867077de9056e25f93dc1a7e9a05"
+
+["serving"]
+updated = "2026-09-14"
+digest = "0e27f31bf1c2c30883e696305f3cb429985d8599d1447d9c2536db24805a76da"
+
+["site"]
+updated = "2026-09-14"
+digest = "734e863fdb0939249116959ccfa3aa1f34849a8b8b36ff22b845acaa2264016f"
+
+["skill"]
+updated = "2026-09-14"
+digest = "4dcf023791ab36d2d141d6ea80d28f3a2798e8b4ea237f2c5968c3bc8e3a482a"
