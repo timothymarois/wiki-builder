@@ -1144,6 +1144,30 @@ class WikiTests(unittest.TestCase):
         self.assertIn('href="thing/part/index.html">A part</a><ul>', nav)
         self.assertIn('href="thing/part/bit/index.html">A bit</a>', nav)
 
+    def test_the_branch_holding_the_current_page_is_marked(self):
+        # A reader on a child page sees which branch they are in: every page above theirs is marked, and so
+        # is every list that holds it. A page outside the branch carries neither mark.
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        self.write("thing/part/bit", PAGE.replace("A thing", "A bit"))
+        self.build()
+
+        def nav_of(path):
+            page = (self.out / path).read_text(encoding="utf-8")
+            return page[page.index('<div id="nav">'):page.index("</div></nav>")]
+
+        nav = nav_of("thing/part/bit/index.html")
+        self.assertRegex(nav, r'<a class="up" href="[^"]*">A thing</a><ul class="here">')
+        self.assertRegex(nav, r'<a class="up" href="[^"]*">A part</a><ul class="here">')
+        self.assertRegex(nav, r'<a class="on" href="[^"]*">A bit</a>')
+
+        nav = nav_of("thing/index.html")
+        self.assertRegex(nav, r'<a class="on" href="[^"]*">A thing</a><ul class="here">')
+        self.assertNotIn('class="up"', nav)
+
+        nav = nav_of("index.html")
+        self.assertNotIn('class="up"', nav)
+        self.assertNotIn('class="here"', nav)
+
     def test_a_page_beneath_nothing_listed_is_still_refused(self):
         self.write("elsewhere/lost", PAGE.replace("A thing", "Lost"))
         self.refused("navigation section")
