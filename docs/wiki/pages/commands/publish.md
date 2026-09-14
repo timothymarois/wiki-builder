@@ -37,7 +37,8 @@ in a folder rather than a file.[^publish] Those addresses need a server; how the
 
 The folder is required.[^usage]
 ```sh
-wiki publish [--root ROOT] [--wiki WIKI] OUT
+wiki publish [-h] [--root ROOT] [--wiki WIKI] OUT
+wiki publish site-out
 ```
 
 ## Arguments
@@ -48,16 +49,31 @@ wiki publish [--root ROOT] [--wiki WIKI] OUT
 
 ## Output
 
-It prints what `wiki build` prints, then a reminder that the result needs a server.[^output]
+It prints what `wiki build` prints, then a reminder that the result needs a server.[^output] On a wiki of
+three pages:[^output]
+```text
+wiki: goals                              20 words    0 cited    0 missing
+wiki: index                               3 words    0 cited    0 missing
+wiki: refunds                            29 words    1 cited    1 missing
+wiki: 1 source cited, 1 claim marked as having no source
+wiki: the collected goals read in 15 words
+wiki: 3 pages written to /path/to/notes/site-out
+wiki: /path/to/notes/site-out uses clean addresses and needs a server; the site itself opens without one
+```
 
 ## Exit codes
 
-It exits with 0 once built, 1 when a page stops the build, and 2 when the folder is not empty and was not
-made by the tool, or there is no wiki.[^exit]
+| Code | Condition | Message |
+|---|---|---|
+| `0` | the site is built[^exit] | `wiki: /path/to/notes/site-out uses clean addresses and needs a server; the site itself opens without one` |
+| `1` | a problem stops the build | the problem |
+| `2` | `OUT` is not empty and was not made by the tool | `wiki: /path/to/notes/taken is not empty and was not written by this tool; remove it yourself if you meant to replace it` |
+| `2` | there is no wiki where it was pointed | `wiki: no wiki at nowhere` |
 
 [^publish]: `src/builder/cli.py` — `run()` builds into `OUT` with `links="clean"`.
 [^usage]: `src/builder/cli.py` — `main()` gives `publish` the positional `out`; `run()` resolves it from
     the working directory and passes it to `guard_output()`.
-[^output]: `src/builder/cli.py` — `run()` prints that clean addresses need a server.
+[^output]: `src/builder/cli.py` — `run()` calls `report()`, then prints the page count, the folder, and
+    that clean addresses need a server.
 [^exit]: `src/builder/cli.py` — `run()` returns 2 when `guard_output()` refuses; `main()` returns 2 with no
     wiki and 1 for a `WikiError`.

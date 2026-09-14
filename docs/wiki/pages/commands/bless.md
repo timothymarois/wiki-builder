@@ -34,10 +34,10 @@ record.[^bless] When a picture needs it is described on [Pictures](../checks/pic
 
 ## Usage
 
-Both arguments are required.[^usage]
+Both arguments are required, and a reason with spaces is quoted.[^usage]
 ```sh
-wiki bless [--root ROOT] [--wiki WIKI] PICTURE REASON
-wiki bless page-anatomy.svg "only the placeholder's name changed"
+wiki bless [-h] [--root ROOT] [--wiki WIKI] PICTURE REASON
+wiki bless refund-flow.svg "the arrows still match the code"
 ```
 
 ## Arguments
@@ -50,14 +50,23 @@ wiki bless page-anatomy.svg "only the placeholder's name changed"
 ## Output
 
 It prints the picture and the reason it recorded.[^bless]
+```text
+wiki: refund-flow.svg blessed -- the arrows still match the code
+```
 
 ## Exit codes
 
-It exits with 0 once the blessing is recorded, 1 when the picture has no record or the reason is empty,
-and 2 when an argument is missing or there is no wiki.[^exit]
+| Code | Condition | Message |
+|---|---|---|
+| `0` | the blessing is recorded[^exit] | `wiki: refund-flow.svg blessed -- the arrows still match the code` |
+| `1` | the picture has no record | `wiki: missing.png has no entry in PICTURES.toml` |
+| `1` | the reason is empty | `wiki: a blessing needs a reason; it is the record that someone actually looked` |
+| `2` | an argument is missing | `wiki bless: error: the following arguments are required: REASON` |
+| `2` | there is no wiki where it was pointed | `wiki: no wiki at nowhere` |
 
 [^bless]: `src/builder/build.py` — `bless()` writes `digest` and `blessed` through `write_ledger()`, and
     returns the line `run()` prints.
-[^usage]: `src/builder/cli.py` — `main()` gives `bless` the positional `picture` and `reason`.
+[^usage]: `src/builder/cli.py` — `main()` gives `bless` the positional `picture` and `reason`, each read
+    as one argument.
 [^exit]: `src/builder/build.py` — `bless()` raises `WikiError` for an unrecorded picture or an empty
     reason; `src/builder/cli.py` — `main()` returns 1 for it, and argparse exits 2 on a missing argument.

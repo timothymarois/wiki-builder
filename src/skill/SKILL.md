@@ -157,6 +157,9 @@ the section, a sentence's first clause answers the sentence. A reader who stops 
 - **The consequence, not the mechanism.** "An expired session does not lose your draft" — not that one
   setting outlives another.
 - **Short sentences, ordinary words.** A sentence that needs reading twice is the sentence's fault.
+- **No sentence without a statement.** A run-up, a transition, a summary or a restatement states nothing
+  a reader can check, so it has nothing to cite — and a sentence with nothing to cite has nothing to
+  say. Cut it.
 - **Bold what matters**, once or twice a section. If everything is bold, nothing is.
 - **A number only where a person would notice it wrong.** "About thirty seconds" beats a precise figure
   nobody can perceive.
@@ -170,6 +173,9 @@ the section, a sentence's first clause answers the sentence. A reader who stops 
   about stops a reader looking for it there. Link a sibling page as `name.md`.
 - **Plain present tense, no hedging.** "A session ends thirty minutes after its last request", not
   "sessions will generally tend to expire".
+- **Code longer than one line is a code block**, fenced and with its language named: two commands, a
+  command and its output, a settings file, a request. One name or one short command inside a sentence
+  stays inline, as code.
 - **Correct grammar.** Name the actor, make subjects agree with their verbs, point each pronoun at one
   thing, keep lists parallel. The rest, and the words that say nothing, are in
   [Naming and grammar](references/naming-and-grammar.md).
@@ -233,18 +239,23 @@ A session ends thirty minutes after its last request.[^expiry]
 
 ## Citation coverage
 
-**Every statement of fact, behaviour, rule or consequence carries a reference** — every one, not the
-surprising ones. The owner, 2026-09-14: *"every statement, fact, requirement, logic, beahvior mentions all
-require a citation or unknown citation."*
+**Every sentence is a statement, and carries its own reference.** A sentence states a fact, a behaviour,
+a rule or a consequence; one that states none of those adds nothing to the page, and is cut. So every
+sentence ends with a citation or `{missing}` — every one, not the surprising ones, and never on the
+strength of its neighbour's. The owner, 2026-09-14: *"every statement, fact, requirement, logic, beahvior
+mentions all require a citation or unknown citation."*
 
-**The gate refuses a paragraph that states something and cites nothing.** Only a page about the wiki
-itself is exempt, because it describes no behaviour.
+**The gate refuses a sentence that cites nothing.** A citation after the full stop belongs to its
+sentence. A sentence that links to another page is excused, because that page carries the citations,
+and a table is held as a whole. Only a page about the wiki itself is exempt, because it describes no
+behaviour.
 
 A reader uses the wiki **instead of** the source, so a sentence they cannot trace must be taken on faith —
 and it looks exactly like one that was checked. **"No source" is a fine answer; silence is not.**
 
 Every build and check prints how many sources each page cites and how many claims it marks as having
-none, with totals for the wiki. Read them before calling a page done.
+none, with totals. `wiki check` names every failing sentence and every marked claim by page and line;
+read both before calling a page done.
 
 ## Missing citations
 
@@ -377,7 +388,8 @@ serving nothing is still wrong, and a page over it is saying its intent has grow
 1. The intent is two to four sentences saying what the thing is for, not how it works.
 2. Every sentence serves the intent.
 3. The prose holds no name only the code knows, no unit a reader cannot feel, and no task or gap list.
-4. Every claim was read from the code; anything uncertain says so; anything uncitable carries `{missing}`.
+4. Every sentence states something read from the code and carries its own citation, or `{missing}`;
+   anything uncertain says so.
 5. Mechanism links out instead of being retold, and a subject of its own is a child page.
 6. The infobox gives the thing's names, values and rules under noun labels, and every row cites a
    footnote the prose cites, or is marked missing.

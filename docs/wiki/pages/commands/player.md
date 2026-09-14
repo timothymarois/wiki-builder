@@ -38,7 +38,8 @@ reference, red mark and Source tab removed.[^player] Which pages those are is de
 
 The folder is required.[^usage]
 ```sh
-wiki player [--root ROOT] [--wiki WIKI] OUT
+wiki player [-h] [--root ROOT] [--wiki WIKI] OUT
+wiki player readers
 ```
 
 ## Arguments
@@ -49,17 +50,29 @@ wiki player [--root ROOT] [--wiki WIKI] OUT
 
 ## Output
 
-It prints what `wiki build` prints.[^output]
+It prints what `wiki build` prints, for the pages marked for players only.[^output] On a wiki of three
+pages, one of them marked for players:[^output]
+```text
+wiki: refunds                            29 words    1 cited    1 missing
+wiki: 1 source cited, 1 claim marked as having no source
+wiki: the collected goals read in 15 words
+wiki: 1 page written to /path/to/notes/readers
+```
 
 ## Exit codes
 
-It exits with 0 once built, 1 when a page stops the build, and 2 when the folder is not empty and was not
-made by the tool, or there is no wiki.[^exit]
+| Code | Condition | Message |
+|---|---|---|
+| `0` | the view is built[^exit] | `wiki: 1 page written to /path/to/notes/readers` |
+| `1` | a problem stops the build | the problem |
+| `2` | `OUT` is not empty and was not made by the tool | `wiki: /path/to/notes/taken is not empty and was not written by this tool; remove it yourself if you meant to replace it` |
+| `2` | there is no wiki where it was pointed | `wiki: no wiki at nowhere` |
 
 [^player]: `src/builder/cli.py` — `run()` builds with audience `"player"`; `src/builder/build.py` —
     `visible_to()`, `for_player()` and `with_source` in `write_site()`.
 [^usage]: `src/builder/cli.py` — `main()` gives `player` the positional `out`; `run()` resolves it from
     the working directory and passes it to `guard_output()`.
-[^output]: `src/builder/cli.py` — `run()` calls `report()` and prints the page count and folder.
+[^output]: `src/builder/cli.py` — `run()` calls `report()` for the pages the build emitted, and prints the
+    page count and folder.
 [^exit]: `src/builder/cli.py` — `run()` returns 2 when `guard_output()` refuses; `main()` returns 2 with no
     wiki and 1 for a `WikiError`.

@@ -17,7 +17,7 @@ The [brief](brief.md) says in one screen what the tool is, who it is for and wha
 
 A person writes [pages](pages.md), and an agent learns to write them from the [skill](skill.md). The
 build makes the [site](site.md), and the [local server](serving.md) shows it on this machine. The
-[checks](checks.md) are the reason the tool exists, and the [commands](commands.md) show how to
-use it.
+[checks](checks.md) are the reason the tool exists, [continuous integration](continuous-integration.md) runs
+them on every push, and the [commands](commands.md) show how to use it.
 
 The [goals page](goals.md) collects what every part of the tool is for.

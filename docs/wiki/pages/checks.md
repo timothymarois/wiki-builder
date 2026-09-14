@@ -31,14 +31,15 @@ rows = [
 +++
 
 `wiki check` builds the site in a temporary folder and lists **every problem at once**, not only the
-first.[^check] It exits with 0 for a sound wiki, 1 when it finds a problem, and 2 when it is
-misused, such as pointed where there is no wiki.[^check] Each check was added after the failure it prevents had actually happened.{missing}
+first.[^check] It exits with 0 for a sound wiki, 1 when it finds a problem, and 2 when it is misused,
+such as pointed where there is no wiki.[^check] The same check runs on every push and pull request
+through [Continuous integration](continuous-integration.md).
 
 ## Refusals
 
 | Refused | Described on |
 |---|---|
-| A paragraph that cites nothing, or a reference to a document[^cited] | [Citations](checks/citations.md) |
+| A sentence that cites nothing, or a reference to a document[^cited] | [Citations](checks/citations.md) |
 | An infobox row that cites nothing[^rows] | [Citations](checks/citations.md) |
 | A heading that asks a question or rates its contents[^headings] | [Headings](checks/headings.md) |
 | A page longer than its budget[^budget] | [Reading budgets](checks/budgets.md) |
@@ -52,17 +53,16 @@ Some problems **stop the build** instead of joining the list: a page with no int
 can reach, a sidebar naming a page that does not exist, or a picture with no record.[^stop] When that
 happens, only that one problem is reported, as a single sentence, and the command exits with 1.[^caught]
 
-[^check]: `src/builder/build.py` — `check()` builds into a temporary folder
-    and gathers every problem; `src/builder/cli.py` — `main()` prints them
-    and returns 1 if there are any, 0 if not, and 2 when there is no wiki.
-[^cited]: `src/builder/build.py` — `uncited_problems()` and
-    `citation_problems()`.
+[^check]: `src/builder/build.py` — `check()` builds into a temporary folder and gathers every problem;
+    `src/builder/cli.py` — `main()` prints them and returns 1 if there are any, 0 if not, and 2 when
+    there is no wiki.
+[^cited]: `src/builder/build.py` — `uncited_problems()` and `citation_problems()`.
 [^rows]: `src/builder/build.py` — `infobox_problems()`.
 [^headings]: `src/builder/build.py` — `heading_problems()`.
 [^budget]: `src/builder/build.py` — `budget_problems()`.
 [^pictures]: `src/builder/build.py` — `picture_problems()`.
 [^dates]: `src/builder/build.py` — `date_problems()`.
 [^version]: `src/builder/build.py` — `version_problems()`.
-[^stop]: `src/builder/build.py` — `read_pages()`, `write_site()`,
-    `render_nav()` and `rewrite_references()` raise `WikiError`.
+[^stop]: `src/builder/build.py` — `read_pages()`, `write_site()`, `render_nav()` and
+    `rewrite_references()` raise `WikiError`.
 [^caught]: `src/builder/cli.py` — `main()` catches `WikiError`, prints it, and returns 1.

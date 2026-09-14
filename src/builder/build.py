@@ -811,6 +811,10 @@ def write_site(root, out, audience, link_root, today, record, wiki):
             page["raw"] += ("\n<!-- Every intent below this page's own text is collected from the other\n"
                             "     pages when the wiki is built, and is not written here. -->\n")
         body = LONE_FIGURE.sub(r"\1", body)
+        # A page's own table takes the wiki's table style, and scrolls inside its wrapper on a narrow
+        # screen rather than widening the page.
+        body = body.replace("<table>", '<div class="wt"><table class="w">').replace("</table>",
+                                                                                    "</table></div>")
         body = MISSING.sub(MISSING_CITATION, body)
         body = rewrite_references(body, directory, site_root, root, ledger, set(pages),
                                   wiki / "pages", page["path"])
@@ -977,17 +981,88 @@ QUESTION_WORD = re.compile(r"^(how|what|where|why|when|which|who|whether)\b", re
 EDITORIAL = re.compile(r"\b(matters?|important|interesting|note|overview|misc|details?)\b", re.I)
 
 
-# A block of prose that states anything: not a heading, not a picture, not a reference definition.
+# What says where a statement came from: a citation, or the mark that says there is none.
 CLAIM = re.compile(r"\[\^[^\]]+\]|\{missing\}")
+# Any heading line. Removed before a page is read as statements, so prose written directly beneath one is
+# read like any other.
+HEADING_ANY = re.compile(r"^#{1,6}[ \t].*$", re.M)
+# The start of a list item inside a block, so each item is read on its own.
+LIST_ITEM = re.compile(r"\n(?=[ \t]*(?:[-*+]|\d+\.)[ \t])")
+# The end of a sentence: a full stop, question or exclamation mark, any closing quote, bracket or emphasis,
+# and the citations or mark that belong to the sentence -- then a space and what starts the next one: a
+# capital, a digit, code, emphasis or an opening bracket. A version number or an abbreviation has no space
+# and capital after its full stop, so neither ends one.
+BOUNDARY = re.compile(r"([.!?][\"”’')\]*_]*(?:\[\^[^\]]+\]|\s*\{missing\})*)\s+(?=[A-Z0-9`*_\[\"“(])")
+# Inline code. Its punctuation is part of a name, never the end of a sentence.
+INLINE_CODE = re.compile(r"`[^`\n]*`")
+# One block of prose: a run of lines with no blank line inside it.
+BLOCK = re.compile(r"^(?![ \t]*$).+(?:\n(?![ \t]*$).*)*", re.M)
+# A link to another page. The page it points at carries the citations.
+PAGE_LINK = re.compile(r"\]\([^)\s]*\.md(?:#[^)\s]*)?\)")
+
+
+def statements(block):
+    """The statements in one block of prose: each sentence of each list item, or a table as a whole."""
+    if block.startswith("|"):
+        return [block]
+    found = []
+    for item in LIST_ITEM.split(block):
+        text = " ".join(item.split())
+        # Boundaries are found with code's punctuation blanked out, then cut from the text as written. The
+        # blanking keeps every character where it was, so the positions agree.
+        masked = INLINE_CODE.sub(lambda code: re.sub(r"[.!?]", " ", code.group(0)), text)
+        start = 0
+        for boundary in BOUNDARY.finditer(masked):
+            found.append(text[start:boundary.end(1)])
+            start = boundary.end()
+        found.append(text[start:])
+    return found
+
+
+def page_statements(path):
+    """Every statement on one page, with the line of the file it starts on.
+
+    Footnote definitions, fenced code and headings are blanked rather than removed, so every line keeps its
+    number and a statement is reported where a person or an agent will find it.
+    """
+    text = path.read_text(encoding="utf-8")
+    _, body = read_front_matter(path)
+    first = text[:len(text) - len(body)].count("\n") + 1
+
+    def blank(match):
+        return "\n" * match.group(0).count("\n")
+
+    body = HEADING_ANY.sub("", FENCED.sub(blank, FOOTNOTE.sub(blank, body)))
+    for block in BLOCK.finditer(body):
+        start = first + body[:block.start()].count("\n")
+        chunk = block.group(0)
+        if chunk.lstrip().startswith("!["):
+            continue
+        for statement in statements(chunk.strip()):
+            words = statement.split()[:6]
+            found = re.search(r"\s+".join(map(re.escape, words)), chunk) if words else None
+            yield (start + chunk[:found.start()].count("\n") if found else start), statement
+
+
+def quoted(statement, limit=80):
+    """A statement as a report quotes it: whole when short, cut at a word with an ellipsis when not."""
+    text = " ".join(statement.split())
+    if len(text) <= limit:
+        return "“%s”" % text
+    return "“%s…”" % (text[:limit].rsplit(" ", 1)[0] if " " in text[:limit] else text[:limit])
 
 
 def uncited_problems(root, wiki=None):
-    """Prose that states something and says nothing about where it came from.
+    """Sentences that state something and say nothing about where they came from.
 
-    A reader uses this instead of reading the source, so a sentence they cannot trace is a sentence they
-    have to take on faith. Every paragraph either carries a reference or carries the mark that says there
-    is none -- and the second is a fine answer. What is not a fine answer is silence, because silence
-    looks exactly like a cited claim to someone scanning the page.
+    A reader uses this instead of reading the source, so a sentence they cannot trace is one they have to
+    take on faith. Every sentence carries a reference, or the mark that says there is none -- and the
+    second is a fine answer. What is not a fine answer is silence, because silence looks exactly like a
+    cited claim to someone scanning the page. A sentence never borrows its neighbour's citation: one
+    citation used to cover a whole paragraph, and a claim beside a cited one read as though it were checked.
+
+    A sentence that links to another page is excused, because that page carries the citations. A table is
+    held as a whole, because a row is not a sentence.
     """
     pages_dir = wiki_of(root, wiki) / "pages"
     problems = []
@@ -998,17 +1073,40 @@ def uncited_problems(root, wiki=None):
         # will. `goals = false` already marks exactly those pages.
         if not meta.get("goals", True):
             continue
-        body = FENCED.sub("", FOOTNOTE.sub("", body))
-        for block in body.split("\n\n"):
-            block = block.strip()
-            if not block or block.startswith("#") or block.startswith("!["):
+        for line, statement in page_statements(path):
+            if not re.search(r"[A-Za-z]", statement):
                 continue
-            if CLAIM.search(block):
+            if CLAIM.search(statement) or PAGE_LINK.search(statement):
                 continue
-            problems.append("%s: \u201c%s\u2026\u201d states something and cites nothing; give it a "
-                            "reference, or {missing} if there is none"
-                            % (path.relative_to(pages_dir), " ".join(block.split())[:60]))
+            problems.append("%s:%d: %s states something and cites nothing; give it a reference, or "
+                            "{missing} if there is none"
+                            % (path.relative_to(pages_dir), line, quoted(statement)))
     return problems
+
+
+def missing_marks(root, wiki=None):
+    """Every claim marked as having no source, and the line it is on.
+
+    The count on every build says how much of the wiki is taken on faith; this says where. `wiki check`
+    prints it without failing, because the mark is an answer and the list is the work that remains.
+    """
+    pages_dir = wiki_of(root, wiki) / "pages"
+    marks = []
+    for path in sorted(pages_dir.rglob("*.md")):
+        name = path.relative_to(pages_dir)
+        text = path.read_text(encoding="utf-8")
+        meta, _ = read_front_matter(path)
+        found = [(line, "%s:%d: %s is marked as having no source" % (name, line, quoted(statement)))
+                 for line, statement in page_statements(path) if MISSING.search(statement)]
+        for group in meta.get("infobox", []):
+            for row in group.get("rows", []):
+                if row.get("missing"):
+                    label = str(row.get("label", ""))
+                    line = text[:max(text.find('label = "%s"' % label), 0)].count("\n") + 1
+                    found.append((line, "%s:%d: the infobox row %r is marked as having no source"
+                                  % (name, line, label)))
+        marks += [message for _, message in sorted(found)]
+    return marks
 
 
 # A footnote cited in the prose, and one defined at the foot.

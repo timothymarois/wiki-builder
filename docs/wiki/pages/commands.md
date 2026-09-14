@@ -26,8 +26,6 @@ rows = [
 +++
 
 `wiki` is the one program the tool installs, and each job it does is a command typed after it.[^program]
-This page lists the commands and what they share; each command's own page gives its usage, and links to
-the page describing what it does to a wiki.
 
 ## Usage
 
@@ -68,8 +66,8 @@ when it was misused: an option it does not know, no wiki where it was pointed, a
 did not make, or a port already in use.[^exit] A problem is always printed as a sentence saying what to
 do.[^exit]
 
-[^program]: `src/builder/cli.py` — `main()` builds the `wiki` parser and its seven commands; `pyproject.toml`
-    names the program under `[project.scripts]`.
+[^program]: `src/builder/cli.py` — `main()` builds the `wiki` parser and its seven commands;
+    `pyproject.toml` names the program under `[project.scripts]`.
 [^commands]: `src/builder/cli.py` — each command's `help` in `main()`, and what `run()` does for it.
 [^alone]: `src/builder/cli.py` — `run()` treats no command as `"serve"`.
 [^place]: `src/builder/cli.py` — `main()` declares `--root` and `--wiki` on the program and, suppressed,

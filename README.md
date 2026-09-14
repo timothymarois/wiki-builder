@@ -18,7 +18,7 @@ So it refuses:
 
 | | |
 |---|---|
-| A paragraph that states something and cites nothing | `{missing}` is a fine answer; silence is not |
+| A sentence that states something and cites nothing | `{missing}` is a fine answer; silence is not |
 | A reference that cites a document instead of code | A page of prose is another claim, not an answer |
 | A heading that asks a question or rates itself | "Where it goes" — the reader wanted "Home" |
 | A page longer than anyone will read | Budgets you set, that nag until you have measured them |
@@ -102,8 +102,37 @@ copy already there is brought up to date with the release.
 ```
 
 **A release that adds a check is a breaking release.** New rules find old pages — that is what they are
-for — so `check` names every page a release will fail, rather than stopping at the first. Nothing updates itself: a documentation build that goes red on a morning you
-changed nothing is how people stop trusting the build.
+for — so `check` names every page a release will fail, rather than stopping at the first. Nothing updates
+itself: a documentation build that goes red on a morning you changed nothing is how people stop trusting
+the build.
+
+## Continuous integration
+
+This repository is also a GitHub Action. A project checks its wiki on every push and pull request with one
+step, and the job fails on every reason the wiki is not fit to read: an uncited sentence or infobox row, a
+question for a heading, a page over its budget, a stale date, a picture whose subject changed, or a wiki
+synced against a different release.
+
+```yaml
+# .github/workflows/wiki.yml
+name: wiki
+on: [push, pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: timothymarois/wiki-builder@TAG
+        with:
+          wiki: docs/wiki      # the default; set it only if the wiki lives elsewhere
+```
+
+`TAG` is a release of this repository, the same one `scripts/dev-wiki.sh` pins, so the check in CI is the
+check that ran locally. The action installs the tool from its own copy at that release. Its inputs are
+`root` (the project, default `.`), `wiki` (default `docs/wiki`) and `python-version` (default `3.12`).
+
+This repository runs two workflows of its own: `tests`, the tool's tests on Python 3.11 and 3.12, and
+`wiki`, the same action on its own `docs/wiki`.
 
 ## Requirements
 

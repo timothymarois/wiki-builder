@@ -36,27 +36,41 @@ changed.[^build] What the site holds is described on [Site](../site.md).
 
 It takes only the options every command shares.[^usage]
 ```sh
-wiki build [--root ROOT] [--wiki WIKI]
+wiki build [-h] [--root ROOT] [--wiki WIKI]
+wiki build
 ```
 
 ## Output
 
-It prints each page's word count, sources cited and claims marked as having no source, then the
-totals, the words in the collected goals, any drafts waiting on the owner, and a
-warning while the reading budgets are uncalibrated, then how many pages it wrote and where.[^report]
+It prints each page's word count and citations, then the totals, the words in the collected goals, and
+how many pages it wrote and where.[^report] It also names any draft waiting on the owner, and warns while
+the reading budgets are uncalibrated.[^report] On a wiki of three pages:[^report]
+```text
+wiki: goals                              20 words    0 cited    0 missing
+wiki: index                               3 words    0 cited    0 missing
+wiki: refunds                            29 words    1 cited    1 missing
+wiki: 1 source cited, 1 claim marked as having no source
+wiki: the collected goals read in 15 words
+wiki: 3 pages written to /path/to/notes/docs/wiki/site
+```
 
 It refuses to write into a folder that is not empty and was not made by an earlier build.[^guard]
 
 ## Exit codes
 
-It exits with 0 once the site is written, 1 when a page stops the build, and 2 when there is no wiki or
-the output folder was not made by the tool.[^exit]
+| Code | Condition | Message |
+|---|---|---|
+| `0` | the site is written[^exit] | `wiki: 3 pages written to /path/to/notes/docs/wiki/site` |
+| `1` | a problem stops the build | the problem, such as `wiki: there is no goals.md; the collected goals need a page to be collected onto` |
+| `2` | there is no wiki where it was pointed | `wiki: no wiki at nowhere` |
+| `2` | the site folder holds files the tool did not write | `wiki: /path/to/notes/docs/wiki/site is not empty and was not written by this tool; remove it yourself if you meant to replace it` |
+| `2` | an option it does not know | `wiki: error: unrecognized arguments: --unknown` |
 
 [^build]: `src/builder/cli.py` — `run()` builds into `site` inside the wiki folder;
     `src/builder/build.py` — `write_site()` writes `UPDATED.toml` when a page's digest changes.
 [^usage]: `src/builder/cli.py` — `main()` gives `build` only the shared options.
-[^report]: `src/builder/build.py` — `report()`, with `citation_counts()`; `src/builder/cli.py` — `run()` prints the page count and
-    the folder.
+[^report]: `src/builder/build.py` — `report()`, with `citation_counts()`; `src/builder/cli.py` — `run()`
+    prints the page count and the folder.
 [^guard]: `src/builder/cli.py` — `guard_output()`.
-[^exit]: `src/builder/cli.py` — `main()` returns 2 with no wiki and 1 for a `WikiError`; `run()` returns 2
-    when `guard_output()` refuses.
+[^exit]: `src/builder/cli.py` — `main()` returns 2 with no wiki and prints a `WikiError` before returning 1;
+    `run()` returns 2 when `guard_output()` refuses; argparse exits 2 on an option it does not know.

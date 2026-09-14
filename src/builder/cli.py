@@ -11,7 +11,8 @@ import sys
 from pathlib import Path
 
 from . import __version__
-from .build import (ASSETS, SKILL, bless, build, check, citation_counts, report, wiki_of)
+from .build import (ASSETS, SKILL, bless, build, check, citation_counts, missing_marks, report,
+                    wiki_of)
 from .config import CONFIG, WikiError, record_version
 from .serve import serve
 
@@ -155,8 +156,12 @@ def run(args, root, wiki):
         problems, counts, goals_words, budget = check(root, wiki, __version__)
         for problem in problems:
             print("wiki: " + problem, file=sys.stderr)
+        # Not problems: each is an answer, and together they are the work that remains.
+        for mark in missing_marks(root, wiki):
+            print("wiki: " + mark)
         report(counts, goals_words, budget, citations=citation_counts(root, wiki))
-        print("wiki: %d pages, %d problems" % (len(counts), len(problems)))
+        print("wiki: %d page%s, %d problem%s" % (len(counts), "" if len(counts) == 1 else "s",
+                                                len(problems), "" if len(problems) == 1 else "s"))
         return 1 if problems else 0
 
     out = {"publish": lambda: args.out.resolve(),
@@ -168,7 +173,7 @@ def run(args, root, wiki):
         root, out, "player" if command == "player" else "internal",
         links="clean" if command == "publish" else "file", wiki_dir=wiki)
     report(counts, goals_words, budget, drafts, citation_counts(root, wiki))
-    print("wiki: %d pages written to %s" % (len(counts), out))
+    print("wiki: %d page%s written to %s" % (len(counts), "" if len(counts) == 1 else "s", out))
 
     if command == "publish":
         print(f"wiki: {out} uses clean addresses and needs a server; the site itself opens without one")

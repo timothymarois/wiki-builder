@@ -40,7 +40,7 @@ each must be a positive whole number.[^config]
 A page is counted from its markdown, **leaving out its references**, so citing costs nothing.[^count]
 Words are split on spaces, so a table's borders and a link's address count as words too.[^count]
 
-The goals page is not held to the page limit. What it collects is measured against the goals limit
+The goals page is not held to the page limit.[^goals] What it collects is measured against the goals limit
 instead.[^goals]
 
 ## Enforcement
@@ -52,7 +52,7 @@ anything else is checked.[^intent] Every build and every check prints each page'
 
 Until the settings file marks the budgets as calibrated, every run warns that the numbers are a guess that
 happens to be enforced.[^calibrated] Nobody knows what a project's readers will read until somebody
-measures it.
+measures it.[^calibrated]
 
 [^defaults]: `src/builder/config.py` — `DEFAULT_BUDGET`.
 [^config]: `src/builder/config.py` — `read_config()` merges

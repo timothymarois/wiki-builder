@@ -80,6 +80,9 @@ In prose and tables, a name the software owns is formatted as code — `retry_li
 punctuation even at the start of a sentence; better, rewrite the sentence so it does not start with one.
 Infobox values render as plain text, so write them there exactly as typed and without backticks.
 
+Anything longer than one line — two commands, a command and its output, a settings file, a request — is a
+fenced code block with its language named, never a run of inline code one line at a time.
+
 ### Terms
 
 Before drafting, list the terms the page will use and where the software defines each. Then hold the

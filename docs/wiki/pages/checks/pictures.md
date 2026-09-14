@@ -25,10 +25,9 @@ rows = [
 +++
 
 Every picture has a record in `images/PICTURES.toml` naming the files or folders in the project that it
-shows.[^ledger] The check
-fingerprints those files and fails when **they have changed since the picture was made**.[^check] Nothing
-about the files is assumed, so any project can say what a picture shows without adopting a convention for
-its own assets.[^digest]
+shows.[^ledger] The check fingerprints those files and fails when **they have changed since the picture
+was made**.[^check] Nothing about the files is assumed, so any project can say what a picture shows
+without adopting a convention for its own assets.[^digest]
 
 ## Records
 
@@ -41,25 +40,23 @@ flags the picture.[^digest]
 `wiki bless` takes a picture and a reason, and records the current fingerprint along with the
 reason.[^bless] **A reason is required**, because it is the record that somebody looked.[^bless]
 
-A picture whose record has no fingerprint yet is never checked. **A new picture is unguarded until it is
-blessed for the first time.**[^unguarded]
+A picture whose record has no fingerprint yet is never checked.[^unguarded] **A new picture is unguarded
+until it is blessed for the first time.**[^unguarded]
 
-## This wiki
+## Page anatomy
 
-The picture of a page's parts, on [Pages](../pages.md), shows the page template. If the template changes,
-this wiki's own check fails until the picture is redrawn or blessed.[^here]
+The picture of a page's parts shows the page template.[^here] If the template changes, this wiki's own
+check fails until the picture is redrawn or blessed.[^here]
 
-[^ledger]: `src/builder/build.py` — `read_ledger()` reads `LEDGER`
-    from the images folder.
-[^check]: `src/builder/build.py` — `picture_problems()` compares each
-    recorded `digest` with `subject_digest()`.
-[^digest]: `src/builder/build.py` — `subject_digest()` hashes the bytes
-    of every file under each `depicts` path.
-[^missing]: `src/builder/build.py` — `rewrite_references()` and
-    `render_infobox()` refuse an unrecorded picture; `write_site()` refuses a record with no file.
-[^bless]: `src/builder/build.py` — `bless()` refuses an empty reason and
-    writes `digest` and `blessed` through `write_ledger()`.
-[^unguarded]: `src/builder/build.py` — `picture_problems()` checks an
-    entry only when it has a `digest`.
-[^here]: `docs/wiki/images/PICTURES.toml` — `page-anatomy.svg` depicts
-    `src/builder/assets/template.html`, read by `picture_problems()`.
+[^ledger]: `src/builder/build.py` — `read_ledger()` reads `LEDGER` from the images folder.
+[^check]: `src/builder/build.py` — `picture_problems()` compares each recorded `digest` with
+    `subject_digest()`.
+[^digest]: `src/builder/build.py` — `subject_digest()` hashes the bytes of every file under each `depicts`
+    path.
+[^missing]: `src/builder/build.py` — `rewrite_references()` and `render_infobox()` refuse an unrecorded
+    picture; `write_site()` refuses a record with no file.
+[^bless]: `src/builder/build.py` — `bless()` refuses an empty reason and writes `digest` and `blessed`
+    through `write_ledger()`.
+[^unguarded]: `src/builder/build.py` — `picture_problems()` checks an entry only when it has a `digest`.
+[^here]: `docs/wiki/images/PICTURES.toml` — `page-anatomy.svg` depicts `src/builder/assets/template.html`,
+    read by `picture_problems()`.

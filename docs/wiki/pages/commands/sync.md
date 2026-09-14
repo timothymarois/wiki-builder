@@ -38,7 +38,8 @@ from.[^sync] Why the skill lives in the project is described on [Skill](../skill
 
 Either skill option may be given, but not both.[^group]
 ```sh
-wiki sync [--root ROOT] [--wiki WIKI] [--skill-dir DIR | --no-skill]
+wiki sync [-h] [--root ROOT] [--wiki WIKI] [--skill-dir DIR | --no-skill]
+wiki sync
 ```
 
 ## Options
@@ -51,15 +52,29 @@ wiki sync [--root ROOT] [--wiki WIKI] [--skill-dir DIR | --no-skill]
 ## Output
 
 It names each file it wrote, leaving out any already up to date, then the release it recorded.[^output]
+In a project with an `.agents/skills` folder:[^output]
+```text
+wiki: wrote .agents/skills/writing-wiki-pages/SKILL.md
+wiki: wrote .agents/skills/writing-wiki-pages/references/naming-and-grammar.md
+wiki: wrote .agents/skills/writing-wiki-pages/references/page-standard.md
+wiki: wrote .agents/skills/writing-wiki-pages/references/reference-pages.md
+wiki: wrote .agents/skills/writing-wiki-pages/references/reference-standard.md
+wiki: wiki.toml records wiki-builder 0.1.0
+```
 
 ## Exit codes
 
-It exits with 0 once done, 1 when there is no `wiki.toml` to record the release in, and 2 when both skill
-options are given or there is no wiki.[^exit]
+| Code | Condition | Message |
+|---|---|---|
+| `0` | the release is recorded[^exit] | `wiki: wiki.toml records wiki-builder 0.1.0` |
+| `1` | there is no `wiki.toml` to record it in | ``wiki: there is no wiki.toml in /path/to/notes/docs/wiki; write one with a [site] name and at least one [[section]], then run `wiki sync` again`` |
+| `2` | both skill options are given | `wiki sync: error: argument --skill-dir: not allowed with argument --no-skill` |
+| `2` | there is no wiki where it was pointed | `wiki: no wiki at nowhere` |
 
 [^sync]: `src/builder/cli.py` — `sync()`, and `record_version()` in `src/builder/config.py`.
 [^group]: `src/builder/cli.py` — `main()` puts `--skill-dir` and `--no-skill` in one mutually exclusive
     group; `skill_home()` joins a given folder to the project.
 [^output]: `src/builder/cli.py` — `sync()` prints each file it wrote and the recorded release.
-[^exit]: `src/builder/cli.py` — `main()` returns 2 with no wiki and 1 for a `WikiError`;
-    `src/builder/config.py` — `record_version()` raises one when `wiki.toml` is missing.
+[^exit]: `src/builder/cli.py` — `main()` returns 2 with no wiki and 1 for a `WikiError`, and argparse exits
+    2 when both options are given; `src/builder/config.py` — `record_version()` raises `WikiError` when
+    `wiki.toml` is missing.

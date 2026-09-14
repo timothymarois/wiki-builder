@@ -26,16 +26,17 @@ rows = [
 ## Purpose
 
 wiki-builder renders markdown into a wiki a person can read, and then refuses the things that make
-documentation rot. A project installs it rather than copying it in, and it knows nothing about what it documents.
+documentation rot. A project installs it rather than copying it in, and it knows nothing about what it
+documents.
 
 It has two halves, and the second is the reason it exists:
 
 - **A generator.** Pages with TOML front matter become a static site with a sidebar, infobox, contents,
-  citations, search and pictures, which works served or opened straight from disk.
-- **A set of refusals.** A paragraph that states something and cites nothing. A reference that cites a
-  document rather than code. A heading that asks a question instead of naming its section. A page longer
-  than anyone will read. A page edited since its date was recorded. A picture whose subject has changed.
-  A page nobody can reach.
+  citations, search and pictures, that works served or from disk.
+- **A set of refusals.** A sentence or an infobox row that states something and cites nothing. A reference
+  that cites a document rather than code. A heading that asks a question instead of naming its section. A
+  page longer than anyone will read. A page edited since its date was recorded. A picture whose subject
+  has changed. A page nobody can reach.
 
 ## Reasoning
 
@@ -44,10 +45,10 @@ sentences were checked, and by the time it is wrong it still looks authoritative
 extracted from had grown to 75,000 words that its owner had stopped reading.
 
 This tool is for the case where **somebody reads the wiki instead of the source.** There, an untraceable
-sentence is worse than a missing one, because it looks exactly like a verified one. So every statement is
+sentence is worse than a missing one, because it looks exactly like a verified one. So every sentence is
 cited to the code it came from, or marked as uncited.
 
-Every rule was added after the failure it prevents had actually happened. On the day the check against
+Every rule was added after the failure it prevents happened. On the day the check against
 question headings was written, it found nine, all written by the agent that had written the rule against
 them.
 
@@ -60,13 +61,13 @@ them.
 
 ## Scope
 
-- **Covers:** rendering; the checks; the skill and its worked example; a local server that shows cited
-  source files as readable text; a published build with clean addresses; a reader-facing build with
-  everything internal removed; carrying rule changes into a project when it updates.
+- **Covers:** rendering; the checks; the skill; a local server that shows the site and the project's
+  files; a published build with clean addresses; a reader-facing build with everything internal removed;
+  carrying rule changes into a project; a GitHub Action for a project's CI.
 - **Refuses:** knowing anything about the project it documents, which a test over the code and the skill
   enforces: no project name, no domain word, no assumption about its assets. Generating pages from the
-  code they describe, since such a page agrees with the code whatever it does. Updating itself silently. Scaffolding, opinions
-  about hosting, and anything a second project has not yet asked for.
+  code they describe, since such a page agrees with the code whatever it does. Updating itself silently.
+  Scaffolding, opinions about hosting, and anything a second project has not yet asked for.
 
 ## External systems
 
@@ -75,3 +76,4 @@ them.
 - `mistune` is the markdown parser, pinned exactly so that a new version cannot turn every page red at
   once.
 - Python 3.11 or newer, for `tomllib` in the standard library.
+- GitHub Actions, for continuous integration.

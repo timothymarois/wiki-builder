@@ -1,0 +1,35 @@
+name: wiki-builder check
+description: Check a project's wiki with wiki-builder, and fail on every reason it is not fit to read.
+
+inputs:
+  root:
+    description: The project, relative to the checkout.
+    default: "."
+  wiki:
+    description: Where the wiki lives, relative to the project. Empty means docs/wiki.
+    default: ""
+  python-version:
+    description: The Python that runs the check; 3.11 or newer.
+    default: "3.12"
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    # The tool is installed from this action's own copy, so the check that runs is the one the release
+    # named in `uses:` ships -- never whatever is newest.
+    - name: Install wiki-builder
+      shell: bash
+      run: python -m pip install --quiet "$ACTION_PATH"
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+
+    - name: Check the wiki
+      shell: bash
+      working-directory: ${{ inputs.root }}
+      run: wiki check ${WIKI:+--wiki "$WIKI"}
+      env:
+        WIKI: ${{ inputs.wiki }}

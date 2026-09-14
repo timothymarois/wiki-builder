@@ -20,7 +20,7 @@ pages = ["site", "serving"]
 
 [[section]]
 title = "Checking"
-pages = ["checks"]
+pages = ["checks", "continuous-integration"]
 
 [[section]]
 title = "Reference"

@@ -3,7 +3,10 @@
 
    The one block that is not from the prototype is "figures", at the foot. The prototype drew a debug glyph
    where a picture would go, because it had no pictures; the owner asked for pictures of the real thing on
-   2026-09-13. That block follows the infobox's idiom rather than inventing one. */
+   2026-09-13. That block follows the infobox's idiom rather than inventing one.
+
+   On 2026-09-14 the owner asked for tables and code blocks in a page to look like the wiki's own: a page's
+   tables now take the prototype's table.w, and code blocks take the source view's frame. */
 
 :root{
   --page:#fff; --surface:#f8f9fa; --sunk:#eaecf0; --shade:#f1f3f5;
@@ -138,7 +141,8 @@ table.w tbody tr:hover{background:var(--shade)}
 sup.ref{font-size:10.5px;line-height:1}
 sup.ref a{padding:0 1px}
 /* A claim with nothing to cite reads exactly like a citation, in red: it sits where the reader already
-   looks for the source, and says there is not one: it is not built yet, or nobody has found where it happens. */
+   looks for the source, and says there is not one: it is not built yet, or nobody has found where it
+   happens. */
 sup.nocite{color:var(--red);font-weight:700;cursor:help}
 ol.refs{font-size:12.5px;padding-left:22px;margin:8px 0}
 ol.refs li{margin:2px 0;overflow-wrap:anywhere;border-radius:2px;scroll-margin-top:16px}
@@ -206,6 +210,15 @@ figure.fig img,.ib .pic img{cursor:zoom-in}
 .theme{align-self:center;margin:0 0 5px;flex:none;min-width:64px}
 .navtoggle{display:none;width:100%;text-align:left}
 .navtoggle[aria-expanded="true"]{background:var(--sunk);color:var(--text);font-weight:700}
+
+/* ===== code blocks ===== */
+/* A code sample in a page is one block in the source view's frame, not a column of inline code: without
+   this, the inline style's background and border are drawn behind every line separately. It comes before
+   the source view so that view's own rules still win. */
+.art pre{overflow-x:auto;margin:12px 0;padding:10px 14px;background:var(--surface);
+  border:1px solid var(--border-soft);font:12.5px/1.55 ui-monospace,Menlo,Consolas,monospace;
+  color:var(--text);white-space:pre;tab-size:4}
+.art pre code{background:none;border:0;border-radius:0;padding:0;font-size:inherit}
 
 /* ===== the source view ===== */
 /* The markdown a page is written in, shown as it is written. Not from the prototype, which had no such

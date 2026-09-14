@@ -222,6 +222,122 @@ class WikiTests(unittest.TestCase):
         self.write("thing", PAGE.replace("It does it slowly.[^why]", "It does it slowly. {missing}"))
         self.assertEqual([], wiki.uncited_problems(self.root))
 
+    def test_a_sentence_riding_on_its_neighbours_citation_is_refused(self):
+        """Every sentence states something, so every sentence says where it came from.
+
+        One citation used to cover its whole paragraph, and a claim beside a cited one read exactly as
+        though it had been checked.
+        """
+        self.write("thing", PAGE.replace("It does it slowly.[^why]", "It does it slowly.[^why] It never hurries."))
+        problems = wiki.uncited_problems(self.root)
+        self.assertEqual(1, len(problems), problems)
+        self.assertIn("It never hurries", problems[0])
+
+    def test_a_citation_after_the_full_stop_belongs_to_its_sentence(self):
+        # Neither a version number nor an abbreviation ends a sentence.
+        self.write("thing", PAGE.replace(
+            "It does it slowly.[^why]",
+            "It does it slowly.[^why] It needs version 3.11, e.g. the current one.[^why] It waits. {missing}"))
+        self.assertEqual([], wiki.uncited_problems(self.root))
+
+    def test_a_sentence_linking_to_another_page_needs_no_citation(self):
+        # The page it links to carries the citations; a sentence that only points there has none of its own.
+        self.write("thing", PAGE.replace("It does it slowly.[^why]",
+                                         "It does it slowly.[^why] How it began is on [the front](index.md)."))
+        self.assertEqual([], wiki.uncited_problems(self.root))
+
+    # Where one sentence ends and the next begins. Each case is a block and the statements it must split
+    # into, exactly: a split in the wrong place lets an uncited sentence hide inside a cited one, or cuts
+    # a cited sentence off from its own citation.
+    SPLITS = (
+        ("a citation after the full stop", "One.[^a] Two.[^b]", ["One.[^a]", "Two.[^b]"]),
+        ("several citations after one full stop", "It cites twice.[^a][^b] Next one.",
+         ["It cites twice.[^a][^b]", "Next one."]),
+        ("a citation before the full stop", "It is fast[^a]. It is cheap.", ["It is fast[^a].", "It is cheap."]),
+        ("a version number", "It needs 3.11 or newer.[^a]", ["It needs 3.11 or newer.[^a]"]),
+        ("dotted versions", "Versions v0.1.0 and 1.2.3 stay whole.[^a]", ["Versions v0.1.0 and 1.2.3 stay whole.[^a]"]),
+        ("an abbreviation", "Use e.g. the default, i.e. none.[^a]", ["Use e.g. the default, i.e. none.[^a]"]),
+        ("a file name in code", "It reads `wiki.toml` first.[^a]", ["It reads `wiki.toml` first.[^a]"]),
+        ("code ending a sentence", "It reads `wiki.toml`. Then it builds.[^a]",
+         ["It reads `wiki.toml`.", "Then it builds.[^a]"]),
+        ("a full stop and capital inside code", "It prints `done. Next` at the end.[^a]",
+         ["It prints `done. Next` at the end.[^a]"]),
+        ("exclamation and question marks", "It is fast! Is it safe? Yes.", ["It is fast!", "Is it safe?", "Yes."]),
+        ("a closing quote", 'It says "stop." Then it stops.', ['It says "stop."', "Then it stops."]),
+        ("bold", "**It is bold.** It is plain.", ["**It is bold.**", "It is plain."]),
+        ("emphasis with underscores", "It is _done._ It is next.", ["It is _done._", "It is next."]),
+        ("a closing parenthesis", "(It is cached.) It is served.", ["(It is cached.)", "It is served."]),
+        ("the mark for no source", "It waits. {missing} It stops.[^a]", ["It waits. {missing}", "It stops.[^a]"]),
+        ("a sentence starting with a digit", "It has 3 parts. 2 are cited.[^a]", ["It has 3 parts.", "2 are cited.[^a]"]),
+        ("a wrapped line", "It spans\na wrapped line.[^a]", ["It spans a wrapped line.[^a]"]),
+        ("list items", "- one item\n- another item", ["- one item", "- another item"]),
+        ("numbered items", "1. first step\n2. second step", ["1. first step", "2. second step"]),
+        ("a colon and a semicolon", "It is cheap; it is fast: both hold.[^a]", ["It is cheap; it is fast: both hold.[^a]"]),
+        ("an ellipsis", "It waits... Then it goes.", ["It waits...", "Then it goes."]),
+        ("a table", "| a | b |\n|---|---|\n| c | d |", ["| a | b |\n|---|---|\n| c | d |"]),
+    )
+
+    def test_a_block_splits_into_its_sentences(self):
+        for case, block, expected in self.SPLITS:
+            with self.subTest(case):
+                self.assertEqual(expected, wiki.statements(block))
+
+    # A body the check must pass or refuse, and the start of each sentence it must name.
+    UNCITED = (
+        ("a link to another page", "It is described on [the front](index.md).", []),
+        ("a link to a section of another page", "It is on [the front](index.md#top).", []),
+        ("a link off the site", "It is on [the web](https://example.com/page).", ["It is on [the web]"]),
+        ("a link to a picture", "It looks like [this](../images/thing.png).", ["It looks like"]),
+        ("a table with no citation", "| a | b |\n|---|---|\n| c | d |", ["| a | b |"]),
+        ("a table with one citation", "| a | b |\n|---|---|\n| c[^why] | d |", []),
+        ("a quotation", "> It is quoted.", ["> It is quoted."]),
+        ("a child item under a cited one", "- It is cited.[^why]\n  - It is not.", ["- It is not."]),
+        ("a horizontal rule", "---", []),
+        ("code inside a cited sentence", "It prints `done. Next` at the end.[^why]", []),
+        ("the mark in the middle", "It waits {missing} and then stops.", []),
+        ("a cited sentence beside an uncited one", "It is cited.[^why] It is not.", ["It is not."]),
+    )
+
+    def test_each_sentence_is_held_to_its_own_citation(self):
+        for case, prose, expected in self.UNCITED:
+            with self.subTest(case):
+                self.write("thing", PAGE.replace("It does it slowly.[^why]", prose))
+                problems = wiki.uncited_problems(self.root)
+                named = [problem.split("“", 1)[1] for problem in problems]
+                self.assertEqual(len(expected), len(problems), problems)
+                for start, name in zip(expected, named):
+                    self.assertTrue(name.startswith(start), f"expected {start!r}, got {name!r}")
+
+    def line_of(self, page_id, fragment):
+        """The line of a page's file a fragment starts on, counted independently of the tool."""
+        text = (self.pages / (page_id + ".md")).read_text(encoding="utf-8")
+        return text[:text.index(fragment)].count("\n") + 1
+
+    def test_an_uncited_sentence_is_named_with_the_line_it_is_on(self):
+        # Code with blank lines sits above it, and a heading, so a count that dropped them would be wrong.
+        self.write("thing", PAGE.replace("## Ground", self.SAMPLE + "\nThis says something.\n\n## Ground"))
+        problems = wiki.uncited_problems(self.root)
+        self.assertEqual(1, len(problems), problems)
+        self.assertTrue(problems[0].startswith("thing.md:%d: " % self.line_of("thing", "This says something")),
+                        problems[0])
+
+    def test_check_lists_every_claim_marked_as_having_no_source(self):
+        """So the work left is a list a person or an agent can act on, not only a count."""
+        self.write("thing", PAGE.replace('{ label = "Today", value = "a number", cite = "why" }',
+                                         '{ label = "Today", value = "a number", missing = true }'))
+        self.build()
+        status, output = self.run_main(["--root", str(self.root), "check"])
+        self.assertEqual(0, status, "a claim marked as having no source is an answer, not a failure")
+        self.assertIn("wiki: thing.md:%d: “Because speed would change it. {missing}” is marked as having no source"
+                      % self.line_of("thing", "Because speed"), output)
+        self.assertIn("wiki: thing.md:%d: the infobox row 'Today' is marked as having no source"
+                      % self.line_of("thing", 'label = "Today"'), output)
+
+    def test_a_paragraph_directly_under_its_heading_is_checked(self):
+        self.write("thing", PAGE.replace("## Speed\n\nIt does it slowly.[^why]", "## Speed\nIt does it slowly."))
+        problems = wiki.uncited_problems(self.root)
+        self.assertTrue(any("It does it slowly" in problem for problem in problems), problems)
+
     def test_a_page_about_the_wiki_itself_needs_no_citations(self):
         # index.md and goals.md carry `goals = false`: they describe no behaviour, so there is nothing
         # for them to cite and the rule would be noise.
@@ -371,6 +487,25 @@ class WikiTests(unittest.TestCase):
                 _, output = self.run_main(["--root", str(self.root), command])
                 self.assertRegex(output, r"wiki: thing\s+\d+ words\s+1 cited\s+1 missing")
                 self.assertIn("wiki: 1 source cited, 1 claim marked as having no source", output)
+
+    def test_a_markdown_table_is_drawn_as_a_wiki_table(self):
+        # Without the class, a page's own table had no borders, no header row and no padding.
+        self.write("thing", PAGE.replace("It does it slowly.[^why]", "| a | b |\n|---|---|\n| c[^why] | d |"))
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertIn('<div class="wt"><table class="w">', page)
+        self.assertIn("</table></div>", page)
+        self.assertNotIn("<table>", page)
+
+    def test_a_count_of_one_is_singular(self):
+        # "1 pages written" and "1 problems" were printed by every one-page build and one-problem check.
+        self.write("thing", PAGE.replace('categories = ["Things"]', 'categories = ["Things"]\naudience = "player"'))
+        _, output = self.run_main(["--root", str(self.root), "player", str(self.out)])
+        self.assertIn("wiki: 1 page written to", output)
+        self.write("thing", PAGE.replace("It does it slowly.[^why]", "It does it slowly."))
+        self.build()
+        _, output = self.run_main(["--root", str(self.root), "check"])
+        self.assertRegex(output, r"wiki: 3 pages, 1 problem\n")
 
     # --- citations -------------------------------------------------------------------------------
 
