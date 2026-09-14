@@ -1,6 +1,7 @@
 +++
 title = "Pictures"
 subtitle = "showing a picture on a page, and opening it whole"
+status = "approved"
 intent = """
 Pictures exist so that a page can show the thing it describes, with a caption, and a reader can open any
 picture whole without leaving the page. A picture should never go on showing something that has changed
