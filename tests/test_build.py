@@ -24,6 +24,11 @@ from builder.config import CONFIG, WikiError
 # happens to hold.
 PACKAGE = Path(wiki.__file__).resolve().parent
 
+
+def wiki_version():
+    import builder
+    return builder.__version__
+
 CONFIGURATION = """
 [site]
 name = "A Wiki"
@@ -888,6 +893,30 @@ class PackageTests(unittest.TestCase):
             for word in self.SOMEBODY_ELSES:
                 self.assertIsNone(re.search(r"\b" + word + r"\b", text),
                                   f"{name} names {word!r}; this package must not know it")
+
+    def test_the_skill_is_written_into_a_directory_of_its_own_name(self):
+        """A skill is found by its directory, and declares its name in its own front matter.
+
+        Nothing joins the two but agreement, so a rename that changes one and not the other leaves a
+        skill nobody can load and nothing that says so.
+        """
+        declared = re.search(r"^name:\s*(\S+)", (wiki.SKILL / "SKILL.md").read_text(encoding="utf-8"),
+                             re.M)
+        self.assertIsNotNone(declared, "the skill declares no name")
+        self.assertEqual(cli.SKILL_NAME, declared.group(1))
+
+    def test_sync_writes_the_skill_where_agents_look_for_it(self):
+        with tempfile.TemporaryDirectory() as work:
+            root = Path(work)
+            (root / ".agents/skills").mkdir(parents=True)
+            (root / "docs/wiki").mkdir(parents=True)
+            (root / "docs/wiki" / CONFIG).write_text(CONFIGURATION, encoding="utf-8")
+            cli.sync(root, root / "docs/wiki")
+            home = root / ".agents/skills" / cli.SKILL_NAME
+            self.assertTrue((home / "SKILL.md").is_file())
+            self.assertTrue((home / "references/the-standard.md").is_file())
+            self.assertIn(f'version = "{wiki_version()}"',
+                          (root / "docs/wiki" / CONFIG).read_text(encoding="utf-8"))
 
     def test_the_skill_names_nothing_about_any_project(self):
         # The skill ships to every project too, and its worked example is the part most likely to carry

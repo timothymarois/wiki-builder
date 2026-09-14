@@ -35,7 +35,7 @@ it does not own.
 |---|---|
 | `using-python` | Any Python: boundaries, naming, errors, resources, testing mechanics, traps |
 | `testing-code` | Any change in behaviour: which boundary holds the risk, and proving a test has teeth |
-| `writing-the-wiki` | A link to `src/skill/` — the copy that ships, so there is only one of it |
+| `writing-wiki-pages` | A link to `src/skill/` — the copy that ships, so there is only one of it |
 
 ## The skill (`src/skill/` — not a builder feature)
 

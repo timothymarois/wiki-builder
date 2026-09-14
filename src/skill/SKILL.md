@@ -1,5 +1,5 @@
 ---
-name: writing-the-wiki
+name: writing-wiki-pages
 description: Use when writing or changing any page of the wiki under docs/wiki/ — a page, an intent, an infobox, a citation, a picture, or the wording of anything a person reads there. It supplies how the wiki is built, the terms for its parts, the intent contract, what may and may not appear on a page, and the voice. Do not use for engineering documentation written for builders, which follows different rules.
 ---
 

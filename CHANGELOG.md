@@ -18,8 +18,9 @@ code; a heading that asks a question or rates its own contents; a page or a goal
 a page edited since its date was recorded; a picture whose subject has changed; a page in no navigation
 section; a category nobody belongs to; a page with no intent, or an intent over its budget.
 
-**Carries** the skill that tells an agent how to write a page, written into the consuming project by
-`wiki sync` and recorded against the release it came from.
+**Carries** the skill that tells an agent how to write a page -- `writing-wiki-pages` -- written into the
+consuming project by `wiki sync` and recorded against the release it came from. **Renaming it after this
+release would strand a directory in every project that had synced**, so it is named now and left alone.
 
 **If you are adopting this into a project that already has pages**, expect `check` to fail on the first
 run and to name everything at once. That is the tool doing its job.

@@ -17,6 +17,10 @@ from .serve import serve
 
 PORT = 8787
 
+# The directory a skill lives in is named for the skill. Named once here so the tool and the skill's own
+# front matter cannot drift apart.
+SKILL_NAME = "writing-wiki-pages"
+
 
 def skill_home(root):
     """Where this project keeps its agent skills.
@@ -27,8 +31,8 @@ def skill_home(root):
     """
     for name in (".agents/skills", ".claude/skills"):
         if (root / name).is_dir():
-            return root / name / "writing-the-wiki"
-    return root / ".claude/skills/writing-the-wiki"
+            return root / name / SKILL_NAME
+    return root / ".claude/skills" / SKILL_NAME
 
 
 def sync(root, wiki):
