@@ -17,14 +17,20 @@ being true. Every rule below follows from that one fact.
 
 ## Before starting
 
-1. **Load the skills the work calls for, all of them, before anything else.**
+1. **Load the skills the work calls for, all of them, before anything else.** They live in
+   `.agents/skills/`, linked from `.claude/skills/`. Working on something whose skill you never loaded
+   is a failed task, however green the checks. After a compaction, load them again.
 
    | The work | Load |
    |---|---|
    | Any Python | `using-python` |
    | Any change in behaviour | `testing-code` |
-   | Something broken and the cause not yet proved | `debugging-code` |
-   | The pages this tool renders, or the skill it ships | `writing-the-wiki` — the one in `src/skill/` |
+   | The pages this tool renders, or the skill it ships | `writing-the-wiki` |
+
+   **This repository owns every skill its rules name**, and those skills reference no others. A skill
+   here that told you to load one this repository does not have would be an instruction you could not
+   follow. `writing-the-wiki` is a link to `src/skill/`, which is the copy that ships — there is one of
+   it, and editing it changes what every project receives on its next `wiki sync`.
 
 2. Read this file, `docs/BRIEF.md`, and the task you were handed in full.
 3. State the outcome and the observable proof. Check `git status` before editing.

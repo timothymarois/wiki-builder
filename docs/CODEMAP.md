@@ -26,6 +26,17 @@ Counts are of lines, and are meant to show shape and growth at a glance.
 | `assets/wiki.js` | Search over an inlined index, the theme switch, the mobile menu, the lightbox, copy |
 | `assets/template.html` | The page, as named holes |
 
+## Skills (`.agents/skills/` — 3, linked from `.claude/skills/`)
+
+What an agent working here must load. The repository owns each one, and none of them references a skill
+it does not own.
+
+| Skill | For |
+|---|---|
+| `using-python` | Any Python: boundaries, naming, errors, resources, testing mechanics, traps |
+| `testing-code` | Any change in behaviour: which boundary holds the risk, and proving a test has teeth |
+| `writing-the-wiki` | A link to `src/skill/` — the copy that ships, so there is only one of it |
+
 ## The skill (`src/skill/` — not a builder feature)
 
 Prose the builder carries to whoever installs it, which is why it sits beside the builder rather than
