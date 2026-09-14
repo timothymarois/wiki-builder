@@ -584,7 +584,7 @@ class WikiTests(unittest.TestCase):
             "powerful": "say what it does",
             "Simply": "delete the word",
             "typically": "say what happens",
-            "note that": "keep the fact and drop the frame",
+            "please note that": "keep the fact and drop the frame",
             "etc.": "give the whole list",
             "currently": "note at the end of the page",
             "a number of": "give the number",
@@ -627,6 +627,25 @@ class WikiTests(unittest.TestCase):
                      "Some pages are drafts, and a new page is one of them.[^why]",
                      "It lists every problem, not only the first, and a failure is unlikely.[^why]",
                      "The flag is `--simply`, and the value `yes` is quoted.[^why]"):
+            with self.subTest(text=text):
+                self.write("thing", PAGE.replace("It does it slowly.[^why]", text))
+                self.assertEqual([], wiki.empty_word_problems(self.root))
+
+    def test_note_that_is_refused_only_as_a_frame(self):
+        # "note" is also a noun, and a wiki about notes says "each note that is archived". The frame opens a
+        # sentence or a clause, or follows please, also, to, should or must.
+        for text in ("Note that it does it slowly.[^why]",
+                     "It does it slowly; note that it waits.[^why]",
+                     "Please note that it does it slowly.[^why]",
+                     "It is important to note that it does it slowly.[^why]"):
+            with self.subTest(text=text):
+                self.write("thing", PAGE.replace("It does it slowly.[^why]", text))
+                problems = wiki.empty_word_problems(self.root)
+                self.assertEqual(1, len(problems), problems)
+                self.assertIn("which frames the fact", problems[0])
+        for text in ("It keeps each note that is archived.[^why]",
+                     "The note that it writes is short.[^why]",
+                     "It keeps every archived note\nthat has a title.[^why]"):
             with self.subTest(text=text):
                 self.write("thing", PAGE.replace("It does it slowly.[^why]", text))
                 self.assertEqual([], wiki.empty_word_problems(self.root))

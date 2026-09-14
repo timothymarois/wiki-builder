@@ -1515,7 +1515,10 @@ EMPTY_WORDS = (
     (re.compile(r"\b(appears? to|seems? to|typically|usually|generally|probably|likely|in some cases|"
                 r"tends? to)\b", re.I),
      "which hedges", "say what happens, or mark the claim {missing}"),
-    (re.compile(r"\b(note that|it is worth noting|please be aware|in order to)\b", re.I),
+    # "note" is also a noun ("each note that is archived"), so the frame is refused only where it opens a
+    # sentence or clause, or follows a word that makes it an instruction.
+    (re.compile(r"\b((?:please|also|to|should|must)\s+note that|(?<![\w'’]\s)note that|it is worth noting|"
+                r"please be aware|in order to)\b", re.I),
      "which frames the fact instead of stating it", "keep the fact and drop the frame"),
     (re.compile(r"\b(etc\b\.?|and so on\b|and/or\b|various\b)", re.I),
      "which leaves a list open", "give the whole list, or the one thing"),

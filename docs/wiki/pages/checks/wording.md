@@ -64,7 +64,7 @@ judges them.[^empty]
 | Marketing | `powerful`, `seamless`, `robust`, `cutting-edge`, `best-in-class`[^empty] |
 | Minimisers | `simply`, `easily`, `obviously`, `of course`, `clearly`[^empty] |
 | Hedges | `appears to`, `seems to`, `typically`, `usually`, `generally`, `probably`, `likely`, `in some cases`, `tends to`[^empty] |
-| Preamble | `note that`, `it is worth noting`, `please be aware`, `in order to`[^empty] |
+| Preamble | `note that` opening a clause or after `please` or `to`[^note], `it is worth noting`, `please be aware`, `in order to` |
 | Open lists | `etc.`, `and so on`, `and/or`, `various`[^empty] |
 | Time words | `currently`, `at the moment`, `for now`[^empty] |
 | Empty amounts | `a number of`, `reasonable`[^empty] |
@@ -80,6 +80,9 @@ judges them.[^empty]
     `EMPTY_WORDS` gives the reason for the words left out.
 [^values]: `src/builder/build.py` — `empty_word_problems()` refuses an infobox value that `EMPTY_VALUE`
     matches whole.
+[^note]: `src/builder/build.py` — the preamble pattern in `EMPTY_WORDS` matches `note that` after
+    `please`, `also`, `to`, `should` or `must`, or where no word and space come before it, so "each note
+    that is archived" passes.
 [^names]: `src/builder/build.py` — `pointing_problems()` matches `DEMONSTRATIVE` against the title and
     every infobox group and label; the comment on `DEMONSTRATIVE` gives the reason.
 [^prose]: `src/builder/build.py` — `pointing_problems()` matches `POINTING` against the subtitle, the

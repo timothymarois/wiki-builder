@@ -35,7 +35,7 @@ audited = "2026-09-14"
 
 ["checks/wording"]
 updated = "2026-09-14"
-digest = "5f5707006f048a1b2d05624216a7ad1a6e7f2125b0cc4bf8cfef0e73c8fb34cf"
+digest = "6e19c78b7145c794b50b7819a9808f406d69e9e724c8e97c0e719c06e2cd5131"
 audited = "2026-09-14"
 
 ["commands"]
