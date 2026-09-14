@@ -25,7 +25,9 @@ rows = [
 +++
 
 The prompt below sends an agent to [Installation](installation.md) to install the tool, then has it write
-the project's first pages by the skill that installation puts in the project.[^skill] The agent is done
+the project's first pages by the skill that installation puts in the project.[^skill] It also adds
+documentation duties to the project's agent instructions, so every later agent loads the skill and updates
+the wiki with the code. The agent is done
 when `wiki check` reports no problems.[^check] The prompt names nothing about the project it is used in,
 and checking the wiki once it exists has its own [Review prompt](review-prompt.md).
 
@@ -49,11 +51,29 @@ Install wiki-builder in this project and start its wiki.
    code or from me, and a fact neither gives is marked {missing}. Anything I describe that is not built
    yet is written on its page too, every statement of it marked {missing} until code does it. New pages
    are drafts; list their intents for me to approve.
-4. Finish when `wiki check` reports 0 problems.
+4. Add documentation duties to the project's agent instructions, so every later agent keeps the wiki
+   true. Put them in AGENTS.md, CLAUDE.md or whatever file this project's agents read, in every copy
+   the project keeps, or create AGENTS.md if there is none; if the instructions say editing them needs
+   my approval, show me the section and ask first. Adapt the wrapper command to this project:
 
-Report the release tag used, every file created or changed, the output of the last `wiki check`, each
-draft page with its intent, and anything you could not find in the code. Do not commit or push unless I
-ask.
+   ## Documentation duties
+
+   docs/wiki/ is read instead of the code, so it changes in the same change as the code, never after.
+
+   - Before writing or changing any page under docs/wiki/, load the writing-wiki-pages skill, if it
+     is installed, and follow it.
+   - A change in behaviour updates the page that describes it, in the same commit. Something new a
+     person can use, configure or notice gets its page, or a section of one.
+   - A requirement the owner gives goes onto its page when it is given, marked {missing} until code
+     implements it. The change that builds it replaces the mark with a citation to that code.
+   - An intent is the owner's to approve; a new page is a draft until they do.
+   - Finish only when `./scripts/dev-wiki.sh check` reports 0 problems.
+
+5. Finish when `wiki check` reports 0 problems.
+
+Report the release tag used, every file created or changed, the documentation duties as added, the output
+of the last `wiki check`, each draft page with its intent, and anything you could not find in the code. Do
+not commit or push unless I ask.
 ```
 
 [^skill]: `src/builder/cli.py` — `SKILL_NAME` names the skill, and `sync()` copies it into the project.
