@@ -69,11 +69,14 @@ jobs:
 
 ## Settings
 
-The workflow writes the domain into a `CNAME` file at the root of the site.[^cname]
+**GitHub Pages is switched on before the workflow first runs**: in the repository's settings, under
+Pages and then Build and deployment, the source is GitHub Actions.[^source] Until it is, the build job
+passes and the deploy job fails with a 404 saying to enable GitHub Pages.[^enable] The workflow writes the
+domain into a `CNAME` file at the root of the site.[^cname]
 
 | Setting | Value |
 |---|---|
-| Pages source, in the repository's settings | GitHub Actions[^pages] |
+| Pages source, under Build and deployment | GitHub Actions[^source] |
 | Custom domain | the domain in `CNAME` |
 | DNS record | a `CNAME` from the domain to `OWNER.github.io`[^dns] |
 | HTTPS | enforced, once GitHub has issued the certificate[^https] |
@@ -94,6 +97,12 @@ wiki-builder deploys its own wiki to wiki-builder.marois.dev the same way, on ev
 [^publish]: `src/builder/cli.py` — `run()` builds with `links="clean"` for `publish`, into a folder
     `guard_output()` allows; `build()` then empties `LINK_SUFFIX`, so a link names the folder and not its
     `index.html`.
+[^source]: GitHub Docs — [Configuring a publishing source for your GitHub Pages site](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site):
+    under Settings, Pages, "Build and deployment", the source is set to GitHub Actions; and
+    [Using custom workflows with GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages):
+    custom workflows must first be enabled for the repository.
+[^enable]: GitHub — [actions/deploy-pages](https://github.com/actions/deploy-pages/blob/v4/src/internal/deployment.js):
+    when creating the deployment returns 404, the error adds "Ensure GitHub Pages has been enabled".
 [^dns]: GitHub Docs — [Managing a custom domain for your GitHub Pages site](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site):
     a subdomain needs a `CNAME` record pointing to `<user>.github.io` or `<organization>.github.io`,
     without the repository name.
