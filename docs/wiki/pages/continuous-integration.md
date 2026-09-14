@@ -66,7 +66,7 @@ Every push to `main` and every pull request runs two workflows in the wiki-build
 to `main` also runs a third that publishes the wiki.[^ci] One runs the tool's own tests on Python 3.11 and
 3.12, against the installed package.[^tests] Another checks wiki-builder's own wiki with the same action a
 project uses, so the action is exercised on every change to it.[^wiki] Publishing that wiki once
-it passes is described on [Deployment (GitHub)](deployment-github.md).
+it passes is described on [GitHub Pages](deployment-github.md).
 
 [^action]: `action.yml` — a composite action whose last step runs `wiki check` in the project's folder.
 [^inputs]: `action.yml` — `inputs`: `root`, `wiki` and `python-version`, with their defaults; `wiki` is

@@ -1,6 +1,7 @@
 +++
-title = "Authentication (Cloudflare)"
+title = "Authentication"
 subtitle = "a sign-in in front of a wiki published on Cloudflare"
+status = "approved"
 intent = """
 This guide exists so that a project can deploy its wiki on Cloudflare behind a sign-in in the browser, so
 that only the readers the project chooses can read it. A reader who has not signed in should see none of
@@ -32,7 +33,7 @@ A wiki published on Cloudflare Pages can ask for a sign-in before it shows any p
 **Cloudflare Access**, which emails each allowed reader a sign-in code, or a **Pages Function** that asks
 the browser for a shared user name and password.[^pin][^middleware] Cloudflare recommends Access for a
 production sign-in, and a password prompt is safe only over HTTPS, because it sends the password
-unencrypted.[^basic] Publishing the wiki is described on [Deployment (Cloudflare)](../deployment-cloudflare.md).
+unencrypted.[^basic] Publishing the wiki is described on [Cloudflare](../deployment-cloudflare.md).
 
 `wiki publish` writes a markdown copy beside each page and an `llms.txt` listing them, and each holds the
 wiki's text, so a sign-in guards those files as well as the pages.[^copies]

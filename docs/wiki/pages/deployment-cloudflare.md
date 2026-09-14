@@ -1,5 +1,5 @@
 +++
-title = "Deployment (Cloudflare)"
+title = "Cloudflare"
 subtitle = "publishing a wiki on Cloudflare"
 status = "approved"
 intent = """
@@ -18,6 +18,7 @@ rows = [
 group = "Values"
 rows = [
   { label = "Output directory", value = "_site", cite = "publish" },
+  { label = "Price", value = "free", note = "up to 500 builds a month", cite = "limits" },
 ]
 
 [[infobox]]
@@ -30,8 +31,8 @@ rows = [
 Cloudflare Pages builds a project's wiki from its repository with one build command, which installs
 wiki-builder, checks the wiki and runs `wiki publish`.[^git] If the check fails, the command stops and
 nothing is published.[^exit] What `wiki publish` makes is described on [wiki publish](commands/publish.md),
-and the same guide for GitHub on [Deployment (GitHub)](deployment-github.md). A sign-in in front of the
-published wiki is described on [Authentication (Cloudflare)](deployment-cloudflare/authentication.md).
+and the same guide for GitHub on [GitHub Pages](deployment-github.md). A sign-in in front of the
+published wiki is described on [Authentication](deployment-cloudflare/authentication.md).
 
 ## Build
 
@@ -59,6 +60,8 @@ build settings are entered then.[^git]
 | Custom domain | the subdomain, added under the project's custom domains[^domains] |
 
 When the domain's zone is already on Cloudflare, adding the custom domain creates its DNS record.[^domains]
+Cloudflare Pages is free on Cloudflare's Free plan, which allows 500 builds a month and up to 20,000 files
+in a site.[^limits]
 
 ## External links
 
@@ -84,3 +87,5 @@ When the domain's zone is already on Cloudflare, adding the custom domain create
     record is confirmed.
 [^exit]: `src/builder/cli.py` — `run()` returns 1 when `check()` finds a problem, and `main()` returns
     that as the exit code.
+[^limits]: Cloudflare Docs — [Limits](https://developers.cloudflare.com/pages/platform/limits/): the Free
+    plan allows 500 builds a month, and a site on it can hold up to 20,000 files.

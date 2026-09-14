@@ -1,5 +1,5 @@
 +++
-title = "Deployment (GitHub)"
+title = "GitHub Pages"
 subtitle = "publishing a wiki on GitHub"
 status = "approved"
 intent = """
@@ -16,18 +16,23 @@ rows = [
 ]
 
 [[infobox]]
+group = "Values"
+rows = [
+  { label = "Price", value = "free", note = "for a public repository", cite = "plans" },
+]
+
+[[infobox]]
 group = "Rules"
 rows = [
   { label = "Condition", value = "wiki check passes", cite = "order" },
   { label = "Custom domain", value = "set in the repository's Pages settings", note = "a CNAME file is ignored", cite = "domain" },
-  { label = "Cost", value = "free for a public repository", cite = "plans" },
 ]
 +++
 
 A project on GitHub publishes its wiki with one workflow that checks the wiki, builds it with
 `wiki publish` and hands the result to GitHub Pages.[^pages] If the check fails, the job stops and nothing
 is published.[^order] What `wiki publish` makes is described on [wiki publish](commands/publish.md), and
-the same guide for Cloudflare on [Deployment (Cloudflare)](deployment-cloudflare.md).
+the same guide for Cloudflare on [Cloudflare](deployment-cloudflare.md).
 
 ## Workflow
 

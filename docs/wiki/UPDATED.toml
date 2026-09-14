@@ -84,20 +84,20 @@ digest = "efe0ad0654a224e450899d0e0eee2fafedf873cb6452da12c1f33b296412e881"
 
 ["continuous-integration"]
 updated = "2026-09-14"
-digest = "0587eb3fa0aee5fbb72970720f9b72e0fc705bfda90d9e63673a9712bf4d62ef"
+digest = "7a95cba7ffc4b5be59228387bf6915dffe26b72a529e630a20f35799eb091184"
 audited = "2026-09-14"
 
 ["deployment-cloudflare"]
 updated = "2026-09-14"
-digest = "9fa65e7e1154812806c46a239d818085375964fe6878183a78a934838b32c6da"
+digest = "64a7240c822eed3424f56b372bd42a8e72a2d9c49b5005e8ca28cdd8584cebdf"
 
 ["deployment-cloudflare/authentication"]
 updated = "2026-09-14"
-digest = "06a203da56b6c3b8c6f2c6871d410bb145b1091820dd177ebeea505889560b78"
+digest = "d6e25d897a3c40a9afca64a166dfa96a9142749625759158f1382a0e46c50caf"
 
 ["deployment-github"]
 updated = "2026-09-14"
-digest = "c253b4e4b3f80ec3bd3f19cc9dc8688db0dbec268425a0865ba7886b39b0a33d"
+digest = "ef73980a6e6ad9238e25375f840bc3f068e95fcdd1fc8e82203257dfbfa4956e"
 
 ["front-matter"]
 updated = "2026-09-14"
@@ -133,7 +133,7 @@ audited = "2026-09-14"
 
 ["pages/diagrams"]
 updated = "2026-09-14"
-digest = "a6efe426dc00b0bbfa488c08c253f07d6c0f5ef1c5b154b66d0cba6e27d67e19"
+digest = "ca473bd0228fc6e2a948b4e45c8f0528051f14b989fb0594762d5acd6ac06aa1"
 audited = "2026-09-14"
 
 ["pictures-toml"]
