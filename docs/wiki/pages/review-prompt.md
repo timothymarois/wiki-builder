@@ -19,8 +19,8 @@ rows = [
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Edits", value = "none, findings only" },
-  { label = "Severity", value = "false, undocumented, uncited, stale, writing" },
+  { label = "Edits", value = "none, findings only", missing = true },
+  { label = "Severity", value = "false, undocumented, uncited, stale, writing", missing = true },
 ]
 +++
 

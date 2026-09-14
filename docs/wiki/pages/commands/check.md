@@ -38,18 +38,20 @@ wiki check
 
 ## Output
 
-Each problem is printed as one sentence naming the page, the line and what to do.[^output] Every claim
-marked as having no source is listed the same way, and does not fail the check.[^marks] Then come every
-page's word count and citations, the totals, and a last line counting pages and problems.[^output] On a
-wiki of three pages with one uncited sentence:[^output]
+Each problem is printed to standard error as one sentence saying what is wrong and what to do; a problem
+with a sentence on a page also names that page and line.[^output] Every claim marked as having no source
+is listed on standard output, and does not fail the check.[^marks] Then come every page's word count and
+citations, the totals, the budget warning while budgets are uncalibrated, and a last line counting pages
+and problems.[^output] On a wiki of three pages with one uncited sentence:[^output]
 ```text
-wiki: refunds.md:13: “A support agent can issue one.” states something and cites nothing; give it a reference, or {missing} if there is none
+wiki: refunds.md:14: “A support agent can issue one.” states something and cites nothing; give it a reference, or {missing} if there is none
 wiki: refunds.md:12: “Partial refunds are not offered. {missing}” is marked as having no source
-wiki: goals                              20 words    0 cited    0 missing
-wiki: index                               3 words    0 cited    0 missing
-wiki: refunds                            29 words    1 cited    1 missing
+wiki: goals                              25 words    0 cited    0 missing
+wiki: index                               8 words    0 cited    0 missing
+wiki: refunds                            22 words    1 cited    1 missing
 wiki: 1 source cited, 1 claim marked as having no source
-wiki: the collected goals read in 15 words
+wiki: the collected goals read in 17 words
+wiki: these budgets are PROVISIONAL -- 500 words a page, 3500 for the collected goals. Nobody has measured what this project's reader will actually read; until they have, the numbers are a guess that happens to be enforced. Set budget.calibrated in wiki.toml when they have.
 wiki: 3 pages, 1 problem
 ```
 
@@ -58,14 +60,15 @@ wiki: 3 pages, 1 problem
 | Code | Condition | Message |
 |---|---|---|
 | `0` | no problem is found[^exit] | a last line ending `0 problems` |
-| `1` | at least one problem is found | each problem, then a last line such as `wiki: 3 pages, 1 problem` |
+| `1` | at least one problem is found[^exit] | each problem, then a last line such as `wiki: 3 pages, 1 problem` |
 | `1` | a problem stops the build | that problem alone[^stop] |
-| `2` | there is no wiki where it was pointed | `wiki: no wiki at nowhere` |
+| `2` | there is no wiki where it was pointed[^exit] | `wiki: no wiki at nowhere` |
 
 [^check]: `src/builder/build.py` — `check()` builds into a temporary directory with `record=False`.
 [^usage]: `src/builder/cli.py` — `main()` gives `check` only the shared options.
 [^output]: `src/builder/cli.py` — `run()` prints each problem to standard error, then calls `report()` with
-    `citation_counts()` and prints the count.
+    `citation_counts()`, which prints the budget warning, and prints the count; `src/builder/build.py` —
+    `uncited_problems()` and `pointing_problems()` name a sentence's page and line.
 [^marks]: `src/builder/cli.py` — `run()` prints `missing_marks()` after the problems.
 [^exit]: `src/builder/cli.py` — `run()` returns 1 when there are problems and 0 when there are none;
     `main()` returns 2 with no wiki.

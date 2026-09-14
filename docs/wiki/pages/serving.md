@@ -46,17 +46,19 @@ answers only on this machine.[^loopback]
 
 Code, settings and markdown files open **as text in the browser** instead of downloading, across 38 common
 file types.[^text] Anything else, such as the site's own pages and pictures, is served as it normally
-would be.[^text]
+would be.[^text] A file named only `.env` has no suffix, so it is sent as a download.[^text]
 
 ## Freshness
 
-**Nothing the server sends may be cached**, so a rebuilt page appears on the next reload.[^cache] The
+The server never rebuilds the site, so a page edited while it runs appears after `wiki build` and a
+reload.[^rebuild] **Nothing the server sends may be cached**, so a rebuilt page appears on the next
+reload.[^cache] The
 addresses of the stylesheet and the script also change whenever their contents do, so even a tab holding
 an old copy picks up the new one.[^stamp]
 
 ## Errors
 
-Successful requests are not logged; failed ones are.[^log] If the port is already in use, the server says
+A request answered with a success status is not logged; redirects and failures are.[^log] If the port is already in use, the server says
 so, names `--port` as the way to pick another, and exits with 2.[^port]
 
 [^serve]: `src/builder/serve.py` — `serve()` binds `127.0.0.1` and opens the site's address with
@@ -69,9 +71,14 @@ so, names `--port` as the way to pick another, and exits with 2.[^port]
     path from the page to that file.
 [^loopback]: `src/builder/serve.py` — `serve()` listens on `127.0.0.1` only.
 [^text]: `src/builder/serve.py` — `shown_as_text()` answers every suffix in `AS_TEXT` as `text/plain`, and
-    leaves every other type to the stock handler.
-[^cache]: `src/builder/serve.py` — `Handler.end_headers()` sends `Cache-Control: no-store`.
+    leaves every other type to the stock handler, which sends a name with no suffix as
+    `application/octet-stream`.
+[^rebuild]: `src/builder/cli.py` — `run()` builds once before it calls `serve()`; `src/builder/serve.py` —
+    `serve()` only serves.
+[^cache]: `src/builder/serve.py` — `Handler.end_headers()` sends `Cache-Control: no-store, must-revalidate`,
+    `Pragma: no-cache` and `Expires: 0`.
 [^stamp]: `src/builder/build.py` — `write_site()` adds a digest of each asset to its address.
-[^log]: `src/builder/serve.py` — `Handler.log_message()` drops any status starting with 2.
+[^log]: `src/builder/serve.py` — `Handler.log_message()` drops any status starting with 2, and logs every
+    other.
 [^port]: `src/builder/serve.py` — `serve()` catches the `OSError` a taken port raises and returns 2;
     `src/builder/cli.py` — `main()` defines `--port`.

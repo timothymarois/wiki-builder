@@ -28,7 +28,7 @@ pages = ["checks"]
 
 [[section]]
 title = "Reference"
-pages = ["commands"]
+pages = ["commands", "wiki-toml", "front-matter", "pictures-toml"]
 
 [[section]]
 title = "Agent prompts"

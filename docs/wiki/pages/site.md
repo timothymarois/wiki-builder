@@ -27,13 +27,13 @@ group = "Rules"
 rows = [
   { label = "Search scope", value = "page titles only", cite = "search" },
   { label = "Date change", value = "the page's own text only", note = "any intent, for the goals page", cite = ["dates", "goalsdate"] },
-  { label = "Dead links", value = "not refused", cite = "deadlink" },
+  { label = "Link to a missing page", value = "drawn red, refused by the check", cite = "redlink" },
 ]
 +++
 
 `wiki build` turns the pages into a website in `docs/wiki/site`, beside them.[^build] **The site is never
-committed.**[^serve] It is rebuilt every time it is served, so what is served never falls behind the
-pages.[^serve] What refuses a page is described on [Checks](checks.md), and how the site is served on
+committed.**[^serve] It is rebuilt each time `wiki serve` starts, and a page edited while the server runs
+appears after `wiki build`.[^serve] What refuses a page is described on [Checks](checks.md), and how the site is served on
 [Local server](serving.md).
 
 ## Addresses
@@ -41,13 +41,15 @@ pages.[^serve] What refuses a page is described on [Checks](checks.md), and how 
 Every page is a folder holding one file, `index.html`, and every link names that file.[^links] That way the
 same site works both through a server and opened straight from disk.[^links] `wiki publish` builds it with
 clean addresses instead, which work only on a host.[^publish] A link that leaves the wiki opens in a new tab,
-is marked `nofollow`, and ends in an arrow, without its author writing anything but the link.[^outside]
+is marked `nofollow` and ends in an arrow, without its author writing anything but the link.[^outside]
 
 The build deletes whatever it no longer makes, so a removed page leaves nothing behind.[^removed] For the
 same reason, **it refuses to write into a folder it did not make**, so it never empties someone
 else's.[^guard]
 
-A link to a page or file that does not exist is not refused.[^deadlink] It is written as it stands, and it
+**A link to a wiki page that does not exist is drawn red instead of blue**, and `wiki check` refuses it,
+naming the page and the line.[^redlink] The owner, 2026-09-14: "then its red instead of blue. and that could
+be part of our dead link checks".[^redlink] A link to any other file that does not exist is not refused, and
 leads nowhere.[^deadlink]
 
 ## Dates
@@ -57,7 +59,9 @@ does**: restyling or rebuilding the site leaves every date alone.[^dates] The go
 its date moves whenever any page's intent changes, including a draft's.[^goalsdate]
 
 The record of dates is committed with the pages, because a date taken from the clock would say "today"
-forever.[^dates]
+forever.[^dates] Every command that builds the site records dates, and `wiki check` never does.[^record]
+Instead, `wiki check` refuses a page whose text has changed since its date was recorded, and a record of a
+page that no longer exists, and says to run `wiki build`.[^stale]
 
 ## Search
 
@@ -67,13 +71,14 @@ too.[^index]
 
 ## Audiences
 
-`wiki player` builds a second view for people outside the project.[^player] It holds only the pages marked
-for players, and it strips every reference, every red mark and the Source tab.[^strip]
+`wiki player` builds only the pages marked for players, which say `audience = "player"` in their front
+matter; an infobox group can be marked the same way.[^player] The player build strips every reference,
+every red mark and the Source tab.[^strip] Every field is listed on [Front matter](front-matter.md).
 
 [^build]: `src/builder/cli.py` — `run()` builds into `site` beside the pages unless the command is
     `publish` or `player`.
-[^serve]: `src/builder/cli.py` — `run()` builds before it serves; the project's `.gitignore` excludes
-    `docs/wiki/site/`.
+[^serve]: `src/builder/cli.py` — `run()` builds once, then calls `serve()` in `src/builder/serve.py`,
+    which never rebuilds; the project's `.gitignore` excludes `docs/wiki/site/`.
 [^links]: `src/builder/build.py` — `page_directory()` and `relative_directory()`, which end every link in
     `LINK_SUFFIX`, `index.html`.
 [^publish]: `src/builder/build.py` — `build()` empties `LINK_SUFFIX` when `links` is `"clean"`, which
@@ -83,16 +88,24 @@ for players, and it strips every reference, every red mark and the Source tab.[^
 [^removed]: `src/builder/build.py` — the end of `write_site()` unlinks every file the build did not write.
 [^guard]: `src/builder/cli.py` — `guard_output()` refuses a non-empty folder with no stylesheet from an
     earlier build.
-[^deadlink]: `src/builder/build.py` — `rewrite_references()` turns a link into a relative path without
-    checking that anything is there.
+[^redlink]: `src/builder/build.py` — `rewrite_references()` adds `NEW_PAGE` to a link to a page the wiki
+    does not have, and `dead_link_problems()`, called from `check()`, names it with its line;
+    `src/builder/assets/wiki.css` draws `a.new` in `--red`.
+[^deadlink]: `src/builder/build.py` — `rewrite_references()` turns a link into a path from the page to the
+    file it resolves to, without checking that anything is there.
 [^dates]: `src/builder/build.py` — `write_site()` hashes each page's markdown and moves its date in
     `UPDATED.toml` only when the hash changes.
+[^record]: `src/builder/cli.py` — `run()` calls `build()`, which records dates; `src/builder/build.py` —
+    `check()` builds with `record=False`.
+[^stale]: `src/builder/build.py` — `date_problems()`, called from `check()`.
 [^goalsdate]: `src/builder/build.py` — `content_of()` in `write_site()` adds every page's intent to the
     goals page's hash.
 [^search]: `src/builder/assets/wiki.js` — the search listener filters on `page.t`, the title, and keeps
     eight.
 [^index]: `src/builder/build.py` — `index_for()` in `write_site()`; `src/builder/assets/template.html`
     inlines it as `WIKI_INDEX`.
-[^player]: `src/builder/cli.py` — `run()` builds with audience `"player"`.
+[^player]: `src/builder/cli.py` — `run()` builds with audience `"player"`; `src/builder/build.py` —
+    `read_pages()` reads a page's `audience`, defaulting to `"internal"`, and `render_infobox()` reads a
+    group's own.
 [^strip]: `src/builder/build.py` — `visible_to()` for pages, `for_player()` for references and marks, and
     `with_source` in `write_site()` for the tab.

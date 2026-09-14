@@ -77,6 +77,8 @@ SETTLED_LINK = re.compile(r"^(?:[a-z][a-z0-9+.-]*:|#|//)")
 # published wiki lends no standing to what it points at, and is marked so the reader knows before following.
 OUTSIDE_LINK = re.compile(r"^(?:https?:)?//", re.I)
 OUTSIDE = ' class="ext" target="_blank" rel="nofollow noopener noreferrer"'
+# A link to a page the wiki does not have, drawn red the way an encyclopedia marks a page nobody has written.
+NEW_PAGE = ' class="new" title="This page does not exist"'
 
 HEADING = re.compile(r"<(h2|h3)>(.*?)</\1>", re.S)
 TAG = re.compile(r"<[^>]+>")
@@ -451,6 +453,11 @@ def rewrite_references(body, directory, site_root, root, images, page_ids, pages
                     target_id = None
             if target_id in page_ids:
                 resolved = relative_directory(directory, page_directory(target_id))
+            elif target_id is not None:
+                # A page the wiki does not have: pointed where it would be, and drawn red, so nobody takes
+                # it for a page that exists. `wiki check` refuses it through dead_link_problems().
+                return '%s="%s%s"%s' % (attribute, relative_directory(directory, page_directory(target_id)),
+                                        ("#" + fragment) if fragment else "", NEW_PAGE)
             else:
                 resolved = os.path.relpath(absolute, here.resolve()).replace(os.sep, "/")
         return '%s="%s%s"' % (attribute, resolved, ("#" + fragment) if fragment else "")
@@ -458,11 +465,17 @@ def rewrite_references(body, directory, site_root, root, images, page_ids, pages
     return ATTRIBUTE.sub(replace, body)
 
 
-def render_source(raw):
+def render_source(raw, copy_link=""):
     """The page's own markdown, and a button that copies it. The button adds no text of its own inside
-    the block, so what is copied is exactly the file."""
-    return ('<div class="srcbox"><button class="copy" type="button">Copy</button>'
-            '<pre class="src">%s</pre></div>' % html_module.escape(raw))
+    the block, so what is copied is exactly the file.
+
+    Above it, a link to the page's markdown copy, opened as the file itself: the one place a person looking
+    for the markdown already goes. The owner, 2026-09-14: "update markdown tab to be in source. but a link
+    to the markdown file instead"."""
+    link = ('<p class="hat">The page as a markdown file: <a href="%s">%s</a></p>'
+            % (copy_link, posixpath.basename(copy_link))) if copy_link else ""
+    return link + ('<div class="srcbox"><button class="copy" type="button">Copy</button>'
+                   '<pre class="src">%s</pre></div>' % html_module.escape(raw))
 
 
 # --------------------------------------------------------------------------------------------------
@@ -674,18 +687,16 @@ ARTICLE_ONLY = '      <ul><li><a class="sel">Article</a></li></ul>'
 
 
 def on_article():
-    """The tab row of an article: itself, its source, and its markdown copy, opened as the file itself."""
+    """The tab row of an article: itself, and its source beside it."""
     return ('      <ul><li><a class="sel">Article</a></li>'
-            '<li><a href="source/%s">Source</a></li>'
-            '<li><a href="%s">Markdown</a></li></ul>' % (LINK_SUFFIX, AGENT_COPY))
+            '<li><a href="source/%s">Source</a></li></ul>' % LINK_SUFFIX)
 
 
 def on_source():
     """And of a source view. Both go through LINK_SUFFIX: written by hand they were dead off disk, which
     is exactly the failure the suffix exists to prevent."""
     return ('      <ul><li><a href="../%s">Article</a></li>'
-            '<li><a class="sel">Source</a></li>'
-            '<li><a href="../%s">Markdown</a></li></ul>' % (LINK_SUFFIX, AGENT_COPY))
+            '<li><a class="sel">Source</a></li></ul>' % LINK_SUFFIX)
 
 
 def render_page(title, subtitle, hatnote, body_html, infobox, categories_bar, nav, index, site,
@@ -985,7 +996,7 @@ def write_site(root, out, audience, link_root, today, record, wiki):
             source_directory = directory + "source/"
             emit(source_directory, render_page(
                 page["title"], "markdown source of this page", "",
-                render_source(page["raw"]), "", "",
+                render_source(page["raw"], "../" + AGENT_COPY), "", "",
                 render_nav(sections, pages, categories, page_id, source_directory, audience),
                 index_for(source_directory), site, source_directory, template, on_source(),
                 dates[page_id]["updated"], stamps["wiki.css"], stamps["wiki.js"]))
@@ -1150,6 +1161,8 @@ CLAIM = re.compile(r"\[\^[^\]]+\]|\{missing\}")
 HEADING_ANY = re.compile(r"^#{1,6}[ \t].*$", re.M)
 # The start of a list item inside a block, so each item is read on its own.
 LIST_ITEM = re.compile(r"\n(?=[ \t]*(?:[-*+]|\d+\.)[ \t])")
+# The line under a table's header: pipes, dashes, colons and spaces only.
+TABLE_SEPARATOR = re.compile(r"^\s*\|?[\s:|-]*-[\s:|-]*$")
 # The end of a sentence: a full stop, question or exclamation mark, any closing quote, bracket or emphasis,
 # and the citations or mark that belong to the sentence -- then a space and what starts the next one: a
 # capital, a digit, code, emphasis or an opening bracket. A version number or an abbreviation has no space
@@ -1167,9 +1180,17 @@ LINK_ONLY = re.compile(r"^\s*(?:(?:[-*+]|\d+\.)\s+)?\[[^\]]+\]\([^)\s]+\)\s*$")
 
 
 def statements(block):
-    """The statements in one block of prose: each sentence of each list item, or a table as a whole."""
+    """The statements in one block of prose: each sentence of each list item, or each row of a table.
+
+    A table's rows are read one at a time, and its header is not read at all: a header names the columns
+    and states nothing. The owner, 2026-09-14: "a table row must have at least one citation in any of the
+    columns of its row" -- a table held as a whole let one cited row carry every row beside it.
+    """
     if block.startswith("|"):
-        return [block]
+        rows = block.split("\n")
+        if len(rows) > 1 and TABLE_SEPARATOR.match(rows[1]):
+            rows = rows[2:]
+        return [row.strip() for row in rows if row.strip()]
     found = []
     for item in LIST_ITEM.split(block):
         text = " ".join(item.split())
@@ -1226,8 +1247,8 @@ def uncited_problems(root, wiki=None):
     cited claim to someone scanning the page. A sentence never borrows its neighbour's citation: one
     citation used to cover a whole paragraph, and a claim beside a cited one read as though it were checked.
 
-    A sentence that links to another page is excused, because that page carries the citations. A table is
-    held as a whole, because a row is not a sentence.
+    A sentence that links to another page is excused, because that page carries the citations. A table row
+    is held to the rule the way a sentence is: a citation or the mark in any one of its cells.
     """
     pages_dir = wiki_of(root, wiki) / "pages"
     problems = []
@@ -1243,6 +1264,11 @@ def uncited_problems(root, wiki=None):
                 continue
             if (CLAIM.search(INLINE_CODE.sub("", statement)) or PAGE_LINK.search(statement)
                     or LINK_ONLY.match(statement)):
+                continue
+            if statement.startswith("|"):
+                problems.append("%s:%d: the table row %s cites nothing; give one of its cells a reference, "
+                                "or {missing} if there is none"
+                                % (path.relative_to(pages_dir), line, quoted(statement)))
                 continue
             problems.append("%s:%d: %s states something and cites nothing; give it a reference, or "
                             "{missing} if there is none"
@@ -1339,6 +1365,45 @@ def heading_problems(root, wiki=None):
             elif DEMONSTRATIVE.match(title):
                 problems.append(f"{path.relative_to(pages_dir)}: the heading {title!r} points at the page "
                                 "instead of naming anything; name the thing the section is about")
+    return problems
+
+
+def dead_link_problems(root, wiki=None):
+    """Links to a page the wiki does not have.
+
+    A link that leads nowhere looks exactly like one that leads somewhere until somebody follows it, and a
+    reader who does has been told a page exists that does not. The owner, 2026-09-14: a link to a missing
+    page is drawn red, "and that could be part of our dead link checks". Code is left alone, because a
+    sample shows a link as written; a link outside the pages, or off the site, is not a page link at all.
+    """
+    pages_dir = wiki_of(root, wiki) / "pages"
+    pages_root = pages_dir.resolve()
+    page_ids = {path.relative_to(pages_dir).with_suffix("").as_posix() for path in pages_dir.rglob("*.md")}
+    problems = []
+    for path in sorted(pages_dir.rglob("*.md")):
+        text = path.read_text(encoding="utf-8")
+        _, body = read_front_matter(path)
+        first = text[:len(text) - len(body)].count("\n") + 1
+
+        def blank(match):
+            return "\n" * match.group(0).count("\n")
+
+        # Blanked rather than removed, so every link keeps its line; inline code keeps its width too.
+        body = FENCED.sub(blank, FOOTNOTE.sub(blank, body))
+        body = INLINE_CODE.sub(lambda code: " " * len(code.group(0)), body)
+        for link in MARKDOWN_LINK.finditer(body):
+            opening, target, _ = link.groups()
+            address = target.partition("#")[0]
+            if opening.startswith("!") or SETTLED_LINK.match(target) or not address.endswith(".md"):
+                continue
+            try:
+                target_id = (path.parent / address).resolve().relative_to(pages_root).with_suffix("").as_posix()
+            except ValueError:
+                continue
+            if target_id not in page_ids:
+                problems.append(f"{path.relative_to(pages_dir)}:{first + body[:link.start()].count(chr(10))}: "
+                                f"links to {target}, which is no page in the wiki; write that page, or link "
+                                "to one that exists")
     return problems
 
 
@@ -1449,6 +1514,7 @@ def check(root, wiki=None, version=None):
         problems += citation_problems(root, wiki)
         problems += heading_problems(root, wiki)
         problems += pointing_problems(root, wiki)
+        problems += dead_link_problems(root, wiki)
         problems += uncited_problems(root, wiki)
         problems += infobox_problems(root, wiki)
         if version:

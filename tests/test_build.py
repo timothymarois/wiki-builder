@@ -242,14 +242,16 @@ class WikiTests(unittest.TestCase):
         self.assertTrue(index.startswith("# "), index[:60])
         self.assertIn("- [A thing](thing/index.md): what it is", index)
 
-    def test_a_page_and_its_source_view_link_to_the_markdown_copy(self):
-        # Anyone can open a page as pure markdown from the page itself. The owner, 2026-09-14: "we would
-        # want the docs to be viewable as pure md file content".
+    def test_a_source_view_links_to_the_markdown_file(self):
+        # Anyone can open a page as pure markdown from its Source view. The owner, 2026-09-14: "we would
+        # want the docs to be viewable as pure md file content", and then "update markdown tab to be in
+        # source. but a link to the markdown file instead".
         self.build()
         page = (self.out / "thing/index.html").read_text(encoding="utf-8")
         source = (self.out / "thing/source/index.html").read_text(encoding="utf-8")
-        self.assertIn('<li><a href="index.md">Markdown</a></li>', page)
-        self.assertIn('<li><a href="../index.md">Markdown</a></li>', source)
+        self.assertIn('<a href="../index.md">index.md</a>', source)
+        self.assertNotIn(">Markdown</a>", page, "the tab row still carries a Markdown tab")
+        self.assertNotIn(">Markdown</a>", source, "the tab row still carries a Markdown tab")
         self.assertTrue((self.out / "thing/index.md").is_file())
 
     def test_a_player_build_has_no_markdown_copy_and_no_agent_index(self):
@@ -328,7 +330,10 @@ class WikiTests(unittest.TestCase):
         ("numbered items", "1. first step\n2. second step", ["1. first step", "2. second step"]),
         ("a colon and a semicolon", "It is cheap; it is fast: both hold.[^a]", ["It is cheap; it is fast: both hold.[^a]"]),
         ("an ellipsis", "It waits... Then it goes.", ["It waits...", "Then it goes."]),
-        ("a table", "| a | b |\n|---|---|\n| c | d |", ["| a | b |\n|---|---|\n| c | d |"]),
+        ("a table, row by row, without its header", "| a | b |\n|---|---|\n| c | d |\n| e | f |",
+         ["| c | d |", "| e | f |"]),
+        ("a table with an aligned separator", "| a | b |\n|:--|--:|\n| c | d |", ["| c | d |"]),
+        ("a table with only a header", "| a | b |\n|---|---|", []),
     )
 
     def test_a_block_splits_into_its_sentences(self):
@@ -342,8 +347,16 @@ class WikiTests(unittest.TestCase):
         ("a link to a section of another page", "It is on [the front](index.md#top).", []),
         ("a link off the site", "It is on [the web](https://example.com/page).", ["It is on [the web]"]),
         ("a link to a picture", "It looks like [this](../images/thing.png).", ["It looks like"]),
-        ("a table with no citation", "| a | b |\n|---|---|\n| c | d |", ["| a | b |"]),
+        ("a table with no citation", "| a | b |\n|---|---|\n| c | d |", ["| c | d |"]),
         ("a table with one citation", "| a | b |\n|---|---|\n| c[^why] | d |", []),
+        # The owner, 2026-09-14: "a table row must have at least one citation in any of the columns of its
+        # row". One cited row no longer covers the rows beside it.
+        ("a cited row beside an uncited one", "| a | b |\n|---|---|\n| c[^why] | d |\n| e | f |", ["| e | f |"]),
+        ("a citation in the last cell", "| a | b |\n|---|---|\n| c | d[^why] |", []),
+        ("a row marked as having no source", "| a | b |\n|---|---|\n| c | d {missing} |", []),
+        ("a row linking to another page", "| a | b |\n|---|---|\n| c | [the front](index.md) |", []),
+        ("a row whose only mark is in code", "| a | b |\n|---|---|\n| c | `{missing}` |", ["| c |"]),
+        ("a header that cites nothing", "| a | b |\n|---|---|\n| c[^why] | d |", []),
         ("a quotation", "> It is quoted.", ["> It is quoted."]),
         ("a child item under a cited one", "- It is cited.[^why]\n  - It is not.", ["- It is not."]),
         ("a horizontal rule", "---", []),
@@ -682,6 +695,38 @@ class WikiTests(unittest.TestCase):
         self.write("thing", PAGE.replace("It does it slowly.[^why]", "It is written `{missing}` or `[^key]`."))
         problems = wiki.uncited_problems(self.root)
         self.assertTrue(any("It is written" in problem for problem in problems), problems)
+
+    # A link to a page the wiki does not have. The owner, 2026-09-14: "then its red instead of blue. and
+    # that could be part of our dead link checks".
+
+    def test_a_link_to_a_page_the_wiki_does_not_have_is_drawn_red(self):
+        self.write("thing", PAGE.replace("It does it slowly.[^why]",
+                                         "It does it slowly, as [a gone page](gone.md) says.[^why]"))
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertIn('<a href="../gone/index.html" class="new" title="This page does not exist">a gone page</a>',
+                      page)
+        front = (self.out / "index.html").read_text(encoding="utf-8")
+        self.assertNotIn('class="new"', front, "a link to a page that exists was drawn red")
+
+    def test_the_check_names_a_link_to_a_page_the_wiki_does_not_have(self):
+        self.write("thing", PAGE.replace("It does it slowly.[^why]",
+                                         "It does it slowly, as [a gone\npage](gone.md#top) says.[^why]"))
+        self.assertEqual(["thing.md:%d: links to gone.md#top, which is no page in the wiki; write that page, "
+                          "or link to one that exists" % self.line_of("thing", "It does it slowly")],
+                         wiki.dead_link_problems(self.root))
+        problems, *_ = wiki.check(self.root)
+        self.assertTrue(any("gone.md#top" in problem for problem in problems), problems)
+
+    def test_a_link_that_is_not_to_a_missing_page_is_not_dead(self):
+        for text in ("See [the front](index.md).[^why]",
+                     "Type `[x](gone.md)` for a link.[^why]",
+                     "A sample.[^why]\n\n```markdown\n[x](gone.md)\n```",
+                     "See [the notes](../../../README.md).[^why]",
+                     "See [the web](https://example.com/gone.md).[^why]"):
+            with self.subTest(text=text):
+                self.write("thing", PAGE.replace("It does it slowly.[^why]", text))
+                self.assertEqual([], wiki.dead_link_problems(self.root))
 
     def test_a_markdown_table_is_drawn_as_a_wiki_table(self):
         # Without the class, a page's own table had no borders, no header row and no padding.

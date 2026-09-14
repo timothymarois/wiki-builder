@@ -21,7 +21,7 @@ group = "Requirements"
 rows = [
   { label = "Python", value = "3.11 or newer" },
   { label = "Parser", value = "mistune, pinned exactly" },
-  { label = "Runner", value = "uv" },
+  { label = "Runner", value = "uv or pip" },
 ]
 +++
 
@@ -31,13 +31,13 @@ wiki-builder renders markdown into a wiki a person can read, and then refuses th
 documentation rot. A project installs it rather than copying it in, and it knows nothing about what it
 documents.
 
-It has two halves, and the second is the reason it exists:
+It has two halves, and the second is why it exists:
 
 - **A generator.** Pages with TOML front matter become a static site with a sidebar, infobox, contents,
   citations, search and pictures, that works served or from disk.
 - **A set of refusals.** A sentence or an infobox row that states something and cites nothing. A reference
-  that cites a project document rather than code. A heading that asks a question instead of naming its section. A
-  page longer than anyone will read. A page edited since its date was recorded. A picture whose subject
+  linking to a markdown document. A heading that asks a question or rates itself. A name or sentence that
+  points instead of naming. A page longer than anyone will read. A page edited since its date was recorded. A picture whose subject
   has changed. A page nobody can reach.
 
 ## Reasoning
@@ -64,7 +64,7 @@ them.
 ## Scope
 
 - **Covers:** rendering; the checks; the skill; a local server that shows the site and the project's
-  files; a published build with clean addresses; a reader-facing build with everything internal removed;
+  files; a published build with clean addresses; a player build with everything internal removed;
   carrying rule changes into a project; a GitHub Action for a project's CI; guides to installing and
   deploying a wiki.
 - **Refuses:** knowing anything about the project it documents, which a test over the code and the skill

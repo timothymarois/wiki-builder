@@ -21,83 +21,84 @@ group = "Rules"
 rows = [
   { label = "Unit checked", value = "sentence", cite = "uncited" },
   { label = "Infobox rows", value = "cited, or marked missing", cite = "rows" },
-  { label = "Code samples", value = "not checked", cite = "sample" },
-  { label = "Refused reference", value = "a link to a markdown document", cite = "document" },
-  { label = "Outside documentation", value = "allowed, as a link", cite = "document" },
-  { label = "Exempt pages", value = "pages about the wiki itself", cite = "exempt" },
+  { label = "Code samples", value = "not checked", cite = "excused" },
+  { label = "Refused reference", value = "a link containing .md", cite = "document" },
+  { label = "Outside documentation", value = "allowed, as a link without .md", cite = "document" },
+  { label = "Exempt pages", value = "any page with goals = false", cite = "exempt" },
 ]
 +++
 
 A **citation** is a numbered mark at a claim, with its reference at the foot of the page, written as a
-markdown footnote.[^render] Two checks hold citations to account: one for a sentence that cites nothing,
-and one for a reference that cites the wrong kind of thing.[^uncited]
+markdown footnote.[^render] Three checks hold citations to account: one each for a sentence and an infobox
+row that cite nothing, and one for a reference that cites the wrong kind of thing.[^three]
 
 ## Silence
 
 Every sentence must carry a citation, or the red mark that says there is none.[^uncited] If one does not,
-the check names the page and the line, and quotes the sentence.[^uncited]
+the check names the page and the line, and quotes the sentence.[^uncited] **The check looks for the mark,
+not the reference behind it**: a sentence naming a footnote the page never defines passes, and shows the
+mark as plain text.[^undefined]
 
 A citation after the full stop belongs to its sentence, and **a sentence never borrows its neighbour's
-citation**.[^uncited] A version number or an abbreviation does not end a sentence.[^boundary] A sentence
-written directly under its heading is checked like any other.[^heading]
+citation**.[^uncited] A version number does not end a sentence, but an abbreviation followed by a capital
+does, so `Dr. Smith` is read as two sentences.[^boundary] A sentence directly under a heading is checked
+like any other.[^heading]
 
-A sentence that links to another page is excused, because that page carries the citations, and a table is
-held as a whole.[^excused] A list item that is only a link, such as an entry under External links, states
-nothing and is excused as well.[^excused] A code sample needs no citation, because it is the thing itself
-rather than a claim about it; the sentence introducing it does.[^sample]
+Four things are excused: a sentence linking to any markdown file, even one that does not exist; a list
+item that is only a link; a code sample; and a picture with its caption.[^excused] **Every table row carries a citation, or the red mark, in at least one of its cells**, and a row with
+neither is named with its line; a table whose rows cite nothing is a gap, not an excuse.[^rowcite] The owner,
+2026-09-14: "a table row must have at least one citation in any of the columns of its row".[^rowcite]
+The header row is exempt.[^rowcite]
 
-An infobox row is held to the same rule.[^rows] It names a footnote the page's text cites for the same
-fact, and carries that citation's number, or it is marked as having no source; a row with neither is
-refused, and so is one citing a footnote no sentence uses.[^rows]
-
-Pages about the wiki itself, such as the front page, are excused.[^exempt]
+An infobox row cites a footnote the page's text also cites, and carries that citation's number, or is
+marked as having no source; a row with neither, or citing a footnote no sentence uses, is refused.[^rows]
+A page that says `goals = false` is excused from both rules, whatever it describes.[^exempt]
 
 ## Red mark
 
 Where nothing can be cited, the writer puts the word *missing* in curly braces, and it renders as a red
-question mark in brackets where a citation would go.[^mark] **It is a fine answer; silence is
-not.**[^uncited] It means either that the thing is not built or that nobody has found where it happens,
-and to a reader both mean the same thing: do not take this on faith.[^mark] A reader-facing build removes
-all of them.[^player] Inside code, the mark is shown as written, and neither counts nor answers for
-its sentence.[^code]
+question mark in brackets.[^mark] **It is a fine answer; silence is not.**[^uncited] It means the thing is
+not built or nobody has found where it happens, and to a reader both mean the same: do not take this on
+faith.[^mark] A player build removes every mark.[^player] Inside code, the mark is shown as written and
+counts for nothing.[^code]
 
-Every build and check prints how many sources each page cites and how many claims it marks as having none,
-with totals for the wiki, so how much of it is taken on faith is visible on every run.[^counts]
-`wiki check` also lists every claim marked as having no source, with its page and line, without
-failing.[^marks]
+Every build and check prints how many sources each page cites and how many claims it marks, with totals
+for the wiki.[^counts] `wiki check` also lists every marked claim by page and line, without failing.[^marks]
 
 ## Documents
 
-A reference that links to a markdown document is refused.[^document] A page of prose is only another
-claim, and it can be wrong in exactly the way the citing page is.[^document]
-
-A reference to an outside service's own documentation is a link that does not end in `.md`, so it
-passes; it is how a page cites the behaviour of something outside the project.[^document]
-
-Only a link is recognised: **a reference that names a document without linking to it passes**, and so does
-a reference that names nothing at all.[^document]
+A reference whose link contains `.md` anywhere is refused, because a page of prose is only another claim
+that can be wrong in the same way.[^document] Outside documentation passes when its address has no `.md`,
+so **a README on GitHub is refused like a project document**.[^document] A reference that names a document
+without linking to it passes, and so does one that names nothing.[^document]
 
 [^render]: `src/builder/build.py` — `footnote_reference()`, `footnote_item()` and `footnote_block()`,
     registered in `make_markdown()`.
-[^uncited]: `src/builder/build.py` — `uncited_problems()` reads each sentence from `page_statements()` and
-    accepts one containing a footnote or `CLAIM` match; `citation_problems()` checks each reference.
-[^boundary]: `src/builder/build.py` — `BOUNDARY` ends a sentence only at a full stop, question or
-    exclamation mark followed by a space and a capital, a digit, code, emphasis or an opening bracket.
+[^three]: `src/builder/build.py` — `uncited_problems()`, `infobox_problems()` and `citation_problems()`,
+    each called from `check()`.
+[^uncited]: `src/builder/build.py` — `uncited_problems()` reads each sentence from `page_statements()`,
+    accepts one containing a `CLAIM` match, and quotes one that has none with `quoted()`.
+[^undefined]: `src/builder/build.py` — `CLAIM` matches any footnote mark, whether or not the page defines
+    that footnote; the footnotes plugin in `make_markdown()` leaves an undefined one as text.
+[^boundary]: `src/builder/build.py` — `BOUNDARY` ends a sentence at a full stop, question or exclamation
+    mark followed by a space and a capital, a digit, a quotation mark, code, emphasis or an opening
+    bracket, and knows no abbreviations.
 [^heading]: `src/builder/build.py` — `page_statements()` blanks every heading line with `HEADING_ANY`
     before reading the body.
-[^excused]: `src/builder/build.py` — `uncited_problems()` skips a sentence matching `PAGE_LINK` or `LINK_ONLY`, and
-    `statements()` returns a block that starts with `|` whole.
-[^sample]: `src/builder/build.py` — `page_statements()` blanks fenced code with `FENCED`, so a sample is
-    never read as sentences.
+[^excused]: `src/builder/build.py` — `uncited_problems()` skips a sentence matching `PAGE_LINK`, which
+    looks for no file, or `LINK_ONLY`; `page_statements()` blanks fenced code with `FENCED` and skips a
+    block that starts with `![`; `statements()` reads a block that starts with `|` row by row.
+[^rowcite]: `src/builder/build.py` — `statements()` returns each row of a table after its header and
+    `TABLE_SEPARATOR`, and `uncited_problems()` names a row with no citation or mark as a table row.
 [^rows]: `src/builder/build.py` — `infobox_problems()`, and `render_infobox()`, which gives a cited row
     the number `footnote_reference()` recorded for its footnote.
-[^exempt]: `src/builder/build.py` — `uncited_problems()` skips a page whose front matter says
-    `goals = false`.
+[^exempt]: `src/builder/build.py` — `uncited_problems()` and `infobox_problems()` skip a page whose front
+    matter says `goals = false`.
 [^mark]: `src/builder/build.py` — `MISSING` and `MISSING_CITATION`, applied in `write_site()`.
 [^player]: `src/builder/build.py` — `for_player()` removes every `INTERNAL_MARKER`.
 [^code]: `src/builder/build.py` — `write_site()` draws the mark only outside `CODE_HTML`; `citation_counts()`,
     `missing_marks()` and `uncited_problems()` remove `INLINE_CODE` before looking for it.
 [^counts]: `src/builder/build.py` — `citation_counts()`, printed by `report()`.
 [^marks]: `src/builder/build.py` — `missing_marks()`, printed by `run()` in `src/builder/cli.py`.
-[^document]: `src/builder/build.py` — `citation_problems()` matches `DOCUMENT_LINK`, a markdown link
-    ending in `.md`, inside each footnote.
+[^document]: `src/builder/build.py` — `citation_problems()` matches `DOCUMENT_LINK`, a markdown link whose
+    address contains `.md` anywhere, inside each footnote; its comment gives the reason.

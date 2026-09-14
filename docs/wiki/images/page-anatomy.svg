@@ -14,7 +14,6 @@
   <rect x="200" y="16" width="504" height="32" rx="6" fill="#ffffff" stroke="#c8ccd1"/>
   <text x="214" y="37" font-weight="700" fill="#202122">Article</text>
   <text x="272" y="37" fill="#3366cc">Source</text>
-  <text x="324" y="37" fill="#3366cc">Markdown</text>
   <text x="656" y="37" fill="#54595d">Auto</text>
   <!-- the article -->
   <rect x="200" y="58" width="504" height="366" rx="6" fill="#ffffff" stroke="#c8ccd1"/>

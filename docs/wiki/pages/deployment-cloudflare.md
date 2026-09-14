@@ -27,21 +27,21 @@ rows = [
 ]
 +++
 
-`wiki publish` builds the site into a folder, with addresses that end in a folder rather than a
-file.[^publish] Every page is a folder holding one `index.html`, and every link names the folder, so no address a reader follows ends in `.html` and no host setting is needed to hide it.[^publish] What the build makes is described on [Site](site.md), and the same guide for another
-free host on [Deployment (GitHub)](deployment-github.md).
+Cloudflare Pages builds a project's wiki from its repository with one build command, which installs
+wiki-builder, checks the wiki and runs `wiki publish`.[^git] If the check fails, the command stops and
+nothing is published.[^exit] What `wiki publish` makes is described on [wiki publish](commands/publish.md),
+and the same guide for GitHub on [Deployment (GitHub)](deployment-github.md).
 
 ## Build
 
-Cloudflare Pages runs one build command for a project, and the command below checks the wiki before it
-publishes it.[^git][^exit]
+The build command is one line.[^git]
 
 ```sh
 pip install "git+https://github.com/timothymarois/wiki-builder@TAG" && wiki check && wiki publish _site
 ```
 
-`wiki check` exits with 1 when it finds any problem, so the command stops there and nothing is
-published.[^exit] `wiki publish` then builds into `_site`, the folder Cloudflare serves.[^publish]
+`wiki check` exits with 1 when it finds any problem, so the command stops there.[^exit] `wiki publish` then
+builds into `_site`, the folder Cloudflare serves.[^publish][^output]
 
 ## Settings
 
@@ -50,10 +50,10 @@ build settings are entered then.[^git]
 
 | Setting | Value |
 |---|---|
-| Framework preset | left blank[^git] |
+| Framework preset | none{missing} |
 | Build command | the command above[^exit] |
 | Build output directory | `_site`[^publish] |
-| Python version | the build image's default, 3.13.3 in the current image, above wiki-builder's 3.11 floor[^image][^floor] |
+| Python version | the build image's default, newer than wiki-builder's 3.11 floor[^image][^floor] |
 | Custom domain | the subdomain, added under the project's custom domains[^domains] |
 
 When the domain's zone is already on Cloudflare, adding the custom domain creates its DNS record.[^domains]
@@ -68,13 +68,16 @@ When the domain's zone is already on Cloudflare, adding the custom domain create
 
 [^publish]: `src/builder/cli.py` — `run()` builds with `links="clean"` for `publish`, into the folder it is
     given; `build()` then empties `LINK_SUFFIX`, so a link names the folder and not its `index.html`.
-[^git]: Cloudflare Docs — [Git integration guide](https://developers.cloudflare.com/pages/get-started/git-integration/): a project is created
-    from Workers & Pages with Create application, Pages and Connect to Git, where the build command and build
-    output directory are set, and the framework preset is left blank for a project without a framework.
-[^image]: Cloudflare Docs — [Build image](https://developers.cloudflare.com/pages/configuration/build-image/): the current image's default
-    Python is 3.13.3, and `PYTHON_VERSION` selects another.
+[^git]: Cloudflare Docs — [Git integration guide](https://developers.cloudflare.com/pages/get-started/git-integration/):
+    a project is created from Workers & Pages with Create application, Pages and Connect to Git, where
+    its build command and build output directory are set.
+[^output]: Cloudflare Docs — [Build configuration](https://developers.cloudflare.com/pages/configuration/build-configuration/):
+    the build output directory is where the build command writes the built version of the site.
+[^image]: Cloudflare Docs — [Build image](https://developers.cloudflare.com/pages/configuration/build-image/):
+    the current image's default Python is 3.13.3, and `PYTHON_VERSION` selects another.
 [^floor]: `pyproject.toml` — `requires-python = ">=3.11"`.
-[^domains]: Cloudflare Docs — [Custom domains](https://developers.cloudflare.com/pages/configuration/custom-domains/): when the site is
-    already a Cloudflare zone, its `CNAME` record is added automatically once the DNS record is confirmed.
+[^domains]: Cloudflare Docs — [Custom domains](https://developers.cloudflare.com/pages/configuration/custom-domains/):
+    when the site is already a Cloudflare zone, its `CNAME` record is added automatically once the DNS
+    record is confirmed.
 [^exit]: `src/builder/cli.py` — `run()` returns 1 when `check()` finds a problem, and `main()` returns
     that as the exit code.

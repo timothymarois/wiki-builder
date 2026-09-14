@@ -32,7 +32,8 @@ without adopting a convention for its own assets.[^digest]
 ## Records
 
 A page showing a picture that has no record stops the build, and so does a record for a picture file that
-is missing.[^missing] A record naming a folder covers every file in it, so a change to any of those files
+is missing.[^missing] A record whose `depicts` names a path that is not in the project, or a folder holding
+no files, stops the check.[^subject] A record naming a folder covers every file in it, so a change to any of those files
 flags the picture.[^digest]
 
 ## Blessing
@@ -55,6 +56,8 @@ own wiki fails until the picture is redrawn or blessed.[^here]
     path.
 [^missing]: `src/builder/build.py` — `rewrite_references()` and `render_infobox()` refuse an unrecorded
     picture; `write_site()` refuses a record with no file.
+[^subject]: `src/builder/build.py` — `subject_digest()` raises `WikiError` for both, when
+    `picture_problems()` or `bless()` reads the record.
 [^bless]: `src/builder/build.py` — `bless()` refuses an empty reason and writes `digest` and `blessed`
     through `write_ledger()`.
 [^unguarded]: `src/builder/build.py` — `picture_problems()` checks an entry only when it has a `digest`.

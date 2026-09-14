@@ -14,7 +14,7 @@ documentation stop being true. Every page here was written with it and passes it
 describes the tool and demonstrates it.
 
 The [brief](brief.md) says in one screen what the tool is, who it is for and what it refuses.
-[Installation](installation.md) starts a wiki in a project, and two guides put it on the web for free, on
+[Installation](installation.md) starts a wiki in a project, and two guides put it on the web, on
 [GitHub](deployment-github.md) or [Cloudflare](deployment-cloudflare.md).
 
 A person writes [pages](pages.md), and an agent learns to write them from the [skill](skill.md). The

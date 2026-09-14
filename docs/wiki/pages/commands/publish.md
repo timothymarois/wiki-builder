@@ -49,14 +49,16 @@ wiki publish site-out
 
 ## Output
 
-It prints what `wiki build` prints, then a reminder that the result needs a server.[^output] On a wiki of
-three pages:[^output]
+It prints what `wiki build` prints, then a reminder that the result needs a server.[^output] Like
+`wiki build`, it records each changed page's date in `UPDATED.toml`.[^dates] On a wiki of three pages,
+with the folder being wherever the command ran:[^output]
 ```text
-wiki: goals                              20 words    0 cited    0 missing
-wiki: index                               3 words    0 cited    0 missing
-wiki: refunds                            29 words    1 cited    1 missing
+wiki: goals                              25 words    0 cited    0 missing
+wiki: index                               8 words    0 cited    0 missing
+wiki: refunds                            22 words    1 cited    1 missing
 wiki: 1 source cited, 1 claim marked as having no source
-wiki: the collected goals read in 15 words
+wiki: the collected goals read in 17 words
+wiki: these budgets are PROVISIONAL -- 500 words a page, 3500 for the collected goals. Nobody has measured what this project's reader will actually read; until they have, the numbers are a guess that happens to be enforced. Set budget.calibrated in wiki.toml when they have.
 wiki: 3 pages written to /path/to/notes/site-out
 wiki: /path/to/notes/site-out uses clean addresses and needs a server; the site itself opens without one
 ```
@@ -66,14 +68,16 @@ wiki: /path/to/notes/site-out uses clean addresses and needs a server; the site 
 | Code | Condition | Message |
 |---|---|---|
 | `0` | the site is built[^exit] | `wiki: /path/to/notes/site-out uses clean addresses and needs a server; the site itself opens without one` |
-| `1` | a problem stops the build | the problem |
-| `2` | `OUT` is not empty and was not made by the tool | `wiki: /path/to/notes/taken is not empty and was not written by this tool; remove it yourself if you meant to replace it` |
-| `2` | there is no wiki where it was pointed | `wiki: no wiki at nowhere` |
+| `1` | a problem stops the build[^exit] | the problem |
+| `2` | `OUT` is not empty and was not made by the tool[^exit] | `wiki: /path/to/notes/taken is not empty and was not written by this tool; remove it yourself if you meant to replace it` |
+| `2` | there is no wiki where it was pointed[^exit] | `wiki: no wiki at nowhere` |
 
 [^publish]: `src/builder/cli.py` — `run()` builds into `OUT` with `links="clean"`.
 [^usage]: `src/builder/cli.py` — `main()` gives `publish` the positional `out`; `run()` resolves it from
     the working directory and passes it to `guard_output()`.
 [^output]: `src/builder/cli.py` — `run()` calls `report()`, then prints the page count, the folder, and
     that clean addresses need a server.
+[^dates]: `src/builder/cli.py` — `run()` calls `build()`, and `write_site()` in `src/builder/build.py`
+    records dates in `UPDATED.toml`.
 [^exit]: `src/builder/cli.py` — `run()` returns 2 when `guard_output()` refuses; `main()` returns 2 with no
     wiki and 1 for a `WikiError`.

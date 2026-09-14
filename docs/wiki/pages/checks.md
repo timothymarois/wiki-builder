@@ -42,7 +42,9 @@ something, not that the citation is true; an agent checks that from the [Review 
 |---|---|
 | A sentence that cites nothing, or a reference to a document[^cited] | [Citations](checks/citations.md) |
 | An infobox row that cites nothing[^rows] | [Citations](checks/citations.md) |
-| A heading that asks a question or rates its contents[^headings] | [Headings](checks/headings.md) |
+| A heading that asks a question, rates its contents or points at the page[^headings] | [Headings](checks/headings.md) |
+| A title, label or sentence that points at the project instead of naming it[^pointing] | [Pointing words](checks/pointing.md) |
+| A link to a wiki page that does not exist[^deadlinks] | [Site](site.md) |
 | A page longer than its budget[^budget] | [Reading budgets](checks/budgets.md) |
 | A picture whose subject has changed[^pictures] | [Pictures](checks/pictures.md) |
 | A page edited since its date was recorded[^dates] | [Site](site.md) |
@@ -50,20 +52,24 @@ something, not that the citation is true; an agent checks that from the [Review 
 
 ## Stoppages
 
-Some problems **stop the build** instead of joining the list: a page with no intent, a page that nobody
-can reach, a sidebar naming a page that does not exist, or a picture with no record.[^stop] When that
-happens, only that one problem is reported, as a single sentence, and the command exits with 1.[^caught]
+Some problems **stop the build** instead of joining the list, such as a missing `wiki.toml` or `goals.md`,
+a page with no title or intent, a page that nobody can reach, a sidebar naming a page that does not exist
+or a picture with no record.[^stop] When that happens, only that one problem is reported, as a single
+sentence, and the command exits with 1.[^caught]
 
 [^check]: `src/builder/build.py` — `check()` builds into a temporary folder and gathers every problem;
-    `src/builder/cli.py` — `main()` prints them and returns 1 if there are any, 0 if not, and 2 when
-    there is no wiki.
+    `src/builder/cli.py` — `run()` prints them and returns 1 if there are any and 0 if not, and `main()`
+    returns 2 when there is no wiki.
 [^cited]: `src/builder/build.py` — `uncited_problems()` and `citation_problems()`.
 [^rows]: `src/builder/build.py` — `infobox_problems()`.
 [^headings]: `src/builder/build.py` — `heading_problems()`.
+[^pointing]: `src/builder/build.py` — `pointing_problems()`.
+[^deadlinks]: `src/builder/build.py` — `dead_link_problems()`.
 [^budget]: `src/builder/build.py` — `budget_problems()`.
 [^pictures]: `src/builder/build.py` — `picture_problems()`.
 [^dates]: `src/builder/build.py` — `date_problems()`.
 [^version]: `src/builder/build.py` — `version_problems()`.
-[^stop]: `src/builder/build.py` — `read_pages()`, `write_site()`, `render_nav()` and
-    `rewrite_references()` raise `WikiError`.
+[^stop]: `src/builder/config.py` — `read_config()`; `src/builder/build.py` — `read_pages()`,
+    `write_site()`, `render_nav()`, `render_infobox()`, `rewrite_references()` and `subject_digest()`
+    raise `WikiError`.
 [^caught]: `src/builder/cli.py` — `main()` catches `WikiError`, prints it, and returns 1.

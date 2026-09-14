@@ -18,7 +18,7 @@ rows = [
 [[infobox]]
 group = "Values"
 rows = [
-  { label = "Skill folder", value = ".agents/skills, else .claude/skills", cite = "group" },
+  { label = "Skill folder", value = ".agents/skills, else .claude/skills", cite = "home" },
   { label = "Release record", value = "wiki.toml", cite = "sync" },
 ]
 
@@ -46,13 +46,14 @@ wiki sync
 
 | Option | Meaning | Default |
 |---|---|---|
-| `--skill-dir DIR` | the folder to put the skill in, relative to the project[^group] | `.agents/skills` if it exists, otherwise `.claude/skills` |
-| `--no-skill` | record the release without writing the skill | the skill is written |
+| `--skill-dir DIR` | the folder to put the skill in, relative to the project[^group] | `.agents/skills` if it exists, otherwise `.claude/skills`[^home] |
+| `--no-skill` | record the release without writing the skill[^noskill] | the skill is written |
 
 ## Output
 
-It names each file it wrote, leaving out any already up to date, then the release it recorded.[^output]
-In a project with an `.agents/skills` folder:[^output]
+It names each file it wrote, leaving out any already up to date, then the release it recorded.[^output] It
+deletes nothing, so a file a newer release no longer ships stays where it is.[^output] In a project with
+an `.agents/skills` folder:[^output]
 ```text
 wiki: wrote .agents/skills/writing-wiki-pages/SKILL.md
 wiki: wrote .agents/skills/writing-wiki-pages/references/naming-and-grammar.md
@@ -62,19 +63,36 @@ wiki: wrote .agents/skills/writing-wiki-pages/references/reference-standard.md
 wiki: wiki.toml records wiki-builder 0.1.0
 ```
 
+With `--no-skill`, it says so in place of the files:[^output]
+```text
+wiki: the skill was left out, as asked
+wiki: wiki.toml records wiki-builder 0.1.0
+```
+
+When `wiki.toml` has a `[tool]` table with no `version` line, nothing is recorded, although the last line
+still says it was.[^record]
+
 ## Exit codes
 
 | Code | Condition | Message |
 |---|---|---|
 | `0` | the release is recorded[^exit] | `wiki: wiki.toml records wiki-builder 0.1.0` |
-| `1` | there is no `wiki.toml` to record it in | ``wiki: there is no wiki.toml in /path/to/notes/docs/wiki; write one with a [site] name and at least one [[section]], then run `wiki sync` again`` |
-| `2` | both skill options are given | `wiki sync: error: argument --skill-dir: not allowed with argument --no-skill` |
-| `2` | there is no wiki where it was pointed | `wiki: no wiki at nowhere` |
+| `1` | there is no `wiki.toml` to record it in; the skill has already been written, and is not listed[^exit] | ``wiki: there is no wiki.toml in /path/to/notes/docs/wiki; write one with a [site] name and at least one [[section]], then run `wiki sync` again`` |
+| `2` | both skill options are given; the one given second is named first[^exit] | `wiki sync: error: argument --skill-dir: not allowed with argument --no-skill` |
+| `2` | there is no wiki where it was pointed[^exit] | `wiki: no wiki at nowhere` |
 
 [^sync]: `src/builder/cli.py` — `sync()`, and `record_version()` in `src/builder/config.py`.
 [^group]: `src/builder/cli.py` — `main()` puts `--skill-dir` and `--no-skill` in one mutually exclusive
     group; `skill_home()` joins a given folder to the project.
-[^output]: `src/builder/cli.py` — `sync()` prints each file it wrote and the recorded release.
+[^home]: `src/builder/cli.py` — `skill_home()` tries `.agents/skills`, then `.claude/skills`, and falls
+    back to `.claude/skills`.
+[^output]: `src/builder/cli.py` — `sync()` prints each file it wrote, the line for a skill left out and
+    the recorded release, and deletes nothing.
+[^record]: `src/builder/config.py` — `record_version()` replaces the first line starting `version` after
+    `[tool]`, and adds nothing when no such line follows.
 [^exit]: `src/builder/cli.py` — `main()` returns 2 with no wiki and 1 for a `WikiError`, and argparse exits
-    2 when both options are given; `src/builder/config.py` — `record_version()` raises `WikiError` when
-    `wiki.toml` is missing.
+    2 when both options are given; `sync()` copies the skill before `record_version()` in
+    `src/builder/config.py` raises `WikiError` for a missing `wiki.toml`.
+[^noskill]: `src/builder/cli.py` — `main()` declares `--no-skill` off by default, and `run()` passes
+    `skill=not args.no_skill` to `sync()`, which writes the skill only when asked and records the release
+    either way.

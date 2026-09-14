@@ -17,7 +17,7 @@ rows = [
 [[infobox]]
 group = "Values"
 rows = [
-  { label = "Output", value = "docs/wiki/site", cite = "build" },
+  { label = "Output", value = "docs/wiki/site", note = "site inside the wiki folder", cite = "build" },
 ]
 
 [[infobox]]
@@ -29,8 +29,9 @@ rows = [
 ]
 +++
 
-`wiki build` renders every page into `docs/wiki/site`, and records the day each changed page last
-changed.[^build] What the site holds is described on [Site](../site.md).
+`wiki build` renders every page into `site` inside the wiki folder, `docs/wiki/site` by default, and
+records the day each changed page last changed.[^build] What the site holds is described on
+[Site](../site.md).
 
 ## Usage
 
@@ -44,13 +45,15 @@ wiki build
 
 It prints each page's word count and citations, then the totals, the words in the collected goals, and
 how many pages it wrote and where.[^report] It also names any draft waiting on the owner, and warns while
-the reading budgets are uncalibrated.[^report] On a wiki of three pages:[^report]
+the reading budgets are uncalibrated.[^report] On a wiki of three pages, with the folder on the last line
+being wherever the wiki sits:[^report]
 ```text
-wiki: goals                              20 words    0 cited    0 missing
-wiki: index                               3 words    0 cited    0 missing
-wiki: refunds                            29 words    1 cited    1 missing
+wiki: goals                              25 words    0 cited    0 missing
+wiki: index                               8 words    0 cited    0 missing
+wiki: refunds                            22 words    1 cited    1 missing
 wiki: 1 source cited, 1 claim marked as having no source
-wiki: the collected goals read in 15 words
+wiki: the collected goals read in 17 words
+wiki: these budgets are PROVISIONAL -- 500 words a page, 3500 for the collected goals. Nobody has measured what this project's reader will actually read; until they have, the numbers are a guess that happens to be enforced. Set budget.calibrated in wiki.toml when they have.
 wiki: 3 pages written to /path/to/notes/docs/wiki/site
 ```
 
@@ -61,10 +64,10 @@ It refuses to write into a folder that is not empty and was not made by an earli
 | Code | Condition | Message |
 |---|---|---|
 | `0` | the site is written[^exit] | `wiki: 3 pages written to /path/to/notes/docs/wiki/site` |
-| `1` | a problem stops the build | the problem, such as `wiki: there is no goals.md; the collected goals need a page to be collected onto` |
-| `2` | there is no wiki where it was pointed | `wiki: no wiki at nowhere` |
-| `2` | the site folder holds files the tool did not write | `wiki: /path/to/notes/docs/wiki/site is not empty and was not written by this tool; remove it yourself if you meant to replace it` |
-| `2` | an option it does not know | `wiki: error: unrecognized arguments: --unknown` |
+| `1` | a problem stops the build[^stop] | the problem, such as `wiki: there is no goals.md; the collected goals need a page to be collected onto` |
+| `2` | there is no wiki where it was pointed[^exit] | `wiki: no wiki at nowhere` |
+| `2` | the site folder holds files the tool did not write[^exit] | `wiki: /path/to/notes/docs/wiki/site is not empty and was not written by this tool; remove it yourself if you meant to replace it` |
+| `2` | an option it does not know[^exit] | `wiki: error: unrecognized arguments: --unknown` |
 
 [^build]: `src/builder/cli.py` — `run()` builds into `site` inside the wiki folder;
     `src/builder/build.py` — `write_site()` writes `UPDATED.toml` when a page's digest changes.
@@ -74,3 +77,5 @@ It refuses to write into a folder that is not empty and was not made by an earli
 [^guard]: `src/builder/cli.py` — `guard_output()`.
 [^exit]: `src/builder/cli.py` — `main()` returns 2 with no wiki and prints a `WikiError` before returning 1;
     `run()` returns 2 when `guard_output()` refuses; argparse exits 2 on an option it does not know.
+[^stop]: `src/builder/cli.py` — `main()` prints a `WikiError` and returns 1; `src/builder/build.py` —
+    `write_site()` raises the one for a wiki with no `goals.md`.

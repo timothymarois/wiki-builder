@@ -39,7 +39,7 @@ each must be a positive whole number.[^config]
 
 A page is counted from its markdown, **leaving out its references and code blocks**, so citing costs
 nothing and a sample to copy, such as a prompt, costs nothing either.[^count]
-Words are split on spaces, so a table's borders and a link's address count as words too.[^count]
+Words are split on spaces, so a table's borders count as words too.[^count]
 
 The goals page is not held to the page limit.[^goals] What it collects is measured against the goals limit
 instead.[^goals]
@@ -51,8 +51,8 @@ anything else is checked.[^intent] Every build and every check prints each page'
 
 ## Calibration
 
-Until the settings file marks the budgets as calibrated, every run warns that the numbers are a guess that
-happens to be enforced.[^calibrated] Nobody knows what a project's readers will read until somebody
+Until `[budget]` in `wiki.toml` sets `calibrated = true`, every build and check warns that the numbers are
+a guess that happens to be enforced.[^calibrated] Nobody knows what a project's readers will read until somebody
 measures it.[^calibrated]
 
 [^defaults]: `src/builder/config.py` — `DEFAULT_BUDGET`.
@@ -64,8 +64,8 @@ measures it.[^calibrated]
     for the page limit and compares `goals_words` with the goals limit.
 [^over]: `src/builder/build.py` — `budget_problems()`.
 [^intent]: `src/builder/build.py` — `read_pages()` raises `WikiError`.
-[^report]: `src/builder/build.py` — `report()`, called by `main()` in
+[^report]: `src/builder/build.py` — `report()`, called by `run()` in
     `src/builder/cli.py`.
-[^calibrated]: `src/builder/build.py` — `report()` prints the
-    provisional warning while `budget.calibrated` is false, its default in
-    `src/builder/config.py`.
+[^calibrated]: `src/builder/build.py` — `report()` prints the provisional warning while
+    `budget.calibrated` is false, its default in `DEFAULT_BUDGET` in `src/builder/config.py`;
+    `src/builder/cli.py` — `run()` calls `report()` for every command but `sync` and `bless`.

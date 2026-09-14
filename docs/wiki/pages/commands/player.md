@@ -1,6 +1,6 @@
 +++
 title = "wiki player"
-subtitle = "build the view for people outside the project"
+subtitle = "build the pages marked for players"
 status = "approved"
 intent = """
 wiki player exists so that the pages meant for people outside the project can be handed to them with
@@ -31,8 +31,8 @@ rows = [
 +++
 
 `wiki player` builds only the pages marked for players into the folder it is given, with every
-reference, red mark and Source tab removed.[^player] Which pages those are is described on
-[Site](../site.md).
+reference, red mark and Source tab removed.[^player] How a page is marked for players is described on
+[Front matter](../front-matter.md).
 
 ## Usage
 
@@ -50,12 +50,16 @@ wiki player readers
 
 ## Output
 
-It prints what `wiki build` prints, for the pages marked for players only.[^output] On a wiki of three
-pages, one of them marked for players:[^output]
+It prints a line for each page it built, then the same closing lines as `wiki build`.[^output] **The
+totals of sources and marks, and the list of drafts, count every page in the wiki**, not only those it
+built.[^output] Like `wiki build`, it records each changed page's date in `UPDATED.toml`.[^dates] On a
+wiki of three pages, one of them marked for players, with the folder being wherever the command
+ran:[^output]
 ```text
-wiki: refunds                            29 words    1 cited    1 missing
+wiki: refunds                            22 words    1 cited    1 missing
 wiki: 1 source cited, 1 claim marked as having no source
-wiki: the collected goals read in 15 words
+wiki: the collected goals read in 17 words
+wiki: these budgets are PROVISIONAL -- 500 words a page, 3500 for the collected goals. Nobody has measured what this project's reader will actually read; until they have, the numbers are a guess that happens to be enforced. Set budget.calibrated in wiki.toml when they have.
 wiki: 1 page written to /path/to/notes/readers
 ```
 
@@ -63,16 +67,18 @@ wiki: 1 page written to /path/to/notes/readers
 
 | Code | Condition | Message |
 |---|---|---|
-| `0` | the view is built[^exit] | `wiki: 1 page written to /path/to/notes/readers` |
-| `1` | a problem stops the build | the problem |
-| `2` | `OUT` is not empty and was not made by the tool | `wiki: /path/to/notes/taken is not empty and was not written by this tool; remove it yourself if you meant to replace it` |
-| `2` | there is no wiki where it was pointed | `wiki: no wiki at nowhere` |
+| `0` | the player build is written[^exit] | `wiki: 1 page written to /path/to/notes/readers` |
+| `1` | a problem stops the build[^exit] | the problem |
+| `2` | `OUT` is not empty and was not made by the tool[^exit] | `wiki: /path/to/notes/taken is not empty and was not written by this tool; remove it yourself if you meant to replace it` |
+| `2` | there is no wiki where it was pointed[^exit] | `wiki: no wiki at nowhere` |
 
 [^player]: `src/builder/cli.py` — `run()` builds with audience `"player"`; `src/builder/build.py` —
     `visible_to()`, `for_player()` and `with_source` in `write_site()`.
 [^usage]: `src/builder/cli.py` — `main()` gives `player` the positional `out`; `run()` resolves it from
     the working directory and passes it to `guard_output()`.
-[^output]: `src/builder/cli.py` — `run()` calls `report()` for the pages the build emitted, and prints the
-    page count and folder.
+[^output]: `src/builder/cli.py` — `run()` passes `report()` the word counts of the pages the build
+    emitted, but `citation_counts()` and the drafts of every page, and prints the page count and folder.
+[^dates]: `src/builder/cli.py` — `run()` calls `build()`, and `write_site()` in `src/builder/build.py`
+    records dates in `UPDATED.toml`.
 [^exit]: `src/builder/cli.py` — `run()` returns 2 when `guard_output()` refuses; `main()` returns 2 with no
     wiki and 1 for a `WikiError`.

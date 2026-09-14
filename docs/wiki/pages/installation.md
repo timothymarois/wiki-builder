@@ -19,6 +19,7 @@ group = "Requirements"
 rows = [
   { label = "Python", value = "3.11 or newer", cite = "package" },
   { label = "Dependency", value = "mistune, pinned exactly", cite = "package" },
+  { label = "Runner", value = "uv or pip", cite = "uv" },
 ]
 
 [[infobox]]
@@ -36,6 +37,8 @@ below from the [Installation prompt](installation-prompt.md).
 ## Requirements
 
 It needs Python 3.11 or newer, and one dependency pinned exactly, the markdown parser `mistune`.[^package]
+The wrapper script below also needs `uv`, whose `uvx` runs a release straight from its git address; a
+project without `uv` installs a release with `pip` and runs `wiki` directly.[^uv]
 
 ## Wrapper
 
@@ -53,7 +56,7 @@ exec uvx --from "git+https://github.com/timothymarois/wiki-builder@$WIKI_VERSION
 ```
 
 The tool accepts `--root` after the command, which is what lets the script add it to whatever it is
-handed.[^root]
+handed.[^root] `TAG` names a published wiki-builder release.{missing}
 
 ## First wiki
 
@@ -87,8 +90,8 @@ What each part is for.
 ```
 
 `wiki sync` writes the skill for the project's agents and records the release, then `wiki build` records
-each page's date.[^sync] The rendered site stays out of version control, as wiki-builder's own
-`.gitignore` keeps it.[^ignore]
+each page's date.[^sync] The tool writes no ignore file, so a project adds `docs/wiki/site/` to its own
+`.gitignore` to keep the rendered site out of version control, as wiki-builder does.[^ignore]
 
 ```sh
 ./scripts/dev-wiki.sh sync
@@ -103,6 +106,9 @@ An update is a new tag in the script, then `wiki sync` to rewrite the skill and 
 
 [^package]: `pyproject.toml` — `[project.scripts]` names the `wiki` command, `requires-python` asks for
     3.11 or newer, and `dependencies` pins `mistune==3.3.4`.
+[^uv]: uv docs — [Tools](https://docs.astral.sh/uv/guides/tools/): `uvx` is an alias for `uv tool run`,
+    and `--from` installs a tool from another source, such as a git repository; `action.yml` — installs
+    wiki-builder with `pip`, without `uv`.
 [^root]: `src/builder/cli.py` — `main()` accepts `--root` and `--wiki` before the command or after it.
 [^where]: `src/builder/build.py` — `wiki_of()` defaults the wiki to `docs/wiki`.
 [^config]: `src/builder/config.py` — `read_config()` refuses a `wiki.toml` with no `site.name` or no
@@ -113,6 +119,7 @@ An update is a new tag in the script, then `wiki sync` to rewrite the skill and 
 [^exempt]: `src/builder/build.py` — `goals = false` is skipped by `goals_page()` and `uncited_problems()`.
 [^sync]: `src/builder/cli.py` — `sync()` writes the skill and calls `record_version()` in
     `src/builder/config.py`; `src/builder/build.py` — `write_site()` records dates in `UPDATED.toml`.
-[^ignore]: `.gitignore` — `docs/wiki/site/`.
+[^ignore]: `.gitignore` — `docs/wiki/site/`; `src/builder/cli.py` — `run()` builds into `site` inside the
+    wiki folder, and nothing in `src/builder` writes a `.gitignore`.
 [^version]: `src/builder/build.py` — `version_problems()`, called from `check()`, which gathers every
     problem at once.

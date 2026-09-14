@@ -37,6 +37,8 @@ body{margin:0;background:var(--page);color:var(--text);
   font:14px/1.6 -apple-system,"Segoe UI",Helvetica,Arial,sans-serif}
 img{max-width:100%}
 a{color:var(--link);text-decoration:none}
+/* A link to a page the wiki does not have is red, visited or not, until somebody writes the page. */
+a.new,a.new:visited{color:var(--red)}
 a:hover{text-decoration:underline}
 a.v{color:var(--visited)}
 a:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--link);outline-offset:1px}

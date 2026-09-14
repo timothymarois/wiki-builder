@@ -13,7 +13,7 @@ group = "Identity"
 rows = [
   { label = "Page copy", value = "index.md", cite = "copy" },
   { label = "Index", value = "llms.txt", cite = "index" },
-  { label = "Tab", value = "Markdown", cite = "tab" },
+  { label = "Link", value = "in the Source view", cite = "tab" },
 ]
 
 [[infobox]]
@@ -32,8 +32,8 @@ A page's copy sits in the same folder as its rendered page, as `index.md`.[^copy
 title, subtitle, intent and whether it is a draft, then its body and references as written.[^copy] A link
 in a copy to another page points at that page's copy, and a link shown inside code is left as
 written.[^links] The goals page's copy carries every collected intent.[^goals] The local server answers a
-copy as plain text.[^serve] **Every page has a Markdown tab beside Article and Source**, which opens its
-copy as the markdown file itself, so a person or an agent can read the page as pure markdown.[^tab]
+copy as plain text.[^serve] **A page's Source view links to its markdown file**, which opens the copy as
+the file itself, so a person or an agent can read the page as pure markdown.[^tab]
 
 ## Index
 
@@ -57,8 +57,8 @@ build withholds.[^player]
     page uses.
 [^serve]: `src/builder/serve.py` — `shown_as_text()` answers a file in `AS_TEXT`, which includes `.md`,
     as plain text.
-[^tab]: `src/builder/build.py` — `on_article()` and `on_source()` add a Markdown tab linking to
-    `AGENT_COPY`; neither is used in a player build.
+[^tab]: `src/builder/build.py` — `render_source()`, given `AGENT_COPY` by `write_site()`, links the source
+    view to the page's markdown copy; a player build has no source view.
 [^index]: `src/builder/build.py` — `agent_index()`, written as `AGENT_INDEX` by `write_site()`.
 [^head]: `src/builder/build.py` — `write_site()` passes both links to `render_page()`, which fills
     `llm_links` in `src/builder/assets/template.html`.

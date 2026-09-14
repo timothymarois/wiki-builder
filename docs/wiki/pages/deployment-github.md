@@ -11,32 +11,27 @@ one workflow and a DNS record.
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Command", value = "wiki publish", cite = "publish" },
+  { label = "Command", value = "wiki publish", cite = "pages" },
   { label = "Host", value = "GitHub Pages", cite = "pages" },
-]
-
-[[infobox]]
-group = "Values"
-rows = [
-  { label = "Domain", value = "wiki-builder.marois.dev", cite = "cname" },
 ]
 
 [[infobox]]
 group = "Rules"
 rows = [
   { label = "Condition", value = "wiki check passes", cite = "order" },
+  { label = "Custom domain", value = "set in the repository's Pages settings", note = "a CNAME file is ignored", cite = "domain" },
+  { label = "Cost", value = "free for a public repository", cite = "plans" },
 ]
 +++
 
-`wiki publish` builds the site into a folder, with addresses that end in a folder rather than a
-file.[^publish] Every page is a folder holding one `index.html`, and every link names the folder, so no address a reader follows ends in `.html` and no host setting is needed to hide it.[^publish] What the build makes is described on [Site](site.md), and the same guide for another
-free host on [Deployment (Cloudflare)](deployment-cloudflare.md).
+A project on GitHub publishes its wiki with one workflow that checks the wiki, builds it with
+`wiki publish` and hands the result to GitHub Pages.[^pages] If the check fails, the job stops and nothing
+is published.[^order] What `wiki publish` makes is described on [wiki publish](commands/publish.md), and
+the same guide for Cloudflare on [Deployment (Cloudflare)](deployment-cloudflare.md).
 
 ## Workflow
 
-A project adds one workflow that checks the wiki, publishes it, and hands the result to GitHub
-Pages.[^pages] The action installs `wiki` and leaves it installed, so a later step in the same job can run
-it.[^action] If the check fails, the job stops and nothing is published.[^order]
+The action installs `wiki` and leaves it installed, so a later step in the same job can run it.[^action]
 
 ```yaml
 # .github/workflows/pages.yml
@@ -55,7 +50,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: timothymarois/wiki-builder@TAG
       - run: wiki publish _site
-      - run: echo "DOMAIN" > _site/CNAME
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
@@ -71,20 +65,23 @@ jobs:
 
 **GitHub Pages is switched on before the workflow first runs**: in the repository's settings, under
 Pages and then Build and deployment, the source is GitHub Actions.[^source] Until it is, the build job
-passes and the deploy job fails with a 404 saying to enable GitHub Pages.[^enable] The workflow writes the
-domain into a `CNAME` file at the root of the site.[^cname]
+passes and the deploy job fails with a 404 saying to enable GitHub Pages.[^enable]
 
 | Setting | Value |
 |---|---|
 | Pages source, under Build and deployment | GitHub Actions[^source] |
-| Custom domain | the domain in `CNAME` |
+| Custom domain | the domain, entered in the repository's Pages settings[^domain] |
 | DNS record | a `CNAME` from the domain to `OWNER.github.io`[^dns] |
 | HTTPS | enforced, once GitHub has issued the certificate[^https] |
 
+A `CNAME` file in the published folder does nothing, because GitHub ignores it for a site deployed by a
+custom workflow.[^domain] GitHub Pages is free for a public repository on GitHub Free, and publishing from
+a private repository needs a paid plan.[^plans]
+
 ## Example
 
-wiki-builder deploys its own wiki to wiki-builder.marois.dev the same way, on every push to
-`main`.[^pages]
+wiki-builder's own `pages` workflow checks and publishes its wiki on every push to `main`.[^pages] It
+serves the result at wiki-builder.marois.dev.{missing}
 
 ## External links
 
@@ -94,26 +91,27 @@ wiki-builder deploys its own wiki to wiki-builder.marois.dev the same way, on ev
 - [GitHub Pages limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits)
 - [actions/deploy-pages](https://github.com/actions/deploy-pages)
 
-[^publish]: `src/builder/cli.py` — `run()` builds with `links="clean"` for `publish`, into a folder
-    `guard_output()` allows; `build()` then empties `LINK_SUFFIX`, so a link names the folder and not its
-    `index.html`.
+[^pages]: `.github/workflows/pages.yml` — the `build` job checks the wiki and runs `wiki publish _site`,
+    and the `deploy` job runs `actions/deploy-pages`, on every push to `main`.
+[^order]: `.github/workflows/pages.yml` — `deploy` needs `build`, whose first step after checkout is the
+    check.
+[^action]: `action.yml` — installs wiki-builder with `pip` into the Python `actions/setup-python` puts on
+    the path.
 [^source]: GitHub Docs — [Configuring a publishing source for your GitHub Pages site](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site):
     under Settings, Pages, "Build and deployment", the source is set to GitHub Actions; and
     [Using custom workflows with GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages):
     custom workflows must first be enabled for the repository.
 [^enable]: GitHub — [actions/deploy-pages](https://github.com/actions/deploy-pages/blob/v4/src/internal/deployment.js):
     when creating the deployment returns 404, the error adds "Ensure GitHub Pages has been enabled".
+[^domain]: GitHub Docs — [Managing a custom domain for your GitHub Pages site](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site):
+    the domain is entered under Settings, Pages and Custom domain, and a site published from a custom
+    GitHub Actions workflow ignores any existing `CNAME` file.
 [^dns]: GitHub Docs — [Managing a custom domain for your GitHub Pages site](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site):
     a subdomain needs a `CNAME` record pointing to `<user>.github.io` or `<organization>.github.io`,
     without the repository name.
 [^https]: GitHub Docs — [Securing your GitHub Pages site with HTTPS](https://docs.github.com/en/pages/getting-started-with-github-pages/securing-your-github-pages-site-with-https):
     **Enforce HTTPS** is in the repository's Pages settings, and the certificate is provisioned after the
     DNS check that starts when the custom domain is set.
-[^pages]: `.github/workflows/pages.yml` — the `build` job checks and publishes the wiki, and the `deploy`
-    job runs `actions/deploy-pages`.
-[^action]: `action.yml` — installs wiki-builder with `pip` into the Python `actions/setup-python` puts on
-    the path.
-[^order]: `.github/workflows/pages.yml` — `deploy` needs `build`, whose first step after checkout is the
-    check.
-[^cname]: `.github/workflows/pages.yml` — writes `wiki-builder.marois.dev` into `_site/CNAME` before the
-    upload.
+[^plans]: GitHub Docs — [GitHub's plans](https://docs.github.com/en/get-started/learning-about-github/githubs-plans):
+    GitHub Free includes GitHub Pages in public repositories, and GitHub Pro and GitHub Team add it for
+    private repositories.

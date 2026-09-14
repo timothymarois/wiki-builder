@@ -80,6 +80,8 @@ in seconds and impossible to issue one by accident.
   number makes a worse page.
 
 **Write the intent first.** It decides what the page holds; written last, the page gets written twice.
+**An intent comes from the owner.** Draft it from their words, mark the page a draft, and ask; never
+invent what a thing is for.
 
 ## Naming
 
@@ -169,7 +171,8 @@ the section, a sentence's first clause answers the sentence. A reader who stops 
 - **Units a reader can feel** — seconds, metres, kilograms, days, plain counts. Convert from whatever the
   code uses; never leave that to the reader.
 - **A surprising decision gets one clause of reason.** "Expiry is meant to make a stolen session useless,
-  not to punish somebody who went to lunch." A reader who knows why does not report it as a bug.
+  not to punish somebody who went to lunch." A reader who knows why does not report it as a bug. The
+  reason is the owner's, or a comment's in the code — never one you supply.
 - **Link sideways instead of repeating**, in the prose and near the top. A thing belongs on one page, and
   every other page links to it and says so: *"Sessions live in storage, where eviction and replication are
   described; this page covers what a session is for and what it does."* Naming what a page is **not**
@@ -242,7 +245,8 @@ A session ends thirty minutes after its last request.[^expiry]
   row.
 - **References are the one place a path belongs**, and a player build strips them.
 - **Link other pages and pictures relative to your own file**, so the link works in the markdown and in
-  the browser.
+  the browser. A link to a page the wiki does not have is drawn red, and the gate refuses it: write the
+  page, or link to one that exists.
 
 ## Citation coverage
 
@@ -253,8 +257,9 @@ strength of its neighbour's. The owner, 2026-09-14: *"every statement, fact, req
 mentions all require a citation or unknown citation."*
 
 **The gate refuses a sentence that cites nothing.** A citation after the full stop belongs to its
-sentence. A sentence that links to another page is excused, because that page carries the citations,
-and a table is held as a whole. A list item that is a bare link — the host's own guides, under **External
+sentence. A sentence that links to another page is excused, because that page carries the citations.
+**Every table row cites in at least one of its cells**, or carries `{missing}`; the header row is exempt, and
+one cited row never covers the rows beside it. A list item that is a bare link — the host's own guides, under **External
 links** at the end of a page — states nothing and is excused too. Write an outside link as a plain link; the build
 opens it in a new tab, marks it `nofollow` and adds the arrow. Only a page about the wiki itself is exempt, because it describes no
 behaviour.
@@ -366,7 +371,25 @@ record that someone looked.
 
 ## Truthfulness
 
-The page describes **what the thing actually does**.
+The page describes **what the thing actually does**, and nothing else.
+
+**Never invent.** Everything on a page comes from one of three places: **the code**, **the owner's own
+words**, or **an outside service's own documentation** for how that service behaves. Nothing else is a
+source — not what is typical, what similar tools do, what seems likely, what would make the page
+complete, or what you would have built. The owner, 2026-09-14: *"never invents, never makes anything up
+that does not already exist, never adds information that either the owner or the code base never
+mentioned or given."*
+
+- **No invented behaviour**: no feature, option, default, limit, error, step or edge case the code does
+  not have.
+- **No invented reasons**: a why comes from the owner, or from a comment or commit in the code, never from
+  a plausible guess about what someone intended.
+- **No invented requirements, plans or audiences**: only what the owner has said.
+- **No invented examples**: every sample, output and message is copied from a real run or from the code.
+- **No invented names**: a thing is called what the code or the owner calls it.
+- **A gap stays a gap.** Where the page needs a fact nobody has given, mark the claim `{missing}` or leave
+  it out, and ask the owner. A sentence you cannot trace to one of the three sources is deleted, not
+  softened into a hedge.
 
 1. **Read the code for every claim** — not the configuration, another document, or what a task said would
    be built.
@@ -424,3 +447,5 @@ serving nothing is still wrong, and a page over it is saying its intent has grow
 7. `wiki check` passes.
 8. Someone who has never read the source can follow the whole page.
 9. Everything in the code a person can use, configure or notice has a page or a section.
+10. Nothing on the page was invented: every statement traces to the code, the owner's words, or an
+    outside service's own documentation.

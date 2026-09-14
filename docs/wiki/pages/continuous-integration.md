@@ -53,8 +53,8 @@ jobs:
 | Input | Meaning | Default |
 |---|---|---|
 | `root` | the project, relative to the checkout[^inputs] | `.` |
-| `wiki` | where the wiki lives, relative to the project | `docs/wiki` |
-| `python-version` | the Python that runs the check, 3.11 or newer | `3.12` |
+| `wiki` | where the wiki lives, relative to the project[^inputs] | `docs/wiki` |
+| `python-version` | the Python that runs the check, 3.11 or newer[^inputs] | `3.12` |
 
 The action installs the tool from its own copy, at the release named in `uses:`, so the check that runs is
 the one that release ships.[^install] A wiki synced against a different release fails, and the check says
@@ -62,17 +62,19 @@ to run `wiki sync`.[^version]
 
 ## Repository workflows
 
-Every push to `main` and every pull request runs two workflows in the wiki-builder repository.[^ci] One runs the tool's own tests on
-Python 3.11 and 3.12, against the installed package.[^tests] The other checks wiki-builder's own wiki with the same
-action a project uses, so the action is exercised on every change to it.[^wiki] Publishing that wiki once
+Every push to `main` and every pull request runs two workflows in the wiki-builder repository, and a push
+to `main` also runs a third that publishes the wiki.[^ci] One runs the tool's own tests on Python 3.11 and
+3.12, against the installed package.[^tests] Another checks wiki-builder's own wiki with the same action a
+project uses, so the action is exercised on every change to it.[^wiki] Publishing that wiki once
 it passes is described on [Deployment (GitHub)](deployment-github.md).
 
 [^action]: `action.yml` — a composite action whose last step runs `wiki check` in the project's folder.
-[^inputs]: `action.yml` — `inputs`: `root`, `wiki` and `python-version`, with their defaults.
+[^inputs]: `action.yml` — `inputs`: `root`, `wiki` and `python-version`, with their defaults; `wiki` is
+    empty by default, which leaves the tool's own `docs/wiki`.
 [^install]: `action.yml` — installs `github.action_path` with `pip`, after `actions/setup-python`.
 [^version]: `src/builder/build.py` — `version_problems()`, called from `check()`.
 [^ci]: `.github/workflows/tests.yml` and `.github/workflows/wiki.yml` — both run `on` a push to `main`
-    and on a pull request.
+    and on a pull request; `.github/workflows/pages.yml` — runs `on` a push to `main`.
 [^tests]: `.github/workflows/tests.yml` — the `python-version` matrix, then `pip install .` and the
     tests.
 [^wiki]: `.github/workflows/wiki.yml` — a job whose only step after checkout uses `./`, this

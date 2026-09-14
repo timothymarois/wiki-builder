@@ -9,5 +9,6 @@ sitting and a change to any of it is visible in one place.
 """
 +++
 
-This page collects every page's intent when the wiki is built, in the order the sidebar lists the pages.
+The goals page collects the intent of every approved page, except a page that says `goals = false`, when
+the wiki is built, in the order the sidebar lists the pages.
 Changing an intent changes what that part of the tool is trying to be, and that is the owner's decision.
