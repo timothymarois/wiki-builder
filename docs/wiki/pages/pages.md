@@ -3,9 +3,9 @@ title = "Pages"
 subtitle = "what a person writes"
 status = "approved"
 intent = """
-A page is how someone who has read the code tells someone who will not what it does. Writing one should
+A page is how a writer who has read the code tells a reader who will not what it does. Writing one should
 need nothing but markdown and a few lines of settings, and where the file sits should decide where the
-page is found, so nobody has to keep a list in step with the files.
+page is found, so no list has to be kept in step with the files.
 """
 
 [[infobox]]
@@ -50,11 +50,11 @@ page.[^exempt] The same setting excuses a page from citing anything, whatever it
 ## Approval
 
 **A page is a draft until its front matter says `status = "approved"`.**[^status] A draft sits in the sidebar like any other
-page, under a banner saying that nobody has agreed with it.[^draft] Search, the categories and the goals
+page, under a banner saying that the owner has not approved it.[^draft] Search, the categories and the goals
 page offer only approved pages.[^approved] What a part of the system is for is the owner's decision, and
 an agent that drafts a page has not made it.[^status]
 
-A page that nobody can reach from the sidebar stops the build, whether it is a draft or not.[^reach]
+A page that no reader can reach from the sidebar stops the build, whether it is a draft or not.[^reach]
 
 ## Parts
 

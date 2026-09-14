@@ -5,7 +5,7 @@ status = "approved"
 categories = ["Refusals"]
 intent = """
 The picture check exists so that a page never shows something that has since changed. When a picture's
-subject moves, someone should have to redraw it, or say why it is still true.
+subject moves, the picture should have to be redrawn, or given a reason why it is still true.
 """
 
 [[infobox]]
@@ -39,7 +39,7 @@ flags the picture.[^digest]
 ## Blessing
 
 `wiki bless` takes a picture and a reason, and records the current fingerprint along with the
-reason.[^bless] **A reason is required**, because it is the record that somebody looked.[^bless]
+reason.[^bless] **A reason is required**, because it is the record that the picture was looked at.[^bless]
 
 A picture whose record has no fingerprint yet is never checked.[^unguarded] **A new picture is unguarded
 until it is blessed for the first time.**[^unguarded]

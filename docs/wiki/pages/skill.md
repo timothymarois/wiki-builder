@@ -5,7 +5,7 @@ status = "approved"
 intent = """
 The skill exists so that an agent writing a page, in any project, writes it the way the owner approved
 without each project inventing its own rules. A change to those rules should reach a project only when
-that project asks for it, and arrive where somebody reviews it.
+that project asks for it, and arrive where the project reviews it.
 """
 
 [[infobox]]
@@ -21,7 +21,7 @@ group = "Contents"
 rows = [
   { label = "Instructions", value = "SKILL.md", cite = "files" },
   { label = "Worked examples", value = "page-standard.md, reference-standard.md", cite = "files" },
-  { label = "Rule files", value = "naming-and-grammar.md, reference-pages.md", cite = "files" },
+  { label = "Rule files", value = "naming-and-grammar.md, reference-pages.md, flowcharts.md", cite = "files" },
 ]
 
 [[infobox]]
@@ -32,14 +32,14 @@ rows = [
 ]
 +++
 
-The **skill**, `writing-wiki-pages`, is the half of the tool that is not code: instructions for writing
-a page in `SKILL.md`, and a `references` folder beside it.[^files] That folder holds the rules for naming,
-grammar and reference pages, and two worked examples, one for an ordinary page and one for a reference
+The **skill**, `writing-wiki-pages`, is the instructions an agent follows to write a page: `SKILL.md`,
+and a `references` folder beside it.[^files] That folder holds the rules for naming, grammar, reference
+pages and flowcharts, and two worked examples, one for an ordinary page and one for a reference
 page, each written well and badly.[^files] `wiki sync` copies it into the project, where agents read
 it.[^sync] Some of the rules it teaches are enforced by the [Checks](checks.md): citations, headings,
 pointing words, reading budgets and pictures. **It forbids an agent to invent**: everything on a page comes
-from the code, the owner's own words, or an outside service's own documentation, and a fact nobody has
-given is marked `{missing}` or left out.[^invent]
+from the code, the owner's own words, or an outside service's own documentation, and a fact none of these
+gives is marked `{missing}` or left out.[^invent]
 
 ## Home
 
@@ -48,8 +48,8 @@ The skill goes into the project's `.agents/skills` folder if there is one.[^home
 is often a link to it, and writing through the link would write the same place twice.[^home]
 
 The skill lands in a folder named after itself, and a file is rewritten only when its text has
-changed.[^written] A file that a newer release no longer ships stays in the project until someone deletes
-it.[^written]
+changed.[^written] A file that a newer release no longer ships stays in the project until it is deleted by
+hand.[^written]
 
 `wiki sync --skill-dir` names the folder instead, relative to the project, and the skill goes there
 whatever else exists; the folder is created if it is missing.[^skilldir] `wiki sync --no-skill` records

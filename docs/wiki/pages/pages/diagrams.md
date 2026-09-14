@@ -38,20 +38,24 @@ Every push checks the wiki before it is published.[^flow]
 
 ```mermaid
 flowchart LR
-  push --> check{"wiki check"}
-  check -- "a problem" --> stop["nothing published"]
-  check -- "no problems" --> publish
+  accTitle: Checking before publishing
+  accDescr: A push checks the wiki; a problem stops it with nothing published, otherwise the site is published.
+  pushed(["Push to main"]) --> check["Check the wiki"] --> passed{"Check passed?"}
+  passed -- "No" --> stopped(["Nothing published"])
+  passed -- "Yes" --> publish["Publish the site"] --> published(["Site published"])
 ```
 ````
 
-A block written that way becomes a drawing in four steps, and only a page that has one takes the last
-two.[^block][^script]
+Only a page with a mermaid block loads Mermaid, and its block is drawn in three steps.[^block][^script]
 
 ```mermaid
 flowchart LR
-  block["mermaid code block"] --> marked["marked as a diagram<br/>when the page is built"]
-  marked --> loaded["that page loads Mermaid"]
-  loaded --> drawn["Mermaid draws it<br/>in the page's theme"]
+  accTitle: How a diagram is drawn
+  accDescr: When a page is built, a page without a mermaid block is shown without Mermaid. A page with one has the block marked as a diagram, loads Mermaid, and has the diagram drawn in its theme.
+  built(["Page built"]) --> has{"Mermaid block<br/>on the page?"}
+  has -- "No" --> plain(["Page shown without Mermaid"])
+  has -- "Yes" --> mark["Mark it as a diagram"] --> load["Load Mermaid on the page"]
+  load --> draw["Draw it in the page's theme"] --> shown(["Diagram shown"])
 ```
 
 ## Drawing

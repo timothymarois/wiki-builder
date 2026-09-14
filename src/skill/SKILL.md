@@ -5,14 +5,14 @@ description: Use when writing or changing any page of the wiki under docs/wiki/ 
 
 # Writing wiki pages
 
-**Read [Page standard](references/page-standard.md) before writing anything.** It holds a page the owner
-approved, the same content written badly, and why the difference matters. Rules say what to avoid; only an
+**Read [Page standard](references/page-standard.md) before writing anything.** It holds a page written to the
+standard, the same content written badly, and why the difference matters. Rules say what to avoid; only an
 example shows what good looks like. A page written from these rules alone comes out **flat, true and
 unread** — the failure this skill exists to prevent, and the one that does not announce itself.
 
 **The wiki is for people, not builders.** Its readers are the project's owner, and later its users and
-product people. They do not read code and must never need to. Someone who has read the source learns
-nothing new from a page; someone who never has understands all of it. Every rule below serves one job:
+product people. They do not read code and must never need to. A reader who has read the source learns
+nothing new from a page; a reader who never has understands all of it. Every rule below serves one job:
 **the owner sees how the thing works without reading it.**
 
 Nothing here is specific to one project. These rules travel with the wiki into any project that installs
@@ -66,7 +66,7 @@ it works.
 
 ```toml
 intent = """
-Refunds exist so that a customer who was charged wrongly gets their money back without anyone having to
+Refunds exist so that a customer who was charged wrongly gets their money back without the customer having to
 ask us twice. A refund that needs a support conversation has failed. It should be possible to issue one
 in seconds and impossible to issue one by accident.
 """
@@ -162,16 +162,21 @@ the section, a sentence's first clause answers the sentence. A reader who stops 
 - **The consequence, not the mechanism.** "An expired session does not lose your draft" — not that one
   setting outlives another.
 - **Short sentences, ordinary words.** A sentence that needs reading twice is the sentence's fault.
+- **Name who acts.** "Nobody has approved it", "someone must bless it" and "anyone can run it" hide the one
+  fact a reader needs. Say the reader, the owner, an agent, or the part of the system that acts. The gate
+  refuses nobody, somebody, someone, anyone, everyone and no one.
+- **Say what a thing is and does.** Framing such as "the half of the tool that is not code" or "at its
+  heart" names no purpose and no behaviour: state what the thing is for and what it does instead.
 - **No sentence without a statement.** A run-up, a transition, a summary or a restatement states nothing
   a reader can check, so it has nothing to cite — and a sentence with nothing to cite has nothing to
   say. Cut it.
 - **Bold what matters**, once or twice a section. If everything is bold, nothing is.
 - **A number only where a person would notice it wrong.** "About thirty seconds" beats a precise figure
-  nobody can perceive.
+  a reader cannot perceive.
 - **Units a reader can feel** — seconds, metres, kilograms, days, plain counts. Convert from whatever the
   code uses; never leave that to the reader.
 - **A surprising decision gets one clause of reason.** "Expiry is meant to make a stolen session useless,
-  not to punish somebody who went to lunch." A reader who knows why does not report it as a bug. The
+  not to punish a user who went to lunch." A reader who knows why does not report it as a bug. The
   reason is the owner's, or a comment's in the code — never one you supply.
 - **Link sideways instead of repeating**, in the prose and near the top. A thing belongs on one page, and
   every other page links to it and says so: *"Sessions live in storage, where eviction and replication are
@@ -191,7 +196,7 @@ the section, a sentence's first clause answers the sentence. A reader who stops 
 A **reference page** documents something a person calls or configures: a command, an endpoint, a
 published function, a settings file. Every rule above applies; the register changes. The names the
 software owns are the content, every input has its type, default and meaning, every error is quoted
-exactly, and the bar is that someone can use the surface correctly from the page alone.
+exactly, and the bar is that a reader can use the surface correctly from the page alone.
 
 **Read [Reference pages](references/reference-pages.md) and
 [Reference standard](references/reference-standard.md) before writing one.**
@@ -212,7 +217,7 @@ These are not style preferences. A page carrying any of them has failed its read
 | An attribution: "the owner said", a dated quote of whoever asked for a rule | The rule itself, stated plainly. The gate refuses a dated attribution |
 
 **Do not document absence in prose.** A reader who finds no mention of something has learned what they
-needed. A section headed "not built yet" turns the wiki into a backlog, and backlogs are read by nobody and
+needed. A section headed "not built yet" turns the wiki into a backlog, and backlogs go unread and
 rot fastest.
 
 **A planned change is one short, marked note at the end**, never mixed into the description. A reader must
@@ -236,7 +241,7 @@ A session ends thirty minutes after its last request.[^expiry]
   citing it turns one error into two.
 - **How an outside service behaves is cited to its own documentation** — a host's settings, a platform's
   defaults: the thing the project does not run. Name the publisher, link the page by its title, and say
-  what it states. A `{missing}` on such a claim means nobody looked in that documentation yet.
+  what it states. A `{missing}` on such a claim means that documentation has not been checked yet.
 - **A reference marks the code; it never links to it.** Outside documentation is the one linked reference. Write `` `src/session/expiry.py` — `sweep()` ``,
   not a markdown link. A link to a source file works only while the site is served from inside the
   repository, and is dead wherever the site is published.
@@ -274,7 +279,7 @@ read both before calling a page done.
 Write `{missing}` after the claim, or `missing = true` on an infobox row. A red mark renders where the
 citation would be.
 
-It means **nothing was cited**: either the system does not do this yet, or nobody has found where it does.
+It means **nothing was cited**: either the system does not do this yet, or the writer has not found where it does.
 To a reader both mean the same — do not take this on faith — so one mark serves both. A user never sees
 it.
 
@@ -302,7 +307,7 @@ Rows come in three groups, in this order:
   function, class or internal id; those belong in the references.
 - **A group is named for what it holds**: Identity, Values and Rules, or something more precise when every
   row shares it — **Limits**, **Defaults**, **Exit codes**, **Contents**. Never "Info", which names nothing.
-- **Leave out** what nobody looks up: every setting there is, a value that needs a sentence, anything the
+- **Leave out** what a reader never looks up: every setting there is, a value that needs a sentence, anything the
   thing does not do.
 - **Every row cites.** A row carries `cite = "<footnote>"`, naming a footnote the page's prose cites for
   the same fact, and renders with that citation's number. A row with nothing to cite carries
@@ -328,7 +333,7 @@ is *the expiry is thirty minutes*.
   Never a second value.
 - **`link = "https://…"`** links the value to an address outside the wiki, such as an author's site. A
   page is linked from the text, never from a row.
-- **`missing = true`** renders the red mark beside a value nothing implements, or nobody has found.
+- **`missing = true`** renders the red mark beside a value nothing implements, or whose implementation has not been found.
 - **`guaranteed = "<requirement id>"`** records the requirement a row satisfies, for whoever next checks
   the page against the code. It is never rendered.
 
@@ -362,21 +367,24 @@ rows = [
 A flow, a sequence or a state machine is drawn as a diagram, written as a `mermaid` code block, the way
 GitHub draws one. The site draws it with no network, and the page's markdown keeps it as written.
 
+**Read [Flowcharts](references/flowcharts.md) before drawing one.** It holds when a diagram earns its
+place, which kind to draw, its shapes, direction and labels, and a draft beside the finished drawing.
+
 - **A diagram states behaviour**, so the sentence introducing it carries the citation, and every box and
   arrow is something the cited code does. Never draw a step the code does not have.
 - **Name its parts as the page does**: the same words for the same things.
-- **One idea per diagram.** A diagram that needs a legend is two diagrams.
+- **One question per diagram**, answered in about ten steps at most.
 
-```markdown
-A refund is issued only after its charge is found.[^refund]
+````markdown
+A refund is issued only once its charge is found; otherwise the request is refused.[^refund]
 
 ```mermaid
 flowchart LR
-  request --> charge{charge found?}
-  charge -- yes --> issue --> notify
-  charge -- no --> refuse
+  requested(["Refund requested"]) --> find["Find the charge"] --> found{"Charge found?"}
+  found -- "Yes" --> issue["Issue the refund"] --> issued(["Refund issued"])
+  found -- "No" --> refused(["Request refused"])
 ```
-```
+````
 
 ## Pictures
 
@@ -386,7 +394,7 @@ path, and caption every one; a caption is prose and obeys every rule here.
 Each picture has an entry in `PICTURES.toml` naming what it depicts. **When a depicted file changes and
 the picture has not been redrawn, the gate fails.** Redraw it, or run
 `wiki bless <picture> "<why it is still true>"` when the change left the picture true. The reason is the
-record that someone looked.
+record that the picture was looked at.
 
 ## Truthfulness
 
@@ -400,17 +408,17 @@ complete, or what you would have built.
 - **No invented behaviour**: no feature, option, default, limit, error, step or edge case the code does
   not have.
 - **No invented reasons**: a why comes from the owner, or from a comment or commit in the code, never from
-  a plausible guess about what someone intended.
+  a plausible guess about what the code's author intended.
 - **No invented requirements, plans or audiences**: only what the owner has said.
 - **No invented examples**: every sample, output and message is copied from a real run or from the code.
 - **No invented names**: a thing is called what the code or the owner calls it.
-- **A gap stays a gap.** Where the page needs a fact nobody has given, mark the claim `{missing}` or leave
+- **A gap stays a gap.** Where the page needs a fact no source gives, mark the claim `{missing}` or leave
   it out, and ask the owner. A sentence you cannot trace to one of the three sources is deleted, not
   softened into a hedge.
 
 1. **Read the code for every claim** — not the configuration, another document, or what a task said would
    be built.
-2. **Say where nobody is sure.** Where behaviour is emergent, untested or could not be determined, say so
+2. **Say what is uncertain.** Where behaviour is emergent, untested or could not be determined, say so
    plainly. **A confident sentence covering a gap is the worst thing a page can hold**, because the reader
    is using it *instead of* the code and cannot catch it.
 3. **Never guess a number.** Without one, describe the behaviour.
@@ -462,7 +470,7 @@ serving nothing is still wrong, and a page over it is saying its intent has grow
 6. The infobox gives the thing's names, values and rules under noun labels, and every row cites a
    footnote the prose cites, or is marked missing.
 7. `wiki check` passes.
-8. Someone who has never read the source can follow the whole page.
+8. A reader who has never read the source can follow the whole page.
 9. Everything in the code a person can use, configure or notice has a page or a section.
 10. Nothing on the page was invented: every statement traces to the code, the owner's words, or an
     outside service's own documentation.

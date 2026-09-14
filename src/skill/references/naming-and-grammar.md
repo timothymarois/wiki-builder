@@ -124,8 +124,8 @@ Good: `timeout_seconds` — how long a request waits for a reply, in seconds, fr
       30. Absent means the default, not "wait forever".
 ```
 
-Say only what the code establishes. Leave out a limit nobody enforces rather than guessing one, and mark
-a required fact nobody could find with `{missing}`.
+Say only what the code establishes. Leave out a limit the code does not enforce rather than guessing one, and mark
+a required fact the writer could not find with `{missing}`.
 
 ### Messages and codes
 
@@ -143,8 +143,8 @@ that misleads the writer will mislead every reader.
 | A question or a sentence | `did_the_user_confirm` | the value is unnamed; it wants `is_confirmed` |
 | A negative boolean | `is_not_active`, `disable_email` | a double negative at every use |
 | A number with no unit | `timeout`, `size`, `price` | the unit is guessed, most expensively for money |
-| A generic noun | `data`, `info`, `details`, `meta` | nobody decided what it holds |
-| A numbered suffix | `notes2`, `extra_field` | a second meaning nobody named |
+| A generic noun | `data`, `info`, `details`, `meta` | what it holds was never decided |
+| A numbered suffix | `notes2`, `extra_field` | a second meaning left unnamed |
 | An abbreviation outside the domain | `qty_rcv`, `dt_crt` | comprehension paid on every read |
 | A plural holding one value | `invoice_ids` holding one id | promises a collection |
 | The mechanism, not the value | `retry_mode_flag` | the value itself has no name |
@@ -183,8 +183,8 @@ two ways. These rules settle most cases.
   A planned change is one marked note at the end of the page.
 - **Subject and verb agree**, across whatever sits between them: "the goals page collects", "a list of
   pages is", "neither option is".
-- **The fact first.** Lead with the result, then the condition: "A draft is refused when nobody can reach
-  it", not "When nobody can reach it, a draft is refused."
+- **The fact first.** Lead with the result, then the condition: "A draft is refused when a reader cannot reach
+  it", not "When a reader cannot reach it, a draft is refused."
 - **One idea per sentence.** A sentence that needs reading twice is two sentences.
 - **A pronoun points at one thing.** When "it" or "this" could mean either of two nouns, name the noun.
 - **Name the project; never point at it.** "This repository", "this wiki", "this tool" and "our site" mean
@@ -241,6 +241,8 @@ Each of these survives a first draft and carries no fact.
 | Intentions for machines | the check wants, the server tries to | what it does, and under what condition |
 | Open lists | etc., and so on, various, and/or | the list, or the one thing |
 | Pointing elsewhere | see the documentation for details | link the exact page, or state the fact |
+| Vague actors | nobody, somebody, someone, anyone, everyone, no one | name who acts: the reader, the owner, an agent, the build. The gate refuses them |
+| Empty framing | "the half of the tool that is not code", "at its heart", "the other side of" | say what the thing is and what it does |
 
 ## Last pass
 

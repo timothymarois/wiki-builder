@@ -42,13 +42,14 @@ Every check runs before the result is decided, so one problem never hides anothe
 
 ```mermaid
 flowchart LR
-  run["wiki check"] --> build["build the site<br/>in a temporary folder"]
-  build -- "a page cannot be built" --> stopped["stops with the reason, exit 1"]
-  build --> checks["every check in turn: budgets, pictures,<br/>dates, references, headings, pointing words,<br/>dead links, sentences, infobox rows, release"]
-  checks --> listed["every problem listed,<br/>then every claim with no source"]
-  listed --> any{"any problem?"}
-  any -- yes --> one["exit 1"]
-  any -- no --> zero["exit 0"]
+  accTitle: What wiki check does
+  accDescr: wiki check builds the site in a temporary folder. A page that cannot be built stops it with exit code 1; otherwise it runs every check, lists every problem and every claim with no source, and exits 1 if there is a problem or 0 if not.
+  run(["wiki check run"]) --> build["Build the site in a temporary folder"] --> built{"Every page built?"}
+  built -- "No" --> stopped(["Stopped with the reason, exit 1"])
+  built -- "Yes" --> checks["Run every check"] --> list["List problems and unsourced claims"]
+  list --> any{"Any problem?"}
+  any -- "Yes" --> failed(["Exit 1"])
+  any -- "No" --> passed(["Exit 0"])
 ```
 
 ## Refusals
@@ -68,7 +69,7 @@ flowchart LR
 ## Stoppages
 
 Some problems **stop the build** instead of joining the list, such as a missing `wiki.toml` or `goals.md`,
-a page with no title or intent, a page that nobody can reach, a sidebar naming a page that does not exist
+a page with no title or intent, a page that no reader can reach, a sidebar naming a page that does not exist
 or a picture with no record.[^stop] When that happens, only that one problem is reported, as a single
 sentence, and the command exits with 1.[^caught]
 

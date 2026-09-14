@@ -59,7 +59,7 @@ ran:[^output]
 wiki: refunds                            22 words    1 cited    1 missing
 wiki: 1 source cited, 1 claim marked as having no source
 wiki: the collected goals read in 17 words
-wiki: these budgets are PROVISIONAL -- 500 words a page, 3500 for the collected goals. Nobody has measured what this project's reader will actually read; until they have, the numbers are a guess that happens to be enforced. Set budget.calibrated in wiki.toml when they have.
+wiki: these budgets are PROVISIONAL -- 500 words a page, 3500 for the collected goals. What this project's readers actually read has not been measured; until it is, the numbers are a guess that happens to be enforced. Set budget.calibrated in wiki.toml once it is.
 wiki: 1 page written to /path/to/notes/readers
 ```
 

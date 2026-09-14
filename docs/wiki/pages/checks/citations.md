@@ -41,13 +41,15 @@ mark as plain text.[^undefined] Each statement passes or is refused this way.[^u
 
 ```mermaid
 flowchart LR
-  page{"page says<br/>goals = false?"} -- yes --> excused["whole page excused"]
-  page -- no --> each["each sentence, list item<br/>and table row, with code,<br/>headings and pictures left out"]
-  each --> cited{"a citation or the red mark,<br/>outside code?"}
-  cited -- yes --> pass["passes"]
-  cited -- no --> excuse{"no letters, a link to a<br/>markdown file, or<br/>nothing but a link?"}
-  excuse -- yes --> pass
-  excuse -- no --> refused["refused, with its<br/>page and line"]
+  accTitle: How a statement is judged
+  accDescr: A page that says goals = false is excused. Otherwise each sentence, list item and table row passes if it carries a citation or the red mark outside code, or if it has no letters, links to a markdown file or is only a link; anything else is refused with its page and line.
+  page(["Page checked"]) --> exempt{"Says goals = false?"}
+  exempt -- "Yes" --> excused(["Page excused"])
+  exempt -- "No" --> read["Read each statement"] --> cited{"Citation or red mark<br/>outside code?"}
+  cited -- "Yes" --> passes(["Statement passes"])
+  cited -- "No" --> other{"No letters, a page link<br/>or only a link?"}
+  other -- "Yes" --> passes
+  other -- "No" --> refused(["Refused with page and line"])
 ```
 
 A citation after the full stop belongs to its sentence, and **a sentence never borrows its neighbour's
@@ -68,7 +70,7 @@ A page that says `goals = false` is excused from both rules, whatever it describ
 
 Where nothing can be cited, the writer puts the word *missing* in curly braces, and it renders as a red
 question mark in brackets.[^mark] **It is a fine answer; silence is not.**[^uncited] It means the thing is
-not built or nobody has found where it happens, and to a reader both mean the same: do not take this on
+not built or where it happens has not been found, and to a reader both mean the same: do not take this on
 faith.[^mark] A user build removes every mark.[^user] Inside code, the mark is shown as written and
 counts for nothing.[^code]
 

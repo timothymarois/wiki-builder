@@ -52,8 +52,8 @@ anything else is checked.[^intent] Every build and every check prints each page'
 ## Calibration
 
 Until `[budget]` in `wiki.toml` sets `calibrated = true`, every build and check warns that the numbers are
-a guess that happens to be enforced.[^calibrated] Nobody knows what a project's readers will read until somebody
-measures it.[^calibrated]
+a guess that happens to be enforced.[^calibrated] What a project's readers will read is unknown until it is
+measured.[^calibrated]
 
 [^defaults]: `src/builder/config.py` — `DEFAULT_BUDGET`.
 [^config]: `src/builder/config.py` — `read_config()` merges

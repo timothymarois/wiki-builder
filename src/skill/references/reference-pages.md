@@ -11,8 +11,8 @@ and passes `wiki check`. What changes is the reader and the register.
 ## Reader
 
 The reader is about to call the thing. They arrive knowing what they want done and look up exactly how.
-**The bar: someone can use the surface correctly from the page alone**, without reading the code or
-asking anyone — and when a call fails, can tell from the page why, and what to do.
+**The bar: the reader can use the surface correctly from the page alone**, without reading the code or
+asking the people who built it — and when a call fails, can tell from the page why, and what to do.
 
 - **Dense and factual.** A table for anything parallel; prose for behaviour a table cannot hold.
 - **The names the software owns are the content.** Write them exactly, as code.
@@ -80,7 +80,7 @@ Sections in this order. Leave out a section that does not apply; never write an 
 ## Contract
 
 - **Every input answers four questions**: its type, whether it is required, its default, and what it
-  does. A blank cell is a gap; where nobody could find the answer, write `{missing}` in the cell.
+  does. A blank cell is a gap; where the answer could not be found, write `{missing}` in the cell.
 - **Conditions are stated as conditions.** "Required when `mode` is `replace`", never "sometimes
   required".
 - **Units and limits are figures**: "1 to 8", "in seconds", "at most 60 a minute".
@@ -146,5 +146,5 @@ contract, with every row that nothing implements marked `{missing}`.
 3. Every error is quoted exactly, with its condition.
 4. Every example was run, and shows what the run produced.
 5. Every name matches its source, character for character.
-6. Someone who has never seen the code could make a correct call, recognise a failed one, and know why it
+6. A reader who has never seen the code could make a correct call, recognise a failed one, and know why it
    failed.

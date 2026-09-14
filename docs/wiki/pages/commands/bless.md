@@ -65,7 +65,7 @@ than `made`, `digest`, `depicts` and `blessed` is dropped, and an earlier reason
 |---|---|---|
 | `0` | the blessing is recorded[^exit] | `wiki: refund-flow.svg blessed -- the arrows still match the code` |
 | `1` | the picture has no record[^exit] | `wiki: missing.png has no entry in PICTURES.toml` |
-| `1` | the reason is empty[^exit] | `wiki: a blessing needs a reason; it is the record that someone actually looked` |
+| `1` | the reason is empty[^exit] | `wiki: a blessing needs a reason; it is the record that the picture was looked at` |
 | `1` | the record names a path that is not in the project[^exit] | `wiki: a picture says it shows src/gone.py, which is not in this project` |
 | `2` | an argument is missing[^exit] | `wiki bless: error: the following arguments are required: REASON` |
 | `2` | there is no wiki where it was pointed[^nowiki] | `wiki: no wiki at nowhere` |

@@ -548,6 +548,35 @@ class WikiTests(unittest.TestCase):
         problems, *_ = wiki.check(self.root)
         self.assertTrue(any("attributes a rule to the owner" in problem for problem in problems), problems)
 
+    def test_a_sentence_with_a_vague_actor_is_refused_where_it_is_written(self):
+        # "Nobody has approved it" hides who. The page names the reader, the owner, an agent or the part that
+        # acts.
+        for word in ("nobody", "Somebody", "someone", "anyone", "everyone", "no one"):
+            with self.subTest(word=word):
+                self.write("thing", PAGE.replace("It does it slowly.[^why]", "It does it slowly for %s.[^why]" % word))
+                problems = wiki.vague_actor_problems(self.root)
+                self.assertEqual(1, len(problems), problems)
+                self.assertTrue(problems[0].startswith("thing.md:%d: " % self.line_of("thing", "It does it slowly")))
+                self.assertIn("says %r instead of naming who acts" % word.lower(), problems[0])
+
+    def test_a_vague_actor_in_the_front_matter_is_refused(self):
+        self.write("thing", PAGE.replace("It should be plain what it is for.", "Anyone should see what it is for."))
+        self.assertTrue(any(problem.startswith("thing.md: the intent says 'anyone'")
+                            for problem in wiki.vague_actor_problems(self.root)))
+
+    def test_a_named_actor_or_code_passes(self):
+        for text in ("The reader sees it slowly.[^why]",
+                     "The owner approves it, and no reader can reach it.[^why]",
+                     "The flag is `--nobody`.[^why]"):
+            with self.subTest(text=text):
+                self.write("thing", PAGE.replace("It does it slowly.[^why]", text))
+                self.assertEqual([], wiki.vague_actor_problems(self.root))
+
+    def test_the_check_refuses_a_vague_actor(self):
+        self.write("thing", PAGE.replace("It does it slowly.[^why]", "Somebody does it slowly.[^why]"))
+        problems, *_ = wiki.check(self.root)
+        self.assertTrue(any("instead of naming who acts" in problem for problem in problems), problems)
+
     def test_the_check_refuses_a_name_that_points_at_the_page(self):
         self.write("thing", PAGE.replace('label = "Today"', 'label = "This site"'))
         problems, *_ = wiki.check(self.root)

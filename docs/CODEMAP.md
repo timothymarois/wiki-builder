@@ -70,14 +70,15 @@ inside it.
 | `references/reference-standard.md` | The same for reference pages — a command and an endpoint, each done well and badly |
 | `references/naming-and-grammar.md` | Names a writer chooses and names the software owns, and the grammar pages are held to |
 | `references/reference-pages.md` | How a page documents a command, endpoint, function, settings file or event |
+| `references/flowcharts.md` | How to design a diagram: when to draw, its kind, shapes, direction, labels, and its sources |
 
 `wiki sync` writes every one of them into the consuming project, where its agents read them. A built wheel carries
 them inside the package; a checkout leaves them where they were written, and `build.skill_dir()` finds
 them either way.
 
-## Tests (`tests/` — 161 cases)
+## Tests (`tests/` — 165 cases)
 
-`tests/test_build.py` (1672 lines). Each case builds a small wiki in a temporary directory, breaks exactly
+`tests/test_build.py` (1701 lines). Each case builds a small wiki in a temporary directory, breaks exactly
 one rule, and asserts the tool names it. Run them with:
 
 ```sh

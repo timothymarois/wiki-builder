@@ -39,7 +39,7 @@ described on [Site](site.md).
 **The server shows the whole project, not only the site.**[^root] A page can link to any file in the
 project, and a browser cannot follow a link above the folder it is served from.[^paths]
 
-That means anyone who can reach the server can read every file in the project.[^root] For that reason, it
+That means anything that can reach the server can read every file in the project.[^root] For that reason, it
 answers only on this machine.[^loopback]
 
 ## Sources

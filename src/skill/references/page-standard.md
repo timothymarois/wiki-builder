@@ -1,6 +1,6 @@
 # Page standard
 
-Somebody's owner approved the page below and asked that pages be written like it. Read both versions
+The page below is the standard every page is written to. Read both versions
 before writing anything. **The contrast teaches more than either version alone**, and more than the rules
 do: rules tell you what not to do, an example tells you what good looks like.
 
@@ -22,7 +22,7 @@ will be something else. Nothing about the shape changes.
 >
 > A session that expires while you are typing **does not lose the work**. The draft is held for another
 > day and reattached when you sign in again. That is deliberate — expiry is meant to make a stolen
-> session useless, not to punish somebody who went to lunch.
+> session useless, not to punish a user who went to lunch.
 >
 > ## Size
 >
@@ -54,7 +54,7 @@ will be something else. Nothing about the shape changes.
 > according to the configured overflow policy. Compression is not currently enabled.
 
 Everything in the failed version is *true*. That is what makes it worth studying — **it fails without
-lying**. Correct, complete, flat, and nobody reads it.
+lying**. Correct, complete, flat, and unread.
 
 ## Differences
 
@@ -73,7 +73,7 @@ describes machinery and leaves the reader arithmetic they have no numbers for.
 they would notice being wrong.
 
 **The surprising thing gets its one clause of reason.** "Expiry is meant to make a stolen session
-useless, not to punish somebody who went to lunch." A rule that looks wrong gets reported as a bug; one
+useless, not to punish a user who went to lunch." A rule that looks wrong gets reported as a bug; one
 clause ends the question and saves a round trip with whoever has to answer it.
 
 **What is absent is said once, where a reader would look for it.** "A second device stays signed in —
@@ -124,14 +124,14 @@ rows = [
 ]
 ```
 
-**Identity comes first, and it holds names a person uses.** The cookie someone finds in their browser, the
-setting an operator changes. Not the class, which only the code knows and nobody reading this will type.
+**Identity comes first, and it holds names a person uses.** The cookie a user finds in their browser, the
+setting an operator changes. Not the class, which only the code knows and a reader never types.
 
 **Every label is a noun, and the value completes it.** "Expiry · 30 minutes" reads as a statement. "What
 it is" is a question with a sentence for an answer, which is the lead's job, and "Expires · yes" is a verb
 with nothing a reader can check.
 
-**The values are figures.** Thirty minutes and 4 kB, not "configurable", which is a fact nobody chased.
+**The values are figures.** Thirty minutes and 4 kB, not "configurable", which is a fact the writer never chased.
 
 **Each group is named for what it holds.** Identity, Limits, Rules. "Info" names nothing; every row is
 information.
@@ -140,8 +140,8 @@ information.
 the most visible place on the page.
 
 **Every row cites.** Each row names the footnote the prose cites for the same fact, so it carries the
-same number and a reader can follow it to the code. The failure's rows cite nothing: five claims nobody
-can trace, in the most visible place on the page. The extract above shows no footnotes only because it is
+same number and a reader can follow it to the code. The failure's rows cite nothing: five claims a reader
+cannot trace, in the most visible place on the page. The extract above shows no footnotes only because it is
 an extract; a real page defines each one the infobox names.
 
 ## Self-edit
@@ -150,12 +150,12 @@ Before you call a page done, read it once for each of these. They are quick and 
 
 1. **Cut every sentence that does not serve the intent.** Not shorten — cut. If that empties a section,
    the section was the problem.
-2. **Find every hedge and either get the number or say nobody knows.** "Reasonable", "may vary",
+2. **Find every hedge and either get the number or say it is unknown.** "Reasonable", "may vary",
    "generally", "a number of" — each one is a fact you did not chase.
 3. **Read only the first line of each section.** A reader who stopped there should still be right.
 4. **Check every claim against the code again**, not against the draft. A page derived from another page
    inherits its errors.
-5. **Say where nobody is sure.** Emergent, untested, or you could not determine it — say so. A confident
+5. **Say what is uncertain.** Emergent, untested, or you could not determine it — say so. A confident
    sentence covering a gap is the worst thing you can leave here, because the reader is using this
    *instead of* the code and has no way to catch it.
 6. **Read the headings alone, in order.** They are the page's table of contents and most readers will
@@ -174,6 +174,6 @@ an outside service behaves, at that service's own documentation. The gate
 refuses a reference that cites a `.md`, because a page of prose is not an answer to "where does this
 happen" — it is another claim that can be wrong in the same way.
 
-**A page that surprised nobody who wrote it probably was not read carefully enough.** Writing a page from
+**A page that never surprised its writer probably was not read carefully enough.** Writing a page from
 the code routinely turns up things the owner believed that are not true. If yours turned up nothing, you
 summarised another document instead of reading what runs.

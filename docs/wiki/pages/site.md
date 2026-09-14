@@ -3,7 +3,7 @@ title = "Site"
 subtitle = "what a build makes"
 status = "approved"
 intent = """
-The site exists so that pages can be read by someone who will never open the markdown, wherever they
+The site exists so that pages can be read by a reader who will never open the markdown, wherever they
 happen to open it. It should be impossible for the site to be out of date, and nothing a reader sees
 should change unless a page did.
 """
@@ -44,8 +44,8 @@ clean addresses instead, which work only on a host.[^publish] A link that leaves
 is marked `nofollow` and ends in an arrow, without its author writing anything but the link.[^outside]
 
 The build deletes whatever it no longer makes, so a removed page leaves nothing behind.[^removed] For the
-same reason, **it refuses to write into a folder it did not make**, so it never empties someone
-else's.[^guard]
+same reason, **it refuses to write into a folder it did not make**, so it never empties a folder
+made by anything else.[^guard]
 
 **A link to a wiki page that does not exist is drawn red instead of blue**, and `wiki check` refuses it,
 naming the page and the line.[^redlink] A link to any other file that does not exist is not refused, and

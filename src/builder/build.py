@@ -118,8 +118,8 @@ MISSING = re.compile(r"\{missing\}")
 # Rendered code, inline or a block, kept whole when a page is split around it.
 CODE_HTML = re.compile(r"(<pre\b.*?</pre>|<code\b.*?</code>)", re.S)
 MISSING_CITATION = ('<sup class="ref nocite" data-audience="internal" '
-                    'title="No source cited: either this is not built yet, or nobody has found where it '
-                    'happens">[?]</sup>')
+                    'title="No source cited: either this is not built yet, or where it happens has not been '
+                    'found">[?]</sup>')
 
 
 # --------------------------------------------------------------------------------------------------
@@ -559,7 +559,7 @@ def render_infobox(page, audience, directory, images, cited=None):
                             "<i>%s</i>" % html_module.escape(str(note)) if note else ""))
     if shown and missing:
         parts.append('<div class="legend">A row marked %s has no source to cite: either it is not built '
-                     "yet, or nobody has found where it happens.</div>" % MISSING_CITATION)
+                     "yet, or where it happens has not been found.</div>" % MISSING_CITATION)
     parts.append("</aside>")
     return "\n".join(parts)
 
@@ -754,9 +754,9 @@ def render_page(title, subtitle, hatnote, body_html, infobox, categories_bar, na
         "nav": nav,
         "title": html_module.escape(title),
         "subtitle": html_module.escape(subtitle),
-        "hatnote": (('      <p class="hat draft"><b>This page is a draft.</b> Nobody has agreed that what '
-                     'it says this part of the system is for is what it should be for, so read it as a '
-                     'proposal rather than as the wiki.</p>\n' if draft else "")
+        "hatnote": (('      <p class="hat draft"><b>This page is a draft.</b> The owner has not approved '
+                     'what it says this part of the system is for, so read it as a proposal rather than as '
+                     'the wiki.</p>\n' if draft else "")
                     + ('      <p class="hat">%s</p>' % html_module.escape(hatnote) if hatnote else "")),
         "infobox": infobox,
         "contents": render_contents(entries),
@@ -838,7 +838,7 @@ def markdown_copy(page, directory, page_ids, pages_dir, ledger, extra=""):
     if page["subtitle"]:
         head += ["_%s_" % page["subtitle"], ""]
     if page["status"] != "approved":
-        head += ["**Status.** Draft: nobody has approved what this page says the thing is for.", ""]
+        head += ["**Status.** Draft: the owner has not approved what this page says the thing is for.", ""]
     head += ["**Intent.** " + " ".join(page["intent"].split()), ""]
     body = outside_code(page["body"].strip("\n"), lambda text: MARKDOWN_LINK.sub(readdress, text))
     return "\n".join(head) + "\n" + body + "\n" + extra
@@ -926,7 +926,7 @@ def write_site(root, out, audience, link_root, today, record, wiki):
     for page_id in sorted(pages):
         if page_id not in in_nav:
             raise WikiError(f"{page_id}.md is in no navigation section and beneath no page that is, "
-                            "so nobody could reach it")
+                            "so no reader could reach it")
     # A category needs no navigation entry: every page carrying one links to it from its own foot, which
     # is the only direction anyone travels. Listing one in wiki.toml still works, and still has to name a
     # category some page belongs to.
@@ -1458,6 +1458,41 @@ def attribution_problems(root, wiki=None):
     return problems
 
 
+# A vague actor: a sentence saying that an unnamed person did, did not, or may do something. It hides the one fact
+# a reader needs -- who -- so a page names the reader, the owner, an agent, or the part of the system that acts.
+VAGUE_ACTOR = re.compile(r"\b(nobody|somebody|someone|anyone|anybody|everyone|everybody|no[ -]one)\b", re.I)
+
+
+def vague_actor_problems(root, wiki=None):
+    """Titles, labels and sentences that say an unnamed person acts instead of naming who.
+
+    Code is left alone, because a sample shows text as written.
+    """
+    pages_dir = wiki_of(root, wiki) / "pages"
+    problems = []
+    for path in sorted(pages_dir.rglob("*.md")):
+        meta, _ = read_front_matter(path)
+        name = path.relative_to(pages_dir)
+        fields = [("title", meta.get("title", "")), ("subtitle", meta.get("subtitle", "")),
+                  ("intent", meta.get("intent", ""))]
+        for group in meta.get("infobox", []):
+            fields.append(("infobox group", group.get("group", "")))
+            for row in group.get("rows", []):
+                fields += [("infobox label", row.get("label", "")), ("infobox value", row.get("value", "")),
+                           ("infobox note", row.get("note", ""))]
+        for field, text in fields:
+            found = VAGUE_ACTOR.search(INLINE_CODE.sub("", str(text)))
+            if found:
+                problems.append(f"{name}: the {field} says {found.group(0).lower()!r} instead of naming who "
+                                "acts; name the reader, the owner, an agent or the part that acts")
+        for line, statement in page_statements(path):
+            found = VAGUE_ACTOR.search(INLINE_CODE.sub("", statement))
+            if found:
+                problems.append(f"{name}:{line}: {quoted(statement)} says {found.group(0).lower()!r} instead of "
+                                "naming who acts; name the reader, the owner, an agent or the part that acts")
+    return problems
+
+
 def dead_link_problems(root, wiki=None):
     """Links to a page the wiki does not have.
 
@@ -1606,6 +1641,7 @@ def check(root, wiki=None, version=None):
         problems += pointing_problems(root, wiki)
         problems += dead_link_problems(root, wiki)
         problems += attribution_problems(root, wiki)
+        problems += vague_actor_problems(root, wiki)
         problems += uncited_problems(root, wiki)
         problems += infobox_problems(root, wiki)
         if version:
@@ -1621,7 +1657,7 @@ def bless(root, picture, reason, wiki=None):
     if picture not in ledger:
         raise WikiError(f"{picture} has no entry in {LEDGER}")
     if not reason.strip():
-        raise WikiError("a blessing needs a reason; it is the record that someone actually looked")
+        raise WikiError("a blessing needs a reason; it is the record that the picture was looked at")
     ledger[picture]["digest"] = subject_digest(root, ledger[picture].get("depicts", []))
     ledger[picture]["blessed"] = reason.strip()
     write_ledger(images_dir, ledger)
@@ -1666,7 +1702,7 @@ def report(counts, goals_words, budget, drafts=(), citations=None):
               % (len(drafts), "" if len(drafts) == 1 else "s", ", ".join(drafts)))
     if not budget.get("calibrated"):
         print("wiki: these budgets are PROVISIONAL -- %d words a page, %d for the collected goals. "
-              "Nobody has measured what this project's reader will actually read; until they have, the "
-              "numbers are a guess that happens to be enforced. Set budget.calibrated in %s when they "
-              "have." % (budget["page"], budget["goals"], CONFIG))
+              "What this project's readers actually read has not been measured; until it is, the "
+              "numbers are a guess that happens to be enforced. Set budget.calibrated in %s once it "
+              "is." % (budget["page"], budget["goals"], CONFIG))
 

@@ -3,7 +3,7 @@ title = "Commands"
 subtitle = "everything wiki does, and how to ask for it"
 status = "approved"
 intent = """
-The command reference exists so that someone using the tool can find the command for a job, and exactly
+The command reference exists so that a person using the tool can find the command for a job, and exactly
 how to type it, without reading the code. Every command, option, argument and exit code the tool accepts
 should be here, and nothing it does not.
 """

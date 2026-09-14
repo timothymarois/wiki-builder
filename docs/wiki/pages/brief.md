@@ -4,7 +4,7 @@ subtitle = "what wiki-builder is, who it is for, and what it refuses"
 status = "approved"
 goals = false
 intent = """
-The brief exists so that anyone arriving at wiki-builder, person or agent, learns in one screen what it
+The brief exists so that a reader arriving at wiki-builder, person or agent, learns in one screen what it
 is, who it is for and what it refuses. It stays short and stable, and names nothing private.
 """
 
@@ -37,16 +37,16 @@ It has two halves, and the second is why it exists:
   citations, search and pictures, that works served or from disk.
 - **A set of refusals.** A sentence or an infobox row that states something and cites nothing. A reference
   linking to a markdown document. A heading that asks a question or rates itself. A name or sentence that
-  points instead of naming. A page longer than anyone will read. A page edited since its date was recorded. A picture whose subject
-  has changed. A page nobody can reach.
+  points instead of naming. A page too long to read. A page edited since its date was recorded. A picture whose subject
+  has changed. An unreachable page.
 
 ## Reasoning
 
-Documentation dies the same way every time: it grows faster than anyone reads it, nobody can tell which
+Documentation dies the same way every time: it grows faster than it is read, readers cannot tell which
 sentences were checked, and by the time it is wrong it still looks authoritative. The wiki wiki-builder was
 extracted from had grown to 75,000 words that its owner had stopped reading.
 
-wiki-builder is for the case where **somebody reads the wiki instead of the source.** There, an untraceable
+wiki-builder is for the case where **the wiki is read instead of the source.** There, an untraceable
 sentence is worse than a missing one, because it looks exactly like a verified one. So every sentence is
 cited to the code it came from, or marked as uncited.
 

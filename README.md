@@ -4,14 +4,14 @@
 code it came from.**
 
 It renders pages into a Wikipedia-shaped static site — sidebar, infobox, numbered contents, cited
-references — and then refuses the things that make documentation rot. That second half is the point.
+references — and then refuses the things that make documentation rot. The refusals are what it is for.
 Rendering markdown is easy; keeping a document true for a year is not.
 
 ## Why it exists
 
-Documentation dies the same way every time. It grows faster than anyone reads it, nobody can tell which
+Documentation dies the same way every time. It grows faster than it is read, its readers cannot tell which
 sentences were checked, and by the time it is wrong it still looks authoritative. wiki-builder exists for
-the case where **somebody is reading the wiki instead of reading the source** — so a sentence they cannot
+the case where **a reader is using the wiki instead of reading the source** — so a sentence they cannot
 trace is a sentence they have to take on faith.
 
 So it refuses:
@@ -21,10 +21,10 @@ So it refuses:
 | A sentence that states something and cites nothing | `{missing}` is a fine answer; silence is not |
 | A reference that cites a project document instead of code | A page of prose is another claim, not an answer |
 | A heading that asks a question or rates itself | "Where it goes" — the reader wanted "Home" |
-| A page longer than anyone will read | Budgets you set, that nag until you have measured them |
+| A page longer than its reader will read | Budgets you set, that nag until you have measured them |
 | A page edited since its date was recorded | So a date on a page means something |
 | A picture whose subject has changed | Re-render it, or bless it with a reason |
-| A page nobody can reach | Every page is in the sidebar, and a draft says it is one |
+| A page a reader cannot reach | Every page is in the sidebar, and a draft says it is one |
 
 Each of those was added after the failure it prevents actually happened.
 
@@ -82,12 +82,12 @@ checkout, `uv run wiki serve` builds it and opens it.
 
 ## The skill
 
-Half of wiki-builder is not code. `wiki sync` writes a skill into your repository — `.agents/skills/` or
-`.claude/skills/` — that tells an agent how to write a page: the intent contract, how to name things,
-what may never appear, and a worked example with the same content written badly beside it.
+wiki-builder ships a skill: the instructions an agent follows to write a page. `wiki sync` writes it into
+your repository — `.agents/skills/` or `.claude/skills/` — and it holds the intent contract, how to name
+things, what may never appear, and a worked example with the same content written badly beside it.
 
 **It belongs in your repository rather than inside the package** because agents read it from there, and a
-change to how pages must be written belongs in a diff somebody reviews.
+change to how pages must be written belongs in a diff the owner reviews.
 
 `wiki sync --skill-dir tools/skills` puts it in a folder of your choosing instead, relative to the
 project. `wiki sync --no-skill` records the release without writing the skill at all. Wherever it goes, a
