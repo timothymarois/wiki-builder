@@ -207,6 +207,60 @@ class WikiTests(unittest.TestCase):
         source = (self.out / "thing/source/index.html").read_text(encoding="utf-8")
         self.assertIn('<p class="sub">markdown source of this page</p>', source)
 
+    # An agent reads markdown far better than a rendered page, and a static host cannot choose between
+    # the two by what the reader asks for, so each page sits beside a markdown copy of itself.
+
+    def test_every_page_has_a_markdown_copy_for_agents(self):
+        self.build()
+        copy = (self.out / "thing/index.md").read_text(encoding="utf-8")
+        self.assertTrue(copy.startswith("# A thing\n"), copy[:80])
+        self.assertIn("A thing exists so that something else can happen.", copy)
+        self.assertIn("It does it slowly.[^why]", copy)
+        self.assertIn("[^why]: The reason — `Source/Thing.h`.", copy)
+        self.assertNotIn("+++", copy)
+        self.assertNotIn("<p>", copy)
+
+    def test_a_page_link_in_a_markdown_copy_points_at_that_pages_copy(self):
+        self.build()
+        front = (self.out / "index.md").read_text(encoding="utf-8")
+        self.assertIn("[a thing](thing/index.md)", front)
+
+    def test_the_goals_copy_carries_the_collected_intents(self):
+        self.build()
+        goals = (self.out / "goals/index.md").read_text(encoding="utf-8")
+        self.assertIn("A thing exists so that something else can happen.", goals)
+
+    def test_a_page_names_its_markdown_copy_and_the_agent_index(self):
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertIn('<link rel="alternate" type="text/markdown" href="index.md">', page)
+        self.assertIn('<link rel="describedby" href="../llms.txt">', page)
+
+    def test_llms_txt_lists_every_page_by_its_markdown_copy(self):
+        self.build()
+        index = (self.out / "llms.txt").read_text(encoding="utf-8")
+        self.assertTrue(index.startswith("# "), index[:60])
+        self.assertIn("- [A thing](thing/index.md): what it is", index)
+
+    def test_a_page_and_its_source_view_link_to_the_markdown_copy(self):
+        # Anyone can open a page as pure markdown from the page itself. The owner, 2026-09-14: "we would
+        # want the docs to be viewable as pure md file content".
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        source = (self.out / "thing/source/index.html").read_text(encoding="utf-8")
+        self.assertIn('<li><a href="index.md">Markdown</a></li>', page)
+        self.assertIn('<li><a href="../index.md">Markdown</a></li>', source)
+        self.assertTrue((self.out / "thing/index.md").is_file())
+
+    def test_a_player_build_has_no_markdown_copy_and_no_agent_index(self):
+        # The copy is the page as written, references and marks included, which a player build withholds.
+        self.write("thing", PAGE.replace('categories = ["Things"]',
+                                         'categories = ["Things"]\naudience = "player"'))
+        self.build("player")
+        self.assertTrue((self.out / "thing/index.html").is_file())
+        self.assertFalse((self.out / "thing/index.md").exists())
+        self.assertFalse((self.out / "llms.txt").exists())
+
     def test_a_paragraph_that_states_something_and_cites_nothing_is_refused(self):
         """The rule the whole wiki rests on: a reader uses this instead of the source, so a sentence they
         cannot trace is one they must take on faith -- and it looks exactly like one that was checked."""

@@ -81,6 +81,18 @@
     });
   }
 
+  // --- the current page in a long page list -----------------------------------------------------------
+  // The list scrolls on its own, so a page far down it would open with its own link out of sight. Only
+  // the list moves: the article stays where the reader put it.
+  var nav = document.getElementById("nav");
+  var current = nav && nav.querySelector("a.on");
+  if (current && nav.scrollHeight > nav.clientHeight) {
+    var top = current.getBoundingClientRect().top - nav.getBoundingClientRect().top;
+    if (top < 0 || top > nav.clientHeight - current.offsetHeight) {
+      nav.scrollTop += top - nav.clientHeight / 3;
+    }
+  }
+
   // --- the lightbox ---------------------------------------------------------------------------------
   // Pictures in a page are thumbnails, so there has to be a way to see one whole. Click anywhere, or
   // press Escape, to close it again.

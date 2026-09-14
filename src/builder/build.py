@@ -636,6 +636,18 @@ def collect_categories(pages, audience):
 
 def goals_page(pages, sections, audience):
     """Every intent, in the order the sidebar puts them: the whole point of the thing, in one sitting."""
+    ordered = goals_order(pages, sections, audience)
+    body = []
+    for page_id in ordered:
+        page = pages[page_id]
+        body.append("<h2>%s</h2>" % html_module.escape(page["title"]))
+        body.append("<p>%s</p>" % html_module.escape(page["intent"]))
+    return "\n".join(body), sum(len(pages[page_id]["intent"].split()) for page_id in ordered)
+
+
+def goals_order(pages, sections, audience):
+    """The pages whose intents the goals page collects, in sidebar order. Shared by the rendered goals page
+    and its markdown copy, so the two can never list different goals."""
     ordered = []
     seen = set()
     for section in sections:
@@ -653,12 +665,7 @@ def goals_page(pages, sections, audience):
                     continue
                 ordered.append(page_id)
                 seen.add(page_id)
-    body = []
-    for page_id in ordered:
-        page = pages[page_id]
-        body.append("<h2>%s</h2>" % html_module.escape(page["title"]))
-        body.append("<p>%s</p>" % html_module.escape(page["intent"]))
-    return "\n".join(body), sum(len(pages[page_id]["intent"].split()) for page_id in ordered)
+    return ordered
 
 
 # One row, two views. A page with no written source -- a generated category -- shows the Article tab
@@ -667,21 +674,23 @@ ARTICLE_ONLY = '      <ul><li><a class="sel">Article</a></li></ul>'
 
 
 def on_article():
-    """The tab row of an article: itself, and its source beside it."""
+    """The tab row of an article: itself, its source, and its markdown copy, opened as the file itself."""
     return ('      <ul><li><a class="sel">Article</a></li>'
-            '<li><a href="source/%s">Source</a></li></ul>' % LINK_SUFFIX)
+            '<li><a href="source/%s">Source</a></li>'
+            '<li><a href="%s">Markdown</a></li></ul>' % (LINK_SUFFIX, AGENT_COPY))
 
 
 def on_source():
     """And of a source view. Both go through LINK_SUFFIX: written by hand they were dead off disk, which
     is exactly the failure the suffix exists to prevent."""
     return ('      <ul><li><a href="../%s">Article</a></li>'
-            '<li><a class="sel">Source</a></li></ul>' % LINK_SUFFIX)
+            '<li><a class="sel">Source</a></li>'
+            '<li><a href="../%s">Markdown</a></li></ul>' % (LINK_SUFFIX, AGENT_COPY))
 
 
 def render_page(title, subtitle, hatnote, body_html, infobox, categories_bar, nav, index, site,
                 directory, template, tabs=ARTICLE_ONLY, updated="", stamp_css="", stamp_js="",
-                draft=False):
+                draft=False, llm_links=""):
     body_html, entries = number_headings(body_html)
     filled = {
         "tabs": tabs,
@@ -705,8 +714,114 @@ def render_page(title, subtitle, hatnote, body_html, infobox, categories_bar, na
         "footer": ('      <div class="foot"><span>Last updated %s</span></div>'
                    % html_module.escape(spoken_date(updated))) if updated else "",
         "index": index,
+        "llm_links": llm_links,
     }
     return re.sub(r"\{\{(\w+)\}\}", lambda m: filled.get(m.group(1), ""), template)
+
+
+# --------------------------------------------------------------------------------------------------
+# markdown for agents
+#
+# An agent reads markdown far better than a rendered page, and a static host answers one address with one
+# file whoever asks, so each page is published twice: rendered, and as a markdown copy beside it, with
+# llms.txt at the root listing every copy. The owner, 2026-09-14: "can we have llm rendering where llm sees
+# the md instead of html?" The shape is the llms.txt proposal's.
+
+AGENT_INDEX = "llms.txt"
+AGENT_COPY = "index.md"
+# A markdown link or picture as written: everything up to the address, the address, the closing bracket.
+MARKDOWN_LINK = re.compile(r"(!?\[[^\]]*\]\()([^)\s]+)(\))")
+
+
+def outside_code(text, change):
+    """Apply a change to markdown everywhere but its code, which is shown as written."""
+    def inline(segment):
+        parts = re.split("(%s)" % INLINE_CODE.pattern, segment)
+        return "".join(part if index % 2 else change(part) for index, part in enumerate(parts))
+
+    out, last = [], 0
+    for block in FENCED.finditer(text):
+        out.append(inline(text[last:block.start()]))
+        out.append(block.group(0))
+        last = block.end()
+    out.append(inline(text[last:]))
+    return "".join(out)
+
+
+def copy_address(from_directory, page_id):
+    """A link from one page's folder to another page's markdown copy."""
+    return posixpath.relpath("/" + page_directory(page_id) + AGENT_COPY, "/" + (from_directory or "."))
+
+
+def markdown_copy(page, directory, page_ids, pages_dir, ledger, extra=""):
+    """A page as an agent reads it: title, subtitle and intent, then the body and references as written.
+
+    Only addresses move. The author linked a sibling page as name.md from the pages folder, and the copy
+    sits in the page's own folder in the site, so a link to a page points at that page's copy and a
+    picture at the site's copy of the picture. Code is left alone: a sample shows a link as written.
+    """
+    def readdress(match):
+        opening, target, closing = match.groups()
+        if SETTLED_LINK.match(target):
+            return match.group(0)
+        address, _, fragment = target.partition("#")
+        if opening.startswith("!"):
+            name = posixpath.basename(address)
+            return opening + relative_file(directory, "images/" + name) + closing if name in ledger \
+                else match.group(0)
+        if address.endswith(".md"):
+            try:
+                target_id = (page["path"].parent / address).resolve().relative_to(
+                    pages_dir.resolve()).with_suffix("").as_posix()
+            except ValueError:
+                return match.group(0)
+            if target_id in page_ids:
+                return opening + copy_address(directory, target_id) + (
+                    "#" + fragment if fragment else "") + closing
+        return match.group(0)
+
+    head = ["# " + page["title"], ""]
+    if page["subtitle"]:
+        head += ["_%s_" % page["subtitle"], ""]
+    if page["status"] != "approved":
+        head += ["**Status.** Draft: nobody has approved what this page says the thing is for.", ""]
+    head += ["**Intent.** " + " ".join(page["intent"].split()), ""]
+    body = outside_code(page["body"].strip("\n"), lambda text: MARKDOWN_LINK.sub(readdress, text))
+    return "\n".join(head) + "\n" + body + "\n" + extra
+
+
+def goals_markdown(pages, ordered, directory):
+    """The intents the goals page collects, as its markdown copy carries them."""
+    return "".join("\n## [%s](%s)\n\n%s\n" % (pages[page_id]["title"], copy_address(directory, page_id),
+                                              " ".join(pages[page_id]["intent"].split()))
+                   for page_id in ordered)
+
+
+def agent_order(sections, pages, emitted):
+    """Every page the build writes, each once, grouped by section in sidebar order."""
+    shown, seen, order = set(emitted), set(), []
+    for section in sections:
+        ids = []
+        for top in section.get("pages", []):
+            for page_id in descendants_of(top, set(pages)):
+                if page_id in shown and page_id not in seen:
+                    seen.add(page_id)
+                    ids.append(page_id)
+        order.append((section.get("title", ""), ids))
+    return order
+
+
+def agent_index(site, order, pages):
+    """llms.txt: the site's name, then every page's markdown copy, by section in sidebar order."""
+    lines = ["# " + site["name"], ""]
+    if site.get("tagline"):
+        lines += ["> " + site["tagline"], ""]
+    for title, ids in order:
+        if ids:
+            lines += ["## " + title, ""] + ["- [%s](%s)%s" % (
+                pages[page_id]["title"], copy_address("", page_id),
+                ": " + pages[page_id]["subtitle"] if pages[page_id]["subtitle"] else "") for page_id in ids] + [""]
+    return "\n".join(lines)
 
 
 def build(root, out, audience, link_root=None, today=None, record=True, links="file", wiki_dir=None):
@@ -811,8 +926,8 @@ def write_site(root, out, audience, link_root, today, record, wiki):
     counts = {}
     written = []
 
-    def emit(directory, markup):
-        destination = (out / directory / "index.html") if directory else (out / "index.html")
+    def emit(directory, markup, name="index.html"):
+        destination = out / directory / name
         destination.parent.mkdir(parents=True, exist_ok=True)
         # A page whose bytes have not moved is left alone, so what a build touched is what a build
         # actually changed.
@@ -847,6 +962,17 @@ def write_site(root, out, audience, link_root, today, record, wiki):
             body = for_player(body)
         # The source view names paths and internal identifiers by its nature, so it is internal only.
         with_source = audience != "player"
+        # The markdown copy is the page as written, references and marks included, so it goes where the
+        # source view goes and nowhere else.
+        llm_links = ""
+        if with_source:
+            emit(directory, markdown_copy(
+                page, directory, set(emitted), wiki / "pages", ledger,
+                goals_markdown(pages, goals_order(pages, sections, audience), directory)
+                if page_id == GOALS_ID else ""), AGENT_COPY)
+            llm_links = ('<link rel="alternate" type="text/markdown" href="%s">\n<link rel="describedby" '
+                         'href="%s">' % (AGENT_COPY, posixpath.relpath("/" + AGENT_INDEX,
+                                                                        "/" + (directory or "."))))
         emit(directory, render_page(
             page["title"], page["subtitle"], page["hatnote"], body,
             render_infobox(page, audience, directory, ledger, markdown.renderer.cited),
@@ -854,7 +980,7 @@ def write_site(root, out, audience, link_root, today, record, wiki):
             render_nav(sections, pages, categories, page_id, directory, audience),
             index_for(directory), site, directory, template,
             on_article() if with_source else ARTICLE_ONLY, dates[page_id]["updated"],
-            stamps["wiki.css"], stamps["wiki.js"], page["status"] != "approved"))
+            stamps["wiki.css"], stamps["wiki.js"], page["status"] != "approved", llm_links))
         if with_source:
             source_directory = directory + "source/"
             emit(source_directory, render_page(
@@ -881,6 +1007,10 @@ def write_site(root, out, audience, link_root, today, record, wiki):
             render_nav(sections, pages, categories, slug, directory, audience),
             index_for(directory), site, directory, template, ARTICLE_ONLY, "",
             stamps["wiki.css"], stamps["wiki.js"]))
+
+    if audience != "player":
+        order = agent_order(sections, pages, emitted)
+        emit("", agent_index(site, order, pages), AGENT_INDEX)
 
     assets = out / "assets"
     assets.mkdir(parents=True, exist_ok=True)

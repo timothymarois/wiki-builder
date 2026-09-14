@@ -6,6 +6,6 @@
 # when the change did not alter what the picture shows.
 
 ["page-anatomy.svg"]
-digest = "sha256:257c739ae1004fbd84a9d5b1b56221597d3b86ebb29f2b1ccaa20a82eb20917e"
+digest = "sha256:dc743b25ed52b900662fc854445b4e6ea4e88d10f616d2687898ea7b3144dd32"
 depicts = ["src/builder/assets/template.html"]
-blessed = "The template's subtitle placeholder was renamed from kicker; the parts of a page and their places are unchanged."
+blessed = "the template gained two link elements in the page head, naming the markdown copy and llms.txt; nothing a reader sees moved"

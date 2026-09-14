@@ -74,7 +74,7 @@ digest = "3df4ad8c14b9f1ef3f3ab4ce88058614a2527c453b575843f1df531bebf6328e"
 
 ["goals"]
 updated = "2026-09-14"
-digest = "d4dd8e73b47db984a6b63166b754ad9c712560d42f37c813ce0f649601559521"
+digest = "2a28e79bc76d9e3927aee3476ed76d3a386e8bb797bebc41a32f9b2b550c4db4"
 
 ["index"]
 updated = "2026-09-14"
@@ -103,6 +103,14 @@ digest = "5e54592e2f626ff4dfd482d21739ab9404f46f308ef034aff15d36da5624795b"
 ["site"]
 updated = "2026-09-14"
 digest = "9b0d27baebc9cb548a91e33be499f246ced62cf670af69b1edee83176b057ba4"
+
+["site/agent-markdown"]
+updated = "2026-09-14"
+digest = "d9ace96cc014cbbeda053ed40442c3ba2ede159dac06af63f13c53521186fd51"
+
+["site/layout"]
+updated = "2026-09-14"
+digest = "0e32bb6e4d10350a291169d660f64b153625905cb090780b2fa62ded1012742d"
 
 ["skill"]
 updated = "2026-09-14"

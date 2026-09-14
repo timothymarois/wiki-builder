@@ -50,10 +50,15 @@ code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;backgroun
 /* The rail does not move when the article is scrolled. The padding that used to sit on the column is
    inside the sticky element instead: with it outside, the sticky box started 12px below the top and
    slid that far before it pinned, which reads as the whole sidebar twitching on the first scroll.
-   The column keeps its own background so the tint still runs the full height. */
-.rail{background:var(--surface);padding:0 0 60px;font-size:13px}
-.rail-in{position:sticky;top:0;padding:12px 12px 12px 14px;display:flex;flex-direction:column;gap:14px;
-  max-height:100vh;overflow-y:auto;overscroll-behavior:contain}
+   The column keeps its own background so the tint still runs the full height.
+   The rail is exactly the window's height and never scrolls as a whole: the logo and search stay put, and
+   only the page list beneath them scrolls, on its own, without handing the scroll on to the article. The
+   owner, 2026-09-14: the logo was hidden whenever the article was scrolled. */
+.rail{background:var(--surface);padding:0;font-size:13px}
+.rail-in{position:sticky;top:0;box-sizing:border-box;height:100vh;height:100dvh;
+  padding:12px 12px 0 14px;display:flex;flex-direction:column;gap:14px}
+.rail-in > .logo,.rail-in > .sbox{flex:none}
+.rail #nav{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:24px}
 .logo{padding:4px 0 12px;border-bottom:1px solid var(--hair)}
 .logo b{display:block;font:400 17px/1.2 'Linux Libertine',Georgia,'Times New Roman',serif}
 .logo span{display:block;font-size:10.5px;color:var(--faint);margin-top:3px;font-style:italic}
@@ -252,7 +257,8 @@ pre.src{overflow-x:auto;margin:0;padding:12px 14px;background:var(--surface);
   pre.src{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;padding:10px 12px;
     line-height:1.6}
   .rail{padding:0}
-  .rail-in{position:static;max-height:none;overflow:visible;padding:10px 16px 12px;gap:10px}
+  .rail-in{position:static;height:auto;padding:10px 16px 12px;gap:10px}
+  .rail #nav{overflow:visible;padding-bottom:0}
   .doc{border-left:0;border-top:1px solid var(--border-soft)}
   /* 16px of gutter either side at every width, and slightly larger body text: 14px is comfortable
      beside a 176px rail on a desktop and tight on a phone. */
