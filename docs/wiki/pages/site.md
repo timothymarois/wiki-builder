@@ -11,23 +11,23 @@ should change unless a page did.
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Commands", value = "wiki build, wiki publish, wiki player" },
-  { label = "Output", value = "docs/wiki/site", note = "for wiki build" },
+  { label = "Commands", value = "wiki build, wiki publish, wiki player", cite = "build" },
+  { label = "Output", value = "docs/wiki/site", note = "for wiki build", cite = "build" },
 ]
 
 [[infobox]]
 group = "Values"
 rows = [
-  { label = "Link ending", value = "index.html", note = "none in a published build" },
-  { label = "Search results", value = "8 at most" },
+  { label = "Link ending", value = "index.html", note = "none in a published build", cite = "links" },
+  { label = "Search results", value = "8 at most", cite = "search" },
 ]
 
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Search scope", value = "page titles only" },
-  { label = "Date change", value = "the page's own text only", note = "any intent, for the goals page" },
-  { label = "Dead links", value = "not refused" },
+  { label = "Search scope", value = "page titles only", cite = "search" },
+  { label = "Date change", value = "the page's own text only", note = "any intent, for the goals page", cite = ["dates", "goalsdate"] },
+  { label = "Dead links", value = "not refused", cite = "deadlink" },
 ]
 +++
 

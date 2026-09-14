@@ -10,23 +10,23 @@ show what was just built, and only to this machine.
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Command", value = "wiki serve", note = "or wiki alone" },
-  { label = "Options", value = "--port, --root, --wiki" },
+  { label = "Command", value = "wiki serve", note = "or wiki alone", cite = ["usage", "alone"] },
+  { label = "Options", value = "--port, --root, --wiki", cite = "usage" },
 ]
 
 [[infobox]]
 group = "Values"
 rows = [
-  { label = "Address", value = "127.0.0.1" },
-  { label = "Default port", value = "8787" },
+  { label = "Address", value = "127.0.0.1", cite = "serve" },
+  { label = "Default port", value = "8787", cite = "usage" },
 ]
 
 [[infobox]]
 group = "Exit codes"
 rows = [
-  { label = "Success", value = "0", note = "once stopped" },
-  { label = "Problems", value = "1" },
-  { label = "Misuse", value = "2", note = "including a port in use" },
+  { label = "Success", value = "0", note = "once stopped", cite = "exit" },
+  { label = "Problems", value = "1", cite = "exit" },
+  { label = "Misuse", value = "2", note = "including a port in use", cite = "exit" },
 ]
 +++
 

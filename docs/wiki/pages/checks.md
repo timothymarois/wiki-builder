@@ -11,22 +11,22 @@ sentences a person can act on.
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Command", value = "wiki check" },
+  { label = "Command", value = "wiki check", cite = "check" },
 ]
 
 [[infobox]]
 group = "Exit codes"
 rows = [
-  { label = "Success", value = "0" },
-  { label = "Problems", value = "1" },
-  { label = "Misuse", value = "2", note = "such as no wiki at the path" },
+  { label = "Success", value = "0", cite = "check" },
+  { label = "Problems", value = "1", cite = "check" },
+  { label = "Misuse", value = "2", note = "such as no wiki at the path", cite = "check" },
 ]
 
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Reporting", value = "every problem at once" },
-  { label = "Build stoppage", value = "that problem alone" },
+  { label = "Reporting", value = "every problem at once", cite = "check" },
+  { label = "Build stoppage", value = "that problem alone", cite = "caught" },
 ]
 +++
 
@@ -39,6 +39,7 @@ misused, such as pointed where there is no wiki.[^check] Each check was added af
 | Refused | Described on |
 |---|---|
 | A paragraph that cites nothing, or a reference to a document[^cited] | [Citations](checks/citations.md) |
+| An infobox row that cites nothing[^rows] | [Citations](checks/citations.md) |
 | A heading that asks a question or rates its contents[^headings] | [Headings](checks/headings.md) |
 | A page longer than its budget[^budget] | [Reading budgets](checks/budgets.md) |
 | A picture whose subject has changed[^pictures] | [Pictures](checks/pictures.md) |
@@ -56,6 +57,7 @@ happens, only that one problem is reported, as a single sentence, and the comman
     and returns 1 if there are any, 0 if not, and 2 when there is no wiki.
 [^cited]: `src/builder/build.py` — `uncited_problems()` and
     `citation_problems()`.
+[^rows]: `src/builder/build.py` — `infobox_problems()`.
 [^headings]: `src/builder/build.py` — `heading_problems()`.
 [^budget]: `src/builder/build.py` — `budget_problems()`.
 [^pictures]: `src/builder/build.py` — `picture_problems()`.

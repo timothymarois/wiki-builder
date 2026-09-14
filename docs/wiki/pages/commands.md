@@ -11,17 +11,17 @@ should be here, and nothing it does not.
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Program", value = "wiki" },
-  { label = "Commands", value = "build, check, serve, sync, bless, publish, player" },
-  { label = "Shared options", value = "--root, --wiki, --help" },
+  { label = "Program", value = "wiki", cite = "program" },
+  { label = "Commands", value = "build, check, serve, sync, bless, publish, player", cite = "commands" },
+  { label = "Shared options", value = "--root, --wiki, --help", cite = "place" },
 ]
 
 [[infobox]]
 group = "Exit codes"
 rows = [
-  { label = "Success", value = "0" },
-  { label = "Problems", value = "1" },
-  { label = "Misuse", value = "2" },
+  { label = "Success", value = "0", cite = "exit" },
+  { label = "Problems", value = "1", cite = "exit" },
+  { label = "Misuse", value = "2", cite = "exit" },
 ]
 +++
 

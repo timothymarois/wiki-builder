@@ -10,22 +10,22 @@ and leave a record of why. It should never clear a picture without a reason.
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Command", value = "wiki bless" },
-  { label = "Arguments", value = "PICTURE, REASON" },
+  { label = "Command", value = "wiki bless", cite = "usage" },
+  { label = "Arguments", value = "PICTURE, REASON", cite = "usage" },
 ]
 
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Reason", value = "required" },
+  { label = "Reason", value = "required", cite = "exit" },
 ]
 
 [[infobox]]
 group = "Exit codes"
 rows = [
-  { label = "Success", value = "0" },
-  { label = "Problems", value = "1" },
-  { label = "Misuse", value = "2" },
+  { label = "Success", value = "0", cite = "exit" },
+  { label = "Problems", value = "1", cite = "exit" },
+  { label = "Misuse", value = "2", cite = "exit" },
 ]
 +++
 

@@ -11,17 +11,18 @@ Every statement should lead to the code it came from, or say plainly that nothin
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Syntax", value = "markdown footnote" },
-  { label = "Mark", value = "{missing}", note = "for no source" },
+  { label = "Syntax", value = "markdown footnote", cite = "render" },
+  { label = "Mark", value = "{missing}", note = "for no source", cite = "mark" },
 ]
 
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Unit checked", value = "paragraph" },
-  { label = "Code samples", value = "not checked" },
-  { label = "Refused reference", value = "a link to a markdown document" },
-  { label = "Exempt pages", value = "pages about the wiki itself" },
+  { label = "Unit checked", value = "paragraph", cite = "uncited" },
+  { label = "Infobox rows", value = "cited, or marked missing", cite = "rows" },
+  { label = "Code samples", value = "not checked", cite = "sample" },
+  { label = "Refused reference", value = "a link to a markdown document", cite = "document" },
+  { label = "Exempt pages", value = "pages about the wiki itself", cite = "exempt" },
 ]
 +++
 
@@ -39,6 +40,10 @@ it.[^uncited] A paragraph written directly under its heading, with no blank line
 checked at all.[^heading] A code sample needs no citation, because it is the thing itself rather than a
 claim about it; the sentence introducing it does.[^sample]
 
+An infobox row is held to the same rule. It names a footnote the page's text cites for the same fact,
+and carries that citation's number, or it is marked as having no source; a row with neither is refused,
+and so is one citing a footnote no sentence uses.[^rows]
+
 Pages about the wiki itself, such as the front page, are excused.[^exempt]
 
 ## Red mark
@@ -47,6 +52,9 @@ Where nothing can be cited, the writer puts the word *missing* in curly braces, 
 question mark in brackets where a citation would go.[^mark] **It is a fine answer; silence is not.** It
 means either that the thing is not built or that nobody has found where it happens, and to a reader both
 mean the same thing: do not take this on faith. A reader-facing build removes all of them.[^player]
+
+Every build and check prints how many sources each page cites and how many claims it marks as having
+none, with totals for the wiki, so how much of it is taken on faith is visible on every run.[^counts]
 
 ## Documents
 
@@ -64,11 +72,14 @@ a reference that names nothing at all.[^document]
     that starts with `#`.
 [^sample]: `src/builder/build.py` — `uncited_problems()` removes fenced code with `FENCED` before
     splitting the body.
+[^rows]: `src/builder/build.py` — `infobox_problems()`, and `render_infobox()`, which gives a cited row
+    the number `footnote_reference()` recorded for its footnote.
 [^exempt]: `src/builder/build.py` — `uncited_problems()` skips a page
     whose front matter says `goals = false`.
 [^mark]: `src/builder/build.py` — `MISSING` and `MISSING_CITATION`,
     applied in `write_site()`.
 [^player]: `src/builder/build.py` — `for_player()` removes every
     `INTERNAL_MARKER`.
+[^counts]: `src/builder/build.py` — `citation_counts()`, printed by `report()`.
 [^document]: `src/builder/build.py` — `citation_problems()` matches
     `DOCUMENT_LINK`, a markdown link ending in `.md`, inside each footnote.

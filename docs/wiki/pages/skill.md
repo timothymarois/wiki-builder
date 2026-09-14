@@ -11,24 +11,24 @@ that project asks for it, and arrive where somebody reviews it.
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Name", value = "writing-wiki-pages" },
-  { label = "Command", value = "wiki sync" },
-  { label = "Options", value = "--skill-dir, --no-skill" },
+  { label = "Name", value = "writing-wiki-pages", cite = "files" },
+  { label = "Command", value = "wiki sync", cite = "sync" },
+  { label = "Options", value = "--skill-dir, --no-skill", cite = ["skilldir", "noskill"] },
 ]
 
 [[infobox]]
 group = "Contents"
 rows = [
-  { label = "Instructions", value = "SKILL.md" },
-  { label = "Worked examples", value = "page-standard.md, reference-standard.md" },
-  { label = "Rules", value = "naming-and-grammar.md, reference-pages.md" },
+  { label = "Instructions", value = "SKILL.md", cite = "files" },
+  { label = "Worked examples", value = "page-standard.md, reference-standard.md", cite = "files" },
+  { label = "Rules", value = "naming-and-grammar.md, reference-pages.md", cite = "files" },
 ]
 
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Location", value = ".agents/skills, else .claude/skills", note = "unless --skill-dir names one" },
-  { label = "Release record", value = "wiki.toml", note = "checked by wiki check" },
+  { label = "Location", value = ".agents/skills, else .claude/skills", note = "unless --skill-dir names one", cite = ["home", "skilldir"] },
+  { label = "Release record", value = "wiki.toml", note = "checked by wiki check", cite = ["record", "version"] },
 ]
 +++
 

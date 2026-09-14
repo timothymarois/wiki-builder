@@ -10,22 +10,22 @@ costs to read while they do. It should change nothing but the site and the recor
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Command", value = "wiki build" },
-  { label = "Options", value = "--root, --wiki" },
+  { label = "Command", value = "wiki build", cite = "usage" },
+  { label = "Options", value = "--root, --wiki", cite = "usage" },
 ]
 
 [[infobox]]
 group = "Values"
 rows = [
-  { label = "Output", value = "docs/wiki/site" },
+  { label = "Output", value = "docs/wiki/site", cite = "build" },
 ]
 
 [[infobox]]
 group = "Exit codes"
 rows = [
-  { label = "Success", value = "0" },
-  { label = "Problems", value = "1" },
-  { label = "Misuse", value = "2" },
+  { label = "Success", value = "0", cite = "exit" },
+  { label = "Problems", value = "1", cite = "exit" },
+  { label = "Misuse", value = "2", cite = "exit" },
 ]
 +++
 
@@ -41,7 +41,8 @@ wiki build [--root ROOT] [--wiki WIKI]
 
 ## Output
 
-It prints each page's word count, the words in the collected goals, any drafts waiting on the owner, and a
+It prints each page's word count, sources cited and claims marked as having no source, then the
+totals, the words in the collected goals, any drafts waiting on the owner, and a
 warning while the reading budgets are uncalibrated, then how many pages it wrote and where.[^report]
 
 It refuses to write into a folder that is not empty and was not made by an earlier build.[^guard]
@@ -54,7 +55,7 @@ the output folder was not made by the tool.[^exit]
 [^build]: `src/builder/cli.py` — `run()` builds into `site` inside the wiki folder;
     `src/builder/build.py` — `write_site()` writes `UPDATED.toml` when a page's digest changes.
 [^usage]: `src/builder/cli.py` — `main()` gives `build` only the shared options.
-[^report]: `src/builder/build.py` — `report()`; `src/builder/cli.py` — `run()` prints the page count and
+[^report]: `src/builder/build.py` — `report()`, with `citation_counts()`; `src/builder/cli.py` — `run()` prints the page count and
     the folder.
 [^guard]: `src/builder/cli.py` — `guard_output()`.
 [^exit]: `src/builder/cli.py` — `main()` returns 2 with no wiki and 1 for a `WikiError`; `run()` returns 2

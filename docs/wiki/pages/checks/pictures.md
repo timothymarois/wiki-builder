@@ -11,16 +11,16 @@ subject moves, someone should have to redraw it, or say why it is still true.
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Record", value = "images/PICTURES.toml" },
-  { label = "Command", value = "wiki bless" },
+  { label = "Record", value = "images/PICTURES.toml", cite = "ledger" },
+  { label = "Command", value = "wiki bless", cite = "bless" },
 ]
 
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Fingerprint", value = "bytes of every depicted file" },
-  { label = "Blessing", value = "reason required" },
-  { label = "New picture", value = "unguarded until blessed" },
+  { label = "Fingerprint", value = "bytes of every depicted file", cite = "digest" },
+  { label = "Blessing", value = "reason required", cite = "bless" },
+  { label = "New picture", value = "unguarded until blessed", cite = "unguarded" },
 ]
 +++
 

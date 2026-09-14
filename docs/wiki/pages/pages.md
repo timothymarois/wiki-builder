@@ -11,23 +11,23 @@ page is found, so nobody has to keep a list in step with the files.
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Location", value = "docs/wiki/pages" },
-  { label = "Format", value = "markdown, with TOML front matter" },
+  { label = "Location", value = "docs/wiki/pages", cite = "front" },
+  { label = "Format", value = "markdown, with TOML front matter", cite = "front" },
 ]
 
 [[infobox]]
 group = "Defaults"
 rows = [
-  { label = "Status", value = "draft", note = "until the owner approves it" },
-  { label = "Intent limit", value = "120 words" },
+  { label = "Status", value = "draft", note = "until the owner approves it", cite = "status" },
+  { label = "Intent limit", value = "120 words", cite = "required" },
 ]
 
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Required fields", value = "title, intent" },
-  { label = "Sidebar place", value = "the page's path" },
-  { label = "Reserved name", value = "source" },
+  { label = "Required fields", value = "title, intent", cite = "required" },
+  { label = "Sidebar place", value = "the page's path", cite = "tree" },
+  { label = "Reserved name", value = "source", cite = "source" },
 ]
 +++
 

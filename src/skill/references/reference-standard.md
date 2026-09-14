@@ -24,17 +24,17 @@ should never overwrite a file it did not write.
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Command", value = "notes export" },
-  { label = "Argument", value = "FOLDER" },
-  { label = "Options", value = "--since, --overwrite" },
+  { label = "Command", value = "notes export", cite = "usage" },
+  { label = "Argument", value = "FOLDER", cite = "usage" },
+  { label = "Options", value = "--since, --overwrite", cite = "usage" },
 ]
 
 [[infobox]]
 group = "Exit codes"
 rows = [
-  { label = "Success", value = "0" },
-  { label = "Refused", value = "1" },
-  { label = "Misuse", value = "2" },
+  { label = "Success", value = "0", cite = "exit" },
+  { label = "Refused", value = "1", cite = "exit" },
+  { label = "Misuse", value = "2", cite = "exit" },
 ]
 +++
 
@@ -139,23 +139,23 @@ being deleted from any report. It should be safe to retry, and impossible while 
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Method", value = "POST" },
-  { label = "Path", value = "/invoices/{id}/archive" },
-  { label = "Authentication", value = "bearer token" },
+  { label = "Method", value = "POST", cite = "request" },
+  { label = "Path", value = "/invoices/{id}/archive", cite = "request" },
+  { label = "Authentication", value = "bearer token", cite = "auth" },
 ]
 
 [[infobox]]
 group = "Limits"
 rows = [
-  { label = "Rate limit", value = "60 requests a minute", note = "per token" },
-  { label = "Note length", value = "500 characters" },
+  { label = "Rate limit", value = "60 requests a minute", note = "per token", cite = "limits" },
+  { label = "Note length", value = "500 characters", cite = "request" },
 ]
 
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Repeated call", value = "safe, changes nothing" },
-  { label = "Pending payment", value = "refused" },
+  { label = "Repeated call", value = "safe, changes nothing", cite = "response" },
+  { label = "Pending payment", value = "refused", cite = "errors" },
 ]
 +++
 
@@ -277,8 +277,8 @@ which invoice matters.
 
 **A reader could make the call from the page alone** — and recognise a failure, and know its cause.
 
-**Every row is on the page, and cited.** Each infobox row repeats a cited sentence or table cell, and each
-citation names the code that does the thing.
+**Every infobox row cites.** Each names the footnote the prose cites for the same fact, and each footnote
+names the code that does the thing.
 
 **Examples were run.** The output is what the program printed, trimmed only of what changes between runs,
 and the page says so where it does.

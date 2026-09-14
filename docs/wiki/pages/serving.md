@@ -10,23 +10,23 @@ rather than on a download or a dead link. What a person sees should always be wh
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Command", value = "wiki serve", note = "or wiki with no command" },
-  { label = "Port option", value = "--port" },
+  { label = "Command", value = "wiki serve", note = "or wiki with no command", cite = ["serve", "default"] },
+  { label = "Port option", value = "--port", cite = "port" },
 ]
 
 [[infobox]]
 group = "Values"
 rows = [
-  { label = "Address", value = "127.0.0.1" },
-  { label = "Default port", value = "8787" },
+  { label = "Address", value = "127.0.0.1", cite = "loopback" },
+  { label = "Default port", value = "8787", cite = "serve" },
 ]
 
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Scope", value = "the whole project" },
-  { label = "Reach", value = "this machine only" },
-  { label = "Caching", value = "none" },
+  { label = "Scope", value = "the whole project", cite = "root" },
+  { label = "Reach", value = "this machine only", cite = "loopback" },
+  { label = "Caching", value = "none", cite = "cache" },
 ]
 +++
 

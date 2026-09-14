@@ -31,6 +31,7 @@ from importlib import resources
 from pathlib import Path
 
 import mistune
+from mistune.util import unikey
 
 from .config import WikiError, read_config, CONFIG
 
@@ -296,9 +297,17 @@ def relative_file(from_directory, to_file):
 # markdown
 
 
+CITATION = '<sup class="ref">[<a href="#cite-%d">%d</a>]</sup>'
+
+
 def footnote_reference(renderer, key, index):
-    """Wikipedia's own shape: a bracketed superscript at the claim, linked to the entry at the foot."""
-    return '<sup class="ref">[<a href="#cite-%d">%d</a>]</sup>' % (index, index)
+    """Wikipedia's own shape: a bracketed superscript at the claim, linked to the entry at the foot.
+
+    The number is remembered against its footnote, so an infobox row citing the same footnote carries the
+    same number, whatever order the prose happened to cite things in.
+    """
+    renderer.cited.setdefault(key, index)
+    return CITATION % (index, index)
 
 
 def footnote_item(renderer, text, key, index):
@@ -332,6 +341,7 @@ def make_markdown():
     markdown.renderer.register("footnote_ref", footnote_reference)
     markdown.renderer.register("footnote_item", footnote_item)
     markdown.renderer.register("footnotes", footnote_block)
+    markdown.renderer.cited = {}
     return markdown
 
 
@@ -449,7 +459,17 @@ def render_source(raw):
 # page parts
 
 
-def render_infobox(page, audience, directory, images):
+def row_cites(row):
+    """The footnotes an infobox row cites, as its author wrote them.
+
+    Compared through `unikey`, the markdown parser's own normalisation, and nothing else: a key normalised
+    any other way matches in the check and misses in the render, and the row silently shows no number.
+    """
+    cite = row.get("cite", [])
+    return [str(key) for key in ([cite] if isinstance(cite, str) else cite)]
+
+
+def render_infobox(page, audience, directory, images, cited=None):
     """The facts a reader would actually check, in their language, as the page's author chose them."""
     groups = page["meta"].get("infobox", [])  # a generated page has no front matter and no infobox
     picture = page["meta"].get("image")
@@ -479,6 +499,10 @@ def render_infobox(page, audience, directory, images):
             if row.get("missing") and audience != "player":
                 missing = True
                 value += " " + MISSING_CITATION
+            elif audience != "player":
+                # A row cites the way a sentence does: with the number its footnote has in the prose.
+                value += "".join(CITATION % (cited[unikey(key)], cited[unikey(key)])
+                                 for key in row_cites(row) if unikey(key) in (cited or {}))
             note = row.get("note")
             parts.append('<div class="r"><b>%s</b><span>%s%s</span></div>'
                          % (html_module.escape(str(row.get("label", ""))), value,
@@ -780,6 +804,7 @@ def write_site(root, out, audience, link_root, today, record, wiki):
     for page_id in emitted:
         page = pages[page_id]
         directory = page_directory(page_id)
+        markdown.renderer.cited = {}
         body = markdown(page["body"])
         if page_id == GOALS_ID:
             body += goals_html
@@ -795,7 +820,7 @@ def write_site(root, out, audience, link_root, today, record, wiki):
         with_source = audience != "player"
         emit(directory, render_page(
             page["title"], page["subtitle"], page["hatnote"], body,
-            render_infobox(page, audience, directory, ledger),
+            render_infobox(page, audience, directory, ledger, markdown.renderer.cited),
             render_categories(page, directory, categories),
             render_nav(sections, pages, categories, page_id, directory, audience),
             index_for(directory), site, directory, template,
@@ -986,6 +1011,47 @@ def uncited_problems(root, wiki=None):
     return problems
 
 
+# A footnote cited in the prose, and one defined at the foot.
+CITED = re.compile(r"\[\^([^\]]+)\](?!:)")
+DEFINED = re.compile(r"^\[\^([^\]]+)\]:", re.M)
+
+
+def infobox_problems(root, wiki=None):
+    """Infobox rows that state something and cite nothing.
+
+    A row is a claim in the most visible place on the page, so it carries a citation the way a sentence
+    does. It names a footnote the page's prose also cites -- which keeps every row repeating something the
+    page says, and gives it a number a reader can follow -- or it says there is none with `missing = true`.
+    A page about the wiki itself states no behaviour, and is excused as it is from the prose rule.
+    """
+    pages_dir = wiki_of(root, wiki) / "pages"
+    problems = []
+    for path in sorted(pages_dir.rglob("*.md")):
+        meta, body = read_front_matter(path)
+        if not meta.get("goals", True):
+            continue
+        defined = {unikey(key) for key in DEFINED.findall(body)}
+        prose = FENCED.sub("", FOOTNOTE.sub("", body))
+        cited = {unikey(key) for key in CITED.findall(prose)} & defined
+        name = path.relative_to(pages_dir)
+        for group in meta.get("infobox", []):
+            for row in group.get("rows", []):
+                if row.get("missing"):
+                    continue
+                label = row.get("label", "")
+                keys = row_cites(row)
+                if not keys:
+                    problems.append(f"{name}: the infobox row {label!r} states something and cites nothing; "
+                                    "give it cite = \"<footnote>\" naming a reference the page's text cites, "
+                                    "or missing = true if there is none")
+                for key in keys:
+                    if unikey(key) not in cited:
+                        problems.append(f"{name}: the infobox row {label!r} cites [^{key}], "
+                                        "which no sentence on the page cites; cite it where the page "
+                                        "states the same fact")
+    return problems
+
+
 def heading_problems(root, wiki=None):
     """Headings that name nothing.
 
@@ -1081,6 +1147,7 @@ def check(root, wiki=None, version=None):
         problems += citation_problems(root, wiki)
         problems += heading_problems(root, wiki)
         problems += uncited_problems(root, wiki)
+        problems += infobox_problems(root, wiki)
         if version:
             site, _, _ = read_config(wiki)
             problems += version_problems(site, version)
@@ -1101,10 +1168,37 @@ def bless(root, picture, reason, wiki=None):
     return f"wiki: {picture} blessed -- {reason.strip()}"
 
 
-def report(counts, goals_words, budget, drafts=()):
-    """What each page costs to read, every run, so the cost is visible while it is being spent."""
+def citation_counts(root, wiki=None):
+    """How many sources each page cites, and how many of its claims carry the mark for no source.
+
+    A source is counted once however often it is cited. A claim marked missing is a `{missing}` in the
+    prose or a `missing = true` infobox row. Printed on every build and check, so whoever runs the tool --
+    a person or an agent -- sees how much of the wiki is traced to the code and how much is taken on faith.
+    """
+    pages_dir = wiki_of(root, wiki) / "pages"
+    counts = {}
+    for path in sorted(pages_dir.rglob("*.md")):
+        meta, body = read_front_matter(path)
+        prose = FENCED.sub("", FOOTNOTE.sub("", body))
+        cited = {unikey(key) for key in CITED.findall(prose)} & {unikey(key) for key in DEFINED.findall(body)}
+        rows = [row for group in meta.get("infobox", []) for row in group.get("rows", [])]
+        missing = len(MISSING.findall(prose)) + sum(1 for row in rows if row.get("missing"))
+        counts[path.relative_to(pages_dir).with_suffix("").as_posix()] = (len(cited), missing)
+    return counts
+
+
+def report(counts, goals_words, budget, drafts=(), citations=None):
+    """What each page costs to read and how much of it is cited, every run, while it is being spent."""
     for page_id in sorted(counts):
-        print("wiki: %-32s %4d words" % (page_id, counts[page_id]))
+        line = "wiki: %-32s %4d words" % (page_id, counts[page_id])
+        if citations and page_id in citations:
+            line += "  %3d cited  %3d missing" % citations[page_id]
+        print(line)
+    if citations:
+        cited = sum(count for count, _ in citations.values())
+        missing = sum(count for _, count in citations.values())
+        print("wiki: %d source%s cited, %d claim%s marked as having no source"
+              % (cited, "" if cited == 1 else "s", missing, "" if missing == 1 else "s"))
     print("wiki: the collected goals read in %d words" % goals_words)
     if drafts:
         print("wiki: %d page%s waiting on the owner, in the sidebar but not in search, the categories "

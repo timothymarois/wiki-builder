@@ -10,23 +10,23 @@ nothing internal left in. It should never carry a reference, a missing-source ma
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Command", value = "wiki player" },
-  { label = "Argument", value = "OUT" },
+  { label = "Command", value = "wiki player", cite = "usage" },
+  { label = "Argument", value = "OUT", cite = "usage" },
 ]
 
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Pages", value = "those marked for players" },
-  { label = "Removed", value = "references, red marks, Source tab" },
+  { label = "Pages", value = "those marked for players", cite = "player" },
+  { label = "Removed", value = "references, red marks, Source tab", cite = "player" },
 ]
 
 [[infobox]]
 group = "Exit codes"
 rows = [
-  { label = "Success", value = "0" },
-  { label = "Problems", value = "1" },
-  { label = "Misuse", value = "2" },
+  { label = "Success", value = "0", cite = "exit" },
+  { label = "Problems", value = "1", cite = "exit" },
+  { label = "Misuse", value = "2", cite = "exit" },
 ]
 +++
 

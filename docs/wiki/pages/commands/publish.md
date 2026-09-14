@@ -10,22 +10,22 @@ never write over a folder the tool did not make.
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Command", value = "wiki publish" },
-  { label = "Argument", value = "OUT" },
+  { label = "Command", value = "wiki publish", cite = "usage" },
+  { label = "Argument", value = "OUT", cite = "usage" },
 ]
 
 [[infobox]]
 group = "Values"
 rows = [
-  { label = "Link ending", value = "none", note = "an address ends in a folder" },
+  { label = "Link ending", value = "none", note = "an address ends in a folder", cite = "publish" },
 ]
 
 [[infobox]]
 group = "Exit codes"
 rows = [
-  { label = "Success", value = "0" },
-  { label = "Problems", value = "1" },
-  { label = "Misuse", value = "2" },
+  { label = "Success", value = "0", cite = "exit" },
+  { label = "Problems", value = "1", cite = "exit" },
+  { label = "Misuse", value = "2", cite = "exit" },
 ]
 +++
 

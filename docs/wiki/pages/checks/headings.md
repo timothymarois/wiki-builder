@@ -11,9 +11,9 @@ others. Every heading should name what its section contains, never ask about it 
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Refused openings", value = "how, what, where, why, when, which, who, whether" },
-  { label = "Refused words", value = "matter, important, interesting, note, overview, misc, detail" },
-  { label = "Levels checked", value = "2 to 6" },
+  { label = "Refused openings", value = "how, what, where, why, when, which, who, whether", cite = "question" },
+  { label = "Refused words", value = "matter, important, interesting, note, overview, misc, detail", cite = "verdict" },
+  { label = "Levels checked", value = "2 to 6", cite = "reach" },
 ]
 +++
 

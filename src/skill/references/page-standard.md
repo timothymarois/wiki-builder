@@ -91,22 +91,22 @@ The same page's infobox, to the standard:
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Cookie", value = "session_id" },
-  { label = "Setting", value = "session.timeout" },
+  { label = "Cookie", value = "session_id", cite = "cookie" },
+  { label = "Setting", value = "session.timeout", cite = "timeout" },
 ]
 
 [[infobox]]
 group = "Limits"
 rows = [
-  { label = "Expiry", value = "30 minutes", note = "after the last request" },
-  { label = "Size limit", value = "4 kB" },
+  { label = "Expiry", value = "30 minutes", note = "after the last request", cite = "expiry" },
+  { label = "Size limit", value = "4 kB", cite = "size" },
 ]
 
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Overflow", value = "refused, never truncated" },
-  { label = "Signing out", value = "this device only" },
+  { label = "Overflow", value = "refused, never truncated", cite = "size" },
+  { label = "Signing out", value = "this device only", cite = "signout" },
 ]
 ```
 
@@ -139,9 +139,10 @@ information.
 **What is absent stays out.** Compression is not something sessions do, and a row for it is a gap list in
 the most visible place on the page.
 
-**Every row is already on the page.** Thirty minutes, 4 kB, the refused write and the second device are
-all in the prose above. The two names are missing only because it is an extract; a real page gives each
-where it introduces the thing, with its reference.
+**Every row cites.** Each row names the footnote the prose cites for the same fact, so it carries the
+same number and a reader can follow it to the code. The failure's rows cite nothing: five claims nobody
+can trace, in the most visible place on the page. The extract above shows no footnotes only because it is
+an extract; a real page defines each one the infobox names.
 
 ## Self-edit
 

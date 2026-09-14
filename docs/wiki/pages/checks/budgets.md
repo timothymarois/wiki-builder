@@ -11,23 +11,23 @@ sitting. A page that outgrows its budget should be split rather than squeezed.
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Settings", value = "[budget] in wiki.toml" },
+  { label = "Settings", value = "[budget] in wiki.toml", cite = "config" },
 ]
 
 [[infobox]]
 group = "Defaults"
 rows = [
-  { label = "Page limit", value = "500 words" },
-  { label = "Intent limit", value = "120 words" },
-  { label = "Goals limit", value = "3,500 words" },
+  { label = "Page limit", value = "500 words", cite = "defaults" },
+  { label = "Intent limit", value = "120 words", cite = "defaults" },
+  { label = "Goals limit", value = "3,500 words", cite = "defaults" },
 ]
 
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Word count", value = "references excluded" },
-  { label = "Page overrun", value = "listed by the check" },
-  { label = "Intent overrun", value = "build stopped" },
+  { label = "Word count", value = "references excluded", cite = "count" },
+  { label = "Page overrun", value = "listed by the check", cite = "over" },
+  { label = "Intent overrun", value = "build stopped", cite = "intent" },
 ]
 +++
 

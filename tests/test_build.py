@@ -63,8 +63,8 @@ A thing exists so that something else can happen. It should be plain what it is 
 [[infobox]]
 group = "Facts"
 rows = [
-  { label = "Held to", value = "a promise", guaranteed = "THING-001" },
-  { label = "Today", value = "a number" },
+  { label = "Held to", value = "a promise", guaranteed = "THING-001", cite = "why" },
+  { label = "Today", value = "a number", cite = "why" },
 ]
 +++
 
@@ -316,12 +316,61 @@ class WikiTests(unittest.TestCase):
             self.assertNotIn("THING-001", text)
 
     def test_a_row_with_no_source_is_marked_missing(self):
-        self.write("thing", PAGE.replace('{ label = "Today", value = "a number" }',
+        self.write("thing", PAGE.replace('{ label = "Today", value = "a number", cite = "why" }',
                                          '{ label = "Today", value = "a number", missing = true }'))
         self.build()
         page = (self.out / "thing/index.html").read_text(encoding="utf-8")
         self.assertIn("nocite", page)
         self.assertIn("[?]", page)
+        self.assertEqual([], wiki.infobox_problems(self.root), "a row marked missing needs no citation")
+
+    def test_an_infobox_row_that_cites_nothing_is_refused(self):
+        """A row states a fact in the most visible place on the page, so it is held to the prose's rule."""
+        self.write("thing", PAGE.replace('{ label = "Today", value = "a number", cite = "why" }',
+                                         '{ label = "Today", value = "a number" }'))
+        problems = wiki.infobox_problems(self.root)
+        self.assertTrue(any("'Today'" in p and "cites nothing" in p for p in problems), problems)
+        self.build()
+        status, output = self.run_main(["--root", str(self.root), "check"])
+        self.assertEqual(1, status, output)
+        self.assertIn("cites nothing", output)
+
+    def test_an_infobox_row_citing_a_reference_no_sentence_uses_is_refused(self):
+        # Citing only a definition would let a row carry a fact the page itself never states.
+        self.write("thing", PAGE.replace('{ label = "Today", value = "a number", cite = "why" }',
+                                         '{ label = "Today", value = "a number", cite = "aside" }')
+                   + "[^aside]: Defined, and cited by no sentence — `Source/Aside.h`.\n")
+        problems = wiki.infobox_problems(self.root)
+        self.assertTrue(any("'Today'" in p and "aside" in p for p in problems), problems)
+
+    def test_an_infobox_citation_carries_the_texts_own_number(self):
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        infobox = page[page.index('<aside class="ib">'):page.index("</aside>")]
+        self.assertIn('<sup class="ref">[<a href="#cite-1">1</a>]</sup>', infobox)
+
+    def test_a_player_build_carries_no_infobox_citation(self):
+        self.write("thing", PAGE.replace('categories = ["Things"]',
+                                         'categories = ["Things"]\naudience = "player"'))
+        self.build("player")
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertNotIn("#cite-", page)
+
+    def test_citation_counts_are_sources_cited_and_claims_marked_missing(self):
+        # The fixture cites one source in its prose, marks one claim as having none, and cites that same
+        # source from both infobox rows: a source counts once however often it is cited.
+        self.assertEqual((1, 1), wiki.citation_counts(self.root)["thing"])
+        self.write("thing", PAGE.replace('{ label = "Today", value = "a number", cite = "why" }',
+                                         '{ label = "Today", value = "a number", missing = true }'))
+        self.assertEqual((1, 2), wiki.citation_counts(self.root)["thing"])
+
+    def test_every_build_and_check_prints_the_citation_counts(self):
+        """So whoever runs the tool, person or agent, sees how much of the wiki is traced to the code."""
+        for command in ("build", "check"):
+            with self.subTest(command=command):
+                _, output = self.run_main(["--root", str(self.root), command])
+                self.assertRegex(output, r"wiki: thing\s+\d+ words\s+1 cited\s+1 missing")
+                self.assertIn("wiki: 1 source cited, 1 claim marked as having no source", output)
 
     # --- citations -------------------------------------------------------------------------------
 

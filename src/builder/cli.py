@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 from . import __version__
-from .build import (ASSETS, SKILL, bless, build, check, report, wiki_of)
+from .build import (ASSETS, SKILL, bless, build, check, citation_counts, report, wiki_of)
 from .config import CONFIG, WikiError, record_version
 from .serve import serve
 
@@ -155,7 +155,7 @@ def run(args, root, wiki):
         problems, counts, goals_words, budget = check(root, wiki, __version__)
         for problem in problems:
             print("wiki: " + problem, file=sys.stderr)
-        report(counts, goals_words, budget)
+        report(counts, goals_words, budget, citations=citation_counts(root, wiki))
         print("wiki: %d pages, %d problems" % (len(counts), len(problems)))
         return 1 if problems else 0
 
@@ -167,7 +167,7 @@ def run(args, root, wiki):
     counts, goals_words, budget, drafts = build(
         root, out, "player" if command == "player" else "internal",
         links="clean" if command == "publish" else "file", wiki_dir=wiki)
-    report(counts, goals_words, budget, drafts)
+    report(counts, goals_words, budget, drafts, citation_counts(root, wiki))
     print("wiki: %d pages written to %s" % (len(counts), out))
 
     if command == "publish":

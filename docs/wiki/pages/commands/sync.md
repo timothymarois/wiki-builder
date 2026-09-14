@@ -11,23 +11,23 @@ asks.
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Command", value = "wiki sync" },
-  { label = "Options", value = "--skill-dir, --no-skill, --root, --wiki" },
+  { label = "Command", value = "wiki sync", cite = "sync" },
+  { label = "Options", value = "--skill-dir, --no-skill, --root, --wiki", cite = "group" },
 ]
 
 [[infobox]]
 group = "Values"
 rows = [
-  { label = "Skill folder", value = ".agents/skills, else .claude/skills" },
-  { label = "Release record", value = "wiki.toml" },
+  { label = "Skill folder", value = ".agents/skills, else .claude/skills", cite = "group" },
+  { label = "Release record", value = "wiki.toml", cite = "sync" },
 ]
 
 [[infobox]]
 group = "Exit codes"
 rows = [
-  { label = "Success", value = "0" },
-  { label = "Problems", value = "1", note = "such as no wiki.toml" },
-  { label = "Misuse", value = "2" },
+  { label = "Success", value = "0", cite = "exit" },
+  { label = "Problems", value = "1", note = "such as no wiki.toml", cite = "exit" },
+  { label = "Misuse", value = "2", cite = "exit" },
 ]
 +++
 
