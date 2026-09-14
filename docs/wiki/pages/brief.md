@@ -64,7 +64,7 @@ them.
 ## Scope
 
 - **Covers:** rendering; the checks; the skill; a local server that shows the site and the project's
-  files; a published build with clean addresses; a player build with everything internal removed;
+  files; a published build with clean addresses; a user build with everything internal removed;
   carrying rule changes into a project; a GitHub Action for a project's CI; guides to installing and
   deploying a wiki.
 - **Refuses:** knowing anything about the project it documents, which a test over the code and the skill

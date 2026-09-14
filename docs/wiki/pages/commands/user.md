@@ -1,24 +1,24 @@
 +++
-title = "wiki player"
-subtitle = "build the pages marked for players"
+title = "wiki user"
+subtitle = "build the pages marked for users"
 status = "approved"
 intent = """
-wiki player exists so that the pages meant for people outside the project can be handed to them with
+wiki user exists so that the pages meant for people outside the project can be handed to them with
 nothing internal left in. It should never carry a reference, a missing-source mark or a page's source.
 """
 
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Command", value = "wiki player", cite = "usage" },
+  { label = "Command", value = "wiki user", cite = "usage" },
   { label = "Argument", value = "OUT", cite = "usage" },
 ]
 
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Pages", value = "those marked for players", cite = "player" },
-  { label = "Removed", value = "references, red marks, Source tab", cite = "player" },
+  { label = "Pages", value = "those marked for users", cite = "user" },
+  { label = "Removed", value = "references, red marks, Source tab", cite = "user" },
 ]
 
 [[infobox]]
@@ -30,16 +30,16 @@ rows = [
 ]
 +++
 
-`wiki player` builds only the pages marked for players into the folder it is given, with every
-reference, red mark and Source tab removed.[^player] How a page is marked for players is described on
+`wiki user` builds only the pages marked for users into the folder it is given, with every
+reference, red mark and Source tab removed.[^user] How a page is marked for users is described on
 [Front matter](../front-matter.md).
 
 ## Usage
 
 The folder is required.[^usage]
 ```sh
-wiki player [-h] [--root ROOT] [--wiki WIKI] OUT
-wiki player readers
+wiki user [-h] [--root ROOT] [--wiki WIKI] OUT
+wiki user readers
 ```
 
 ## Arguments
@@ -53,7 +53,7 @@ wiki player readers
 It prints a line for each page it built, then the same closing lines as `wiki build`.[^output] **The
 totals of sources and marks, and the list of drafts, count every page in the wiki**, not only those it
 built.[^output] Like `wiki build`, it records each changed page's date in `UPDATED.toml`.[^dates] On a
-wiki of three pages, one of them marked for players, with the folder being wherever the command
+wiki of three pages, one of them marked for users, with the folder being wherever the command
 ran:[^output]
 ```text
 wiki: refunds                            22 words    1 cited    1 missing
@@ -67,14 +67,14 @@ wiki: 1 page written to /path/to/notes/readers
 
 | Code | Condition | Message |
 |---|---|---|
-| `0` | the player build is written[^exit] | `wiki: 1 page written to /path/to/notes/readers` |
+| `0` | the user build is written[^exit] | `wiki: 1 page written to /path/to/notes/readers` |
 | `1` | a problem stops the build[^exit] | the problem |
 | `2` | `OUT` is not empty and was not made by the tool[^exit] | `wiki: /path/to/notes/taken is not empty and was not written by this tool; remove it yourself if you meant to replace it` |
 | `2` | there is no wiki where it was pointed[^exit] | `wiki: no wiki at nowhere` |
 
-[^player]: `src/builder/cli.py` — `run()` builds with audience `"player"`; `src/builder/build.py` —
-    `visible_to()`, `for_player()` and `with_source` in `write_site()`.
-[^usage]: `src/builder/cli.py` — `main()` gives `player` the positional `out`; `run()` resolves it from
+[^user]: `src/builder/cli.py` — `run()` builds with audience `"user"`; `src/builder/build.py` —
+    `visible_to()`, `for_user()` and `with_source` in `write_site()`.
+[^usage]: `src/builder/cli.py` — `main()` gives `user` the positional `out`; `run()` resolves it from
     the working directory and passes it to `guard_output()`.
 [^output]: `src/builder/cli.py` — `run()` passes `report()` the word counts of the pages the build
     emitted, but `citation_counts()` and the drafts of every page, and prints the page count and folder.

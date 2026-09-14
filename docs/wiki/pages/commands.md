@@ -12,7 +12,7 @@ should be here, and nothing it does not.
 group = "Identity"
 rows = [
   { label = "Program", value = "wiki", cite = "program" },
-  { label = "Commands", value = "build, check, serve, sync, bless, publish, player", cite = "commands" },
+  { label = "Commands", value = "build, check, serve, sync, bless, publish, user", cite = "commands" },
   { label = "Shared options", value = "--root, --wiki, --help", cite = "place" },
 ]
 
@@ -34,7 +34,7 @@ and [PICTURES.toml](pictures-toml.md).
 Every command is typed the same way, as the program's help prints it.[^program]
 ```sh
 wiki [-h] [--version] [--root ROOT] [--wiki WIKI]
-            {build,check,sync,serve,publish,player,bless} ...
+            {build,check,sync,serve,publish,user,bless} ...
 ```
 
 ## Commands
@@ -47,7 +47,7 @@ wiki [-h] [--version] [--root ROOT] [--wiki WIKI]
 | [`wiki sync`](commands/sync.md) | writes the skill into the project and records the release |
 | [`wiki bless`](commands/bless.md) | records that a picture is still true, and why |
 | [`wiki publish`](commands/publish.md) | builds the site with clean addresses, for a host |
-| [`wiki player`](commands/player.md) | builds only the pages marked for players, with everything internal removed |
+| [`wiki user`](commands/user.md) | builds only the pages marked for users, with everything internal removed |
 
 Typing `wiki` with no command is the same as `wiki serve`.[^alone]
 

@@ -37,7 +37,18 @@ row that cite nothing, and one for a reference that cites the wrong kind of thin
 Every sentence must carry a citation, or the red mark that says there is none.[^uncited] If one does not,
 the check names the page and the line, and quotes the sentence.[^uncited] **The check looks for the mark,
 not the reference behind it**: a sentence naming a footnote the page never defines passes, and shows the
-mark as plain text.[^undefined]
+mark as plain text.[^undefined] Each statement passes or is refused this way.[^uncited]
+
+```mermaid
+flowchart LR
+  page{"page says<br/>goals = false?"} -- yes --> excused["whole page excused"]
+  page -- no --> each["each sentence, list item<br/>and table row, with code,<br/>headings and pictures left out"]
+  each --> cited{"a citation or the red mark,<br/>outside code?"}
+  cited -- yes --> pass["passes"]
+  cited -- no --> excuse{"no letters, a link to a<br/>markdown file, or<br/>nothing but a link?"}
+  excuse -- yes --> pass
+  excuse -- no --> refused["refused, with its<br/>page and line"]
+```
 
 A citation after the full stop belongs to its sentence, and **a sentence never borrows its neighbour's
 citation**.[^uncited] A version number does not end a sentence, but an abbreviation followed by a capital
@@ -45,9 +56,8 @@ does, so `Dr. Smith` is read as two sentences.[^boundary] A sentence directly un
 like any other.[^heading]
 
 Four things are excused: a sentence linking to any markdown file, even one that does not exist; a list
-item that is only a link; a code sample; and a picture with its caption.[^excused] **Every table row carries a citation, or the red mark, in at least one of its cells**, and a row with
-neither is named with its line; a table whose rows cite nothing is a gap, not an excuse.[^rowcite] The owner,
-2026-09-14: "a table row must have at least one citation in any of the columns of its row".[^rowcite]
+item that is only a link; a code sample; and a picture with its caption.[^excused] **Every table row carries a citation, or the red mark, in at
+least one of its cells**; a table whose rows cite nothing is a gap, not an excuse.[^rowcite]
 The header row is exempt.[^rowcite]
 
 An infobox row cites a footnote the page's text also cites, and carries that citation's number, or is
@@ -59,7 +69,7 @@ A page that says `goals = false` is excused from both rules, whatever it describ
 Where nothing can be cited, the writer puts the word *missing* in curly braces, and it renders as a red
 question mark in brackets.[^mark] **It is a fine answer; silence is not.**[^uncited] It means the thing is
 not built or nobody has found where it happens, and to a reader both mean the same: do not take this on
-faith.[^mark] A player build removes every mark.[^player] Inside code, the mark is shown as written and
+faith.[^mark] A user build removes every mark.[^user] Inside code, the mark is shown as written and
 counts for nothing.[^code]
 
 Every build and check prints how many sources each page cites and how many claims it marks, with totals
@@ -95,7 +105,7 @@ without linking to it passes, and so does one that names nothing.[^document]
 [^exempt]: `src/builder/build.py` — `uncited_problems()` and `infobox_problems()` skip a page whose front
     matter says `goals = false`.
 [^mark]: `src/builder/build.py` — `MISSING` and `MISSING_CITATION`, applied in `write_site()`.
-[^player]: `src/builder/build.py` — `for_player()` removes every `INTERNAL_MARKER`.
+[^user]: `src/builder/build.py` — `for_user()` removes every `INTERNAL_MARKER`.
 [^code]: `src/builder/build.py` — `write_site()` draws the mark only outside `CODE_HTML`; `citation_counts()`,
     `missing_marks()` and `uncited_problems()` remove `INLINE_CODE` before looking for it.
 [^counts]: `src/builder/build.py` — `citation_counts()`, printed by `report()`.

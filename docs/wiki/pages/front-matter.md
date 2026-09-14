@@ -36,7 +36,7 @@ page is for and how it is laid out is described on [Pages](pages.md), and the fi
 | `subtitle` | string | empty | a line under the title[^shown] |
 | `status` | string | `"draft"` | `"approved"` approves the page; any other value leaves it a draft[^status] |
 | `goals` | true or false | true | `false` keeps the intent off the goals page and excuses the page from the checks that its sentences and infobox rows cite[^goals] |
-| `audience` | string | `"internal"` | `"player"` puts the page in the build `wiki player` makes[^audience] |
+| `audience` | string | `"internal"` | `"user"` puts the page in the build `wiki user` makes[^audience] |
 | `categories` | list of strings | none | the categories named at the page's foot[^categories] |
 | `hatnote` | string | empty | a note shown above the page's text[^shown] |
 | `image` | string | none | a picture recorded in `PICTURES.toml`, shown at the top of the infobox[^image] |
@@ -57,18 +57,19 @@ Every problem below stops the build, and names the page's file.[^validation]
 | `title` or `intent` is missing or empty | `wiki: refunds.md has no intent; every page must say what it is for`, naming `title` instead when that is the one missing[^refusals] |
 | the intent is over its budget | `wiki: refunds.md's intent runs to 130 words, over the 120 an intent may use; say what the system is for, not how it works`[^refusals] |
 | the page gives `kicker` | `wiki: refunds.md gives its subtitle as kicker, which is now called subtitle; rename kicker to subtitle`[^refusals] |
+| `audience` is not `"internal"` or `"user"` | `wiki: refunds.md gives its audience as 'reader'; an audience is "internal" or "user"`[^refusals] |
 | `image` names a picture with no record | `wiki: refunds.md shows flow.svg, which has no entry in PICTURES.toml`[^image] |
 
 ## Example
 
-The front matter of an approved page marked for players, with its fences:[^fences]
+The front matter of an approved page marked for users, with its fences:[^fences]
 
 ```toml
 +++
 title = "Refunds"
 subtitle = "money back for a wrong charge"
 status = "approved"
-audience = "player"
+audience = "user"
 categories = ["Payments"]
 intent = """
 Refunds exist so that a customer who was charged wrongly gets their money back without asking twice.
@@ -93,8 +94,8 @@ Refunds exist so that a customer who was charged wrongly gets their money back w
 [^goals]: `src/builder/build.py` — `goals_order()` leaves out a page whose `goals` is false, and
     `uncited_problems()` and `infobox_problems()` skip it; each reads an absent `goals` as true.
 [^audience]: `src/builder/build.py` — `write_site()` renders only the pages `visible_to()` its audience,
-    which in a player build are those whose `audience` is `"player"`; `run()` in `src/builder/cli.py`
-    builds for players on `wiki player`.
+    which in a user build are those whose `audience` is `"user"`; `run()` in `src/builder/cli.py`
+    builds for users on `wiki user`.
 [^categories]: `src/builder/build.py` — `read_pages()` reads no categories when `categories` is absent, and
     `render_categories()` names them in the bar `template.html` puts after the page's text.
 [^image]: `src/builder/build.py` — `render_infobox()` shows `image` at the top of the infobox with
@@ -103,4 +104,4 @@ Refunds exist so that a customer who was charged wrongly gets their money back w
 [^infobox]: `src/builder/build.py` — `render_infobox()` shows the `infobox` groups in the order written, and
     none when it is absent.
 [^refusals]: `src/builder/build.py` — `read_pages()` raises the messages for a missing or empty `title` or
-    `intent`, an intent over its budget, and `kicker`.
+    `intent`, an intent over its budget, `kicker`, and an `audience` outside `AUDIENCES`.

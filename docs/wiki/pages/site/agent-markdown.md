@@ -4,8 +4,7 @@ subtitle = "what an agent reads instead of the rendered page"
 status = "approved"
 intent = """
 Agent markdown exists so that an agent reading the wiki gets each page as it was written, not as text
-picked back out of HTML. The owner, 2026-09-14: "can we have llm rendering where llm sees the md instead
-of html?" An agent should find every page from one index, without a person pointing it there.
+picked back out of HTML. An agent should find every page from one index, without a person pointing it there.
 """
 
 [[infobox]]
@@ -19,7 +18,7 @@ rows = [
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Player build", value = "no copies, no index", cite = "player" },
+  { label = "User build", value = "no copies, no index", cite = "user" },
 ]
 +++
 
@@ -46,8 +45,8 @@ Every rendered page names its copy with `rel="alternate" type="text/markdown"`, 
 
 ## Audiences
 
-A player build carries no copies and no index, because a copy holds the references and red marks a player
-build withholds.[^player]
+A user build carries no copies and no index, because a copy holds the references and red marks a user
+build withholds.[^user]
 
 [^copy]: `src/builder/build.py` — `write_site()` writes `markdown_copy()` as `AGENT_COPY`, `index.md`,
     beside each page's `index.html`.
@@ -58,12 +57,12 @@ build withholds.[^player]
 [^serve]: `src/builder/serve.py` — `shown_as_text()` answers a file in `AS_TEXT`, which includes `.md`,
     as plain text.
 [^tab]: `src/builder/build.py` — `render_source()`, given `AGENT_COPY` by `write_site()`, links the source
-    view to the page's markdown copy; a player build has no source view.
+    view to the page's markdown copy; a user build has no source view.
 [^index]: `src/builder/build.py` — `agent_index()`, written as `AGENT_INDEX` by `write_site()`.
 [^head]: `src/builder/build.py` — `write_site()` passes both links to `render_page()`, which fills
     `llm_links` in `src/builder/assets/template.html`.
-[^player]: `src/builder/build.py` — `write_site()` writes neither a copy nor the index for the
-    `"player"` audience.
+[^user]: `src/builder/build.py` — `write_site()` writes neither a copy nor the index for the
+    `"user"` audience.
 [^proposal]: llmstxt.org — [The /llms.txt file](https://llmstxt.org/): a markdown file at the site root
     with the site's name as a heading and sections of links to markdown versions of pages, found through
     `rel="alternate" type="text/markdown"` and `rel="describedby"`.

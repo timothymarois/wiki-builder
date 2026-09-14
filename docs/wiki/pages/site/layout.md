@@ -35,7 +35,17 @@ narrowed to fit beside it, so its button is never hidden underneath.[^beside] A 
 as a wiki table, and scrolls inside its own frame when it is wider than the screen.[^table] A list is
 indented and spaced like the references at the foot of the page.[^lists] A link that leaves the wiki
 opens in a new tab and ends in an arrow.[^outside] A flowchart or other diagram written in a `mermaid` code block is drawn as a
-diagram, the way GitHub draws one, and the page's markdown keeps the block as written.{missing}
+diagram, the way GitHub draws one, and the page's markdown keeps the block as written.[^diagram] The drawing needs no network,
+and only a page with a diagram loads it.[^diagram] How to write one is described on
+[Diagrams](../pages/diagrams.md).
+
+## Footer
+
+Every page ends with a footer the build writes: when the page last changed, how many words it has, about
+how long it takes to read, how many sources it cites, and how many of its claims have no source.[^footer] A reader-facing
+build leaves out the two citation counts.[^footer] So does a page excused from citations, such as the goals
+page, because it has nothing to count.[^footer] The reading time counts 250 words
+a minute, the pace a 500-word page answering in about two minutes assumes.[^pace]
 
 ## Narrow screens
 
@@ -53,6 +63,14 @@ button.[^narrow]
 [^table]: `src/builder/build.py` — `write_site()` wraps every table in `wt` and gives it the class `w`;
     `src/builder/assets/wiki.css` draws both.
 [^lists]: `src/builder/assets/wiki.css` — `.art :where(ul,ol)` and `.art :where(li)`.
+[^diagram]: `src/builder/build.py` — `write_site()` turns a block matching `MERMAID_BLOCK` into
+    `pre.mermaid`, gives that page the `MERMAID` script, and copies the script only when a page uses it;
+    `src/builder/assets/wiki.js` draws every `pre.mermaid` in the page's theme.
+[^footer]: `src/builder/build.py` — `write_site()` gives each page `page_stats()`, built from its word count
+    and `citation_counts()`, and leaves the citation counts out for the `"user"` audience and for a page that says `goals = false`; `render_page()`
+    writes them into the footer.
+[^pace]: `src/builder/build.py` — `reading_minutes()` divides by `READING_PACE`, 250, and rounds up to a
+    whole minute, never fewer than one.
 [^outside]: `src/builder/build.py` — `rewrite_references()` adds `OUTSIDE` to a link matching
     `OUTSIDE_LINK`; `src/builder/assets/wiki.css` draws the arrow on `a.ext`.
 [^narrow]: `src/builder/assets/wiki.css` — the rules under `max-width: 900px`; `src/builder/assets/wiki.js`

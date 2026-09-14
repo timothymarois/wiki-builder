@@ -93,6 +93,17 @@
     }
   }
 
+  // --- diagrams ------------------------------------------------------------------------------------------
+  // Mermaid is loaded only on a page that has a diagram. It draws in the theme the page opened in: dark
+  // when the reader chose dark, or chose nothing and their system is dark.
+  if (window.mermaid) {
+    var chosen = document.documentElement.getAttribute("data-theme");
+    var dark = chosen === "dark" ||
+      (!chosen && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    window.mermaid.initialize({ startOnLoad: false, theme: dark ? "dark" : "default", securityLevel: "strict" });
+    window.mermaid.run({ querySelector: "pre.mermaid" });
+  }
+
   // --- the lightbox ---------------------------------------------------------------------------------
   // Pictures in a page are thumbnails, so there has to be a way to see one whole. Click anywhere, or
   // press Escape, to close it again.

@@ -36,6 +36,21 @@ such as pointed where there is no wiki.[^check] The same check runs on every pus
 through [Continuous integration](continuous-integration.md). A check proves that a sentence cites
 something, not that the citation is true; an agent checks that from the [Review prompt](review-prompt.md).
 
+## Order
+
+Every check runs before the result is decided, so one problem never hides another.[^check][^caught]
+
+```mermaid
+flowchart LR
+  run["wiki check"] --> build["build the site<br/>in a temporary folder"]
+  build -- "a page cannot be built" --> stopped["stops with the reason, exit 1"]
+  build --> checks["every check in turn: budgets, pictures,<br/>dates, references, headings, pointing words,<br/>dead links, sentences, infobox rows, release"]
+  checks --> listed["every problem listed,<br/>then every claim with no source"]
+  listed --> any{"any problem?"}
+  any -- yes --> one["exit 1"]
+  any -- no --> zero["exit 0"]
+```
+
 ## Refusals
 
 | Refused | Described on |

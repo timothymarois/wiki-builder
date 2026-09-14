@@ -6,6 +6,6 @@
 # when the change did not alter what the picture shows.
 
 ["page-anatomy.svg"]
-digest = "sha256:dc743b25ed52b900662fc854445b4e6ea4e88d10f616d2687898ea7b3144dd32"
+digest = "sha256:f9c4cbd3da17f352546b89d1b1ae49aae89570f268a71355a6ee094c56aefa6a"
 depicts = ["src/builder/assets/template.html"]
-blessed = "the template gained two link elements in the page head, naming the markdown copy and llms.txt; nothing a reader sees moved"
+blessed = "the template gained a placeholder for the diagram script at the foot of the page; nothing a reader sees moved"

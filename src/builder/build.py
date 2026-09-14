@@ -38,9 +38,22 @@ from .config import WikiError, read_config, CONFIG
 # Front matter is TOML between these fences, so it is read by the standard library and costs no parser.
 FENCE = "+++"
 
+# Who a build is for: everyone working on the project, or the users of whatever it documents.
+AUDIENCES = ("internal", "user")
+
 # Where the tool's own files live, so it runs from anywhere rather than only inside a repository laid
 # out the way the first one was.
 ASSETS = resources.files(__package__) / "assets"
+
+# Diagrams are drawn by Mermaid, the diagram language GitHub draws from a ```mermaid block. Its browser build
+# ships inside the package, pinned by its name, so a wiki draws them served, published, or opened straight
+# off disk with no network. The owner, 2026-09-14: "implement mermaid". Mermaid is MIT licensed; its licence
+# travels with it.
+MERMAID = "mermaid-12.0.0.min.js"
+MERMAID_LICENSE = "mermaid-12.0.0.LICENSE"
+MERMAID_BLOCK = re.compile(r'<pre><code class="language-mermaid">(.*?)</code></pre>', re.S)
+# A code block exactly as markdown renders it: a bare <pre>, through its own closing tag.
+BARE_PRE = re.compile(r"(<pre>.*?</pre>)", re.S)
 
 
 def skill_dir():
@@ -86,12 +99,12 @@ ATTRIBUTE = re.compile(r'(href|src)="([^"]*)"')
 LONE_FIGURE = re.compile(r"<p>(<figure.*?</figure>)</p>", re.S)
 FOOTNOTE_DEFINITION = re.compile(r"^\[\^[^\]]+\]:.*(?:\n(?:[ \t]+.*|))*", re.M)
 
-# Everything the player build must not carry. Each is emitted by this file, in this exact shape, so
+# Everything the user build must not carry. Each is emitted by this file, in this exact shape, so
 # stripping them is removing what we put there rather than parsing arbitrary HTML.
-# An <aside>, not a <div>: the player build strips this block with a non-greedy match, which would stop
+# An <aside>, not a <div>: the user build strips this block with a non-greedy match, which would stop
 # at the first closing tag of the same kind. Markdown can put a <div> inside a citation -- a table
 # wrapper, or raw HTML someone pasted -- and the strip would then truncate and leak the rest of the
-# block into a player build. Nothing this renderer emits ever nests an <aside>.
+# block into a user build. Nothing this renderer emits ever nests an <aside>.
 INTERNAL_BLOCK = re.compile(r'<aside class="cites"[^>]*>.*?</aside>', re.S)
 INTERNAL_MARKER = re.compile(r'<sup class="ref[^"]*">.*?</sup>', re.S)
 
@@ -100,7 +113,7 @@ INTERNAL_MARKER = re.compile(r'<sup class="ref[^"]*">.*?</sup>', re.S)
 # beahvior mentions all require a citation or unknown citation." Two things put the mark there -- the
 # thing is not built yet, or nobody has found where it happens -- and for a reader the consequence is the
 # same: do not take this on faith. Written {missing} in the prose, or missing = true on an infobox row.
-# Never shown to a player.
+# Never shown to a user.
 MISSING = re.compile(r"\{missing\}")
 # Rendered code, inline or a block, kept whole when a page is split around it.
 CODE_HTML = re.compile(r"(<pre\b.*?</pre>|<code\b.*?</code>)", re.S)
@@ -145,6 +158,11 @@ def read_pages(pages_dir, intent_budget):
         if "kicker" in meta:
             raise WikiError(f"{path.name} gives its subtitle as kicker, which is now called subtitle; "
                             "rename kicker to subtitle")
+        # An audience the build does not know is refused rather than read quietly as internal, which would
+        # keep the page out of the user build and say nothing about it.
+        if meta.get("audience", "internal") not in AUDIENCES:
+            raise WikiError(f"{path.name} gives its audience as {meta['audience']!r}; an audience is "
+                            "\"internal\" or \"user\"")
         for required in ("title", "intent"):
             if not str(meta.get(required, "")).strip():
                 raise WikiError(f"{path.name} has no {required}; every page must say what it is for")
@@ -359,7 +377,7 @@ def strip_tags(markup):
     return html_module.unescape(TAG.sub("", markup)).strip()
 
 
-def for_player(body):
+def for_user(body):
     """Remove everything this file marked internal, leaving no dangling marker behind.
 
     The per-heading source links need no removal here: they are added later, by number_headings, and only
@@ -528,10 +546,10 @@ def render_infobox(page, audience, directory, images, cited=None):
             # A row may name the requirement that promises it. That identifier is traceability for
             # whoever next checks the page against the code, and it is never rendered: the owner did not
             # want a badge beside the rows that carry one.
-            if row.get("missing") and audience != "player":
+            if row.get("missing") and audience != "user":
                 missing = True
                 value += " " + MISSING_CITATION
-            elif audience != "player":
+            elif audience != "user":
                 # A row cites the way a sentence does: with the number its footnote has in the prose.
                 value += "".join(CITATION % (cited[unikey(key)], cited[unikey(key)])
                                  for key in row_cites(row) if unikey(key) in (cited or {}))
@@ -550,10 +568,10 @@ def visible_to(audience, marked):
     """Whether something marked for one audience belongs in a build for another.
 
     One predicate rather than the same De Morgan pair written out at every call site: the internal and
-    player split is what keeps a requirement identifier or an internal page out of a player build, and a
+    user split is what keeps a requirement identifier or an internal page out of a user build, and a
     rule restated five times is a rule that will be changed in four places.
     """
-    return audience != "player" or marked == "player"
+    return audience != "user" or marked == "user"
 
 
 def descendants_of(page_id, page_ids):
@@ -699,9 +717,31 @@ def on_source():
             '<li><a class="sel">Source</a></li></ul>' % LINK_SUFFIX)
 
 
+# Words a reader gets through in a minute, for the reading time in a page's footer. Not a new figure: a page
+# of 500 words, the default budget, is meant to answer in about two minutes.
+READING_PACE = 250
+
+
+def reading_minutes(words):
+    """About how many minutes a page takes to read: whole minutes, rounded up, and never none."""
+    return max(1, -(-words // READING_PACE))
+
+
+def page_stats(words, cited=None, missing=None):
+    """The counts a page's footer carries, written out. The owner, 2026-09-14: "in the footer we should have
+    stats such as word count, est reading time, missing citation stats ... rendered based on the build"."""
+    minutes = reading_minutes(words)
+    stats = ["%d word%s" % (words, "" if words == 1 else "s"),
+             "about %d minute%s to read" % (minutes, "" if minutes == 1 else "s")]
+    if cited is not None:
+        stats += ["%d source%s cited" % (cited, "" if cited == 1 else "s"),
+                  "%d claim%s with no source" % (missing, "" if missing == 1 else "s")]
+    return stats
+
+
 def render_page(title, subtitle, hatnote, body_html, infobox, categories_bar, nav, index, site,
                 directory, template, tabs=ARTICLE_ONLY, updated="", stamp_css="", stamp_js="",
-                draft=False, llm_links=""):
+                draft=False, llm_links="", diagram_script="", stats=()):
     body_html, entries = number_headings(body_html)
     filled = {
         "tabs": tabs,
@@ -722,10 +762,13 @@ def render_page(title, subtitle, hatnote, body_html, infobox, categories_bar, na
         "contents": render_contents(entries),
         "body": body_html,
         "categories": categories_bar,
-        "footer": ('      <div class="foot"><span>Last updated %s</span></div>'
-                   % html_module.escape(spoken_date(updated))) if updated else "",
+        "footer": ('      <div class="foot">%s</div>' % "".join(
+            "<span>%s</span>" % html_module.escape(part)
+            for part in (["Last updated " + spoken_date(updated)] if updated else []) + list(stats))
+                   ) if updated or stats else "",
         "index": index,
         "llm_links": llm_links,
+        "diagram_script": diagram_script,
     }
     return re.sub(r"\{\{(\w+)\}\}", lambda m: filled.get(m.group(1), ""), template)
 
@@ -946,6 +989,9 @@ def write_site(root, out, audience, link_root, today, record, wiki):
             destination.write_text(markup, encoding="utf-8", newline="\n")
         written.append(destination)
 
+    # Counted from the pages as written, once, for every footer.
+    citations = citation_counts(root, wiki)
+    diagrams_used = False
     for page_id in emitted:
         page = pages[page_id]
         directory = page_directory(page_id)
@@ -956,23 +1002,31 @@ def write_site(root, out, audience, link_root, today, record, wiki):
             page["raw"] += ("\n<!-- Every intent below this page's own text is collected from the other\n"
                             "     pages when the wiki is built, and is not written here. -->\n")
         body = LONE_FIGURE.sub(r"\1", body)
+        # A mermaid block is a diagram, not a sample: Mermaid draws what it finds in a pre.mermaid, and only
+        # a page carrying one loads the script.
+        body, diagrams = MERMAID_BLOCK.subn(r'<pre class="mermaid">\1</pre>', body)
+        diagrams_used = diagrams_used or bool(diagrams)
+        diagram_script = ('<script src="%s"></script>' % relative_file(directory, "assets/" + MERMAID)
+                          if diagrams else "")
         # A page's own table takes the wiki's table style, and scrolls inside its wrapper on a narrow
         # screen rather than widening the page.
         body = body.replace("<table>", '<div class="wt"><table class="w">').replace("</table>",
                                                                                     "</table></div>")
         # A code block gets the source view's box and copy button, which the page's script already works.
         # Only a bare <pre> is markdown's; the source view's own is built elsewhere, with a class.
-        body = body.replace("<pre>", '<div class="srcbox"><button class="copy" type="button">Copy</button>'
-                                     "<pre>").replace("</pre>", "</pre></div>")
+        # Each bare block is wrapped with its own closing tag. Closing after every </pre> once put a stray
+        # </div> after a diagram, which ended the article there and dropped the rest of the page out of it.
+        body = BARE_PRE.sub(r'<div class="srcbox"><button class="copy" type="button">Copy</button>\1</div>',
+                            body)
         # Outside code only: a sample that shows the mark shows it as written.
         body = "".join(part if CODE_HTML.fullmatch(part) else MISSING.sub(MISSING_CITATION, part)
                        for part in CODE_HTML.split(body))
         body = rewrite_references(body, directory, site_root, root, ledger, set(pages),
                                   wiki / "pages", page["path"])
-        if audience == "player":
-            body = for_player(body)
+        if audience == "user":
+            body = for_user(body)
         # The source view names paths and internal identifiers by its nature, so it is internal only.
-        with_source = audience != "player"
+        with_source = audience != "user"
         # The markdown copy is the page as written, references and marks included, so it goes where the
         # source view goes and nowhere else.
         llm_links = ""
@@ -991,7 +1045,12 @@ def write_site(root, out, audience, link_root, today, record, wiki):
             render_nav(sections, pages, categories, page_id, directory, audience),
             index_for(directory), site, directory, template,
             on_article() if with_source else ARTICLE_ONLY, dates[page_id]["updated"],
-            stamps["wiki.css"], stamps["wiki.js"], page["status"] != "approved", llm_links))
+            stamps["wiki.css"], stamps["wiki.js"], page["status"] != "approved", llm_links, diagram_script,
+            # A reader-facing build carries no references and no marks, so it counts neither; nor does a page
+            # excused from citations, which has nothing to count.
+            page_stats(page["words"], *(citations.get(page_id, (0, 0))
+                                        if with_source and page["meta"].get("goals", True)
+                                        else (None, None)))))
         if with_source:
             source_directory = directory + "source/"
             emit(source_directory, render_page(
@@ -1019,7 +1078,7 @@ def write_site(root, out, audience, link_root, today, record, wiki):
             index_for(directory), site, directory, template, ARTICLE_ONLY, "",
             stamps["wiki.css"], stamps["wiki.js"]))
 
-    if audience != "player":
+    if audience != "user":
         order = agent_order(sections, pages, emitted)
         emit("", agent_index(site, order, pages), AGENT_INDEX)
 
@@ -1027,6 +1086,10 @@ def write_site(root, out, audience, link_root, today, record, wiki):
     assets.mkdir(parents=True, exist_ok=True)
     for name in ("wiki.css", "wiki.js"):
         written.append(copy_if_changed(ASSETS / name, assets / name))
+    # Only a wiki that draws a diagram carries the script, and its licence beside it.
+    if diagrams_used:
+        for name in (MERMAID, MERMAID_LICENSE):
+            written.append(copy_if_changed(ASSETS / name, assets / name))
     if ledger:
         (out / "images").mkdir(parents=True, exist_ok=True)
         for name in sorted(ledger):
@@ -1368,6 +1431,33 @@ def heading_problems(root, wiki=None):
     return problems
 
 
+# A rule told as something somebody said: a dated quote of the owner, or "the owner said". A reader wants the
+# rule; a page that quotes whoever asked for it dates itself and argues instead of describing.
+ATTRIBUTION = re.compile(r"\bthe owner(?:'s ruling)?,?\s+\d{4}-\d{2}-\d{2}|\bthe owner (?:said|says|asked|wrote|ruled)\b",
+                         re.I)
+
+
+def attribution_problems(root, wiki=None):
+    """Pages that attribute a rule to the owner instead of stating it.
+
+    Where a requirement came from is recorded with the work that implements it, never on the page. Code is
+    left alone, because a sample shows text as written.
+    """
+    pages_dir = wiki_of(root, wiki) / "pages"
+    problems = []
+    for path in sorted(pages_dir.rglob("*.md")):
+        meta, _ = read_front_matter(path)
+        name = path.relative_to(pages_dir)
+        for field in ("subtitle", "intent"):
+            if ATTRIBUTION.search(INLINE_CODE.sub("", str(meta.get(field, "")))):
+                problems.append(f"{name}: the {field} attributes a rule to the owner; state the rule itself")
+        for line, statement in page_statements(path):
+            if ATTRIBUTION.search(INLINE_CODE.sub("", statement)):
+                problems.append(f"{name}:{line}: {quoted(statement)} attributes a rule to the owner; state "
+                                "the rule itself")
+    return problems
+
+
 def dead_link_problems(root, wiki=None):
     """Links to a page the wiki does not have.
 
@@ -1515,6 +1605,7 @@ def check(root, wiki=None, version=None):
         problems += heading_problems(root, wiki)
         problems += pointing_problems(root, wiki)
         problems += dead_link_problems(root, wiki)
+        problems += attribution_problems(root, wiki)
         problems += uncited_problems(root, wiki)
         problems += infobox_problems(root, wiki)
         if version:

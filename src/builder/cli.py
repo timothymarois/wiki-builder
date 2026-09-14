@@ -118,8 +118,8 @@ def main(argv=None):
                                      help="build with clean addresses, for a host")
     published.add_argument("out", type=Path, metavar="OUT",
                            help="the folder to build into, relative to the working directory")
-    player = commands.add_parser("player", parents=[place], help="build the player's view into a directory")
-    player.add_argument("out", type=Path, metavar="OUT",
+    user = commands.add_parser("user", parents=[place], help="build the user's view into a directory")
+    user.add_argument("out", type=Path, metavar="OUT",
                         help="the folder to build into, relative to the working directory")
     blessed = commands.add_parser("bless", parents=[place],
                                   help="record that a picture is still true, and why")
@@ -165,12 +165,12 @@ def run(args, root, wiki):
         return 1 if problems else 0
 
     out = {"publish": lambda: args.out.resolve(),
-           "player": lambda: args.out.resolve()}.get(command, lambda: wiki / "site")()
+           "user": lambda: args.out.resolve()}.get(command, lambda: wiki / "site")()
     if not guard_output(out):
         return 2
     out.mkdir(parents=True, exist_ok=True)
     counts, goals_words, budget, drafts = build(
-        root, out, "player" if command == "player" else "internal",
+        root, out, "user" if command == "user" else "internal",
         links="clean" if command == "publish" else "file", wiki_dir=wiki)
     report(counts, goals_words, budget, drafts, citation_counts(root, wiki))
     print("wiki: %d page%s written to %s" % (len(counts), "" if len(counts) == 1 else "s", out))

@@ -6,11 +6,11 @@
 
 ["brief"]
 updated = "2026-09-14"
-digest = "3420ca6e94ee351d103755a87bd20a06bd0d27fa07101409fb2f18c7be3b4e2f"
+digest = "6f1816a7b545daec4517459fbb7da82e8d4611d65198c969aa4644932d900a27"
 
 ["checks"]
 updated = "2026-09-14"
-digest = "5b0173eb2f95f8af530ceb56cb344c72985cac9d68b1da470d300eb90e9ef028"
+digest = "ebb7ea380c69745ce26798c796e46baf5fe9db0ff08328046582968d623337d5"
 
 ["checks/budgets"]
 updated = "2026-09-14"
@@ -18,7 +18,7 @@ digest = "84155246d4d8248b38c61882a82cf43474ae455c131f613cb3375244df3cac91"
 
 ["checks/citations"]
 updated = "2026-09-14"
-digest = "7e8aa94824372819d0f7bdcc50307b97a539c21a418e3bf269d7d7743d3e4a57"
+digest = "8a5560ab30ba4bd266dbb121de3a3668ab0c6fcbaf16ccd6a3e3b67452418ced"
 
 ["checks/headings"]
 updated = "2026-09-14"
@@ -34,7 +34,7 @@ digest = "b90225cf70091dd010a7de0a64ea496491772b55f22d68ae9e40ec6636775c56"
 
 ["commands"]
 updated = "2026-09-14"
-digest = "b753ce79c3f3cc265a8f34467560b7f5b0cf9ff7586993e5c7bc95c8c2ea47e3"
+digest = "c7c29f1b13244c97459fecb7639face00b801756c99276d7387e56b95cae41a2"
 
 ["commands/bless"]
 updated = "2026-09-14"
@@ -48,10 +48,6 @@ digest = "fb128ece0f1f68fd87d366cc44edf01c87d56e9f0b3479853ab2264e662a97f9"
 updated = "2026-09-14"
 digest = "189956444068ff426c3a04f757abe3c1ec22d2f7ef5c71382906e956ad44e32a"
 
-["commands/player"]
-updated = "2026-09-14"
-digest = "79196bc3a26f0604589d6c3b4008784a1d0f6342c91e3314fbe32f6b4fd5317b"
-
 ["commands/publish"]
 updated = "2026-09-14"
 digest = "45e424f5ddda53803d74ced4f2842dfe9a855a857347997a3fa7ce646a6e3133"
@@ -64,6 +60,10 @@ digest = "ba96bb1d18d33fb3664c60c226fc208ff29a2d2e041d4c78b5436422415ac468"
 updated = "2026-09-14"
 digest = "8c7e6bd350fc2094b3689eab3e160a3618ae537dfd64ab9ef4ecb8a478e7e18f"
 
+["commands/user"]
+updated = "2026-09-14"
+digest = "9570f22192d9bb50575111b8deb960f905cec8fb32704d5be140fde96077e707"
+
 ["continuous-integration"]
 updated = "2026-09-14"
 digest = "9198c031d924040b7a13b5bbf5f710beb09cc62ae38acf96093603cc3f201e66"
@@ -74,19 +74,19 @@ digest = "e883e2f13e12f5749dcc65fbfccf8b7d0d4c209127c88c7751d64c99c5471dae"
 
 ["deployment-github"]
 updated = "2026-09-14"
-digest = "60731224235421c1b856aef9ea63106cb5501dc2fb4f0518945b41bf4b78b5b9"
+digest = "5b2a18b93c1b34f24a5c0128eef455f3f4226e41b2ee423dc23e784084d9a0ef"
 
 ["front-matter"]
 updated = "2026-09-14"
-digest = "12675c3f2e96c0cf06ecb5fac18fee146644bd74778418f71a863f2e93f09281"
+digest = "702d75e42a64269565049d8149b9d7099e5caf04518d244259f6007f9c589515"
 
 ["front-matter/infobox"]
 updated = "2026-09-14"
-digest = "3f77e24e850861ad91a76af0289c1d3a3a799b03597a9944c1036c4656fdb4ab"
+digest = "6d2fc369995b7f34f8e78d81051f11074d2c64b8d5845c3c8716fe5d3a7b103c"
 
 ["goals"]
 updated = "2026-09-14"
-digest = "0dc27c14efa85194f22c949eb1a7c07fbb4db1daec09028ca731f5e883c4326f"
+digest = "430302c2c67b4ada184769bf9432a6affc03144a1a701198bd6fd87f301d3c0d"
 
 ["index"]
 updated = "2026-09-14"
@@ -102,7 +102,11 @@ digest = "bb585c7538f02b15abccba08ec5844e64a370e8bba15bb39baba66e20b3388f7"
 
 ["pages"]
 updated = "2026-09-14"
-digest = "1df8072672e6ae52c940694a5a00322e2811b5457e28ccff809670da86cafd8d"
+digest = "e1e2f13ee487315bd1cef061734645846039f6ab05dcbd9d44c071cc0188e423"
+
+["pages/diagrams"]
+updated = "2026-09-14"
+digest = "2488e2857bd760e0927b849f9b2fb4ebcf76ced6eaa18ee9bb4875321fa68030"
 
 ["pictures-toml"]
 updated = "2026-09-14"
@@ -118,15 +122,15 @@ digest = "f8ff8406492e7ac0a29b8f646d63caf22d2ddef62e5b0f77f295005b9592b6f6"
 
 ["site"]
 updated = "2026-09-14"
-digest = "cfa8f951d72087a23f1267e8dedf631b366cc192748d51576945b1bb9f4da41a"
+digest = "47b3d79c9e657844e317fee795399a9b88e2a75ee5a71fd09a59068b74d127f9"
 
 ["site/agent-markdown"]
 updated = "2026-09-14"
-digest = "4c34481369b53acf8c699ac5987c2bd83baf1b4fee3a5d2393a243344700ac5e"
+digest = "d8d5650ffb7ff158d4067eb84f9d18029cbcafbddf2ab645da85d1a0db13f85d"
 
 ["site/layout"]
 updated = "2026-09-14"
-digest = "0e32bb6e4d10350a291169d660f64b153625905cb090780b2fa62ded1012742d"
+digest = "2773b6687dda6061944197c3560fe02d090fc896816485a30150fb35c7550a74"
 
 ["skill"]
 updated = "2026-09-14"

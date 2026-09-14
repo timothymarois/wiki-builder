@@ -60,7 +60,7 @@ wiki serve       build, serve, and open a browser at it
 wiki sync        write the skill into the project, and record the release
 wiki bless       a picture whose subject moved, with why it is still true
 wiki publish     build with clean addresses, for a host
-wiki player      build the reader-facing view, with everything internal removed
+wiki user      build the reader-facing view, with everything internal removed
 ```
 
 A project looks like this:

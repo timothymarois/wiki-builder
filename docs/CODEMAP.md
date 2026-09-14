@@ -37,12 +37,14 @@ The kind of CI other projects include is `action.yml` at the root.
 | File | Holds |
 |---|---|
 | `build.py` | The generator and every check. Reads pages, writes a site, returns the reasons a wiki is not fit to read |
-| `cli.py` | What `wiki` does when typed: build, check, serve, sync, bless, publish, player |
+| `cli.py` | What `wiki` does when typed: build, check, serve, sync, bless, publish, user |
 | `config.py` | `wiki.toml` — a project's site name, reading budgets and sidebar — and the release it was written against |
 | `serve.py` | A local server rooted at the project, so a citation opens the file it names as readable text |
 | `assets/wiki.css` | The look. Lifted from a prototype its owner approved; light and dark |
 | `assets/wiki.js` | Search over an inlined index, the theme switch, the mobile menu, the lightbox, copy |
 | `assets/template.html` | The page, as named holes |
+| `assets/mermaid-12.0.0.min.js` | Mermaid, pinned and bundled: draws `mermaid` blocks with no network; copied only into a site that has a diagram |
+| `assets/mermaid-12.0.0.LICENSE` | Mermaid's MIT licence, copied beside it |
 
 ## Skills (`.agents/skills/` — 4, linked from `.claude/skills/`)
 
@@ -73,9 +75,9 @@ inside it.
 them inside the package; a checkout leaves them where they were written, and `build.skill_dir()` finds
 them either way.
 
-## Tests (`tests/` — 146 cases)
+## Tests (`tests/` — 161 cases)
 
-`tests/test_build.py` (1542 lines). Each case builds a small wiki in a temporary directory, breaks exactly
+`tests/test_build.py` (1672 lines). Each case builds a small wiki in a temporary directory, breaks exactly
 one rule, and asserts the tool names it. Run them with:
 
 ```sh

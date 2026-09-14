@@ -57,7 +57,7 @@ Use these words in commits, reviews and conversation. They are the generator's.
   published function, a settings file.
 - **Goals page** — every page's intent, collected. Generated, never written.
 - **Source view** — the Source tab, showing a page's own markdown.
-- **Audience** — `internal`, the default, or `player`, which `wiki player` builds.
+- **Audience** — `internal`, the default, or `user`, which `wiki user` builds.
 
 ## Intent
 
@@ -209,6 +209,7 @@ These are not style preferences. A page carrying any of them has failed its read
 | An apology for what is missing | Nothing |
 | A restatement of an engineering page | A link to it |
 | Marketing, or persuading the reader | Description. A page that argues is in the wrong repository |
+| An attribution: "the owner said", a dated quote of whoever asked for a rule | The rule itself, stated plainly. The gate refuses a dated attribution |
 
 **Do not document absence in prose.** A reader who finds no mention of something has learned what they
 needed. A section headed "not built yet" turns the wiki into a backlog, and backlogs are read by nobody and
@@ -230,20 +231,18 @@ A session ends thirty minutes after its last request.[^expiry]
 ```
 
 - **A reference names code**: the file and function where the thing happens — not a requirements page, a
-  concepts page or another wiki page. The owner's ruling, 2026-09-14: *"sources must be code, where in the
-  code is the source of this reference that satisfies the requirement"*. **The gate refuses a reference to
+  concepts page or another wiki page. **The gate refuses a reference to
   a markdown document**: a page of prose is another claim that can be wrong exactly as yours is, and
   citing it turns one error into two.
 - **How an outside service behaves is cited to its own documentation** — a host's settings, a platform's
   defaults: the thing the project does not run. Name the publisher, link the page by its title, and say
-  what it states. The owner, 2026-09-14: *"references can use external documentation to cite how it
-  is"*. A `{missing}` on such a claim means nobody looked in that documentation yet.
+  what it states. A `{missing}` on such a claim means nobody looked in that documentation yet.
 - **A reference marks the code; it never links to it.** Outside documentation is the one linked reference. Write `` `src/session/expiry.py` — `sweep()` ``,
   not a markdown link. A link to a source file works only while the site is served from inside the
   repository, and is dead wherever the site is published.
 - **Configuration counts as code** where a number lives there: name the function that reads it *and* the
   row.
-- **References are the one place a path belongs**, and a player build strips them.
+- **References are the one place a path belongs**, and a user build strips them.
 - **Link other pages and pictures relative to your own file**, so the link works in the markdown and in
   the browser. A link to a page the wiki does not have is drawn red, and the gate refuses it: write the
   page, or link to one that exists.
@@ -253,8 +252,7 @@ A session ends thirty minutes after its last request.[^expiry]
 **Every sentence is a statement, and carries its own reference.** A sentence states a fact, a behaviour,
 a rule or a consequence; one that states none of those adds nothing to the page, and is cut. So every
 sentence ends with a citation or `{missing}` — every one, not the surprising ones, and never on the
-strength of its neighbour's. The owner, 2026-09-14: *"every statement, fact, requirement, logic, beahvior
-mentions all require a citation or unknown citation."*
+strength of its neighbour's.
 
 **The gate refuses a sentence that cites nothing.** A citation after the full stop belongs to its
 sentence. A sentence that links to another page is excused, because that page carries the citations.
@@ -277,7 +275,7 @@ Write `{missing}` after the claim, or `missing = true` on an infobox row. A red 
 citation would be.
 
 It means **nothing was cited**: either the system does not do this yet, or nobody has found where it does.
-To a reader both mean the same — do not take this on faith — so one mark serves both. A player never sees
+To a reader both mean the same — do not take this on faith — so one mark serves both. A user never sees
 it.
 
 It is the only sanctioned way to say a thing is not built. Use it where a reader would otherwise assume
@@ -359,6 +357,27 @@ rows = [
 
 [Page standard](references/page-standard.md) sets this infobox beside one that fails, and says why.
 
+## Diagrams
+
+A flow, a sequence or a state machine is drawn as a diagram, written as a `mermaid` code block, the way
+GitHub draws one. The site draws it with no network, and the page's markdown keeps it as written.
+
+- **A diagram states behaviour**, so the sentence introducing it carries the citation, and every box and
+  arrow is something the cited code does. Never draw a step the code does not have.
+- **Name its parts as the page does**: the same words for the same things.
+- **One idea per diagram.** A diagram that needs a legend is two diagrams.
+
+```markdown
+A refund is issued only after its charge is found.[^refund]
+
+```mermaid
+flowchart LR
+  request --> charge{charge found?}
+  charge -- yes --> issue --> notify
+  charge -- no --> refuse
+```
+```
+
 ## Pictures
 
 A page shows the thing it describes. Put pictures in `docs/wiki/images/`, reference them by a relative
@@ -376,9 +395,7 @@ The page describes **what the thing actually does**, and nothing else.
 **Never invent.** Everything on a page comes from one of three places: **the code**, **the owner's own
 words**, or **an outside service's own documentation** for how that service behaves. Nothing else is a
 source — not what is typical, what similar tools do, what seems likely, what would make the page
-complete, or what you would have built. The owner, 2026-09-14: *"never invents, never makes anything up
-that does not already exist, never adds information that either the owner or the code base never
-mentioned or given."*
+complete, or what you would have built.
 
 - **No invented behaviour**: no feature, option, default, limit, error, step or edge case the code does
   not have.
@@ -427,8 +444,8 @@ serving nothing is still wrong, and a page over it is saying its intent has grow
 
 ## Owner approval
 
-- **Changing an intent needs the owner's approval**, quoted where the work is recorded, because it
-  changes what the thing is for.
+- **Changing an intent needs the owner's approval**, recorded with the work and never on the page, because
+  it changes what the thing is for.
 - **Changing detail below an intent does not.** A retuned number that alters no outcome is recorded, not
   approved.
 - **If a change cannot be made without altering an intent, stop and ask.** It is a design decision, and it

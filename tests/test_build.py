@@ -158,7 +158,7 @@ class WikiTests(unittest.TestCase):
     def technical_side(cls, site):
         """Every article carrying the builder's register, as sentences.
 
-        The references are exempt and only they: naming a path is what they are for, and a player build
+        The references are exempt and only they: naming a path is what they are for, and a user build
         carries neither them nor the marks that point into them. The source view is exempt for the same
         reason -- it exists to show the file.
         """
@@ -201,6 +201,12 @@ class WikiTests(unittest.TestCase):
         # The subtitle was called kicker before. Reading it silently as nothing would lose every one.
         self.write("thing", PAGE.replace('subtitle = "what it is"', 'kicker = "what it is"'))
         self.refused("rename kicker to subtitle")
+
+    def test_a_page_with_an_audience_the_build_does_not_know_is_refused(self):
+        # The user audience was once called by a game's word. A page still using it is told, not quietly left
+        # out of the user build.
+        self.write("thing", PAGE.replace('categories = ["Things"]', 'categories = ["Things"]\naudience = "player"'))
+        self.refused('an audience is "internal" or "user"')
 
     def test_a_source_view_says_what_it_shows(self):
         self.build()
@@ -254,11 +260,11 @@ class WikiTests(unittest.TestCase):
         self.assertNotIn(">Markdown</a>", source, "the tab row still carries a Markdown tab")
         self.assertTrue((self.out / "thing/index.md").is_file())
 
-    def test_a_player_build_has_no_markdown_copy_and_no_agent_index(self):
-        # The copy is the page as written, references and marks included, which a player build withholds.
+    def test_a_user_build_has_no_markdown_copy_and_no_agent_index(self):
+        # The copy is the page as written, references and marks included, which a user build withholds.
         self.write("thing", PAGE.replace('categories = ["Things"]',
-                                         'categories = ["Things"]\naudience = "player"'))
-        self.build("player")
+                                         'categories = ["Things"]\naudience = "user"'))
+        self.build("user")
         self.assertTrue((self.out / "thing/index.html").is_file())
         self.assertFalse((self.out / "thing/index.md").exists())
         self.assertFalse((self.out / "llms.txt").exists())
@@ -514,6 +520,34 @@ class WikiTests(unittest.TestCase):
             "    subdomain needs a `CNAME` record."))
         self.assertEqual([], wiki.citation_problems(self.root))
 
+    def test_a_rule_attributed_to_the_owner_is_refused_where_it_is_written(self):
+        self.write("thing", PAGE.replace("It does it slowly.[^why]",
+                                         'It does it slowly. The owner, 2026-09-14: "make it slow".[^why]'))
+        problems = wiki.attribution_problems(self.root)
+        self.assertEqual(1, len(problems), problems)
+        self.assertTrue(problems[0].startswith("thing.md:%d: " % self.line_of("thing", "It does it slowly")),
+                        problems)
+        self.assertIn("attributes a rule to the owner; state the rule itself", problems[0])
+
+    def test_an_intent_attributed_to_the_owner_is_refused(self):
+        self.write("thing", PAGE.replace("It should be plain what it is for.",
+                                         'The owner said so. It should be plain what it is for.'))
+        self.assertTrue(any(problem.startswith("thing.md: the intent attributes")
+                            for problem in wiki.attribution_problems(self.root)))
+
+    def test_the_owners_role_named_as_a_rule_passes(self):
+        for text in ("Changing it needs the owner's approval.[^why]",
+                     "The owner decides what changes.[^why]",
+                     "Write `The owner, 2026-09-14:` nowhere.[^why]"):
+            with self.subTest(text=text):
+                self.write("thing", PAGE.replace("It does it slowly.[^why]", text))
+                self.assertEqual([], wiki.attribution_problems(self.root))
+
+    def test_the_check_refuses_an_attribution_to_the_owner(self):
+        self.write("thing", PAGE.replace("It does it slowly.[^why]", "The owner, 2026-09-14: slowly.[^why]"))
+        problems, *_ = wiki.check(self.root)
+        self.assertTrue(any("attributes a rule to the owner" in problem for problem in problems), problems)
+
     def test_the_check_refuses_a_name_that_points_at_the_page(self):
         self.write("thing", PAGE.replace('label = "Today"', 'label = "This site"'))
         problems, *_ = wiki.check(self.root)
@@ -580,10 +614,10 @@ class WikiTests(unittest.TestCase):
                 continue
             self.assertNotIn("THING-001", text, f"{path.name} shows a requirement identifier")
 
-    def test_a_player_build_carries_no_requirement_identifier_anywhere(self):
+    def test_a_user_build_carries_no_requirement_identifier_anywhere(self):
         self.write("thing", PAGE.replace('categories = ["Things"]',
-                                         'categories = ["Things"]\naudience = "player"'))
-        self.build("player")
+                                         'categories = ["Things"]\naudience = "user"'))
+        self.build("user")
         for text in self.emitted().values():
             self.assertNotIn("THING-001", text)
 
@@ -637,10 +671,10 @@ class WikiTests(unittest.TestCase):
                                          '{ label = "Today", value = "a number", cite = "why", link = "front.md" }'))
         self.refused("not an address outside the wiki")
 
-    def test_a_player_build_carries_no_infobox_citation(self):
+    def test_a_user_build_carries_no_infobox_citation(self):
         self.write("thing", PAGE.replace('categories = ["Things"]',
-                                         'categories = ["Things"]\naudience = "player"'))
-        self.build("player")
+                                         'categories = ["Things"]\naudience = "user"'))
+        self.build("user")
         page = (self.out / "thing/index.html").read_text(encoding="utf-8")
         self.assertNotIn("#cite-", page)
 
@@ -728,6 +762,102 @@ class WikiTests(unittest.TestCase):
                 self.write("thing", PAGE.replace("It does it slowly.[^why]", text))
                 self.assertEqual([], wiki.dead_link_problems(self.root))
 
+    # Diagrams. The owner, 2026-09-14: "with flows, charts, like github and markdown ability. hwo can we make
+    # sure that the wiki can support flow charts viewable?", then "implement mermaid".
+
+    DIAGRAM = "It flows.[^why]\n\n```mermaid\nflowchart LR\n  a --> b{ok?}\n  b -- yes --> c\n```\n"
+
+    def test_a_mermaid_block_is_drawn_as_a_diagram(self):
+        self.write("thing", PAGE.replace("## Ground", self.DIAGRAM + "\n## Ground"))
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertIn('<pre class="mermaid">flowchart LR\n  a --&gt; b{ok?}\n  b -- yes --&gt; c\n</pre>', page)
+        self.assertNotIn("language-mermaid", page, "the diagram was left as a code sample")
+        self.assertIn('<script src="../assets/%s"></script>' % wiki.MERMAID, page)
+        self.assertTrue((self.out / "assets" / wiki.MERMAID).is_file())
+
+    def test_a_diagram_leaves_the_page_whole(self):
+        # The code-block box closed after every </pre>, the diagram's included, and that stray </div> ended
+        # the article at the diagram: everything below it fell out of the page.
+        self.write("thing", PAGE.replace("## Ground", self.SAMPLE + "\n" + self.DIAGRAM + "\n## Ground"))
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertEqual(page.count("<div"), page.count("</div>"), "a diagram left the page's boxes unbalanced")
+        self.assertIn('<pre class="mermaid">flowchart LR', page)
+        self.assertEqual(1, page.count('<button class="copy"'), "only the code sample is a code block")
+        article = page[page.index('<article class="art">'):page.index("</article>")]
+        self.assertIn("Because speed would change it.", article, "the text after the diagram left the article")
+
+    def test_a_page_without_a_diagram_loads_no_diagram_script(self):
+        self.write("thing", PAGE.replace("## Ground", self.DIAGRAM + "\n## Ground"))
+        self.build()
+        front = (self.out / "index.html").read_text(encoding="utf-8")
+        self.assertNotIn(wiki.MERMAID, front)
+
+    def test_a_wiki_with_no_diagram_ships_no_diagram_script(self):
+        self.write("thing", PAGE.replace("## Ground", self.DIAGRAM + "\n## Ground"))
+        self.build()
+        self.write("thing", PAGE)
+        self.build()
+        self.assertFalse((self.out / "assets" / wiki.MERMAID).exists(), "the script outlived the last diagram")
+
+    def test_a_diagram_stays_mermaid_in_the_markdown_copy(self):
+        self.write("thing", PAGE.replace("## Ground", self.DIAGRAM + "\n## Ground"))
+        self.build()
+        copy = (self.out / "thing/index.md").read_text(encoding="utf-8")
+        self.assertIn("```mermaid\nflowchart LR\n  a --> b{ok?}\n", copy)
+
+    # The footer. The owner, 2026-09-14: "in the footer we should have stats such as word count, est reading
+    # time, missing citation stats. for each individeual page. those are rendered based on the build auto
+    # generated".
+
+    def footer(self, page_id="thing"):
+        page = (self.out / page_id / "index.html").read_text(encoding="utf-8")
+        return page[page.index('<div class="foot">'):page.index("</div>", page.index('<div class="foot">'))]
+
+    def test_a_page_footer_carries_its_own_counts(self):
+        counts, _ = self.build()
+        footer = self.footer()
+        self.assertIn("%d words" % counts["thing"], footer)
+        self.assertIn("about 1 minute to read", footer)
+        self.assertIn("1 source cited", footer)
+        self.assertIn("1 claim with no source", footer)
+
+    def test_a_footer_counts_in_the_plural(self):
+        self.write("thing", PAGE.replace("It does it slowly.[^why]", "It does it slowly.[^how] {missing}")
+                   .replace("[^why]: The reason", "[^how]: How — `Source/Thing.h`.\n[^why]: The reason"))
+        self.build()
+        footer = self.footer()
+        self.assertIn("2 sources cited", footer)
+        self.assertIn("2 claims with no source", footer)
+
+    def test_reading_time_is_counted_at_the_pace_the_budget_assumes(self):
+        # 500 words a page is meant to answer in about two minutes, so a minute is 250 words, rounded up.
+        for words, minutes in ((0, 1), (1, 1), (250, 1), (251, 2), (500, 2), (501, 3)):
+            with self.subTest(words=words):
+                self.assertEqual(minutes, wiki.reading_minutes(words))
+
+    def test_a_page_excused_from_citations_counts_none_in_its_footer(self):
+        # The owner, 2026-09-14: "goals pages or pages excluded from citations should no have the 2 cite
+        # stats in footer". The front page and the goals page both say goals = false.
+        self.build()
+        for path in (self.out / "index.html", self.out / "goals/index.html"):
+            with self.subTest(page=path.parent.name or "index"):
+                page = path.read_text(encoding="utf-8")
+                footer = page[page.index('<div class="foot">'):page.index("</div>", page.index('<div class="foot">'))]
+                self.assertIn(" words", footer)
+                self.assertNotIn("cited", footer)
+                self.assertNotIn("no source", footer)
+
+    def test_a_user_footer_leaves_out_the_citation_counts(self):
+        self.write("thing", PAGE.replace('categories = ["Things"]',
+                                         'categories = ["Things"]\naudience = "user"'))
+        self.build("user")
+        footer = self.footer()
+        self.assertIn(" words", footer)
+        self.assertNotIn("cited", footer)
+        self.assertNotIn("no source", footer)
+
     def test_a_markdown_table_is_drawn_as_a_wiki_table(self):
         # Without the class, a page's own table had no borders, no header row and no padding.
         self.write("thing", PAGE.replace("It does it slowly.[^why]", "| a | b |\n|---|---|\n| c[^why] | d |"))
@@ -739,8 +869,8 @@ class WikiTests(unittest.TestCase):
 
     def test_a_count_of_one_is_singular(self):
         # "1 pages written" and "1 problems" were printed by every one-page build and one-problem check.
-        self.write("thing", PAGE.replace('categories = ["Things"]', 'categories = ["Things"]\naudience = "player"'))
-        _, output = self.run_main(["--root", str(self.root), "player", str(self.out)])
+        self.write("thing", PAGE.replace('categories = ["Things"]', 'categories = ["Things"]\naudience = "user"'))
+        _, output = self.run_main(["--root", str(self.root), "user", str(self.out)])
         self.assertIn("wiki: 1 page written to", output)
         self.write("thing", PAGE.replace("It does it slowly.[^why]", "It does it slowly."))
         self.build()
@@ -962,14 +1092,14 @@ class WikiTests(unittest.TestCase):
 
     # --- audience --------------------------------------------------------------------------------
 
-    def test_a_player_build_carries_no_internal_page(self):
-        self.build("player")
+    def test_a_user_build_carries_no_internal_page(self):
+        self.build("user")
         self.assertFalse((self.out / "thing/index.html").exists())
 
-    def test_a_player_build_carries_no_source_view_no_citation_and_no_path(self):
+    def test_a_user_build_carries_no_source_view_no_citation_and_no_path(self):
         self.write("thing", PAGE.replace('categories = ["Things"]',
-                                         'categories = ["Things"]\naudience = "player"'))
-        self.build("player")
+                                         'categories = ["Things"]\naudience = "user"'))
+        self.build("user")
         page = (self.out / "thing/index.html").read_text(encoding="utf-8")
         self.assertNotIn("Source/Thing.h", page)
         self.assertNotIn('class="cites"', page)
@@ -1059,7 +1189,7 @@ class WikiTests(unittest.TestCase):
     def test_no_article_carries_the_technical_side(self):
         """The promise the whole wiki rests on: an article is free of the builder's register.
 
-        The citation block is exempt and only there -- it exists to name paths, and a player build has
+        The citation block is exempt and only there -- it exists to name paths, and a user build has
         neither it nor the marks that point into it.
         """
         self.build()
@@ -1404,7 +1534,7 @@ class PackageTests(unittest.TestCase):
     # any project, and a single one of these in it makes that a rewrite rather than an install.
     SOMEBODY_ELSES = ("deer", "wolf", "wolves", "pine", "settlement", "colonial", "wildlife", "herd",
                       "pasture", "villager", "unreal", "blueprint", "laravel", "django", "rails",
-                      "game", "games")
+                      "game", "games", "player", "players")
 
     def test_the_tool_names_nothing_about_any_project(self):
         # Whole words only: "DecodeError" is not a deer, and a directory tree is not a pine. A word that

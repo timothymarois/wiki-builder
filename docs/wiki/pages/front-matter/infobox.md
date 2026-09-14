@@ -30,7 +30,7 @@ every row cites on [Citations](../checks/citations.md).
 | Field | Type | Default | Meaning |
 |---|---|---|---|
 | `group` | string | empty | the group's heading[^fields] |
-| `audience` | string | the page's audience | `"player"` keeps the group in a player build[^group-audience] |
+| `audience` | string | the page's audience | `"user"` keeps the group in a user build[^group-audience] |
 | `rows` | list of tables | none | the group's rows, in the order written[^rows] |
 | `label` | string | empty | the row's name[^rows] |
 | `value` | string | empty | the row's value, shown as plain text[^rows] |
@@ -73,7 +73,7 @@ rows = [
     does not match.
 [^check]: `src/builder/build.py` — `infobox_problems()`, called from `check()`.
 [^group-audience]: `src/builder/build.py` — `render_infobox()` takes a group's `audience` from the page
-    when absent, and `visible_to()` keeps the group in a player build only when that is `"player"`.
+    when absent, and `visible_to()` keeps the group in a user build only when that is `"user"`.
 [^rows]: `src/builder/build.py` — `render_infobox()` shows a group's `rows` in the order written, none when
     absent, each as its `label`, then its `value` escaped as plain text, both empty when absent, then its
     `note` when it has one.

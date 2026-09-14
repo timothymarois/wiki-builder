@@ -11,7 +11,7 @@ should change unless a page did.
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Commands", value = "wiki build, wiki publish, wiki player", cite = "build" },
+  { label = "Commands", value = "wiki build, wiki publish, wiki user", cite = "build" },
   { label = "Output", value = "docs/wiki/site", note = "for wiki build", cite = "build" },
 ]
 
@@ -48,8 +48,7 @@ same reason, **it refuses to write into a folder it did not make**, so it never 
 else's.[^guard]
 
 **A link to a wiki page that does not exist is drawn red instead of blue**, and `wiki check` refuses it,
-naming the page and the line.[^redlink] The owner, 2026-09-14: "then its red instead of blue. and that could
-be part of our dead link checks".[^redlink] A link to any other file that does not exist is not refused, and
+naming the page and the line.[^redlink] A link to any other file that does not exist is not refused, and
 leads nowhere.[^deadlink]
 
 ## Dates
@@ -71,12 +70,12 @@ too.[^index]
 
 ## Audiences
 
-`wiki player` builds only the pages marked for players, which say `audience = "player"` in their front
-matter; an infobox group can be marked the same way.[^player] The player build strips every reference,
+`wiki user` builds only the pages marked for users, which say `audience = "user"` in their front
+matter; an infobox group can be marked the same way.[^user] The user build strips every reference,
 every red mark and the Source tab.[^strip] Every field is listed on [Front matter](front-matter.md).
 
 [^build]: `src/builder/cli.py` — `run()` builds into `site` beside the pages unless the command is
-    `publish` or `player`.
+    `publish` or `user`.
 [^serve]: `src/builder/cli.py` — `run()` builds once, then calls `serve()` in `src/builder/serve.py`,
     which never rebuilds; the project's `.gitignore` excludes `docs/wiki/site/`.
 [^links]: `src/builder/build.py` — `page_directory()` and `relative_directory()`, which end every link in
@@ -104,8 +103,8 @@ every red mark and the Source tab.[^strip] Every field is listed on [Front matte
     eight.
 [^index]: `src/builder/build.py` — `index_for()` in `write_site()`; `src/builder/assets/template.html`
     inlines it as `WIKI_INDEX`.
-[^player]: `src/builder/cli.py` — `run()` builds with audience `"player"`; `src/builder/build.py` —
+[^user]: `src/builder/cli.py` — `run()` builds with audience `"user"`; `src/builder/build.py` —
     `read_pages()` reads a page's `audience`, defaulting to `"internal"`, and `render_infobox()` reads a
     group's own.
-[^strip]: `src/builder/build.py` — `visible_to()` for pages, `for_player()` for references and marks, and
+[^strip]: `src/builder/build.py` — `visible_to()` for pages, `for_user()` for references and marks, and
     `with_source` in `write_site()` for the tab.

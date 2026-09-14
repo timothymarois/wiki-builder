@@ -31,6 +31,18 @@ the same guide for Cloudflare on [Deployment (Cloudflare)](deployment-cloudflare
 
 ## Workflow
 
+Every push to `main`, or a run started by hand, checks the wiki, publishes it only when the check passes,
+and deploys what was published.[^flow]
+
+```mermaid
+flowchart LR
+  push["push to main, or run by hand"] --> check{"wiki check"}
+  check -- "a problem" --> stop["job fails, nothing published"]
+  check -- "no problems" --> publish["wiki publish _site"]
+  publish --> cname["CNAME written"] --> upload["site uploaded"]
+  upload --> deploy["deploy job"] --> pages["GitHub Pages"]
+```
+
 The action installs `wiki` and leaves it installed, so a later step in the same job can run it.[^action]
 
 ```yaml
@@ -93,6 +105,10 @@ serves the result at wiki-builder.marois.dev.{missing}
 
 [^pages]: `.github/workflows/pages.yml` — the `build` job checks the wiki and runs `wiki publish _site`,
     and the `deploy` job runs `actions/deploy-pages`, on every push to `main`.
+[^flow]: `.github/workflows/pages.yml` — runs `on` a push to `main` or `workflow_dispatch`; the `build`
+    job checks the wiki through `./`, runs `wiki publish _site`, writes `_site/CNAME` and uploads the site
+    with `actions/upload-pages-artifact`; `deploy` needs `build` and runs `actions/deploy-pages`.
+    `action.yml` — its last step runs `wiki check`, and a failing step stops the job.
 [^order]: `.github/workflows/pages.yml` — `deploy` needs `build`, whose first step after checkout is the
     check.
 [^action]: `action.yml` — installs wiki-builder with `pip` into the Python `actions/setup-python` puts on
