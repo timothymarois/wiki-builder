@@ -65,10 +65,11 @@ inside it.
 
 | File | Holds |
 |---|---|
-| `SKILL.md` | How to write a page: the intent contract, naming, what may never appear, the voice |
+| `SKILL.md` | The steps for each task, and how to write a page: the intent contract, naming, what may never appear, the voice |
 | `references/page-standard.md` | The worked example — a page done well, the same content done badly, and the difference |
 | `references/reference-standard.md` | The same for reference pages — a command and an endpoint, each done well and badly |
 | `references/naming-and-grammar.md` | Names a writer chooses and names the software owns, and the grammar pages are held to |
+| `references/infobox.md` | The infobox: its groups, labels and values, the keys a row takes, and an example |
 | `references/reference-pages.md` | How a page documents a command, endpoint, function, settings file or event |
 | `references/flowcharts.md` | How to design a diagram: when to draw, its kind, shapes, direction, labels, and its sources |
 
