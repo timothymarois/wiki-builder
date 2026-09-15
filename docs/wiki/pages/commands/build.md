@@ -49,7 +49,7 @@ wiki build
 ## Output
 
 It prints each page's word count and citations, then the totals, the words in the collected goals, and
-how many pages it wrote and where.[^report] It also names any draft waiting on the owner, and warns while
+how many pages it wrote and where.[^report] It also names any draft waiting on approval, and warns while
 the reading budgets are uncalibrated.[^report] On a wiki of three pages, with the folder on the last line
 being wherever the wiki sits:[^report]
 ```text

@@ -4,9 +4,9 @@ subtitle = "a prompt that has an agent review how a wiki's pages are grouped and
 status = "approved"
 goals = false
 intent = """
-The organization prompt exists so that an owner can have any agent review how a project's wiki is
-organized, so that people understand how everything works and the organization feels intentional. The
-review changes nothing; the owner approves each family's layout before any page moves.
+The organization prompt exists so that any agent can review how a project's wiki is organized, so that
+people understand how everything works and the organization feels intentional. The review changes
+nothing; each family's layout is approved before any page moves.
 """
 
 [[infobox]]
@@ -20,14 +20,14 @@ rows = [
 group = "Rules"
 rows = [
   { label = "Edits", value = "none, findings only", cite = "families" },
-  { label = "Approval", value = "every layout, by the owner", cite = "families" },
+  { label = "Approval", value = "every layout, before any page moves", cite = "families" },
 ]
 +++
 
 The prompt below has an agent review how a wiki is organized: which pages are about things of one kind,
 whether each such family shares one layout of headings and infobox labels, whether its parent page lists
 and compares its members, and whether every page sits where a reader would look for it.[^families] Every
-proposal waits for the owner, because a family's layout decides what each of its pages covers.[^families]
+proposal waits for approval, because a family's layout decides what each of its pages covers.[^families]
 It works in any project that uses wiki-builder, and names nothing about the project it is used in. Checking
 what the pages say against the code has its own [Review prompt](review-prompt.md).
 
@@ -40,7 +40,7 @@ beneath it. Left as it is, the prompt has the agent review the whole sidebar, on
 Review how this project's wiki is organized, and report every change that would let a reader compare
 pages about things of one kind and find each fact where they expect it. The readers are the
 stakeholders, the product owner, the engineering team and, for pages marked for users, customers. The
-review changes nothing: each family's layout is the owner's to approve before any page moves.
+review changes nothing: each family's layout needs approval before any page moves.
 
 ## Scope
 
@@ -108,7 +108,7 @@ your own preference, or a new fact: every proposal moves or renames what the pag
    [family] table its parent would declare, and each member's mapping onto it.
 3. Parent pages to add or change: the sections the lead names, and the table's columns.
 4. Placement findings, one line each: the page, what is wrong, and the move.
-5. For the owner, one line each: every new page that needs an intent, every sentence a change would
+5. For approval, one line each: every new page that needs an intent, every sentence a change would
    cut, and every layout awaiting approval.
 
 Rank every finding by how much it changes what a reader can compare or find.
@@ -116,14 +116,14 @@ Rank every finding by how much it changes what a reader can compare or find.
 
 ## Fixing
 
-To have the agent apply what the owner approved instead of reporting it, replace the third step of "Before
+To have the agent apply what was approved instead of reporting it, replace the third step of "Before
 starting" with: "Apply only the layouts and moves I approve, declaring each layout as `[family]` on its parent,
 moving every sentence with its citation and
 cutting none, run `wiki check` until it reports 0 problems, and list every page you changed, one line
-each." A parent page the agent adds is a draft until the owner approves its intent.[^draft]
+each." A parent page the agent adds is a draft until its intent is approved.[^draft]
 
 [^families]: `src/skill/references/page-families.md` — the families, layout and parent page rules the prompt
-    reviews against, where the owner is shown each layout before any page is rewritten to it.
+    reviews against, where each layout is shown for approval before any page is rewritten to it.
 [^skill]: `src/builder/cli.py` — `SKILL_NAME` names the skill, and `sync()` copies `SKILL.md` and its
     `references` into the project.
 [^check]: `src/builder/build.py` — `check()` builds the site in a temporary folder and gathers every

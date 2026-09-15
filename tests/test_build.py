@@ -250,9 +250,8 @@ class WikiTests(unittest.TestCase):
         self.assertIn("- [A thing](thing/index.md): the thing, its speed and its ground", index)
 
     def test_a_source_view_links_to_the_markdown_file(self):
-        # Anyone can open a page as pure markdown from its Source view. The owner, 2026-09-14: "we would
-        # want the docs to be viewable as pure md file content", and then "update markdown tab to be in
-        # source. but a link to the markdown file instead".
+        # A reader can open a page as pure markdown: its Source view links to the markdown file, in place of
+        # a separate markdown tab.
         self.build()
         page = (self.out / "thing/index.html").read_text(encoding="utf-8")
         source = (self.out / "thing/source/index.html").read_text(encoding="utf-8")
@@ -356,8 +355,8 @@ class WikiTests(unittest.TestCase):
         ("a link to a picture", "It looks like [this](../images/thing.png).", ["It looks like"]),
         ("a table with no citation", "| a | b |\n|---|---|\n| c | d |", ["| c | d |"]),
         ("a table with one citation", "| a | b |\n|---|---|\n| c[^why] | d |", []),
-        # The owner, 2026-09-14: "a table row must have at least one citation in any of the columns of its
-        # row". One cited row no longer covers the rows beside it.
+        # A table row needs at least one citation in any of its columns. One cited row no longer covers the
+        # rows beside it.
         ("a cited row beside an uncited one", "| a | b |\n|---|---|\n| c[^why] | d |\n| e | f |", ["| e | f |"]),
         ("a citation in the last cell", "| a | b |\n|---|---|\n| c | d[^why] |", []),
         ("a row marked as having no source", "| a | b |\n|---|---|\n| c | d {missing} |", []),
@@ -532,29 +531,29 @@ class WikiTests(unittest.TestCase):
                           "does the thing, or an outside service's own documentation"], problems)
 
     def test_a_reference_to_an_outside_services_documentation_passes(self):
-        # The owner, 2026-09-14: "references can use external documentation to cite how it is".
+        # A reference may cite an outside service's own documentation for how that service behaves.
         self.write("thing", PAGE.replace(
             "[^why]: The reason — `Source/Thing.h`.",
             "[^why]: Host Docs — [Custom domains](https://docs.example.com/pages/custom-domains/): a\n"
             "    subdomain needs a `CNAME` record."))
         self.assertEqual([], wiki.citation_problems(self.root))
 
-    def test_a_rule_attributed_to_the_owner_is_refused_where_it_is_written(self):
+    def test_a_rule_attributed_to_a_person_is_refused_where_it_is_written(self):
         self.write("thing", PAGE.replace("It does it slowly.[^why]",
                                          'It does it slowly. The owner, 2026-09-14: "make it slow".[^why]'))
         problems = wiki.attribution_problems(self.root)
         self.assertEqual(1, len(problems), problems)
         self.assertTrue(problems[0].startswith("thing.md:%d: " % self.line_of("thing", "It does it slowly")),
                         problems)
-        self.assertIn("attributes a rule to the owner; state the rule itself", problems[0])
+        self.assertIn("attributes a rule to a person; state the rule itself", problems[0])
 
-    def test_an_intent_attributed_to_the_owner_is_refused(self):
+    def test_an_intent_attributed_to_a_person_is_refused(self):
         self.write("thing", PAGE.replace("It should be plain what it is for.",
                                          'The owner said so. It should be plain what it is for.'))
         self.assertTrue(any(problem.startswith("thing.md: the intent attributes")
                             for problem in wiki.attribution_problems(self.root)))
 
-    def test_the_owners_role_named_as_a_rule_passes(self):
+    def test_an_approval_role_named_as_a_rule_passes(self):
         for text in ("Changing it needs the owner's approval.[^why]",
                      "The owner decides what changes.[^why]",
                      "Write `The owner, 2026-09-14:` nowhere.[^why]"):
@@ -565,10 +564,10 @@ class WikiTests(unittest.TestCase):
     def test_the_check_refuses_an_attribution_to_the_owner(self):
         self.write("thing", PAGE.replace("It does it slowly.[^why]", "The owner, 2026-09-14: slowly.[^why]"))
         problems, *_ = wiki.check(self.root)
-        self.assertTrue(any("attributes a rule to the owner" in problem for problem in problems), problems)
+        self.assertTrue(any("attributes a rule to a person" in problem for problem in problems), problems)
 
     def test_a_sentence_with_a_vague_actor_is_refused_where_it_is_written(self):
-        # "Nobody has approved it" hides who. The page names the reader, the owner, an agent or the part that
+        # "Nobody has approved it" hides who. The page names the reader, the writer, an agent or the part that
         # acts.
         for word in ("nobody", "Somebody", "someone", "anyone", "everyone", "no one"):
             with self.subTest(word=word):
@@ -585,7 +584,7 @@ class WikiTests(unittest.TestCase):
 
     def test_a_named_actor_or_code_passes(self):
         for text in ("The reader sees it slowly.[^why]",
-                     "The owner approves it, and no reader can reach it.[^why]",
+                     "The writer approves it, and no reader can reach it.[^why]",
                      "The flag is `--nobody`.[^why]"):
             with self.subTest(text=text):
                 self.write("thing", PAGE.replace("It does it slowly.[^why]", text))
@@ -597,7 +596,7 @@ class WikiTests(unittest.TestCase):
         self.assertTrue(any("instead of naming who acts" in problem for problem in problems), problems)
 
     def test_a_word_that_says_nothing_is_refused_where_it_is_written(self):
-        # The owner, 2026-09-14: "add those additional bad words that are meaningless for our documentation".
+        # Words that mean nothing in documentation are refused.
         # One word from each list, each refused with the line it is on and what to write instead.
         cases = {
             "powerful": "say what it does",
@@ -859,8 +858,7 @@ class WikiTests(unittest.TestCase):
         problems = wiki.uncited_problems(self.root)
         self.assertTrue(any("It is written" in problem for problem in problems), problems)
 
-    # A link to a page the wiki does not have. The owner, 2026-09-14: "then its red instead of blue. and
-    # that could be part of our dead link checks".
+    # A link to a page the wiki does not have: drawn red instead of blue, and refused by the dead link check.
 
     def test_a_link_to_a_page_the_wiki_does_not_have_is_drawn_red(self):
         self.write("thing", PAGE.replace("It does it slowly.[^why]",
@@ -891,8 +889,7 @@ class WikiTests(unittest.TestCase):
                 self.write("thing", PAGE.replace("It does it slowly.[^why]", text))
                 self.assertEqual([], wiki.dead_link_problems(self.root))
 
-    # Diagrams. The owner, 2026-09-14: "with flows, charts, like github and markdown ability. hwo can we make
-    # sure that the wiki can support flow charts viewable?", then "implement mermaid".
+    # Diagrams: flows and charts drawn from a ```mermaid block, the way GitHub draws them.
 
     DIAGRAM = "It flows.[^why]\n\n```mermaid\nflowchart LR\n  a --> b{ok?}\n  b -- yes --> c\n```\n"
 
@@ -939,9 +936,7 @@ class WikiTests(unittest.TestCase):
         copy = (self.out / "thing/index.md").read_text(encoding="utf-8")
         self.assertIn("```mermaid\nflowchart LR\n  a --> b{ok?}\n", copy)
 
-    # The footer. The owner, 2026-09-14: "in the footer we should have stats such as word count, est reading
-    # time, missing citation stats. for each individeual page. those are rendered based on the build auto
-    # generated".
+    # The footer: each page's word count, reading time and citation counts, generated by the build.
 
     def footer(self, page_id="thing"):
         page = (self.out / page_id / "index.html").read_text(encoding="utf-8")
@@ -970,8 +965,8 @@ class WikiTests(unittest.TestCase):
                 self.assertEqual(minutes, wiki.reading_minutes(words))
 
     def test_a_page_excused_from_citations_counts_none_in_its_footer(self):
-        # The owner, 2026-09-14: "goals pages or pages excluded from citations should no have the 2 cite
-        # stats in footer". The front page and the goals page both say goals = false.
+        # A goals page, or any page excused from citations, has neither citation count in its footer. The
+        # front page and the goals page both say goals = false.
         self.build()
         for path in (self.out / "index.html", self.out / "goals/index.html"):
             with self.subTest(page=path.parent.name or "index"):
@@ -1093,7 +1088,7 @@ class WikiTests(unittest.TestCase):
         self.nav(CONFIGURATION.replace('pages = ["thing"]', 'pages = ["thing", "proposal"]'))
 
     def test_a_page_is_a_draft_unless_it_says_otherwise(self):
-        """An agent may write a page. Deciding that it belongs in the wiki is the owner's."""
+        """An agent may write a page. Deciding that it belongs in the wiki needs approval."""
         self.draft()
         self.build()
         self.assertIn("proposal", self.drafts)
@@ -1111,7 +1106,7 @@ class WikiTests(unittest.TestCase):
         self.assertLess(page.index("This page is a draft"), page.index("<h2"))
 
     def test_a_draft_is_in_the_sidebar(self):
-        """The owner's ruling, 2026-09-14: "all pages should always be on the nav regardless of status"."""
+        """Every page is in the navigation, whatever its status."""
         self.draft()
         self.build()
         front = (self.out / "index.html").read_text(encoding="utf-8")
@@ -1782,8 +1777,8 @@ class WikiTests(unittest.TestCase):
                          "citing a source pushed a page over its budget")
 
     def test_a_code_block_does_not_count_against_the_reading_budget(self):
-        # A sample is copied or run, not read -- a prompt to hand an agent is a page of it. The owner,
-        # 2026-09-14, chose not to count code blocks.
+        # A sample is copied or run, not read -- a prompt to hand an agent is a page of it. Code blocks
+        # are not counted.
         sample = "Type it.[^why]\n\n```text\n" + ("word " * 600) + "\n```\n"
         self.write("thing", PAGE.replace("## Ground", sample + "\n## Ground"))
         counts, goals_words = self.build()
@@ -1894,8 +1889,8 @@ class WikiTests(unittest.TestCase):
         self.assertNotIn("thing/part", wiki.read_dates(self.root / "docs/wiki"))
         self.assertEqual([], wiki.date_problems(self.root))
 
-    # An audit is the page checked against the code. The owner, 2026-09-14: "Last Audited date in the stats
-    # after last updated ... if not there it just says never."
+    # An audit is the page checked against the code. A page's stats give its last audited date after its
+    # last updated date, and say never when it has not been audited.
 
     def test_a_page_never_audited_says_so_in_its_footer(self):
         self.build()
@@ -1912,8 +1907,8 @@ class WikiTests(unittest.TestCase):
         self.assertIn("Last audited never", self.footer("thing/part"), "auditing one page audited another")
 
     def test_a_page_excused_from_citations_has_no_audit_in_its_footer(self):
-        # The owner, 2026-09-14: "if pages that are goals where it doesnt have citations, we dont need
-        # audited on". The front page and the goals page both say goals = false.
+        # A goals page, or any page excused from citations, has no audit date in its footer. The front page
+        # and the goals page both say goals = false.
         self.build()
         for path in (self.out / "index.html", self.out / "goals/index.html"):
             with self.subTest(page=path.parent.name or "index"):
@@ -1993,7 +1988,7 @@ class WikiTests(unittest.TestCase):
         """The rows of the generated table of that name on a built page, each a list of its cells' text."""
         table = page[page.index('<table class="w %s">' % name):]
         table = table[:table.index("</table>")]
-        return [[re.sub(r"<[^>]+>", "", cell) for cell in re.findall(r"<t[hd]>(.*?)</t[hd]>", row)]
+        return [[re.sub(r"<[^>]+>", "", cell) for cell in re.findall(r"<t[hd][^>]*>(.*?)</t[hd]>", row)]
                 for row in re.findall(r"<tr>(.*?)</tr>", table, re.S)]
 
     def test_a_family_table_lists_each_member_with_its_infobox_values(self):
@@ -2091,7 +2086,7 @@ subtitle = "every page's status, sources, marks and dates"
 goals = false
 status = "approved"
 intent = """
-The health page exists so that an owner sees which pages to check first.
+The health page exists so that a writer sees which pages to check first.
 """
 +++
 
@@ -2107,26 +2102,30 @@ Every page, with its sources and dates.
         self.health()
         self.build()
         page = (self.out / "health/index.html").read_text(encoding="utf-8")
-        self.assertIn("3 pages, 0 drafts waiting on the owner, 1 never audited, 1 claim with no source", page)
+        self.assertIn("3 pages, 0 drafts waiting on approval, 1 never audited, 1 claim with no source", page)
         rows = self.table_cells(page, "health")
         self.assertEqual(["Page", "Status", "Words", "Cited", "Missing", "Updated", "Audited"], rows[0])
         thing = rows[1]
         self.assertEqual(["A thing", "approved", "1", "1", "2 January 2026", "never"], thing[:2] + thing[3:])
         self.assertTrue(thing[2].isdigit(), thing)
-        # Pages that cite nothing cannot be audited, so they come last with their citation cells empty.
-        self.assertEqual([["Goals", "", "", ""], ["Front", "", "", ""]],
+        # Pages that cite nothing cannot be audited, so their citation and audit cells are empty.
+        self.assertEqual([["Front", "", "", ""], ["Goals", "", "", ""]],
                          [[row[0], row[3], row[4], row[6]] for row in rows[2:]])
         self.assertNotIn("Health", [row[0] for row in rows], "the health page listed itself")
 
-    def test_an_audited_page_follows_the_pages_never_audited(self):
-        self.write("thing/part", PAGE.replace("A thing", "A part"))
+    def test_the_health_table_lists_pages_by_title_and_marks_claims_with_no_source(self):
+        # A to Z by title, whatever the case and whether audited or not; a count over 0 is marked, and 0 is not.
+        self.write("thing/part", PAGE.replace("A thing", "a part").replace(" {missing}", "[^why]"))
         self.health()
         self.build()
         wiki.audit(self.root, ["thing"], today="2026-01-03")
         self.build()
-        rows = self.table_cells((self.out / "health/index.html").read_text(encoding="utf-8"), "health")
-        self.assertEqual(["A part", "A thing"], [row[0] for row in rows[1:3]])
+        page = (self.out / "health/index.html").read_text(encoding="utf-8")
+        rows = self.table_cells(page, "health")
+        self.assertEqual(["a part", "A thing", "Front", "Goals"], [row[0] for row in rows[1:]])
         self.assertEqual("3 January 2026", rows[2][6])
+        self.assertIn('<td class="missing">1</td>', page)
+        self.assertNotIn('<td class="missing">0</td>', page)
 
     def test_the_health_table_is_in_the_health_page_markdown_copy(self):
         self.health()
@@ -2456,7 +2455,7 @@ class ServingTests(unittest.TestCase):
 
         The stock handler sends no cache headers, so a browser applies its own heuristic and goes on
         serving a stylesheet that has since changed. The site is rebuilt constantly; a stale asset makes
-        a change look broken rather than unfetched, and that cost three rounds with the owner once.
+        a change look broken rather than unfetched, and that cost three rounds of review once.
         """
         import http.client
         import threading

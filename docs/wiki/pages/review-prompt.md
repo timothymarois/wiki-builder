@@ -4,9 +4,9 @@ subtitle = "a prompt that has an agent check a wiki against its project"
 status = "approved"
 goals = false
 intent = """
-The review prompt exists so that an owner can have any agent check a project's wiki against the project
-itself, and get back everything false, undocumented, out of date, uncited or badly written, without reading the
-code themselves. The review changes nothing; the owner decides what is fixed.
+The review prompt exists so that any agent can check a project's wiki against the project itself, and
+report everything false, undocumented, out of date, uncited or badly written, so the report's reader never
+reads the code. The review changes nothing; every fix waits for approval.
 """
 
 [[infobox]]
@@ -43,14 +43,14 @@ audited with [wiki audit](commands/audit.md).
 ```text
 Review this project's wiki against the project itself, and report what is wrong, undocumented, out of
 date, uncited or badly written. The wiki is read instead of the source, so a page that disagrees with the code is
-worse than no page. When they disagree, the page is wrong, unless the owner says otherwise.
+worse than no page. When they disagree, the page is wrong, unless the stated requirements say otherwise.
 
 ## Scope
 
 Review only PART, and the code it describes: a sidebar section, a page with the pages beneath it, or one
 component of the project. If PART was left as it is, choose the part yourself: read docs/wiki/UPDATED.toml
 and wiki.toml, and take the sidebar section whose pages were audited longest ago, counting a page never
-audited as the oldest. Review the whole wiki only when the owner asks for it.
+audited as the oldest. Review the whole wiki only when you are asked to.
 
 ## Before starting
 
@@ -63,7 +63,7 @@ audited as the oldest. Review the whole wiki only when the owner asks for it.
    starts, not a verdict. `wiki check` writes nothing; run every other command, and every experiment,
    in a scratch copy of the project, because a build rewrites the site and the page dates, and serving
    opens a browser.
-4. Do not edit any page. Report findings; the owner decides what changes. The only thing a review
+4. Do not edit any page. Report findings; every change waits for approval. The only thing a review
    writes is its audit record, once the report is done.
 5. Note the commit you are reviewing. A file that changes while you work is read again before you
    report on it.
@@ -84,8 +84,8 @@ describes. Coverage works the other way, from the code to the wiki.
 - Every claim that a check refuses or accepts something: build a small wiki in the scratch copy that
   breaks the rule, and watch what the check does. Pages go wrong at the edges: abbreviations, links,
   empty values, a file that does not exist.
-- Nothing is invented. Every behaviour, reason, example and name traces to the code, the owner's own
-  words or an outside service's own documentation; a sentence with none of those is false until a
+- Nothing is invented. Every behaviour, reason, example and name traces to the code, the stated
+  requirements or an outside service's own documentation; a sentence with none of those is false until a
   source is found.
 
 ### 2. Coverage
@@ -108,13 +108,13 @@ from the code, never from the wiki, so the wiki cannot hide its own gaps.
   docs/wiki/wiki.toml has a [coverage] table. A file with public behaviour and no citation anywhere is
   usually an undocumented feature, and a citation of a file that no longer exists is stale.
 - Leave out internals a reader never meets: private helpers, refactoring seams, test code. Say what you
-  excluded, so the owner can disagree.
+  excluded, so the report's reader can disagree.
 
 ### 3. Currency
 - Pages describing behaviour that no longer exists, or has been renamed.
 - Every {missing} mark: search for an implementation that now exists, and report the citation that
   should replace the mark.
-- Requirements the owner has stated (agent instructions, the brief, issues, commit messages) that
+- Stated requirements (agent instructions, the brief, issues, commit messages) that
   appear on no page. Each belongs on a page, marked {missing} until it is built.
 - The codemap or file map, if the project has one, against what is on disk.
 
@@ -173,7 +173,7 @@ change before reporting a finding; if you cannot, drop it.
   term used for two things, or two terms for one.
 - Never report: rewording a sentence that is already true, cited and within the skill's rules; a
   synonym you prefer; reordered clauses, sentences or rows; punctuation or style the skill does not rule
-  on; a {missing} mark on something the owner asked for that is not built yet, which is correct as it
+  on; a {missing} mark on a stated requirement that is not built yet, which is correct as it
   is; any change whose only effect is that the page reads more the way you would write it.
 - A writing finding names the rule it breaks, in the skill's words, and what a reader would get wrong
   because of it. Without both it is a preference, and a preference is not a finding.
@@ -182,7 +182,7 @@ change before reporting a finding; if you cannot, drop it.
 
 ## Report
 
-Keep it short. The owner reads it to decide what to fix, not to follow your work: no preamble, no
+Keep it short. It is read to decide what to fix, not to follow your work: no preamble, no
 method, no quoted evidence.
 
 1. One line: the part reviewed, and why if you chose it; the commit; whether `wiki check` passed; and
@@ -191,7 +191,7 @@ method, no quoted evidence.
    page.md:line — severity — what is wrong — the fix, as the corrected text or the citation to add.
    Name the code or the outside page only where the fix needs it. A pattern is one line, listing every
    place it occurs.
-3. For the owner, one line each: code that may be what is wrong, an intent a page now contradicts, and
+3. For approval, one line each: code that may be what is wrong, an intent a page now contradicts, and
    anything that needs an approval.
 4. Not reviewed, one line each, with why.
 
@@ -216,7 +216,7 @@ with: "Fix each finding, change nothing a finding does not name, keep `wiki chec
 `wiki build` and then `wiki audit` on every page reviewed that cites anything, and list every change you made, one line
 each." An edit that fixes nothing still moves the page's date, and tells every reader
 the page changed when it did not.[^dates] Intents stay out of reach either way, because changing one
-changes what a page is for, and that is the owner's decision.
+changes what a page is for, which needs approval.
 
 [^presence]: `src/builder/build.py` — `uncited_problems()` accepts a sentence containing any footnote or
     the missing mark, and reads nothing the footnote names.

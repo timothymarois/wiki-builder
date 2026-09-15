@@ -67,7 +67,7 @@ flowchart LR
 | A sentence that cites nothing, or a reference to a document[^cited] | [Citations](checks/citations.md) |
 | An infobox row that cites nothing[^rows] | [Citations](checks/citations.md) |
 | A heading that asks a question, rates its contents or points at the page[^headings] | [Headings](checks/headings.md) |
-| A name or sentence that points at the page, hides who acts, quotes the owner or carries no fact[^wording] | [Wording](checks/wording.md) |
+| A name or sentence that points at the page, hides who acts, attributes a rule to a person or carries no fact[^wording] | [Wording](checks/wording.md) |
 | A link to a wiki page that does not exist[^deadlinks] | [Site](site.md) |
 | A page longer than its budget[^budget] | [Reading budgets](checks/budgets.md) |
 | A picture whose subject has changed[^pictures] | [Pictures](checks/pictures.md) |

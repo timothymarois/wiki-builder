@@ -90,7 +90,7 @@ passes and the deploy job fails with a 404 saying to enable GitHub Pages.[^enabl
 |---|---|
 | Pages source, under Build and deployment | GitHub Actions[^source] |
 | Custom domain | the domain, entered in the repository's Pages settings[^domain] |
-| DNS record | a `CNAME` from the domain to `OWNER.github.io`[^dns] |
+| DNS record | a `CNAME` from the domain to `ACCOUNT.github.io`[^dns] |
 | HTTPS | enforced, once GitHub has issued the certificate[^https] |
 
 A `CNAME` file in the published folder does nothing, because GitHub ignores it for a site deployed by a

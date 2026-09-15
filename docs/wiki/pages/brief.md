@@ -45,7 +45,7 @@ It has two halves, and the second is why it exists:
 
 Documentation dies the same way every time: it grows faster than it is read, readers cannot tell which
 sentences were checked, and by the time it is wrong it still looks authoritative. The wiki wiki-builder was
-extracted from had grown to 75,000 words that its owner had stopped reading.
+extracted from had grown to 75,000 words that were no longer read.
 
 wiki-builder is for the case where **the wiki is read instead of the source.** There, an untraceable
 sentence is worse than a missing one, because it looks exactly like a verified one. So every sentence is
