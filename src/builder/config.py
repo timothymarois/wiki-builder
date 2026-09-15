@@ -39,6 +39,10 @@ def read_config(wiki_dir):
     site = loaded.get("site", {})
     if not site.get("name"):
         raise WikiError(f"{CONFIG} has no site.name")
+    url = site.get("url")
+    if url is not None and not (isinstance(url, str) and url.startswith(("https://", "http://"))):
+        raise WikiError(f"{CONFIG}: site.url must be a full address starting with https:// or http://, "
+                        "such as https://docs.example.org")
     if not loaded.get("section"):
         raise WikiError(f"{CONFIG} lists no sections, so nothing would be reachable")
 

@@ -943,6 +943,24 @@ def goals_markdown(pages, ordered, directory):
                    for page_id in ordered)
 
 
+SITEMAP = "sitemap.xml"
+
+
+def sitemap_xml(url, entries):
+    """sitemap.xml: every address the host serves under site.url, and the day each page last changed.
+
+    A search engine reads every address from this one file. The days come from the recorded dates, never
+    the clock, so two builds of one wiki write the same bytes; a category page has no date of its own.
+    """
+    base = url.rstrip("/") + "/"
+    rows = []
+    for directory, day in sorted(entries):
+        address = html_module.escape(base + urllib.parse.quote(directory) + LINK_SUFFIX)
+        rows.append("  <url><loc>%s</loc>%s</url>\n" % (address, "<lastmod>%s</lastmod>" % day if day else ""))
+    return ('<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(rows) + "</urlset>\n")
+
+
 def agent_order(sections, pages, emitted):
     """Every page the build writes, each once, grouped by section in sidebar order."""
     shown, seen, order = set(emitted), set(), []
@@ -970,7 +988,8 @@ def agent_index(site, order, pages):
     return "\n".join(lines)
 
 
-def build(root, out, audience, link_root=None, today=None, record=True, links="file", wiki_dir=None):
+def build(root, out, audience, link_root=None, today=None, record=True, links="file", wiki_dir=None,
+          sitemap=False):
     """Write the whole site, and return the per-page word counts.
 
     `links` is "file" -- links that work served and off disk alike -- or "clean" for publishing.
@@ -983,12 +1002,12 @@ def build(root, out, audience, link_root=None, today=None, record=True, links="f
     was = LINK_SUFFIX
     LINK_SUFFIX = "" if links == "clean" else "index.html"
     try:
-        return write_site(root, out, audience, link_root, today, record, wiki_of(root, wiki_dir))
+        return write_site(root, out, audience, link_root, today, record, wiki_of(root, wiki_dir), sitemap)
     finally:
         LINK_SUFFIX = was
 
 
-def write_site(root, out, audience, link_root, today, record, wiki):
+def write_site(root, out, audience, link_root, today, record, wiki, sitemap=False):
     """Everything a build does, once the kind of link it emits has been settled."""
     site, budget, sections = read_config(wiki)
     pages = read_pages(wiki / "pages", budget["intent"])
@@ -1186,6 +1205,12 @@ def write_site(root, out, audience, link_root, today, record, wiki):
     if audience != "user":
         order = agent_order(sections, pages, emitted)
         emit("", agent_index(site, order, pages), AGENT_INDEX)
+
+    # Only a build meant for a host lists its addresses, and only once the wiki says where it is hosted.
+    if sitemap and site.get("url"):
+        entries = [(page_directory(page_id), dates[page_id]["updated"]) for page_id in linked]
+        entries += [(category_directory(slug), "") for slug in sorted(categories)]
+        emit("", sitemap_xml(site["url"], entries), SITEMAP)
 
     # Only a wiki that draws a diagram carries the script, and its licence beside it.
     if diagrams_used:

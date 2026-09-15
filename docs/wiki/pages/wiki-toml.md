@@ -39,6 +39,7 @@ as TOML.[^location]
 |---|---|---|---|
 | `site.name` | string | required | the name at the top of the sidebar and in every tab title[^read] |
 | `site.tagline` | string | none | a line under the name in the sidebar[^read] |
+| `site.url` | string | none | the site's full address, such as `https://docs.example.org`; `wiki publish` and `wiki user` write `sitemap.xml` under it[^url] |
 | `[[section]]` | table, repeated | required, at least one | a group in the sidebar, in the order written[^nav] |
 | `section.title` | string | empty | the group's heading[^nav] |
 | `section.pages` | list of page names | none | the pages that start a branch, by path without `.md`, such as `checks/budgets`[^nav] |
@@ -61,6 +62,7 @@ lists with the rest.[^version]
 | the file is missing | `wiki: there is no wiki.toml in /path/to/notes/docs/wiki`[^read] |
 | the file is not valid TOML, or not UTF-8 | `wiki: wiki.toml is unreadable:` and the parser's error[^read] |
 | `site.name` is missing or empty | `wiki: wiki.toml has no site.name`[^read] |
+| `site.url` is not a full address | `wiki: wiki.toml: site.url must be a full address starting with https:// or http://, such as https://docs.example.org`[^url] |
 | there is no `[[section]]` | `wiki: wiki.toml lists no sections, so nothing would be reachable`[^read] |
 | a budget is not a positive whole number | `wiki: wiki.toml: budget.page must be a positive number of words`[^read] |
 | a section lists a page that does not exist | `wiki: the navigation lists a page 'nope' that does not exist`[^nav] |
@@ -106,3 +108,6 @@ version = "0.1.0"
     `budget_problems()` refuses collected goals that run over it.
 [^calibrated]: `src/builder/config.py` — `DEFAULT_BUDGET` sets it false; `src/builder/build.py` — `report()`
     calls the budgets provisional on every run until it is true.
+[^url]: `src/builder/config.py` — `read_config()` refuses a `site.url` that does not start with `https://` or
+    `http://`; `src/builder/build.py` — `write_site()` writes `SITEMAP` under it when `build()` is asked for a
+    sitemap.

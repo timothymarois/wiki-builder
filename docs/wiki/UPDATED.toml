@@ -65,7 +65,7 @@ audited = "2026-09-14"
 
 ["commands/publish"]
 updated = "2026-09-15"
-digest = "e24327436186662f9fd48b5ebd2a865359f098e38c876a7d50d58e2be52cc8f2"
+digest = "bd9453e82a8e7ba98b6ab914cda7c55c70b3d4b7f55d0175ae68782cda73eeac"
 audited = "2026-09-14"
 
 ["commands/serve"]
@@ -80,7 +80,7 @@ audited = "2026-09-14"
 
 ["commands/user"]
 updated = "2026-09-15"
-digest = "f26c803de15493c6f98f4ca32c90615f1e6c60edba749da3447a564d555a003c"
+digest = "73cd6daf97ccbfbaafa86d3c8dc7b78eb3ff968da6dfb0ca03ea32f87f97dfdb"
 
 ["continuous-integration"]
 updated = "2026-09-14"
@@ -187,6 +187,6 @@ updated = "2026-09-15"
 digest = "fea70b8a8c36d5645445ea71669e8dc8b6e48e3beac221dffda11e92f7859676"
 
 ["wiki-toml"]
-updated = "2026-09-14"
-digest = "7f19c139f46c6df8246f5c25f4a8f69f6486777eee1fa7d89700b6fce6c8197e"
+updated = "2026-09-15"
+digest = "9afa26517a6582fd57480532ab1b17b5a7d15158a925d4ff7b4d830913434bf2"
 audited = "2026-09-14"
