@@ -58,7 +58,10 @@ wiki user readers
 
 It prints a line for each page it built, then the same closing lines as `wiki build`.[^output] **The
 totals of sources and marks, and the list of drafts, count every page in the wiki**, not only those it
-built.[^output] Like `wiki build`, it records each changed page's date in `UPDATED.toml`.[^dates] On a
+built.[^output] Like `wiki build`, it records each changed page's date in `UPDATED.toml`.[^dates] With
+`site.url` set in `wiki.toml`, it also writes `sitemap.xml` into `OUT`, listing every approved page it
+built and every category page at its full address; without it, a closing line names the
+setting.[^sitemap] On a
 wiki of three pages, one of them marked for users, with the folder being wherever the command
 ran:[^output]
 ```text
@@ -67,6 +70,7 @@ wiki: 1 source cited, 1 claim marked as having no source
 wiki: the collected goals read in 17 words
 wiki: these budgets are PROVISIONAL -- 500 words a page, 3500 for the collected goals. What this project's readers actually read has not been measured; until it is, the numbers are a guess that happens to be enforced. Set budget.calibrated in wiki.toml once it is.
 wiki: 1 page written to /path/to/notes/readers
+wiki: set site.url in wiki.toml to write sitemap.xml
 ```
 
 ## Exit codes
@@ -90,5 +94,8 @@ wiki: 1 page written to /path/to/notes/readers
     emitted, but `citation_counts()` and the drafts of every page, and prints the page count and folder.
 [^dates]: `src/builder/cli.py` — `run()` calls `build()`, and `write_site()` in `src/builder/build.py`
     records dates in `UPDATED.toml`.
+[^sitemap]: `src/builder/build.py` — `write_site()` writes `sitemap_xml()` as `SITEMAP` when `build()` is
+    given `sitemap=True` and the site has a `url`; `src/builder/cli.py` — `run()` asks for it on `publish`
+    and `user`, and prints how many addresses it lists, or the setting to add.
 [^exit]: `src/builder/cli.py` — `run()` returns 2 when `guard_output()` refuses; `main()` returns 2 with no
     wiki and 1 for a `WikiError`; argparse exits 2 on a missing argument or an option it does not know.

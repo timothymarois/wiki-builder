@@ -1027,6 +1027,44 @@ class WikiTests(unittest.TestCase):
         wiki.build(self.root, self.out, "internal", links="clean")[:2]
         self.assertEqual([], [ref for ref in self.references() if ".html" in ref])
 
+    def published_addresses(self, audience="internal", links="clean"):
+        """The addresses and days sitemap.xml lists, in the order it lists them."""
+        import xml.etree.ElementTree as ElementTree
+        wiki.build(self.root, self.out, audience, links=links, today="2026-01-02", sitemap=True)
+        namespace = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+        urls = ElementTree.parse(self.out / wiki.SITEMAP).getroot().findall("s:url", namespace)
+        return [(url.findtext("s:loc", namespaces=namespace), url.findtext("s:lastmod", namespaces=namespace))
+                for url in urls]
+
+    def test_a_published_wiki_lists_its_approved_pages_in_a_sitemap(self):
+        # A search engine finds every page from one file, so each page is listed at the full address a host
+        # serves it from, with the day it last changed. A draft is not listed, and nor is a Source view.
+        self.nav(CONFIGURATION.replace('name = "A Wiki"', 'name = "A Wiki"\nurl = "https://docs.example.org/"'))
+        self.write("thing/proposal", PAGE.replace('status = "approved"\n', "").replace("A thing", "A proposal"))
+        self.assertEqual([("https://docs.example.org/", "2026-01-02"),
+                          ("https://docs.example.org/category/things/", None),
+                          ("https://docs.example.org/goals/", "2026-01-02"),
+                          ("https://docs.example.org/thing/", "2026-01-02")],
+                         self.published_addresses())
+
+    def test_a_user_build_lists_only_the_pages_marked_for_users_in_its_sitemap(self):
+        self.nav(CONFIGURATION.replace('name = "A Wiki"', 'name = "A Wiki"\nurl = "https://docs.example.org"'))
+        self.write("thing", PAGE.replace('categories = ["Things"]', 'categories = ["Things"]\naudience = "user"'))
+        self.assertEqual([("https://docs.example.org/category/things/index.html", None),
+                          ("https://docs.example.org/thing/index.html", "2026-01-02")],
+                         self.published_addresses("user", links="file"))
+
+    def test_no_sitemap_is_written_without_an_address_or_for_reading_on_this_computer(self):
+        wiki.build(self.root, self.out, "internal", links="clean", sitemap=True)
+        self.assertFalse((self.out / wiki.SITEMAP).exists(), "a sitemap was written with no site.url")
+        self.nav(CONFIGURATION.replace('name = "A Wiki"', 'name = "A Wiki"\nurl = "https://docs.example.org"'))
+        self.build()
+        self.assertFalse((self.out / wiki.SITEMAP).exists(), "wiki build wrote a sitemap")
+
+    def test_a_site_address_that_is_not_a_full_address_is_refused(self):
+        self.nav(CONFIGURATION.replace('name = "A Wiki"', 'name = "A Wiki"\nurl = "docs.example.org"'))
+        self.refused("site.url")
+
     def test_a_published_build_still_puts_every_page_in_its_own_directory(self):
         wiki.build(self.root, self.out, "internal", links="clean")[:2]
         self.assertTrue((self.out / "thing/index.html").is_file())
@@ -1983,6 +2021,15 @@ class WikiTests(unittest.TestCase):
         status, output = self.run_main(["--root", str(self.root), "check"])
         self.assertEqual(1, status)
         self.assertIn("wiki: there is no goals.md", output)
+
+    def test_publish_names_its_sitemap_or_the_setting_that_writes_one(self):
+        status, output = self.run_main(["--root", str(self.root), "publish", str(self.out)])
+        self.assertEqual(0, status, output)
+        self.assertIn("set site.url in wiki.toml to write sitemap.xml", output)
+        self.nav(CONFIGURATION.replace('name = "A Wiki"', 'name = "A Wiki"\nurl = "https://docs.example.org"'))
+        status, output = self.run_main(["--root", str(self.root), "publish", str(self.out)])
+        self.assertEqual(0, status, output)
+        self.assertIn("sitemap.xml lists 4 addresses under https://docs.example.org/", output)
 
     def test_the_root_may_follow_the_command(self):
         # The wrapper the README gives a project passes --root after whatever command it was handed.

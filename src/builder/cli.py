@@ -11,9 +11,9 @@ import sys
 from pathlib import Path
 
 from . import __version__
-from .build import (ASSETS, SKILL, audit, bless, build, check, citation_counts, missing_marks, report,
+from .build import (ASSETS, SITEMAP, SKILL, audit, bless, build, check, citation_counts, missing_marks, report,
                     wiki_of)
-from .config import CONFIG, WikiError, record_version
+from .config import CONFIG, WikiError, read_config, record_version
 from .serve import serve
 
 PORT = 8787
@@ -180,9 +180,18 @@ def run(args, root, wiki):
     out.mkdir(parents=True, exist_ok=True)
     counts, goals_words, budget, drafts = build(
         root, out, "user" if command == "user" else "internal",
-        links="clean" if command == "publish" else "file", wiki_dir=wiki)
+        links="clean" if command == "publish" else "file", wiki_dir=wiki,
+        sitemap=command in ("publish", "user"))
     report(counts, goals_words, budget, drafts, citation_counts(root, wiki))
     print("wiki: %d page%s written to %s" % (len(counts), "" if len(counts) == 1 else "s", out))
+    if command in ("publish", "user"):
+        url = read_config(wiki)[0].get("url")
+        if url:
+            listed = (out / SITEMAP).read_text(encoding="utf-8").count("<url>")
+            print("wiki: %s lists %d address%s under %s/" % (SITEMAP, listed, "" if listed == 1 else "es",
+                                                              url.rstrip("/")))
+        else:
+            print(f"wiki: set site.url in wiki.toml to write {SITEMAP}")
 
     if command == "publish":
         print(f"wiki: {out} uses clean addresses and needs a server; the site itself opens without one")

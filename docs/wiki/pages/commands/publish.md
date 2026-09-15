@@ -56,7 +56,10 @@ wiki publish site-out
 ## Output
 
 It prints what `wiki build` prints, then a reminder that the result needs a server.[^output] Like
-`wiki build`, it records each changed page's date in `UPDATED.toml`.[^dates] On a wiki of three pages,
+`wiki build`, it records each changed page's date in `UPDATED.toml`.[^dates] With `site.url` set in
+`wiki.toml`, it also writes `sitemap.xml` into `OUT`, listing every approved page and category page at its
+full address, each page with the day it last changed; without it, a closing line names the
+setting.[^sitemap] On a wiki of three pages,
 with the folder being wherever the command ran:[^output]
 ```text
 wiki: goals                              25 words    0 cited    0 missing
@@ -66,6 +69,7 @@ wiki: 1 source cited, 1 claim marked as having no source
 wiki: the collected goals read in 17 words
 wiki: these budgets are PROVISIONAL -- 500 words a page, 3500 for the collected goals. What this project's readers actually read has not been measured; until it is, the numbers are a guess that happens to be enforced. Set budget.calibrated in wiki.toml once it is.
 wiki: 3 pages written to /path/to/notes/site-out
+wiki: set site.url in wiki.toml to write sitemap.xml
 wiki: /path/to/notes/site-out uses clean addresses and needs a server; the site itself opens without one
 ```
 
@@ -87,5 +91,8 @@ wiki: /path/to/notes/site-out uses clean addresses and needs a server; the site 
     that clean addresses need a server.
 [^dates]: `src/builder/cli.py` — `run()` calls `build()`, and `write_site()` in `src/builder/build.py`
     records dates in `UPDATED.toml`.
+[^sitemap]: `src/builder/build.py` — `write_site()` writes `sitemap_xml()` as `SITEMAP` when `build()` is
+    given `sitemap=True` and the site has a `url`; `src/builder/cli.py` — `run()` asks for it on `publish`
+    and `user`, and prints how many addresses it lists, or the setting to add.
 [^exit]: `src/builder/cli.py` — `run()` returns 2 when `guard_output()` refuses; `main()` returns 2 with no
     wiki and 1 for a `WikiError`; argparse exits 2 on a missing argument or an option it does not know.
