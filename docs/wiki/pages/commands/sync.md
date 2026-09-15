@@ -71,7 +71,7 @@ wiki: wiki.toml records wiki-builder 0.1.0
 ```
 
 When `wiki.toml` has no `[tool]` table, or one with no `version`, the release is added to it, and no other
-setting changes.[^record]
+setting, line ending or comment beside the version changes.[^record]
 
 ## Exit codes
 
@@ -93,8 +93,9 @@ setting changes.[^record]
 [^output]: `src/builder/cli.py` — `sync()` prints each file it wrote, the line for a skill left out and
     the recorded release, and deletes nothing.
 [^record]: `src/builder/config.py` — `record_version()` replaces the `version` line inside the `[tool]`
-    table, adds one under its header or appends the table, and refuses to write a file that would read
-    differently anywhere outside `[tool]`.
+    table, keeping a comment after the value, adds one under its header or appends the table, writes the
+    file's own line endings back, and refuses to write a file that would read differently anywhere outside
+    `[tool]`.
 [^exit]: `src/builder/cli.py` — `main()` returns 2 with no wiki and 1 for a `WikiError`, and argparse exits
     2 when both options are given or an option it does not know is; `sync()` copies the skill before `record_version()` in
     `src/builder/config.py` raises `WikiError` for a missing `wiki.toml`.

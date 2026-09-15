@@ -2301,6 +2301,25 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(wiki_version(), recorded.get("tool", {}).get("version"), "the release was not recorded")
         self.assertEqual({"version_label": "kept"}, recorded["notes"], "another table's setting was changed")
 
+    def test_sync_keeps_the_line_endings_the_settings_file_was_written_with(self):
+        root = self.project()
+        settings = root / "docs/wiki" / CONFIG
+        settings.write_bytes(settings.read_bytes().replace(b"\n", b"\r\n"))
+        status, output = self.sync(root, "--no-skill")
+        self.assertEqual(0, status, output)
+        written = settings.read_bytes()
+        self.assertIn(f'version = "{wiki_version()}"\r\n'.encode(), written, "the release was not recorded")
+        self.assertNotIn(b"\n", written.replace(b"\r\n", b""), "a line ending was changed")
+
+    def test_sync_keeps_a_comment_beside_the_version(self):
+        root = self.project()
+        settings = root / "docs/wiki" / CONFIG
+        text = settings.read_text(encoding="utf-8").replace('version = "0.0.0"', 'version = "0.0.0"  # pinned on purpose')
+        settings.write_text(text, encoding="utf-8")
+        status, output = self.sync(root, "--no-skill")
+        self.assertEqual(0, status, output)
+        self.assertIn(f'version = "{wiki_version()}"  # pinned on purpose', settings.read_text(encoding="utf-8"))
+
     def test_sync_records_the_release_under_a_header_that_carries_a_comment(self):
         root = self.project()
         settings = root / "docs/wiki" / CONFIG

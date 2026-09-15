@@ -75,7 +75,7 @@ audited = "2026-09-14"
 
 ["commands/sync"]
 updated = "2026-09-14"
-digest = "2579b8274074966a0a72f08a02524002fbbbdcb2abe5307eb8e5cb61fceda817"
+digest = "ea9002a1242fc50f898ba17f5efa1ff5f92649710e59ffd62ef9420a454eb67c"
 audited = "2026-09-14"
 
 ["commands/user"]
@@ -175,7 +175,7 @@ audited = "2026-09-14"
 
 ["skill"]
 updated = "2026-09-14"
-digest = "30ed433017e176f4f89be581e79f0240401b0ab72c0a47b30a400f9887b6ef54"
+digest = "de3601f776f134c6e599540b516e8c5638e0137bfb97e45a731c0610bd62cb16"
 audited = "2026-09-14"
 
 ["wiki-toml"]
