@@ -1413,6 +1413,27 @@ class WikiTests(unittest.TestCase):
         self.assertTrue((self.out / "CNAME").is_file(), "a rebuild deleted a file the build never wrote")
         self.assertTrue((self.out / ".well-known/security.txt").is_file())
 
+    def test_a_build_record_naming_a_file_outside_the_site_deletes_nothing_there(self):
+        # The record is text anyone can edit, so a name leading out of the site folder is not the build's.
+        outside = self.root / "keep.txt"
+        outside.write_text("kept", encoding="utf-8")
+        self.build()
+        record = self.out / wiki.BUILD_RECORD
+        record.write_text(record.read_text(encoding="utf-8") + "../keep.txt\n", encoding="utf-8")
+        self.build()
+        self.assertTrue(outside.is_file(), "a rebuild deleted a file outside the site")
+
+    def test_a_site_with_no_build_record_loses_its_stale_pictures(self):
+        images = self.root / "docs/wiki/images"
+        (images / "thing.png").write_bytes(b"\x89PNG\r\n")
+        wiki.write_ledger(images, {"thing.png": {"depicts": [], "digest": "", "made": "by hand"}})
+        self.write("thing", PAGE.replace("A thing does what it does.[^why]", "![A thing](../images/thing.png)"))
+        self.build()
+        (self.out / wiki.BUILD_RECORD).unlink()
+        self.write("thing", PAGE)
+        self.build()
+        self.assertFalse((self.out / "images/thing.png").exists(), "a picture no page shows was left behind")
+
     def test_a_site_with_no_build_record_loses_only_what_a_build_writes(self):
         # A site written before builds kept a record still has its old pages cleared, and nothing else.
         self.write("thing/part", PAGE.replace("A thing", "A part"))
@@ -1549,6 +1570,38 @@ class WikiTests(unittest.TestCase):
         wiki.write_ledger(images, {"../secret.png": {"depicts": [], "digest": "", "made": "by hand"}})
         self.refused("../secret.png")
         self.assertFalse((self.out / "secret.png").exists())
+
+    def test_every_picture_name_that_is_not_a_file_name_is_refused(self):
+        images = self.root / "docs/wiki/images"
+        for name in ("", ".", "..", "sub\\thing.png"):
+            with self.subTest(name=name):
+                wiki.write_ledger(images, {name: {"depicts": [], "digest": "", "made": "by hand"}})
+                self.refused("not a file name")
+
+    def test_a_recorded_picture_whose_file_is_gone_is_refused(self):
+        wiki.write_ledger(self.root / "docs/wiki/images", {"gone.png": {"depicts": [], "digest": "", "made": "by hand"}})
+        self.refused("gone.png, which is not in")
+
+    def test_an_infobox_picture_is_carried_into_the_site(self):
+        images = self.root / "docs/wiki/images"
+        (images / "thing.png").write_bytes(b"\x89PNG\r\n")
+        wiki.write_ledger(images, {"thing.png": {"depicts": [], "digest": "", "made": "by hand"}})
+        self.write("thing", PAGE.replace('status = "approved"', 'status = "approved"\nimage = "thing.png"'))
+        self.build()
+        self.assertTrue((self.out / "images/thing.png").is_file(), "the infobox picture was not copied")
+
+    def test_a_picture_shown_only_in_a_reference_stays_out_of_a_user_build(self):
+        # A user build removes the references, so a picture shown only there is not carried.
+        images = self.root / "docs/wiki/images"
+        (images / "cited.png").write_bytes(b"\x89PNG\r\n")
+        wiki.write_ledger(images, {"cited.png": {"depicts": [], "digest": "", "made": "by hand"}})
+        self.write("thing", PAGE.replace('categories = ["Things"]', 'categories = ["Things"]\naudience = "user"')
+                   .replace("[^why]: The reason — `Source/Thing.h`.",
+                            "[^why]: The reason — `Source/Thing.h`, ![as drawn](../images/cited.png)."))
+        self.build()
+        self.assertTrue((self.out / "images/cited.png").is_file(), "the full wiki did not carry the picture")
+        self.build("user")
+        self.assertFalse((self.out / "images/cited.png").exists(), "a picture only in a reference reached users")
 
     def test_a_build_carries_only_the_pictures_its_pages_show(self):
         # A user build leaves internal pages out, and the pictures only they show go with them.
