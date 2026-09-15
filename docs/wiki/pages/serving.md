@@ -44,7 +44,7 @@ project, and a browser cannot follow a link above the folder it is served from.[
 That means anything that can reach the server can read every file in the project.[^root] For that reason, it
 answers only on this machine.[^loopback] **A hidden file is never served**: an address with any part
 starting with a full stop, such as `.env` or `.git/config`, is answered with page not found, and so is a
-file that a link in the project leads into a hidden folder or out of the project.[^hidden] It answers only a
+file that a link in the project leads into a hidden folder.[^hidden] It answers only a
 request addressed to 127.0.0.1 or localhost, so a web page that gives its own domain that address cannot
 read the project through it.[^host]
 
@@ -80,7 +80,8 @@ so, names `--port` as the way to pick another, and exits with 2.[^port]
 [^text]: `src/builder/serve.py` — `shown_as_text()` answers every suffix in `AS_TEXT` as `text/plain`, and
     leaves every other type to the stock handler.
 [^hidden]: `src/builder/serve.py` — `Handler.send_head()` answers 404 when any part of the decoded path
-    starts with `.`, or when the file it resolves to is outside the project or has such a part inside it.
+    starts with `.`, or when the file it resolves to has such a part, counted from the project when the
+    file is inside it.
 [^host]: `src/builder/serve.py` — `Handler.send_head()` answers 403 when the request's `Host` names
     anything but `LOCAL_NAMES`.
 [^sniff]: `src/builder/serve.py` — `Handler.end_headers()` sends `X-Content-Type-Options: nosniff`.

@@ -506,7 +506,7 @@ def rewrite_references(body, directory, site_root, root, images, page_ids, pages
             return match.group(0)
         address, _, fragment = target.partition("#")
         if attribute == "src":
-            name = posixpath.basename(address)
+            name = posixpath.basename(urllib.parse.unquote(address))
             if name not in images:
                 raise WikiError(f"{directory or 'the main page'} shows {name}, which has no entry in {LEDGER}")
             shown.add(name)
@@ -538,6 +538,8 @@ def linked_page(source_path, address, pages_dir):
     /private/var, so a resolved path compared against an unresolved folder takes a page for a file, and
     the link is emitted as an absolute path that works on exactly one machine.
     """
+    # The markdown parser percent-encodes an address, so it is decoded to name the file on disk.
+    address = urllib.parse.unquote(address)
     if not address.endswith(".md"):
         return None
     try:
@@ -899,7 +901,8 @@ def outside_code(text, change):
 
 def copy_address(from_directory, page_id):
     """A link from one page's folder to another page's markdown copy."""
-    return posixpath.relpath("/" + page_directory(page_id) + AGENT_COPY, "/" + (from_directory or "."))
+    return urllib.parse.quote(posixpath.relpath("/" + page_directory(page_id) + AGENT_COPY,
+                                                "/" + (from_directory or ".")))
 
 
 def markdown_copy(page, directory, page_ids, pages_dir, ledger, extra=""):

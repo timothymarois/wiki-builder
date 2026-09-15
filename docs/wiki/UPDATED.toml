@@ -155,7 +155,7 @@ digest = "d914107637ba248e3ef4c6dbf92dacfb4f4bb3b98eb9a642671654a52ccd1363"
 
 ["serving"]
 updated = "2026-09-14"
-digest = "7c0fe17bbf46c1c0d85bb21531f45cd00c5dfbf4edba24c70060f75d66c82046"
+digest = "bdae27b452daa99993bdd47159d5303dde0db9b1d5670ed06555059afd648abe"
 audited = "2026-09-14"
 
 ["site"]
@@ -180,5 +180,5 @@ audited = "2026-09-14"
 
 ["wiki-toml"]
 updated = "2026-09-14"
-digest = "bbec839d656fdcd7e894ea745d23710dcd5c5f8ea464737f7ff639012030767d"
+digest = "7f19c139f46c6df8246f5c25f4a8f69f6486777eee1fa7d89700b6fce6c8197e"
 audited = "2026-09-14"
