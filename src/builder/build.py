@@ -34,7 +34,7 @@ from pathlib import Path
 import mistune
 from mistune.util import unikey
 
-from .config import WikiError, read_config, CONFIG
+from .config import WikiError, read_config, read_coverage, CONFIG
 
 # Front matter is TOML between these fences, so it is read by the standard library and costs no parser.
 FENCE = "+++"
@@ -1927,6 +1927,57 @@ def bless(root, picture, reason, wiki=None):
     ledger[picture]["blessed"] = reason.strip()
     write_ledger(images_dir, ledger)
     return f"wiki: {picture} blessed -- {reason.strip()}"
+
+
+def cited_paths(body):
+    """Every project path a page's references name in backticks, as written.
+
+    A code block shows a reference rather than making one, so fenced code is taken out first.
+    """
+    for note in FOOTNOTE.finditer(FENCED.sub("", body)):
+        for code in INLINE_CODE.findall(note.group(1)):
+            name = code.strip("`").strip()
+            if name and not any(mark in name for mark in (" ", "://", "*")) and not name.startswith(("/", "-")):
+                yield name
+
+
+def coverage(root, wiki=None):
+    """The source files no page cites, and every citation of a file that does not exist.
+
+    Counted from the project's side, so a wiki cannot hide its own gaps: `wiki check` proves each sentence
+    cites something, and this names the files nothing cites. A folder covers none of its files, because a
+    citation of a folder says nothing about what any one file in it does. None when wiki.toml has no
+    [coverage] table.
+    """
+    wiki = wiki_of(root, wiki)
+    patterns = read_coverage(wiki)
+    if patterns is None:
+        return None
+    include, exclude = patterns
+
+    def matching(globs):
+        return {path.relative_to(root).as_posix() for pattern in globs for path in root.glob(pattern)
+                if path.is_file()}
+
+    files = sorted(matching(include) - matching(exclude))
+    if not files:
+        raise WikiError(f"{CONFIG}: coverage.include matches no files in {root}; name the project's source "
+                        'files relative to the project, such as include = ["src/**/*.py"]')
+    pages_dir = wiki / "pages"
+    cited, missing = set(), set()
+    for path in sorted(pages_dir.rglob("*.md")):
+        _, body = read_front_matter(path)
+        for name in cited_paths(body):
+            target = posixpath.normpath(name)
+            if (root / target).is_file():
+                cited.add(target)
+            # A reference also names an action, a media type, a generated folder or a file a reader creates,
+            # none of which is in the project. Only a file with an extension, under a folder the project
+            # has, is taken for a citation that has gone stale.
+            elif (not name.endswith("/") and "." in posixpath.basename(target) and "/" in target
+                  and (root / target.split("/")[0]).is_dir() and not (root / target).exists()):
+                missing.add((path.relative_to(pages_dir).as_posix(), name))
+    return {"files": files, "uncited": [name for name in files if name not in cited], "missing": sorted(missing)}
 
 
 def citation_counts(root, wiki=None):

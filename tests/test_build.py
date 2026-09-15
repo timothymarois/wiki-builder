@@ -1942,6 +1942,68 @@ class WikiTests(unittest.TestCase):
         self.assertIn("Last updated", footer)
         self.assertNotIn("audited", footer)
 
+    # --- coverage ------------------------------------------------------------------------------------
+
+    def source(self, *names):
+        """Source files in the project, each holding one line."""
+        for name in names:
+            path = self.root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("// source\n", encoding="utf-8")
+
+    def covering(self, include, exclude=None):
+        """Set the [coverage] table in wiki.toml, and return the report it gives."""
+        table = "\n[coverage]\ninclude = %s\n" % json.dumps(include)
+        if exclude is not None:
+            table += "exclude = %s\n" % json.dumps(exclude)
+        self.nav(CONFIGURATION + table)
+        return wiki.coverage(self.root)
+
+    def test_coverage_lists_every_source_file_no_page_cites(self):
+        # The thing page cites Source/Thing.h; no page cites Source/Other.h, and the tests are left out.
+        self.source("Source/Thing.h", "Source/Other.h", "tests/test_thing.py")
+        report = self.covering(["Source/**/*.h", "tests/*.py"], exclude=["tests/*.py"])
+        self.assertEqual(["Source/Other.h", "Source/Thing.h"], report["files"])
+        self.assertEqual(["Source/Other.h"], report["uncited"])
+        self.assertEqual([], report["missing"])
+
+    def test_coverage_names_a_citation_of_a_file_that_does_not_exist(self):
+        self.source("Source/Other.h")
+        self.assertEqual([("thing.md", "Source/Thing.h")], self.covering(["Source/*.h"])["missing"])
+
+    def test_a_name_that_is_not_a_project_file_is_not_reported_missing(self):
+        # A reference also names things that are not files in the project: an action, a media type, a
+        # generated or relative folder, and a file a reader creates in a folder the project does not have.
+        # Only a file under a folder the project has, with an extension, is taken for a stale citation.
+        self.source("Source/Thing.h")
+        notes = ("[^why]: The reason — `Source/Thing.h`, `actions/setup-python`, `text/plain`, `_site/CNAME`, "
+                 "`docs/wiki/site/`, `images/`, `functions/_middleware.js` and `Source/Gone.h`.")
+        self.write("thing", PAGE.replace("[^why]: The reason — `Source/Thing.h`.", notes))
+        self.assertEqual([("thing.md", "Source/Gone.h")], self.covering(["Source/*.h"])["missing"])
+
+    def test_a_folder_citation_covers_none_of_the_files_in_it(self):
+        self.source("Source/Thing.h")
+        self.write("thing", PAGE.replace("[^why]: The reason — `Source/Thing.h`.", "[^why]: The reason — `Source/`."))
+        self.assertEqual(["Source/Thing.h"], self.covering(["Source/*.h"])["uncited"])
+
+    def test_a_citation_shown_in_a_code_sample_is_not_counted(self):
+        self.source("Source/Thing.h", "Source/Other.h")
+        sample = "```markdown\n[^x]: `Source/Other.h` — `sample()`.\n[^y]: `Source/Gone.h`.\n```\n\n## Ground"
+        self.write("thing", PAGE.replace("## Ground", sample))
+        report = self.covering(["Source/*.h"])
+        self.assertEqual(["Source/Other.h"], report["uncited"])
+        self.assertEqual([], report["missing"])
+
+    def test_coverage_patterns_that_match_no_file_are_refused(self):
+        with self.assertRaises(wiki.WikiError) as caught:
+            self.covering(["nowhere/*.py"])
+        self.assertIn("coverage.include matches no files", str(caught.exception))
+
+    def test_coverage_include_that_is_not_a_list_of_patterns_is_refused(self):
+        with self.assertRaises(wiki.WikiError) as caught:
+            self.covering("Source/*.h")
+        self.assertIn("coverage.include must list", str(caught.exception))
+
     # --- the command line ---------------------------------------------------------------------------
 
     def run_main(self, argv):
@@ -2030,6 +2092,20 @@ class WikiTests(unittest.TestCase):
         status, output = self.run_main(["--root", str(self.root), "publish", str(self.out)])
         self.assertEqual(0, status, output)
         self.assertIn("sitemap.xml lists 4 addresses under https://docs.example.org/", output)
+
+    def test_coverage_without_a_coverage_table_names_the_table_to_add(self):
+        status, output = self.run_main(["--root", str(self.root), "coverage"])
+        self.assertEqual(2, status, output)
+        self.assertIn("[coverage]", output)
+
+    def test_coverage_prints_each_gap_on_its_own_line_then_the_totals(self):
+        self.source("Source/Other.h")
+        self.nav(CONFIGURATION + '\n[coverage]\ninclude = ["Source/*.h"]\n')
+        status, output = self.run_main(["--root", str(self.root), "coverage"])
+        self.assertEqual(0, status, output)
+        self.assertIn("wiki: Source/Other.h is cited by no page\n", output)
+        self.assertIn("wiki: thing.md cites Source/Thing.h, which does not exist\n", output)
+        self.assertIn("wiki: 0 of 1 source file cited; 1 citation names a file that does not exist\n", output)
 
     def test_the_root_may_follow_the_command(self):
         # The wrapper the README gives a project passes --root after whatever command it was handed.

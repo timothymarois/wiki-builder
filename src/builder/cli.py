@@ -11,8 +11,8 @@ import sys
 from pathlib import Path
 
 from . import __version__
-from .build import (ASSETS, SITEMAP, SKILL, audit, bless, build, check, citation_counts, missing_marks, report,
-                    wiki_of)
+from .build import (ASSETS, SITEMAP, SKILL, audit, bless, build, check, citation_counts, coverage,
+                    missing_marks, report, wiki_of)
 from .config import CONFIG, WikiError, read_config, record_version
 from .serve import serve
 
@@ -104,6 +104,7 @@ def main(argv=None):
 
     commands.add_parser("build", parents=[place], help="render the pages into the site")
     commands.add_parser("check", parents=[place], help="every reason the wiki is not fit to read")
+    commands.add_parser("coverage", parents=[place], help="list the source files no page cites")
     synced = commands.add_parser("sync", parents=[place],
                                  help="write the skill into the project and record the release")
     skill = synced.add_mutually_exclusive_group()
@@ -159,6 +160,23 @@ def run(args, root, wiki):
     if command == "audit":
         for line in audit(root, args.pages, wiki):
             print(line)
+        return 0
+
+    if command == "coverage":
+        found = coverage(root, wiki)
+        if found is None:
+            print("wiki: wiki.toml has no [coverage] table; add one naming the source files to count, such as "
+                  '[coverage] include = ["src/**/*.py"]', file=sys.stderr)
+            return 2
+        # A report, not a gate: each gap is one line an agent can act on, and the command still succeeds.
+        for name in found["uncited"]:
+            print(f"wiki: {name} is cited by no page")
+        for page, name in found["missing"]:
+            print(f"wiki: {page} cites {name}, which does not exist")
+        total, gone = len(found["files"]), len(found["missing"])
+        print("wiki: %d of %d source file%s cited; %d citation%s a file that does not exist"
+              % (total - len(found["uncited"]), total, "" if total == 1 else "s", gone,
+                 " names" if gone == 1 else "s name"))
         return 0
 
     if command == "check":

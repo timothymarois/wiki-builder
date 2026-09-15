@@ -40,7 +40,7 @@ audited = "2026-09-14"
 
 ["commands"]
 updated = "2026-09-15"
-digest = "998863946b3a0f02e0229f926e142b37d7477ab2f6fadb97965a986154c6783c"
+digest = "098cdac14d689e3fd2e519b0f9cd091eb0d7572361f8eeb229a5d7236cce70d6"
 audited = "2026-09-14"
 
 ["commands/audit"]
@@ -62,6 +62,10 @@ audited = "2026-09-14"
 updated = "2026-09-15"
 digest = "bf6c90fcfdcbab4960a8e4f3d256735ee351f49650b91bb8a7a7aeb7f4c36783"
 audited = "2026-09-14"
+
+["commands/coverage"]
+updated = "2026-09-15"
+digest = "ff205c2c90f004189d892f7295e2e12791a36b114cacb33711bb8d7d92abb5de"
 
 ["commands/publish"]
 updated = "2026-09-15"
@@ -155,7 +159,7 @@ audited = "2026-09-14"
 
 ["review-prompt"]
 updated = "2026-09-15"
-digest = "337054ae6711d23eee73ff6d20e1bd88bb297af36e58e3f6b81f1252a6a4faff"
+digest = "8f6cae6c3898e2919a33e639e866da3830183a91e587640cf1380acb1d5bdfa1"
 
 ["serving"]
 updated = "2026-09-14"
@@ -188,5 +192,5 @@ digest = "fea70b8a8c36d5645445ea71669e8dc8b6e48e3beac221dffda11e92f7859676"
 
 ["wiki-toml"]
 updated = "2026-09-15"
-digest = "9afa26517a6582fd57480532ab1b17b5a7d15158a925d4ff7b4d830913434bf2"
+digest = "3da1a09d77d6a18c132d630e3423eb66a2b79c1590174c13eb446cdfed465533"
 audited = "2026-09-14"

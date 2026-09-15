@@ -104,8 +104,9 @@ from the code, never from the wiki, so the wiki cannot hide its own gaps.
   - access: roles, permissions, authentication.
 - Search the wiki for each item. Mark it documented (name the page and section), mentioned in passing
   without its behaviour, or undocumented.
-- Walk the other way too: list the source files no reference cites. A file with public behaviour and no
-  citation anywhere is usually an undocumented feature.
+- Walk the other way too: list the source files no reference cites, starting from `wiki coverage` when
+  docs/wiki/wiki.toml has a [coverage] table. A file with public behaviour and no citation anywhere is
+  usually an undocumented feature, and a citation of a file that no longer exists is stale.
 - Leave out internals a reader never meets: private helpers, refactoring seams, test code. Say what you
   excluded, so the owner can disagree.
 

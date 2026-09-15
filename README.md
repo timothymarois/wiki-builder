@@ -31,6 +31,7 @@ Pages live in `docs/wiki/pages`, and `docs/wiki/wiki.toml` names the site and it
 ```text
 wiki build     render the pages into docs/wiki/site
 wiki check     every reason the wiki is not fit to read
+wiki coverage  list the source files no page cites
 wiki serve     build, serve, and open a browser at it
 wiki sync      write the agent skill into the project, and record the release
 wiki publish   build with clean addresses, for a host
