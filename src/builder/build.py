@@ -97,7 +97,8 @@ HEADING = re.compile(r"<(h2|h3)>(.*?)</\1>", re.S)
 TAG = re.compile(r"<[^>]+>")
 ATTRIBUTE = re.compile(r'(href|src)="([^"]*)"')
 LONE_FIGURE = re.compile(r"<p>(<figure.*?</figure>)</p>", re.S)
-FOOTNOTE_DEFINITION = re.compile(r"^\[\^[^\]]+\]:.*(?:\n(?:[ \t]+.*|))*", re.M)
+# A footnote's definition: its first line and every indented or blank line after it, the reference in group 1.
+FOOTNOTE = re.compile(r"^\[\^[^\]]+\]:(.*(?:\n(?:[ \t]+.*|))*)", re.M)
 
 # Everything the user build must not carry. Each is emitted by this file, in this exact shape, so
 # stripping them is removing what we put there rather than parsing arbitrary HTML.
@@ -207,7 +208,7 @@ def read_pages(pages_dir, intent_budget):
 
 def strip_footnote_definitions(body):
     """Prose only. A citation is provenance, and counting it against a page would punish citing."""
-    return FOOTNOTE_DEFINITION.sub("", body)
+    return FOOTNOTE.sub("", body)
 
 
 def read_dates(wiki):
@@ -493,21 +494,9 @@ def rewrite_references(body, directory, site_root, root, images, page_ids, pages
             shown.add(name)
             resolved = relative_file(directory, "images/" + name)
         else:
-            # The author wrote the link relative to their own file, so resolve it from there. Inside the
-            # pages tree it is a sibling page and becomes a clean address; anywhere else it is a path in
-            # the repository and becomes a path from this page to it.
-            absolute = (source_path.parent / address).resolve()
-            # Both sides resolved, or neither: resolve() follows symlinks, and on macOS a path under
-            # /var comes back under /private/var. Comparing a resolved path against an unresolved
-            # directory then fails, and a link to a sibling page is emitted as an absolute filesystem
-            # path that works on exactly one machine.
-            pages_root = pages_dir.resolve()
-            target_id = None
-            if address.endswith(".md"):
-                try:
-                    target_id = absolute.relative_to(pages_root).with_suffix("").as_posix()
-                except ValueError:
-                    target_id = None
+            # Inside the pages tree it is a sibling page and becomes a clean address; anywhere else it is a
+            # path in the repository and becomes a path from this page to it.
+            target_id = linked_page(source_path, address, pages_dir)
             if target_id in page_ids:
                 resolved = relative_directory(directory, page_directory(target_id))
             elif target_id is not None:
@@ -516,10 +505,27 @@ def rewrite_references(body, directory, site_root, root, images, page_ids, pages
                 return '%s="%s%s"%s' % (attribute, relative_directory(directory, page_directory(target_id)),
                                         ("#" + fragment) if fragment else "", NEW_PAGE)
             else:
-                resolved = os.path.relpath(absolute, here.resolve()).replace(os.sep, "/")
+                resolved = os.path.relpath((source_path.parent / address).resolve(),
+                                           here.resolve()).replace(os.sep, "/")
         return '%s="%s%s"' % (attribute, resolved, ("#" + fragment) if fragment else "")
 
     return ATTRIBUTE.sub(replace, body)
+
+
+def linked_page(source_path, address, pages_dir):
+    """The page a link to a markdown file names, or None when the link leads outside the pages.
+
+    The author wrote the link relative to their own file, so it is resolved from there. Both sides are
+    resolved, or neither: resolve() follows symlinks, and on macOS a path under /var comes back under
+    /private/var, so a resolved path compared against an unresolved folder takes a page for a file, and
+    the link is emitted as an absolute path that works on exactly one machine.
+    """
+    if not address.endswith(".md"):
+        return None
+    try:
+        return (source_path.parent / address).resolve().relative_to(pages_dir.resolve()).with_suffix("").as_posix()
+    except ValueError:
+        return None
 
 
 def render_source(raw, copy_link=""):
@@ -894,15 +900,9 @@ def markdown_copy(page, directory, page_ids, pages_dir, ledger, extra=""):
             name = posixpath.basename(address)
             return opening + relative_file(directory, "images/" + name) + closing if name in ledger \
                 else match.group(0)
-        if address.endswith(".md"):
-            try:
-                target_id = (page["path"].parent / address).resolve().relative_to(
-                    pages_dir.resolve()).with_suffix("").as_posix()
-            except ValueError:
-                return match.group(0)
-            if target_id in page_ids:
-                return opening + copy_address(directory, target_id) + (
-                    "#" + fragment if fragment else "") + closing
+        target_id = linked_page(page["path"], address, pages_dir)
+        if target_id in page_ids:
+            return opening + copy_address(directory, target_id) + ("#" + fragment if fragment else "") + closing
         return match.group(0)
 
     head = ["# " + page["title"], ""]
@@ -1287,8 +1287,7 @@ def picture_problems(root, wiki=None):
     return problems
 
 
-# A reference in a footnote definition, and a link inside one.
-FOOTNOTE = re.compile(r"^\[\^[^\]]+\]:(.*(?:\n(?:[ \t]+.*|))*)", re.M)
+# A link to a document, inside a footnote's reference.
 DOCUMENT_LINK = re.compile(r"\]\(([^)]*\.md[^)]*)\)")
 
 
@@ -1683,7 +1682,6 @@ def dead_link_problems(root, wiki=None):
     sample shows a link as written; a link outside the pages, or off the site, is not a page link at all.
     """
     pages_dir = wiki_of(root, wiki) / "pages"
-    pages_root = pages_dir.resolve()
     page_ids = {path.relative_to(pages_dir).with_suffix("").as_posix() for path in pages_dir.rglob("*.md")}
     problems = []
     for path in sorted(pages_dir.rglob("*.md")):
@@ -1700,13 +1698,10 @@ def dead_link_problems(root, wiki=None):
         for link in MARKDOWN_LINK.finditer(body):
             opening, target, _ = link.groups()
             address = target.partition("#")[0]
-            if opening.startswith("!") or SETTLED_LINK.match(target) or not address.endswith(".md"):
+            if opening.startswith("!") or SETTLED_LINK.match(target):
                 continue
-            try:
-                target_id = (path.parent / address).resolve().relative_to(pages_root).with_suffix("").as_posix()
-            except ValueError:
-                continue
-            if target_id not in page_ids:
+            target_id = linked_page(path, address, pages_dir)
+            if target_id is not None and target_id not in page_ids:
                 problems.append(f"{path.relative_to(pages_dir)}:{first + body[:link.start()].count(chr(10))}: "
                                 f"links to {target}, which is no page in the wiki; write that page, or link "
                                 "to one that exists")
