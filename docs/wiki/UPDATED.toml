@@ -5,8 +5,8 @@
 # build that changed nothing writes nothing. An audit keeps its day through later edits.
 
 ["brief"]
-updated = "2026-09-14"
-digest = "d3d7e8d6ccbd9c00624b3cf0f46090c33a6b742b4197fd64fcacb224b3c6d30b"
+updated = "2026-09-15"
+digest = "7d877e17816686caa14f87b8ba1cf91a3e14ebed3806d70ea14738adb7a6b551"
 
 ["checks"]
 updated = "2026-09-15"
@@ -204,5 +204,5 @@ digest = "fea70b8a8c36d5645445ea71669e8dc8b6e48e3beac221dffda11e92f7859676"
 
 ["wiki-toml"]
 updated = "2026-09-15"
-digest = "3da1a09d77d6a18c132d630e3423eb66a2b79c1590174c13eb446cdfed465533"
+digest = "1b50e0a1d9c6a5e73d17a02a77ee8061ab0ff35615ea12f63ed98142b34e586c"
 audited = "2026-09-14"

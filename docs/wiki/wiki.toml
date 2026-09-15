@@ -4,6 +4,7 @@
 name = "Wiki Builder"
 tagline = "the tool's own wiki"
 url = "https://wiki-builder.marois.dev"
+github = "https://github.com/timothymarois/wiki-builder"
 
 # No [budget]: these pages run on the defaults, and nobody has measured them against a reader yet.
 

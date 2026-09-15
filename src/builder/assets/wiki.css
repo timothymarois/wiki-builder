@@ -65,7 +65,11 @@ code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;backgroun
    scroll bar sits on the rail's edge rather than inside the padding. */
 .rail #nav{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;
   margin:0 calc(-1 * var(--pad-r)) 0 calc(-1 * var(--pad-l));padding:0 var(--pad-r) 24px var(--pad-l)}
-.logo{position:relative;padding:0 0 14px}
+.logo{position:relative;padding:0 0 14px;display:flex;align-items:center;gap:8px}
+.logo .brand{flex:1;min-width:0}
+/* The GitHub mark sits at the right of the site's name, centred on it, quieter than the name until pointed at. */
+.logo .github{flex:none;display:flex;color:inherit;opacity:.65}
+.logo .github:hover{opacity:1}
 .logo b{display:block;font:400 17px/1.2 'Linux Libertine',Georgia,'Times New Roman',serif}
 .logo span{display:block;font-size:10.5px;color:var(--faint);margin-top:3px;font-style:italic}
 .sbox{position:relative;padding:11px 0 14px}
