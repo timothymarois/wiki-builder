@@ -1,6 +1,6 @@
 +++
 title = "Wiki Builder"
-subtitle = "a tool that renders markdown into a wiki, and refuses what makes documentation rot"
+subtitle = "a markdown wiki generator that refuses uncited, unreadable and stale pages"
 status = "approved"
 goals = false
 intent = """

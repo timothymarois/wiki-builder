@@ -1,6 +1,6 @@
 +++
 title = "Brief"
-subtitle = "what wiki-builder is, who it is for, and what it refuses"
+subtitle = "purpose, reasoning, users, scope and outside systems"
 status = "approved"
 goals = false
 intent = """

@@ -1,6 +1,6 @@
 +++
 title = "Pages"
-subtitle = "what a person writes"
+subtitle = "page files, their intent and approval, and the parts of a page"
 status = "approved"
 intent = """
 A page is how a writer who has read the code tells a reader who will not what it does. Writing one should

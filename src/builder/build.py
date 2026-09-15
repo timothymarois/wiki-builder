@@ -1467,7 +1467,13 @@ def heading_problems(root, wiki=None):
     pages_dir = wiki_of(root, wiki) / "pages"
     problems = []
     for path in sorted(pages_dir.rglob("*.md")):
-        _, body = read_front_matter(path)
+        meta, body = read_front_matter(path)
+        # A subtitle is held to the same question words: "what a person writes" names nothing a reader
+        # choosing between pages can tell apart either.
+        subtitle = str(meta.get("subtitle", "")).strip()
+        if QUESTION_WORD.match(subtitle):
+            problems.append(f"{path.relative_to(pages_dir)}: the subtitle {subtitle!r} asks a question; "
+                            "name the things the page covers")
         for heading in HEADING_LINE.finditer(FENCED.sub("", body)):
             title = heading.group(1)
             if QUESTION_WORD.match(title):

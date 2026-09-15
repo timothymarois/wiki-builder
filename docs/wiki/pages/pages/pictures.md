@@ -1,6 +1,6 @@
 +++
 title = "Pictures"
-subtitle = "showing a picture on a page, and opening it whole"
+subtitle = "pictures in the text and the infobox, captions and the lightbox"
 status = "approved"
 intent = """
 Pictures exist so that a page can show the thing it describes, with a caption, and a reader can open any

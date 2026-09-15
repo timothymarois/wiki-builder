@@ -1,6 +1,6 @@
 +++
 title = "Skill"
-subtitle = "how an agent learns to write a page"
+subtitle = "the writing-wiki-pages instructions that wiki sync puts in a project"
 status = "approved"
 intent = """
 The skill exists so that an agent writing a page, in any project, writes it the way the owner approved

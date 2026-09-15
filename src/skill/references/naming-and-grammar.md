@@ -34,6 +34,18 @@ The thing the page is about, as a reader would say it: **Refunds**, **Session ex
 - **A page about a named thing a person types is titled with that name**, exactly: a page about the
   `export` command is titled `notes export`, not "Exporting notes".
 
+### Subtitles
+
+A short description under the title, naming the specific things the page covers: **word limits for a
+page, an intent and the goals page**.
+
+- **Things, not a clause about them.** "what a build makes" and "how a page sits on the screen" are the
+  writer's question; name the answer: **the built pages, their addresses, dates, search and audiences**.
+- **No vague word stands in for a thing**: not "and other drawings", "something", "here" or "this
+  machine".
+- **No slogan or contrast.** "labels, not questions" rates the page instead of describing it.
+- **Lower case, no full stop**, and on a reference page the software's own help line, exactly.
+
 ### Headings
 
 A label on a drawer: **Expiry**, **Size**, **Signing out**. `SKILL.md` has the method; these are the
@@ -247,6 +259,7 @@ Each of these survives a first draft and carries no fact.
 | Intentions for machines | the check wants, the server tries to | what it does, and under what condition |
 | Open lists | etc., and so on, various, and/or | the whole list, or the single thing. The gate refuses them |
 | Vague references | the one, the ones | the thing itself: the tag, the section, the error. The gate refuses them |
+| Question clauses | what a person writes, how it works, where it lives | the thing itself: page files and their intent. The gate refuses them in headings and subtitles |
 | Pointing elsewhere | see the documentation for details | link the exact page, or state the fact |
 | Vague actors | nobody, somebody, someone, anyone, everyone, no one | name who acts: the reader, the owner, an agent, the build. The gate refuses them |
 | Empty framing | "the half of the tool that is not code", "at its heart", "the other side of" | say what the thing is and what it does |

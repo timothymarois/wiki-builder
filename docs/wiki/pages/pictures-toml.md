@@ -1,6 +1,6 @@
 +++
 title = "PICTURES.toml"
-subtitle = "the record of what each picture shows"
+subtitle = "each picture's depicted files, digest and blessing"
 status = "approved"
 intent = """
 PICTURES.toml exists so that every picture on a page says what it depicts, and the tool can tell when that

@@ -1,6 +1,6 @@
 +++
 title = "Commands"
-subtitle = "everything wiki does, and how to ask for it"
+subtitle = "the eight wiki commands, one page each"
 status = "approved"
 intent = """
 The command reference exists so that a person using the tool can find the command for a job, and exactly

@@ -1,6 +1,6 @@
 +++
 title = "Markdown syntax"
-subtitle = "what a page is written with, and what the site draws from it"
+subtitle = "text, links, code, tables, citations and the missing mark"
 status = "approved"
 intent = """
 The markdown syntax page exists so that a writer finds every piece of markdown a page can use, and what

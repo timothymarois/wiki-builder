@@ -1,6 +1,6 @@
 +++
 title = "GitHub Pages"
-subtitle = "publishing a wiki on GitHub"
+subtitle = "a workflow that checks the wiki and deploys it to GitHub Pages"
 status = "approved"
 intent = """
 This guide exists so that a project on GitHub can publish its wiki as a website for free, read by people

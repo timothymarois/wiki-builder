@@ -1,6 +1,6 @@
 +++
 title = "Cloudflare"
-subtitle = "publishing a wiki on Cloudflare"
+subtitle = "the build command and settings that deploy the wiki to Cloudflare Pages"
 status = "approved"
 intent = """
 This guide exists so that a project can publish its wiki on Cloudflare as a website for free, read by

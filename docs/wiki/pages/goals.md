@@ -1,6 +1,6 @@
 +++
 title = "Goals"
-subtitle = "what every part of the tool is for"
+subtitle = "every approved page's intent, in sidebar order"
 status = "approved"
 goals = false
 intent = """

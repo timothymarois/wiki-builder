@@ -1,6 +1,6 @@
 +++
 title = "Site"
-subtitle = "what a build makes"
+subtitle = "the built pages, their addresses, dates, search and audiences"
 status = "approved"
 intent = """
 The site exists so that pages can be read by a reader who will never open the markdown, wherever they

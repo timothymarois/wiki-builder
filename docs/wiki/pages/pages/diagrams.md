@@ -1,6 +1,6 @@
 +++
 title = "Diagrams"
-subtitle = "flowcharts and other drawings, written as text"
+subtitle = "Mermaid flowcharts, sequence and state diagrams, written as code blocks"
 status = "approved"
 intent = """
 Diagrams exist so that a flow, a sequence or a decision can be drawn on a page, written as text the way

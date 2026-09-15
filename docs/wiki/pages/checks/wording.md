@@ -1,6 +1,6 @@
 +++
 title = "Wording"
-subtitle = "names and sentences that say nothing"
+subtitle = "pointing words, vague actors, attribution and empty words"
 status = "approved"
 categories = ["Refusals"]
 intent = """

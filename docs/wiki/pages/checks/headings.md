@@ -1,6 +1,6 @@
 +++
 title = "Headings"
-subtitle = "labels, not questions"
+subtitle = "headings refused for a question, a verdict or a pointing word"
 status = "approved"
 categories = ["Refusals"]
 intent = """
@@ -26,7 +26,8 @@ drawer.[^check] The check refuses the three kinds of heading that name nothing.[
 A heading that opens with *how*, *what*, *where*, *why*, *when*, *which*, *who* or *whether* is
 refused.[^question] Such a heading is the writer wondering what belongs in the section, when the reader
 wanted the name of the answer: "Where it lives" should be **Home**.[^question] A word that merely starts
-the same way, such as "However", passes.[^question]
+the same way, such as "However", passes.[^question] A page's subtitle that opens with one of those words is
+refused the same way, because "what a person writes" names nothing a reader can choose between.[^subtitle]
 
 ## Verdicts
 
@@ -50,6 +51,8 @@ pointing words and vague actors, described on [Wording](wording.md). A line insi
 and is not checked.[^reach]
 
 [^check]: `src/builder/build.py` — `heading_problems()`.
+[^subtitle]: `src/builder/build.py` — `heading_problems()` matches `QUESTION_WORD` against the start of each
+    page's `subtitle`.
 [^question]: `src/builder/build.py` — `QUESTION_WORD`, matched at the start of the heading and ending on a
     word boundary.
 [^verdict]: `src/builder/build.py` — `EDITORIAL`, which lists `matters?`, `note` and `details?` between

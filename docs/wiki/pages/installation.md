@@ -1,6 +1,6 @@
 +++
 title = "Installation"
-subtitle = "starting a wiki in a project"
+subtitle = "requirements, the wrapper script, a first wiki and updates"
 status = "approved"
 intent = """
 Installation exists so that any project, on any stack, can start a wiki with one pinned release of the

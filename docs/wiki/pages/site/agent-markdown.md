@@ -1,6 +1,6 @@
 +++
 title = "Markdown copies"
-subtitle = "each page as a markdown file"
+subtitle = "an index.md copy beside every page, and llms.txt listing them"
 status = "approved"
 intent = """
 The markdown copies exist so that an agent reading the wiki gets each page as it was written, not as text

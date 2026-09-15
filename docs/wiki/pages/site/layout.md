@@ -1,6 +1,6 @@
 +++
 title = "Layout"
-subtitle = "how a page sits on the screen"
+subtitle = "the sidebar, article, footer and narrow-screen layout"
 status = "approved"
 intent = """
 The layout exists so that a reader can always see where they are and get somewhere else, whatever they

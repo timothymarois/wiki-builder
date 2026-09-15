@@ -1,6 +1,6 @@
 +++
 title = "Continuous integration"
-subtitle = "the check on every push, here and in any project"
+subtitle = "the GitHub Action that runs wiki check on every push"
 status = "approved"
 intent = """
 Continuous integration exists so that a wiki cannot be merged while it is not fit to read: every push and

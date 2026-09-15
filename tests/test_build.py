@@ -53,7 +53,7 @@ version = "VERSION"
 
 PAGE = '''+++
 title = "A thing"
-subtitle = "what it is"
+subtitle = "the thing, its speed and its ground"
 categories = ["Things"]
 status = "approved"
 intent = """
@@ -195,11 +195,11 @@ class WikiTests(unittest.TestCase):
         self.build()
         page = (self.out / "thing/index.html").read_text(encoding="utf-8")
         self.assertIn("<h1>A thing</h1>", page)
-        self.assertIn('<p class="sub">what it is</p>', page)
+        self.assertIn('<p class="sub">the thing, its speed and its ground</p>', page)
 
     def test_a_page_still_using_kicker_is_told_to_rename_it(self):
         # The subtitle was called kicker before. Reading it silently as nothing would lose every one.
-        self.write("thing", PAGE.replace('subtitle = "what it is"', 'kicker = "what it is"'))
+        self.write("thing", PAGE.replace('subtitle = "the thing, its speed and its ground"', 'kicker = "the thing, its speed and its ground"'))
         self.refused("rename kicker to subtitle")
 
     def test_a_page_with_an_audience_the_build_does_not_know_is_refused(self):
@@ -246,7 +246,7 @@ class WikiTests(unittest.TestCase):
         self.build()
         index = (self.out / "llms.txt").read_text(encoding="utf-8")
         self.assertTrue(index.startswith("# "), index[:60])
-        self.assertIn("- [A thing](thing/index.md): what it is", index)
+        self.assertIn("- [A thing](thing/index.md): the thing, its speed and its ground", index)
 
     def test_a_source_view_links_to_the_markdown_file(self):
         # Anyone can open a page as pure markdown from its Source view. The owner, 2026-09-14: "we would
@@ -438,6 +438,24 @@ class WikiTests(unittest.TestCase):
                 problems = wiki.heading_problems(self.root)
                 self.assertTrue(any(bad in problem for problem in problems), problems)
 
+    def test_a_subtitle_that_asks_a_question_is_refused(self):
+        # "what a person writes" names nothing. A subtitle says which things the page covers, so a reader
+        # choosing between pages in search can tell them apart.
+        for bad in ("what a person writes", "How a page sits on the screen", "where it lives", "why it exists"):
+            with self.subTest(subtitle=bad):
+                self.write("thing", PAGE.replace('subtitle = "the thing, its speed and its ground"',
+                                                 'subtitle = "%s"' % bad))
+                self.assertIn("thing.md: the subtitle %r asks a question; name the things the page covers" % bad,
+                              wiki.heading_problems(self.root))
+
+    def test_a_subtitle_that_names_what_the_page_covers_passes(self):
+        for good in ("word limits for a page, an intent and the goals page", "however it is measured"):
+            with self.subTest(subtitle=good):
+                self.write("thing", PAGE.replace('subtitle = "the thing, its speed and its ground"',
+                                                 'subtitle = "%s"' % good))
+                self.assertEqual([], [problem for problem in wiki.heading_problems(self.root)
+                                      if "subtitle" in problem])
+
     def test_a_heading_that_rates_its_own_contents_is_refused(self):
         for bad in ("Fast enough to matter", "Important details", "Overview"):
             with self.subTest(heading=bad):
@@ -488,7 +506,7 @@ class WikiTests(unittest.TestCase):
 
     def test_front_matter_prose_that_points_at_the_project_is_refused(self):
         for old, new, field in (
-                ('subtitle = "what it is"', 'subtitle = "the tool that builds this wiki"', "subtitle"),
+                ('subtitle = "the thing, its speed and its ground"', 'subtitle = "the tool that builds this wiki"', "subtitle"),
                 ("It should be plain", "This site should make it plain", "intent")):
             with self.subTest(field=field):
                 self.write("thing", PAGE.replace(old, new))
@@ -603,7 +621,7 @@ class WikiTests(unittest.TestCase):
 
     def test_a_word_that_says_nothing_in_the_front_matter_is_refused(self):
         for old, new, place in (
-                ('subtitle = "what it is"', 'subtitle = "a powerful thing"', "the subtitle"),
+                ('subtitle = "the thing, its speed and its ground"', 'subtitle = "a powerful thing"', "the subtitle"),
                 ("It should be plain", "It should generally be plain", "the intent"),
                 ('value = "a promise"', 'value = "a robust promise"', "the infobox value"),
                 ('label = "Today"', 'label = "Currently"', "the infobox label")):
@@ -1431,8 +1449,8 @@ class WikiTests(unittest.TestCase):
         self.assertTrue((self.out / "images/thing.png").is_file(), "the picture was not copied")
 
     def test_an_infobox_picture_with_no_ledger_entry_is_refused(self):
-        self.write("thing", PAGE.replace('subtitle = "what it is"',
-                                         'subtitle = "what it is"\nimage = "absent.png"'))
+        self.write("thing", PAGE.replace('subtitle = "the thing, its speed and its ground"',
+                                         'subtitle = "the thing, its speed and its ground"\nimage = "absent.png"'))
         self.refused("pictures.toml")
 
     def test_a_citation_does_not_count_against_the_reading_budget(self):
