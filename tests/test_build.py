@@ -1882,6 +1882,21 @@ class WikiTests(unittest.TestCase):
         self.build()
         self.assertEqual(first, wiki.tree_digest(self.out))
 
+    def test_a_pdf_link_carries_what_the_viewer_needs(self):
+        self.pdf("policy.pdf")
+        self.link_pdf("../files/policy.pdf")
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        # A real link to the published file, so a new tab, a middle click or a download still opens the PDF itself.
+        anchor = re.search(r'<a href="([^"]+)" class="pdf">the policy 1</a>', page)
+        self.assertIsNotNone(anchor, "the PDF link is not marked for the viewer")
+        self.assertTrue((self.out / "thing" / anchor.group(1)).is_file(), "the PDF link leads nowhere")
+        script = (self.out / "assets/wiki.js").read_text(encoding="utf-8")
+        for needed in ('"a.pdf[href]"', "showModal", "(pointer: coarse)", "pdfViewerEnabled", '"iframe"',
+                       "Open in new tab", "Download", "Close"):
+            with self.subTest(needed=needed):
+                self.assertIn(needed, script)
+
     def test_a_pdf_link_resolves_in_every_build_and_markdown_copy(self):
         self.pdf("policy.pdf")
         self.write("thing", PAGE.replace('categories = ["Things"]', 'categories = ["Things"]\naudience = "user"')

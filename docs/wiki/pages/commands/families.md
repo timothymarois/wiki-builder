@@ -51,7 +51,7 @@ own wiki, where the Checks and Commands pages declare families:[^report]
 wiki: pages.md declares no family for its 4 children
 wiki:   pages/diagrams.md: Writing, Drawing, Citations, Copies
 wiki:   pages/markdown.md: Links, Code, Tables, Citations
-wiki:   pages/pdfs.md: Links, Publishing
+wiki:   pages/pdfs.md: Links, Publishing, Viewer
 wiki:   pages/pictures.md: Text pictures, Infobox picture, Lightbox
 wiki: site.md declares no family for its 2 children
 wiki:   site/agent-markdown.md: Copies, Index, Audiences

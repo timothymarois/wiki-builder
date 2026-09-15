@@ -158,48 +158,130 @@
   }
 
   // --- the lightbox ---------------------------------------------------------------------------------
-  // Pictures in a page are thumbnails, so there has to be a way to see one whole. Click anywhere, or
-  // press Escape, to close it again.
-  var open = null;
+  // Pictures in a page are thumbnails, and a PDF is a link, so there has to be a way to see either whole
+  // without leaving the page. One native dialog shows both. It is modal: the page behind cannot be used or
+  // scrolled, Tab stays inside it, Escape, Close or a click on the backdrop closes it, and closing puts focus
+  // back on the picture or link that opened it.
+  //
+  // While focus is inside a PDF's frame, the browser's own PDF viewer takes every key press, so Escape cannot
+  // reach the dialog from there. Close stays in view above the frame, and Tab still leads back to it.
+  var dialogs = typeof HTMLDialogElement === "function" && "showModal" in HTMLDialogElement.prototype;
+  var dialog = null;
+  var opener = null;
 
-  function shut() {
-    if (open) { open.remove(); open = null; }
+  function element(tag, attributes, text) {
+    var made = document.createElement(tag);
+    Object.keys(attributes).forEach(function (name) { made.setAttribute(name, attributes[name]); });
+    if (text) { made.textContent = text; }
+    return made;
+  }
+
+  // A stop at each end of the dialog sends focus round to the control at the other end. A key listener cannot
+  // do this: Tab pressed inside a PDF's frame never reaches the page, but the focus it moves lands on a stop.
+  function stop(toLast) {
+    var edge = element("span", { "class": "edge", tabindex: "0", "aria-hidden": "true" });
+    edge.addEventListener("focus", function () {
+      var controls = dialog.querySelectorAll("a[href], button, iframe");
+      controls[toLast ? controls.length - 1 : 0].focus();
+    });
+    return edge;
+  }
+
+  function lightbox() {
+    if (dialog) { return dialog; }
+    dialog = element("dialog", { "class": "lightbox" });
+    document.body.appendChild(dialog);
+    // The dialog covers the window, so a click that lands on the dialog itself is a click beside what it shows.
+    dialog.addEventListener("click", function (event) {
+      if (event.target === dialog) { dialog.close(); }
+    });
+    dialog.addEventListener("close", function () {
+      root.classList.remove("lightbox-open");
+      // Emptied, so a PDF still loading stops, and the next opening starts clean.
+      dialog.textContent = "";
+      dialog.removeAttribute("aria-label");
+      dialog.removeAttribute("aria-labelledby");
+      if (opener) { opener.focus(); opener = null; }
+    });
+    return dialog;
+  }
+
+  function show(kind, from, parts, shut) {
+    var box = lightbox();
+    box.className = "lightbox " + kind;
+    box.appendChild(stop(true));
+    parts.forEach(function (part) { box.appendChild(part); });
+    box.appendChild(stop(false));
+    shut.addEventListener("click", function () { box.close(); });
+    shut.autofocus = true;
+    opener = from;
+    root.classList.add("lightbox-open");
+    box.showModal();
+    shut.focus();
   }
 
   document.addEventListener("click", function (event) {
-    if (open) { shut(); return; }
     var picture = event.target.closest("figure.fig img, .ib .pic img");
-    if (!picture) { return; }
+    if (!picture || !dialogs) { return; }
     var caption = picture.closest("figure");
     caption = caption ? caption.querySelector("figcaption") : null;
     if (!caption) {
       caption = picture.parentNode.querySelector(".cc");
     }
-    open = document.createElement("div");
-    open.className = "lightbox";
-    open.setAttribute("role", "dialog");
-    open.setAttribute("aria-label", picture.alt || "Picture");
-    open.innerHTML = '<button class="shut" type="button" aria-label="Close">&times;</button>' +
-      '<div class="box"><img src="' + escape(picture.getAttribute("src")) + '" alt="' + escape(picture.alt) + '">' +
-      (caption ? "<p>" + escape(caption.textContent) + "</p>" : "") + "</div>";
-    document.body.appendChild(open);
+    // A picture is not focusable of its own accord, and focus has to come back to it when the dialog closes.
+    if (!picture.hasAttribute("tabindex")) { picture.setAttribute("tabindex", "-1"); }
+    var whole = element("img", { src: picture.getAttribute("src"), alt: picture.alt });
+    var frame = element("div", { "class": "box" });
+    frame.appendChild(whole);
+    if (caption) { frame.appendChild(element("p", {}, caption.textContent)); }
+    var shut = element("button", { "class": "shut", type: "button", "aria-label": "Close" }, "×");
+    lightbox().setAttribute("aria-label", picture.alt || (caption && caption.textContent) || "Picture");
+    show("picture", picture, [shut, frame], shut);
     // A picture with no size of its own, such as an SVG that gives only a viewBox, leaves the box nothing to
     // take its width from, and is drawn at nothing. It takes the thumbnail's shape instead, as large as the
     // window allows.
-    var whole = open.querySelector(".box img");
     var shape = picture.getBoundingClientRect();
     var fit = function () {
       if (whole.getBoundingClientRect().width || !shape.width) { return; }
       var width = Math.min(window.innerWidth * 0.96, window.innerHeight * 0.88 * shape.width / shape.height);
-      whole.parentNode.style.width = Math.round(width) + "px";
+      frame.style.width = Math.round(width) + "px";
       whole.style.width = "100%";
     };
     if (whole.complete) { fit(); } else { whole.addEventListener("load", fit); }
-    open.querySelector(".shut").focus();
   });
 
-  document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape") { shut(); }
+  // A phone or tablet opens a PDF in its own viewer instead, as does a browser that shows no PDFs itself: Safari
+  // on iOS draws only the first page of a PDF in a frame, and older Chrome on Android offers to download it.
+  function showsPdfs() {
+    var touch = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+    return !touch && navigator.pdfViewerEnabled !== false;
+  }
+
+  document.addEventListener("click", function (event) {
+    // Any other button, or a held key, keeps what the browser does with a link: a new tab, a new window, a
+    // download. So does a right click, which is no click at all.
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey ||
+        event.altKey) { return; }
+    var link = event.target.closest("a.pdf[href]");
+    if (!link || !dialogs || !showsPdfs() || link.protocol !== location.protocol || link.host !== location.host) {
+      return;
+    }
+    event.preventDefault();
+    var name = link.textContent.trim() || "PDF";
+    var shut = element("button", { "class": "act", type: "button" }, "Close");
+    var actions = element("div", { "class": "acts" });
+    actions.appendChild(element("a", { "class": "act", href: link.href, target: "_blank", rel: "noopener" },
+                                "Open in new tab"));
+    actions.appendChild(element("a", { "class": "act", href: link.href, download: "" }, "Download"));
+    actions.appendChild(shut);
+    var bar = element("div", { "class": "bar" });
+    bar.appendChild(element("h2", { id: "lightbox-title" }, name));
+    bar.appendChild(actions);
+    var sheet = element("div", { "class": "sheet" });
+    sheet.appendChild(bar);
+    sheet.appendChild(element("iframe", { title: name + " (PDF)", src: link.href }));
+    lightbox().setAttribute("aria-labelledby", "lightbox-title");
+    show("document", link, [sheet], shut);
   });
 
   // --- copying a page's source ---------------------------------------------------------------------

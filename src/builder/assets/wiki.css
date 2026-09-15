@@ -245,11 +245,22 @@ figure.fig figcaption{font-size:11.5px;color:var(--faint);line-height:1.45;margi
 .ib .pic img{display:block;margin:0 auto;border:1px solid var(--border-soft);background:var(--page)}
 
 /* ===== the lightbox ===== */
-/* A picture in the page is a thumbnail; this is how the whole of it gets looked at. */
+/* A picture in the page is a thumbnail, and a PDF a link; this is how either gets looked at whole. One native
+   dialog holds both, and it covers the window, so a click anywhere beside what it shows lands on the dialog
+   itself and closes it. The dialog is shown only while open: display is set on [open] alone, because an
+   author rule would otherwise override the browser's own rule that hides a closed dialog. */
 figure.fig img,.ib .pic img{cursor:zoom-in}
-.lightbox{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;
-  background:rgba(0,0,0,.82);cursor:zoom-out}
-.lightbox img{max-width:96vw;max-height:88vh;box-shadow:0 3px 18px rgba(0,0,0,.5);background:#fff}
+figure.fig img:focus-visible,.ib .pic img:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+/* The page behind stays where the reader left it. */
+html.lightbox-open{overflow:hidden}
+.lightbox{width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:20px;border:0;
+  background:transparent;color:var(--text)}
+.lightbox[open]{display:grid;place-items:center}
+.lightbox::backdrop{background:rgba(0,0,0,.82)}
+.lightbox.picture{cursor:zoom-out}
+/* The stops that keep Tab inside the dialog take no room. */
+.lightbox .edge{position:absolute;width:1px;height:1px;overflow:hidden}
+.lightbox img{max-width:96vw;max-height:88vh;box-shadow:0 3px 18px rgba(0,0,0,.5);background:#fff;cursor:default}
 /* The caption spans the picture exactly. The box takes its width from the picture, and the caption is
    width:0 with min-width:100% so it fills that width without being able to widen it -- a long caption
    wraps under the picture instead of stretching the box past it. */
@@ -257,13 +268,27 @@ figure.fig img,.ib .pic img{cursor:zoom-in}
 .lightbox .box img{max-width:100%}
 .lightbox p{width:0;min-width:100%;box-sizing:border-box;margin:10px 0 0;
   color:#eaecf0;font-size:12.5px;text-align:center}
-.lightbox .shut{position:absolute;top:14px;right:16px;color:#eaecf0;background:none;border:0;
+.lightbox .shut{position:absolute;top:14px;right:16px;color:#eaecf0;background:none;border:0;border-radius:2px;
   font:20px/1 inherit;cursor:pointer;padding:6px 10px}
+.lightbox .shut:hover{background:rgba(255,255,255,.14)}
+.lightbox .shut:focus-visible{outline-color:#eaecf0}
+/* A PDF sits on a sheet in the page's own colours, under a bar holding its name and the three controls, and
+   the browser's own PDF viewer fills the rest. */
+.lightbox .sheet{display:flex;flex-direction:column;width:min(1100px,100%);height:100%;background:var(--page);
+  border:1px solid var(--border-soft);box-shadow:0 3px 18px rgba(0,0,0,.5)}
+.lightbox .bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:8px 12px;
+  background:var(--surface);border-bottom:1px solid var(--border-soft)}
+.lightbox h2{flex:1 1 14em;min-width:0;margin:0;font:400 17px/1.3 'Linux Libertine',Georgia,serif;
+  overflow-wrap:anywhere}
+.lightbox .acts{display:flex;flex-wrap:wrap;gap:6px}
+.lightbox iframe{flex:1;width:100%;min-height:0;border:0;background:var(--surface)}
+/* A PDF's size, after its link. */
+.pdfsize{color:var(--faint);white-space:nowrap}
 
 /* ===== controls ===== */
-.theme,.navtoggle,.copy{font:12.5px/1.3 inherit;color:var(--link);background:var(--shade);
+.theme,.navtoggle,.copy,.lightbox .act{font:12.5px/1.3 inherit;color:var(--link);background:var(--shade);
   border:1px solid var(--border-soft);border-radius:2px;padding:5px 11px;cursor:pointer}
-.theme:hover,.navtoggle:hover,.copy:hover{background:var(--sunk)}
+.theme:hover,.navtoggle:hover,.copy:hover,.lightbox .act:hover{background:var(--sunk);text-decoration:none}
 .theme{align-self:center;margin:0 0 5px;flex:none;min-width:64px}
 .navtoggle{display:none;width:100%;text-align:left}
 .navtoggle[aria-expanded="true"]{background:var(--sunk);color:var(--text);font-weight:700}
@@ -317,6 +342,7 @@ pre.src{overflow-x:auto;margin:0;padding:12px 14px;background:var(--surface);
   .tabs{padding:6px 16px 0}
   .ib{float:none;width:100%;margin:10px 0 14px}
   figure.fig{margin:12px 0}
+  .lightbox{padding:8px}
   h1{font-size:23px}
   /* Tap targets: a 12.8px link on one line is about 20px tall, under any reasonable minimum. */
   .rail li a{padding:8px 0;font-size:14px}

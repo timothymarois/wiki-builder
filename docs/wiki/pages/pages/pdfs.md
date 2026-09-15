@@ -1,6 +1,6 @@
 +++
 title = "PDFs"
-subtitle = "PDF files in the files folder, their links and sizes"
+subtitle = "PDF files in the files folder, their links, sizes and viewer"
 status = "draft"
 intent = """
 PDFs exist so that a page can hand a reader a document the project keeps, such as a policy, from the place
@@ -26,6 +26,7 @@ group = "Rules"
 rows = [
   { label = "Copied", value = "only the PDFs a page links", cite = "copied" },
   { label = "Citation", value = "refused", cite = "document" },
+  { label = "Opening", value = "a lightbox on a computer, the PDF itself on a phone", cite = ["viewer", "touch"] },
 ]
 +++
 
@@ -54,6 +55,24 @@ A PDF larger than 20 MB is refused too.[^limit] A PDF that is a symbolic link to
 stops the build, so the file it points at is never published.[^symlink] A PDF no page links any more is
 removed from the site by the next build.[^stale]
 
+## Viewer
+
+A plain click on a PDF link opens the PDF over the page in a lightbox, so the reader keeps their
+place.[^viewer] The lightbox shows the link's text as its title, the PDF in the browser's own PDF viewer, and
+three controls: `Open in new tab`, `Download` and `Close`.[^viewer] **The link stays a real link**: a right
+click, a middle click, or a click with Ctrl, ⌘, Shift or Alt held does what the browser does with any link,
+such as opening the PDF in a new tab.[^native] It is the lightbox pictures open in, described on
+[Pictures](pictures.md).
+
+Escape, `Close` or a click on the backdrop closes the lightbox, and focus goes back to the link.[^dialog]
+While it is open, the page behind cannot be used or scrolled, and Tab moves only between its controls and the
+PDF.[^dialog] **While focus is inside the PDF, the browser's PDF viewer takes every key press, so Escape
+cannot close the lightbox from there**, and `Close` stays in view above the PDF.[^frame]
+
+**A phone or tablet opens the PDF itself instead**, and so does a browser with no PDF viewer of its own,
+because Safari on iOS draws only the first page of a PDF inside a page and older Chrome on Android offers to
+download it.[^touch]
+
 [^link]: `src/builder/build.py` — `rewrite_references()` points a link that `filed_pdf()` finds directly in
     `FILES`, `files`, at the site's copy, through `filed_name()`, which accepts only a plain file name whose
     folder resolves to the wiki's `files` folder.
@@ -67,3 +86,16 @@ removed from the site by the next build.[^stale]
 [^limit]: `src/builder/build.py` — `pdf_problems()` refuses a PDF over `PDF_LIMIT`, 20 × `MEGABYTE`.
 [^symlink]: `src/builder/build.py` — `filed_pdf()` raises `WikiError` when the file resolves outside the folder.
 [^stale]: `src/builder/build.py` — `clear_stale()` deletes a file an earlier build wrote and this one did not.
+[^viewer]: `src/builder/assets/wiki.js` — the click listener for `a.pdf[href]` calls `show()` with the link's
+    text as an `h2`, an `iframe` of the PDF, and `Open in new tab`, `Download` and `Close`;
+    `src/builder/build.py` — `rewrite_references()` gives a PDF link the class `pdf`.
+[^native]: `src/builder/assets/wiki.js` — the listener returns without `preventDefault()` for any button but
+    the first, when Ctrl, ⌘, Shift or Alt is held, and for a link to another site.
+[^dialog]: `src/builder/assets/wiki.js` — `show()` opens one native `dialog` with `showModal()` and marks the
+    page `lightbox-open`, which `src/builder/assets/wiki.css` stops scrolling; `stop()` keeps Tab inside the
+    dialog, a click on the dialog itself closes it, and its `close` listener in `lightbox()` puts focus back on
+    the opener.
+[^frame]: `src/builder/assets/wiki.js` — the comment above the lightbox, and `stop()`, which catches Tab
+    leaving the frame; `src/builder/assets/wiki.css` — `.lightbox .bar` sits above the `iframe`.
+[^touch]: `src/builder/assets/wiki.js` — `showsPdfs()` is false when `(pointer: coarse)` matches or
+    `navigator.pdfViewerEnabled` is false, and its comment gives the reason.
