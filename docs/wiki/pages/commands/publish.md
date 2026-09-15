@@ -11,7 +11,7 @@ never write over a folder the tool did not make.
 group = "Identity"
 rows = [
   { label = "Command", value = "wiki publish", cite = "usage" },
-  { label = "Argument", value = "OUT", cite = "usage" },
+  { label = "Arguments", value = "OUT", cite = "usage" },
 ]
 
 [[infobox]]

@@ -767,6 +767,123 @@ def goals_page(pages, sections, audience):
     return "\n".join(body), sum(len(pages[page_id]["intent"].split()) for page_id in ordered)
 
 
+# The page the build lists every page on, when a wiki has one, and the marker for a family's member table.
+HEALTH_ID = "health"
+HEALTH_COLUMNS = ("Page", "Status", "Words", "Cited", "Missing", "Updated", "Audited")
+FAMILY_TABLE = "{family-table}"
+FAMILY_TABLE_LINE = re.compile(r"^[ \t]*\{family-table\}[ \t]*$", re.M)
+
+
+def markdown_cell(text):
+    """Text that sits in a markdown table cell without ending it."""
+    return str(text).replace("|", "\\|")
+
+
+def health_rows(pages, emitted, dates, citations):
+    """Every written page but the health page, in the order it lists them, with the cells it shows for each.
+
+    Pages that cite code and were never audited come first, then the longest since their audit, then the
+    pages that cite nothing, which cannot be audited and show no citation counts. Only recorded dates are
+    shown, never days since one, so two builds of one wiki write the same page.
+    """
+    rows = []
+    for page_id in emitted:
+        if page_id == HEALTH_ID:
+            continue
+        page = pages[page_id]
+        cites = page["meta"].get("goals", True)
+        cited, missing = citations.get(page_id, (0, 0))
+        audited = dates.get(page_id, {}).get("audited", "")
+        order = (0 if not audited else 1, audited) if cites else (2, "")
+        cells = ["approved" if page["status"] == "approved" else "draft", str(page["words"]),
+                 str(cited) if cites else "", str(missing) if cites else "",
+                 spoken_date(dates[page_id]["updated"]),
+                 (spoken_date(audited) if audited else "never") if cites else ""]
+        rows.append((order, page_id, cells))
+    return [(page_id, cells) for _, page_id, cells in sorted(rows)]
+
+
+def health_summary(pages, rows):
+    """The line above the health table: how many pages, drafts, pages never audited and unsourced claims."""
+    def counted(count, word):
+        return "%d %s%s" % (count, word, "" if count == 1 else "s")
+
+    drafts = sum(1 for page_id, _ in rows if pages[page_id]["status"] != "approved")
+    never = sum(1 for _, cells in rows if cells[5] == "never")
+    missing = sum(int(cells[3]) for _, cells in rows if cells[3])
+    return "%s, %s waiting on the owner, %d never audited, %s with no source" % (
+        counted(len(rows), "page"), counted(drafts, "draft"), never, counted(missing, "claim"))
+
+
+def health_html(pages, rows, directory):
+    """The health page's summary and table, as the page shows them."""
+    head = "".join("<th>%s</th>" % name for name in HEALTH_COLUMNS)
+    body = "".join('<tr><td><a href="%s">%s</a></td>%s</tr>'
+                   % (relative_directory(directory, page_directory(page_id)),
+                      html_module.escape(pages[page_id]["title"]),
+                      "".join("<td>%s</td>" % html_module.escape(cell) for cell in cells))
+                   for page_id, cells in rows)
+    return ('<p>%s</p>\n<div class="wt"><table class="w health"><thead><tr>%s</tr></thead><tbody>%s</tbody>'
+            "</table></div>\n" % (html_module.escape(health_summary(pages, rows)), head, body))
+
+
+def health_markdown(pages, rows, directory):
+    """The health page's summary and table, as its markdown copy carries them."""
+    lines = ["", health_summary(pages, rows), "", "| %s |" % " | ".join(HEALTH_COLUMNS),
+             "|%s" % ("---|" * len(HEALTH_COLUMNS))]
+    lines += ["| [%s](%s) | %s |" % (markdown_cell(pages[page_id]["title"]), copy_address(directory, page_id),
+                                     " | ".join(markdown_cell(cell) for cell in cells))
+              for page_id, cells in rows]
+    return "\n".join(lines) + "\n"
+
+
+def family_table_rows(page_id, pages, emitted, audience):
+    """A declared family's member table: the labels it compares, and each member this build writes with its
+    value for each label, empty where the member states none. A value in an infobox group the build leaves
+    out is not shown. None when the family declares no table, which `wiki check` reports.
+    """
+    family = pages[page_id]["meta"].get("family")
+    labels = family.get("table") if isinstance(family, dict) else None
+    if not isinstance(labels, list) or not labels:
+        return None
+    written = set(emitted)
+    rows = []
+    for child in children_of(page_id, set(pages)):
+        if child not in written:
+            continue
+        values = {}
+        for group in pages[child]["meta"].get("infobox", []):
+            if visible_to(audience, group.get("audience", pages[child]["audience"])):
+                for row in group.get("rows", []):
+                    values.setdefault(str(row.get("label", "")), str(row.get("value", "")))
+        rows.append((child, [values.get(str(label), "") for label in labels]))
+    return [str(label) for label in labels], rows
+
+
+def family_table_html(pages, table, directory):
+    """A family's member table as the parent page shows it: each member linked, then its values."""
+    labels, rows = table
+    head = "<th></th>" + "".join("<th>%s</th>" % html_module.escape(label) for label in labels)
+    body = "".join('<tr><td><a href="%s">%s</a></td>%s</tr>'
+                   % (relative_directory(directory, page_directory(child)),
+                      html_module.escape(pages[child]["title"]),
+                      "".join("<td>%s</td>" % html_module.escape(value) for value in values))
+                   for child, values in rows)
+    return ('<div class="wt"><table class="w family"><thead><tr>%s</tr></thead><tbody>%s</tbody></table></div>'
+            % (head, body))
+
+
+def family_table_markdown(pages, table, directory):
+    """A family's member table as the parent's markdown copy carries it."""
+    labels, rows = table
+    lines = ["|  | %s |" % " | ".join(markdown_cell(label) for label in labels),
+             "|%s" % ("---|" * (len(labels) + 1))]
+    lines += ["| [%s](%s) | %s |" % (markdown_cell(pages[child]["title"]), copy_address(directory, child),
+                                     " | ".join(markdown_cell(value) for value in values))
+              for child, values in rows]
+    return "\n".join(lines)
+
+
 def goals_order(pages, sections, audience):
     """The pages whose intents the goals page collects, in sidebar order. Shared by the rendered goals page
     and its markdown copy, so the two can never list different goals."""
@@ -1109,6 +1226,12 @@ def write_site(root, out, audience, link_root, today, record, wiki, sitemap=Fals
     for page_id in emitted:
         page = pages[page_id]
         directory = page_directory(page_id)
+        # Tables the build writes from other pages: a family's member table where its parent marks it, and the
+        # health table on the health page, which a user build leaves out.
+        family_table = (family_table_rows(page_id, pages, emitted, audience)
+                        if FAMILY_TABLE in page["body"] else None)
+        health = (health_rows(pages, emitted, dates, citations)
+                  if page_id == HEALTH_ID and audience != "user" else None)
         markdown.renderer.cited = {}
         body = markdown(page["body"])
         if page_id == GOALS_ID:
@@ -1144,16 +1267,24 @@ def write_site(root, out, audience, link_root, today, record, wiki, sitemap=Fals
                                   wiki / "pages", page["path"], shown)
         if page["meta"].get("image"):
             shown.add(page["meta"]["image"])
+        # Written in after the references are pointed, because their links already resolve from this page.
+        if family_table:
+            body = body.replace("<p>%s</p>" % FAMILY_TABLE, family_table_html(pages, family_table, directory))
+        if health is not None:
+            body += health_html(pages, health, directory)
         # The source view names paths and internal identifiers by its nature, so it is internal only.
         with_source = audience != "user"
         # The markdown copy is the page as written, references and marks included, so it goes where the
         # source view goes and nowhere else.
         llm_links = ""
         if with_source:
-            emit(directory, markdown_copy(
-                page, directory, set(emitted), wiki / "pages", ledger,
-                goals_markdown(pages, goals_order(pages, sections, audience), directory)
-                if page_id == GOALS_ID else ""), AGENT_COPY)
+            extra = (goals_markdown(pages, goals_order(pages, sections, audience), directory) if page_id == GOALS_ID
+                     else health_markdown(pages, health, directory) if health is not None else "")
+            copy = markdown_copy(page, directory, set(emitted), wiki / "pages", ledger, extra)
+            if family_table:
+                copy = outside_code(copy, lambda text: FAMILY_TABLE_LINE.sub(
+                    lambda _: family_table_markdown(pages, family_table, directory), text))
+            emit(directory, copy, AGENT_COPY)
             llm_links = ('<link rel="alternate" type="text/markdown" href="%s">\n<link rel="describedby" '
                          'href="%s">' % (AGENT_COPY, posixpath.relpath("/" + AGENT_INDEX,
                                                                         "/" + (directory or "."))))
@@ -1443,7 +1574,8 @@ def page_statements(path):
     def blank(match):
         return "\n" * match.group(0).count("\n")
 
-    body = HEADING_ANY.sub("", FENCED.sub(blank, FOOTNOTE.sub(blank, body)))
+    # The family table marker is where the build writes a table, not a sentence.
+    body = FAMILY_TABLE_LINE.sub("", HEADING_ANY.sub("", FENCED.sub(blank, FOOTNOTE.sub(blank, body))))
     for block in BLOCK.finditer(body):
         start = first + body[:block.start()].count("\n")
         chunk = block.group(0)
@@ -1918,27 +2050,50 @@ def family_problems(root, wiki=None):
     problems = []
     for parent_id in sorted(pages):
         parent_path, meta, body = pages[parent_id]
+        marked = bool(FAMILY_TABLE_LINE.search(FENCED.sub("", body)))
         if "family" not in meta:
+            if marked:
+                problems.append(f"{parent_id}.md has {FAMILY_TABLE} but declares no [family]; declare the family's "
+                                "layout, with table naming the infobox labels its member table compares")
             continue
         if not isinstance(meta["family"], dict):
             problems.append(f"{parent_id}.md: family must be a table, written [family], holding headings and "
                             'labels, such as headings = ["Usage", "Output"]')
             continue
-        layout = {"headings": meta["family"].get("headings"), "labels": meta["family"].get("labels")}
+        layout = {key: meta["family"].get(key) for key in ("headings", "labels", "table")}
         # An empty list would refuse every name a member uses, which is never what a writer meant.
         wrong = [key for key, value in layout.items()
                  if value is not None and (not isinstance(value, list) or not value
                                            or not all(isinstance(item, str) and item for item in value))]
         for key in wrong:
-            example = '["Usage", "Output"]' if key == "headings" else '["Command", "Files written"]'
-            problems.append(f"{parent_id}.md: family.{key} must list the {key[:-1]}s every member of the family "
-                            f"may use, such as {key} = {example}, or leave family.{key} out to check no {key}")
+            meaning, example, tail = {
+                "headings": ("headings every member of the family may use", '["Usage", "Output"]',
+                             " to check no headings"),
+                "labels": ("labels every member of the family may use", '["Command", "Files written"]',
+                           " to check no labels"),
+                "table": ("infobox labels the member table compares", '["Options", "Files written"]', ""),
+            }[key]
+            problems.append(f"{parent_id}.md: family.{key} must list the {meaning}, such as {key} = {example}, or "
+                            f"leave family.{key} out{tail}")
         if wrong:
             continue
         prose = INLINE_CODE.sub("", FENCED.sub("", body))
         linked = {linked_page(parent_path, link.group(2).partition("#")[0], pages_dir)
                   for link in MARKDOWN_LINK.finditer(prose) if not link.group(1).startswith("!")}
-        headings, labels = layout["headings"], layout["labels"]
+        headings, labels, table = layout["headings"], layout["labels"], layout["table"]
+        for label in table if table is not None and labels is not None else []:
+            if label not in labels:
+                problems.append(f"{parent_id}.md: family.table lists {label!r}, which family.labels does not; add it "
+                                "to family.labels, or take it out of family.table")
+        if table is not None and not marked:
+            problems.append(f"{parent_id}.md declares family.table but has no {FAMILY_TABLE}; put {FAMILY_TABLE} on "
+                            "its own line where the member table goes")
+        if marked and table is None:
+            problems.append(f"{parent_id}.md has {FAMILY_TABLE} but declares no family.table; add table = [...] "
+                            "under [family], naming the infobox labels the member table compares")
+        # The member table the build writes links every member, so the parent needs no link of its own to each.
+        if marked and table is not None:
+            linked = set(children_of(parent_id, set(pages)))
         for child_id in children_of(parent_id, set(pages)):
             _, child_meta, child_body = pages[child_id]
             if child_id not in linked:

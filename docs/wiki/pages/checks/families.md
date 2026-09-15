@@ -34,7 +34,12 @@ report that finds families not yet declared on [wiki families](../commands/famil
 [family]
 headings = ["Usage", "Options", "Arguments", "Output", "Exit codes"]
 labels = ["Command", "Arguments", "Options", "Output folder", "Files written"]
+table = ["Arguments", "Options", "Files written"]
 ```
+
+When the family names `table`, the build writes the parent's member table where `{family-table}` stands on
+its own line: one row per member, linked, with the member's infobox value for each label, and an empty cell
+where the member states none.[^table]
 
 ## Refusals
 
@@ -56,9 +61,21 @@ wiki: commands/check.md: the infobox label 'Name' is not in the family layout on
 
 ### Parent links
 
-A member that the parent's text does not link is refused, so the parent lists every member.[^links]
+A member that the parent's text does not link is refused, so the parent lists every member.[^links] A parent
+with both `table` and `{family-table}` links every member through the table the build writes.[^links]
 ```text
 wiki: commands.md does not link commands/audit.md, a member of its family; link every member from the parent, such as in a table of the members
+```
+
+### Table
+
+A `table` label that `labels` does not list is refused, and so are a `table` with no `{family-table}` on the
+parent, and a `{family-table}` with no `table` or on a page with no family.[^tablecheck]
+```text
+wiki: commands.md: family.table lists 'Flags', which family.labels does not; add it to family.labels, or take it out of family.table
+wiki: commands.md declares family.table but has no {family-table}; put {family-table} on its own line where the member table goes
+wiki: commands.md has {family-table} but declares no family.table; add table = [...] under [family], naming the infobox labels the member table compares
+wiki: brief.md has {family-table} but declares no [family]; declare the family's layout, with table naming the infobox labels its member table compares
 ```
 
 ### Declaration
@@ -101,7 +118,13 @@ from the parent's text, such as from a table of the members.[^links]
 [^labels]: `src/builder/build.py` — `family_problems()` refuses each infobox row, in any group, whose label
     `labels` does not hold.
 [^links]: `src/builder/build.py` — `family_problems()` resolves each link in the parent's text with
-    `linked_page()`, and refuses a member none of them reaches.
+    `linked_page()`, refuses a member none of them reaches, and counts every member linked when the parent
+    has both `table` and a line `FAMILY_TABLE_LINE` matches.
+[^table]: `src/builder/build.py` — `family_table_rows()` takes each written member's infobox value for every
+    label in `table`, empty where the member states none; `write_site()` puts `family_table_html()` where the
+    parent's `{family-table}` paragraph stands, and `family_table_markdown()` into its markdown copy.
+[^tablecheck]: `src/builder/build.py` — `family_problems()` refuses a `table` label outside `labels`, a
+    `table` with no line `FAMILY_TABLE_LINE` matches, and that line with no `table` or no `family`.
 [^scope]: `src/builder/build.py` — `family_problems()` checks `children_of()` the declaring page only, and
     `section_headings()` reads `SECTION_HEADING` outside `FENCED` code, dropping a closing run of `#` and
     every backtick.
