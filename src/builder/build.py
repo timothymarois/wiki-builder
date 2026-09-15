@@ -276,6 +276,17 @@ def write_ledger(images_dir, ledger):
     (images_dir / LEDGER).write_text("\n".join(lines), encoding="utf-8", newline="\n")
 
 
+def script_json(value):
+    """A value as JSON that is safe inside a script element.
+
+    A browser ends a script at the first `</script>` whatever JSON surrounds it, so a title carrying one
+    would run the rest as a script of its own. JSON may spell any character as an escape, and these three
+    are the ones HTML reads.
+    """
+    return (json.dumps(value, sort_keys=True, separators=(",", ":"))
+            .replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026"))
+
+
 def toml_string(value):
     return json.dumps(str(value), ensure_ascii=False)
 
@@ -377,7 +388,7 @@ class WikiRenderer(mistune.HTMLRenderer):
 
 def make_markdown():
     markdown = mistune.create_markdown(
-        renderer=WikiRenderer(escape=False), plugins=["footnotes", "table", "strikethrough"])
+        renderer=WikiRenderer(escape=True), plugins=["footnotes", "table", "strikethrough"])
     # These three the plugin adds; the renderer defines no method of its own for them, so they take.
     markdown.renderer.register("footnote_ref", footnote_reference)
     markdown.renderer.register("footnote_item", footnote_item)
@@ -1001,9 +1012,8 @@ def write_site(root, out, audience, link_root, today, record, wiki):
         thing to put in a page: a browser resolves "b/" against the directory it is already in, so one
         shared index sends every result clicked on /a/ to /a/b/, and every one of them is a miss.
         """
-        return json.dumps([{"u": relative_directory(directory, entry["u"]), "t": entry["t"],
-                            "s": entry["s"], "p": entry["p"]} for entry in index_entries],
-                          sort_keys=True, separators=(",", ":"))
+        return script_json([{"u": relative_directory(directory, entry["u"]), "t": entry["t"],
+                             "s": entry["s"], "p": entry["p"]} for entry in index_entries])
 
     changed = []
     for page_id in sorted(pages):
@@ -1057,7 +1067,7 @@ def write_site(root, out, audience, link_root, today, record, wiki):
         # Mermaid is several megabytes, so a page only names it: the page's own script fetches it once a
         # diagram nears the screen, and nothing else on the page waits for it.
         diagram_script = ('<script>const WIKI_MERMAID=%s;</script>'
-                          % json.dumps(relative_file(directory, "assets/" + MERMAID)) if diagrams else "")
+                          % script_json(relative_file(directory, "assets/" + MERMAID)) if diagrams else "")
         # A page's own table takes the wiki's table style, and scrolls inside its wrapper on a narrow
         # screen rather than widening the page.
         body = body.replace("<table>", '<div class="wt"><table class="w">').replace("</table>",

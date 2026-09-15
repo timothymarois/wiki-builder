@@ -27,7 +27,8 @@ rows = [
 
 A page is written in markdown, with three extensions switched on: footnotes, tables and
 strikethrough.[^parser] Paragraphs, bold, italics, lists and quotes are drawn as markdown draws them, and
-`~~text~~` strikes text through.[^parser] Settings above the markdown are described on
+`~~text~~` strikes text through.[^parser] HTML written in a page is shown as text, never run as part of
+the site.[^parser] Settings above the markdown are described on
 [Front matter](../front-matter.md), drawings on [Diagrams](diagrams.md), and pictures on
 [Pictures](pictures.md).
 
@@ -74,7 +75,8 @@ A session ends thirty minutes after its last request.[^expiry]
 ```
 
 [^parser]: `src/builder/build.py` — `make_markdown()` builds a `mistune` parser with the `footnotes`,
-    `table` and `strikethrough` plugins; `pyproject.toml` pins `mistune==3.3.4`.
+    `table` and `strikethrough` plugins, whose renderer escapes HTML; `pyproject.toml` pins
+    `mistune==3.3.4`.
 [^headings]: `src/builder/build.py` — `HEADING` matches `h2` and `h3` only, which `number_headings()`
     numbers and `render_contents()` lists.
 [^links]: `src/builder/build.py` — `rewrite_references()` turns a link to a `.md` file inside the pages

@@ -1099,6 +1099,28 @@ class WikiTests(unittest.TestCase):
         self.assertEqual("A thing", by_title["A part"]["p"])
         self.assertEqual("", by_title["A thing"]["p"])
 
+    def test_a_title_cannot_break_out_of_the_search_index(self):
+        # Every page carries the search index inside a script. A title that closed that script would run a
+        # script of its own on every page, so the index is written with its angle brackets escaped.
+        self.write("thing", PAGE.replace('title = "A thing"',
+                                         'title = "A </script><script>alert(1)</script> thing"'))
+        self.build()
+        front = (self.out / "index.html").read_text(encoding="utf-8")
+        script = front[front.index("const WIKI_INDEX="):]
+        script = script[:script.index("</script>")]
+        self.assertNotIn("<", script)
+        self.assertIn("\\u003c/script\\u003e", script)
+
+    def test_html_written_in_a_page_is_shown_as_text(self):
+        # A page is markdown. HTML written in it is shown as written and never run: a script in a page would
+        # otherwise run for every reader of the published site.
+        self.write("thing", PAGE.replace("It does it slowly.[^why]",
+                                         "It does it <script>alert(1)</script> slowly.[^why]"))
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertNotIn("<script>alert(1)</script>", page)
+        self.assertIn("&lt;script&gt;alert(1)&lt;/script&gt;", page)
+
     def test_a_draft_is_not_in_the_collected_goals(self):
         self.write("proposal", PAGE.replace('status = "approved"\n', "")
                    .replace("A thing exists so that something else can happen.", "A proposal is made."))
