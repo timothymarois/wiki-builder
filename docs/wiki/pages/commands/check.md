@@ -12,7 +12,12 @@ fail a build.
 group = "Identity"
 rows = [
   { label = "Command", value = "wiki check", cite = "usage" },
-  { label = "Options", value = "--root, --wiki", cite = "usage" },
+]
+
+[[infobox]]
+group = "Rules"
+rows = [
+  { label = "Files written", value = "none", cite = "check" },
 ]
 
 [[infobox]]

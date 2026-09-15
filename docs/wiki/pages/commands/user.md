@@ -15,10 +15,15 @@ rows = [
 ]
 
 [[infobox]]
+group = "Values"
+rows = [
+  { label = "Output folder", value = "OUT", note = "relative to the working directory", cite = "usage" },
+]
+
+[[infobox]]
 group = "Rules"
 rows = [
-  { label = "Pages", value = "those marked for users", cite = "user" },
-  { label = "Removed", value = "references, red marks, Source tab", cite = "user" },
+  { label = "Files written", value = "OUT, UPDATED.toml", cite = ["user", "dates"] },
 ]
 
 [[infobox]]

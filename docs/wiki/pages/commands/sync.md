@@ -12,14 +12,13 @@ asks.
 group = "Identity"
 rows = [
   { label = "Command", value = "wiki sync", cite = "sync" },
-  { label = "Options", value = "--skill-dir, --no-skill, --root, --wiki", cite = "group" },
+  { label = "Options", value = "--skill-dir, --no-skill", cite = "group" },
 ]
 
 [[infobox]]
-group = "Values"
+group = "Rules"
 rows = [
-  { label = "Skill folder", value = ".agents/skills, else .claude/skills", cite = "home" },
-  { label = "Release record", value = "wiki.toml", cite = "sync" },
+  { label = "Files written", value = "the skill folder, wiki.toml", cite = "sync" },
 ]
 
 [[infobox]]

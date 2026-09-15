@@ -11,13 +11,18 @@ costs to read while they do. It should change nothing but the site and the recor
 group = "Identity"
 rows = [
   { label = "Command", value = "wiki build", cite = "usage" },
-  { label = "Options", value = "--root, --wiki", cite = "usage" },
 ]
 
 [[infobox]]
 group = "Values"
 rows = [
-  { label = "Output", value = "docs/wiki/site", note = "site inside the wiki folder", cite = "build" },
+  { label = "Output folder", value = "docs/wiki/site", note = "site inside the wiki folder", cite = "build" },
+]
+
+[[infobox]]
+group = "Rules"
+rows = [
+  { label = "Files written", value = "the site, UPDATED.toml", cite = "build" },
 ]
 
 [[infobox]]
