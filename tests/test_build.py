@@ -14,6 +14,7 @@ import shutil
 import sys
 import tempfile
 import threading
+import tomllib
 import unittest
 
 from builder import build as wiki
@@ -2009,6 +2010,49 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(2, status)
         self.assertIn("not allowed with", output)
         self.assertFalse((root / "tools").exists())
+
+    def test_sync_records_the_release_in_its_own_table_and_nowhere_else(self):
+        # A [tool] table with no version, then a table holding a setting whose name starts with version.
+        root = self.project()
+        settings = root / "docs/wiki" / CONFIG
+        settings.write_text(CONFIGURATION.replace(f'[tool]\nversion = "{wiki_version()}"\n',
+                                                  '[tool]\n\n[notes]\nversion_label = "kept"\n'),
+                            encoding="utf-8")
+        status, output = self.sync(root, "--no-skill")
+        self.assertEqual(0, status, output)
+        recorded = tomllib.loads(settings.read_text(encoding="utf-8"))
+        self.assertEqual(wiki_version(), recorded.get("tool", {}).get("version"), "the release was not recorded")
+        self.assertEqual({"version_label": "kept"}, recorded["notes"], "another table's setting was changed")
+
+    def test_sync_records_the_release_when_only_a_comment_names_its_table(self):
+        root = self.project()
+        settings = root / "docs/wiki" / CONFIG
+        settings.write_text(CONFIGURATION.replace(f'[tool]\nversion = "{wiki_version()}"\n',
+                                                  "# [tool] is written by wiki sync\n"), encoding="utf-8")
+        status, output = self.sync(root, "--no-skill")
+        self.assertEqual(0, status, output)
+        recorded = tomllib.loads(settings.read_text(encoding="utf-8"))
+        self.assertEqual(wiki_version(), recorded.get("tool", {}).get("version"), "the release was not recorded")
+
+    def test_sync_refuses_a_settings_file_it_cannot_read(self):
+        root = self.project()
+        settings = root / "docs/wiki" / CONFIG
+        settings.write_text("[site\nname = ", encoding="utf-8")
+        status, output = self.sync(root, "--no-skill")
+        self.assertEqual(1, status, output)
+        self.assertIn(f"{CONFIG} is unreadable", output)
+        self.assertEqual("[site\nname = ", settings.read_text(encoding="utf-8"), "an unreadable file was written")
+
+    def test_sync_refuses_to_record_a_release_that_would_change_another_setting(self):
+        # [[tool]] is a list of tables, where a release has no single place to go.
+        root = self.project()
+        settings = root / "docs/wiki" / CONFIG
+        text = CONFIGURATION.replace(f'[tool]\nversion = "{wiki_version()}"\n', '[[tool]]\nname = "a"\n')
+        settings.write_text(text, encoding="utf-8")
+        status, output = self.sync(root, "--no-skill")
+        self.assertEqual(1, status, output)
+        self.assertIn("by hand", output)
+        self.assertEqual(text, settings.read_text(encoding="utf-8"), "the file was written anyway")
 
     def test_sync_with_no_settings_file_is_a_sentence_not_a_traceback(self):
         root = self.project()
