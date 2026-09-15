@@ -187,6 +187,12 @@ From the encyclopedia's title policy, for titles, headings and categories alike.
 
 - **A page title** is the thing the page is about: **Refunds**, **Sessions**, **Nightly run**. No leading
   "The" unless it is part of the name.
+- **A subtitle** is a short description naming the specific things the page covers, in lower case, so a
+  reader choosing between pages in search can tell them apart: **word limits for a page, an intent and the
+  goals page**, not "how long a page may be". It never opens with How, What, Where, Why or When, never
+  lets a vague word stand in for a thing ("and other drawings", "here", "this machine"), and is never a
+  slogan ("labels, not questions"). The gate refuses one that opens with a question word. A reference
+  page's subtitle is the software's own help line, exactly.
 - **A heading** is the same, one level down. It is never a question: "Where it is stored" is the writer
   wondering what belongs there, and the reader wanted **Storage**. It is never a verdict: "Fast enough to
   matter", "Important notes" and "Overview" rate the contents instead of naming them. The gate refuses a

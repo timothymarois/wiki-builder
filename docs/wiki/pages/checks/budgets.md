@@ -1,6 +1,6 @@
 +++
 title = "Reading budgets"
-subtitle = "how long a page may be"
+subtitle = "word limits for a page, an intent and the goals page"
 status = "approved"
 categories = ["Refusals"]
 intent = """

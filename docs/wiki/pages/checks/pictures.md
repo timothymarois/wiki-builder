@@ -1,6 +1,6 @@
 +++
 title = "Pictures"
-subtitle = "a picture of something that still exists"
+subtitle = "a picture refused once the files it depicts change"
 status = "approved"
 categories = ["Refusals"]
 intent = """

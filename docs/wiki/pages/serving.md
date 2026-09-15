@@ -1,6 +1,6 @@
 +++
 title = "Local server"
-subtitle = "reading the wiki on this machine"
+subtitle = "a local server for the built site and the files its references name"
 status = "approved"
 intent = """
 The local server exists so that following a citation lands on the code it names, readable in the browser,

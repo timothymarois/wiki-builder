@@ -1,6 +1,6 @@
 +++
 title = "Authentication"
-subtitle = "a sign-in in front of a wiki published on Cloudflare"
+subtitle = "Cloudflare Access or a password prompt in front of a published wiki"
 status = "approved"
 intent = """
 This guide exists so that a project can deploy its wiki on Cloudflare behind a sign-in in the browser, so

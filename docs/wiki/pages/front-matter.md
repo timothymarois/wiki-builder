@@ -33,7 +33,7 @@ page is for and how it is laid out is described on [Pages](pages.md), and the fi
 |---|---|---|---|
 | `title` | string | required | the page's name, at its top and in the sidebar[^fields] |
 | `intent` | string | required | what the thing is for, at most `budget.intent` words[^budget] |
-| `subtitle` | string | empty | a line under the title[^shown] |
+| `subtitle` | string | empty | a short description under the title, naming the things the page covers; refused if it opens with a question word[^shown][^subtitle] |
 | `status` | string | `"draft"` | `"approved"` approves the page; any other value leaves it a draft[^status] |
 | `goals` | true or false | true | `false` keeps the intent off the goals page and excuses the page from the checks that its sentences and infobox rows cite[^goals] |
 | `audience` | string | `"internal"` | `"user"` puts the page in the build `wiki user` makes[^audience] |
@@ -89,6 +89,7 @@ Refunds exist so that a customer who was charged wrongly gets their money back w
     it is absent; `read_pages()` in `src/builder/build.py` refuses an intent longer than that.
 [^shown]: `src/builder/build.py` — `read_pages()` leaves `subtitle` and `hatnote` empty when absent, and
     `render_page()` fills `template.html` with the subtitle under the title and the hatnote above the text.
+[^subtitle]: `src/builder/build.py` — `heading_problems()` refuses a `subtitle` that `QUESTION_WORD` matches.
 [^status]: `src/builder/build.py` — `write_site()` renders a page as a draft when its `status` is anything
     but `"approved"`.
 [^goals]: `src/builder/build.py` — `goals_order()` leaves out a page whose `goals` is false, and

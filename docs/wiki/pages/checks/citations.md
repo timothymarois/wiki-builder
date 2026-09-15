@@ -1,6 +1,6 @@
 +++
 title = "Citations"
-subtitle = "every statement traced to its source"
+subtitle = "a citation or the missing mark on every sentence, table row and infobox row"
 status = "approved"
 categories = ["Refusals"]
 intent = """
