@@ -96,14 +96,28 @@
   }
 
   // --- diagrams ------------------------------------------------------------------------------------------
-  // Mermaid is loaded only on a page that has a diagram. It draws in the page's theme -- dark when the reader
+  // Mermaid is several megabytes, so it is fetched only on a page that has a diagram, and only once a diagram
+  // nears the screen: search, the menu and copying work at once. It draws in the page's theme -- dark when the reader
   // chose dark, or chose nothing and their system is dark -- and draws again whenever that changes. A drawn
   // diagram no longer holds the text it was written in, so each one's text is kept before the first drawing.
-  var diagrams = window.mermaid ? Array.prototype.slice.call(document.querySelectorAll("pre.mermaid")) : [];
+  var diagrams = typeof WIKI_MERMAID !== "undefined"
+    ? Array.prototype.slice.call(document.querySelectorAll("pre.mermaid")) : [];
   var diagramText = diagrams.map(function (pre) { return pre.textContent; });
+  // idle until a diagram nears the screen, loading while the script arrives, ready once it can draw.
+  var mermaidState = "idle";
+
+  function loadMermaid() {
+    if (mermaidState !== "idle") { return; }
+    mermaidState = "loading";
+    var script = document.createElement("script");
+    script.src = WIKI_MERMAID;
+    script.onload = function () { mermaidState = "ready"; drawDiagrams(); };
+    script.onerror = function () { mermaidState = "idle"; };
+    document.head.appendChild(script);
+  }
 
   function drawDiagrams() {
-    if (!diagrams.length) { return; }
+    if (!diagrams.length || mermaidState !== "ready") { return; }
     var chosen = root.getAttribute("data-theme");
     var dark = chosen === "dark" ||
       (!chosen && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
@@ -115,7 +129,20 @@
     window.mermaid.run({ nodes: diagrams });
   }
 
-  drawDiagrams();
+  if (diagrams.length) {
+    if ("IntersectionObserver" in window) {
+      // 600px ahead of the screen, so a diagram is usually drawn by the time the reader reaches it.
+      var nearing = new IntersectionObserver(function (entries) {
+        if (entries.some(function (entry) { return entry.isIntersecting; })) {
+          nearing.disconnect();
+          loadMermaid();
+        }
+      }, { rootMargin: "600px 0px" });
+      diagrams.forEach(function (pre) { nearing.observe(pre); });
+    } else {
+      loadMermaid();
+    }
+  }
   if (diagrams.length && window.matchMedia) {
     // In the automatic theme the system decides, so a system change redraws too.
     var system = window.matchMedia("(prefers-color-scheme: dark)");

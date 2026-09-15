@@ -43,7 +43,7 @@ as a wiki table, and scrolls inside its own frame when it is wider than the scre
 indented and spaced like the references at the foot of the page.[^lists] A link that leaves the wiki
 opens in a new tab and ends in an arrow.[^outside] A flowchart or other diagram written in a `mermaid` code block is drawn as a
 diagram, the way GitHub draws one, and the page's markdown keeps the block as written.[^diagram] The drawing needs no network,
-and only a page with a diagram loads it.[^diagram] How to write one is described on
+and a page loads it only as a diagram nears the screen.[^diagram] How to write one is described on
 [Diagrams](../pages/diagrams.md).
 
 A picture written in the page's markdown is captioned with the title given after its address, or with its
@@ -92,8 +92,9 @@ button.[^narrow]
     `src/builder/assets/wiki.css` draws both.
 [^lists]: `src/builder/assets/wiki.css` — `.art :where(ul,ol)` and `.art :where(li)`.
 [^diagram]: `src/builder/build.py` — `write_site()` turns a block matching `MERMAID_BLOCK` into
-    `pre.mermaid`, gives that page the `MERMAID` script, and copies the script only when a page uses it;
-    `src/builder/assets/wiki.js` draws every `pre.mermaid` in the page's theme.
+    `pre.mermaid`, names the `MERMAID` script for that page, and copies the script only when a page uses
+    it; `src/builder/assets/wiki.js` — `loadMermaid()` fetches it as a diagram nears the screen, and
+    `drawDiagrams()` draws every `pre.mermaid` in the page's theme.
 [^footer]: `src/builder/build.py` — `write_site()` gives each page `page_stats()`, built from its word count
     and `citation_counts()`, and leaves the citation counts out for the `"user"` audience and for a page that says `goals = false`; `render_page()`
     writes them into the footer, after `Last updated` and `Last audited`, which `write_site()` passes as

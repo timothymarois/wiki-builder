@@ -48,14 +48,15 @@ flowchart LR
 
 ## Drawing
 
-Only a page with a mermaid block loads Mermaid, and its block is drawn in three steps.[^block][^script][^theme]
+Only a page with a mermaid block loads Mermaid, and only as a diagram nears the screen; its block is drawn
+in three steps.[^block][^script][^theme]
 
 ```mermaid
 flowchart LR
   accTitle: Diagram drawing
-  accDescr: When a page is built, a page without a mermaid block is shown without Mermaid. A page with one has the block marked as a diagram, loads Mermaid, and has the diagram drawn in its theme.
+  accDescr: When a page is built, a page without a mermaid block is shown without Mermaid. A page with one has the block marked as a diagram, loads Mermaid once the diagram nears the screen, and has the diagram drawn in its theme.
   built(["Page built"]) --> has{"Mermaid block<br/>on the page?"}
-  has -- "Yes" --> mark["Mark it as a diagram"] --> load["Load Mermaid on the page"]
+  has -- "Yes" --> mark["Mark it as a diagram"] --> load["Load Mermaid near the screen"]
   load --> draw["Draw it in the page's theme"] --> shown(["Diagram shown"])
   has -- "No" --> plain(["Page shown without Mermaid"])
 ```
@@ -86,8 +87,9 @@ diagrams are on [Checks](../checks.md), [Citations](../checks/citations.md) and
 [^github]: GitHub Docs — [Creating diagrams](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams):
     GitHub draws a fenced code block marked `mermaid` as a diagram.
 [^script]: `src/builder/build.py` — `MERMAID` and `MERMAID_LICENSE` sit in the package's assets;
-    `write_site()` gives a page the script only when it has a diagram, and copies both into the site only
-    when some page does.
+    `write_site()` names the script as `WIKI_MERMAID` only on a page with a diagram, and copies both into
+    the site only when some page does; `src/builder/assets/wiki.js` — `loadMermaid()` fetches it once a
+    diagram comes within 600 pixels of the screen.
 [^theme]: `src/builder/assets/wiki.js` — `drawDiagrams()` keeps each diagram's text, sets Mermaid's theme
     to dark when the page's theme is dark or follows a dark system, and draws every `pre.mermaid`; the
     theme button and a change in the system's colour scheme call it again.
