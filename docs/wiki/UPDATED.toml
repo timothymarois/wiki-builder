@@ -133,7 +133,7 @@ audited = "2026-09-14"
 
 ["pages/diagrams"]
 updated = "2026-09-14"
-digest = "584f013f4d88cfa4987ccb7ba1926c52cae58afeb3505235739c9b100755f048"
+digest = "92e658e1b71cd92d730664534204c40aa0dbffccfe51357f636978f68eb8f028"
 audited = "2026-09-14"
 
 ["pages/markdown"]
@@ -170,7 +170,7 @@ audited = "2026-09-14"
 
 ["site/layout"]
 updated = "2026-09-14"
-digest = "e0d6c808c7c4ccfbc78422011b34b1c1f41aa4c8b79c62cc3e9663138b8c1f60"
+digest = "74633ed635f04858b92b501fb60e47a86ad56dda54bece1eea37a4d6ddf272e4"
 audited = "2026-09-14"
 
 ["skill"]

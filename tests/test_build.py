@@ -883,7 +883,10 @@ class WikiTests(unittest.TestCase):
         page = (self.out / "thing/index.html").read_text(encoding="utf-8")
         self.assertIn('<pre class="mermaid">flowchart LR\n  a --&gt; b{ok?}\n  b -- yes --&gt; c\n</pre>', page)
         self.assertNotIn("language-mermaid", page, "the diagram was left as a code sample")
-        self.assertIn('<script src="../assets/%s"></script>' % wiki.MERMAID, page)
+        # Mermaid is several megabytes, so the page names it for its script to fetch when a diagram nears the
+        # screen, and never loads it with a tag that holds up every script after it.
+        self.assertIn('<script>const WIKI_MERMAID="../assets/%s";</script>' % wiki.MERMAID, page)
+        self.assertNotIn('<script src="../assets/%s"' % wiki.MERMAID, page)
         self.assertTrue((self.out / "assets" / wiki.MERMAID).is_file())
 
     def test_a_diagram_leaves_the_page_whole(self):

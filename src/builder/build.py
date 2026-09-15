@@ -1054,8 +1054,10 @@ def write_site(root, out, audience, link_root, today, record, wiki):
         # a page carrying one loads the script.
         body, diagrams = MERMAID_BLOCK.subn(r'<pre class="mermaid">\1</pre>', body)
         diagrams_used = diagrams_used or bool(diagrams)
-        diagram_script = ('<script src="%s"></script>' % relative_file(directory, "assets/" + MERMAID)
-                          if diagrams else "")
+        # Mermaid is several megabytes, so a page only names it: the page's own script fetches it once a
+        # diagram nears the screen, and nothing else on the page waits for it.
+        diagram_script = ('<script>const WIKI_MERMAID=%s;</script>'
+                          % json.dumps(relative_file(directory, "assets/" + MERMAID)) if diagrams else "")
         # A page's own table takes the wiki's table style, and scrolls inside its wrapper on a narrow
         # screen rather than widening the page.
         body = body.replace("<table>", '<div class="wt"><table class="w">').replace("</table>",
