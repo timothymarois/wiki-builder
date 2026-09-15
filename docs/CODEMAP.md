@@ -77,9 +77,9 @@ inside it.
 them inside the package; a checkout leaves them where they were written, and `build.skill_dir()` finds
 them either way.
 
-## Tests (`tests/` — 191 cases)
+## Tests (`tests/` — 208 cases)
 
-`tests/test_build.py` (1988 lines). Each case builds a small wiki in a temporary directory, breaks exactly
+`tests/test_build.py` (2199 lines). Each case builds a small wiki in a temporary directory, breaks exactly
 one rule, and asserts the tool names it. Run them with:
 
 ```sh
@@ -87,7 +87,7 @@ uv run --with mistune==3.3.4 python -m unittest discover -s tests -t tests
 ```
 
 Two classes carry properties rather than cases: `ServingTests`, that a cited file is shown rather than
-downloaded and that nothing is cached; and `PackageTests`, that neither the code nor the skill names
+downloaded, that nothing is cached and that no hidden file is served; and `PackageTests`, that neither the code nor the skill names
 anything about any project.
 
 ## What a project looks like

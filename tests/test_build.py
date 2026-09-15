@@ -1122,6 +1122,30 @@ class WikiTests(unittest.TestCase):
         self.assertNotIn("<script>alert(1)</script>", page)
         self.assertIn("&lt;script&gt;alert(1)&lt;/script&gt;", page)
 
+    def test_an_infobox_group_marked_internal_is_left_out_of_a_user_build(self):
+        # A group takes the page's audience unless it names its own, so a page for users can keep one group
+        # of internal facts out of what users see.
+        self.write("thing", PAGE.replace('categories = ["Things"]', 'categories = ["Things"]\naudience = "user"')
+                   .replace(']\n+++\n', ']\n\n[[infobox]]\ngroup = "Internals"\naudience = "internal"\nrows = [\n'
+                                        '  { label = "Table", value = "things", cite = "why" },\n]\n+++\n'))
+        self.build()
+        internal = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertIn('<div class="grp">Internals</div>', internal)
+        self.build("user")
+        user = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertIn('<div class="grp">Facts</div>', user)
+        self.assertNotIn('<div class="grp">Internals</div>', user, "an internal group reached a user build")
+
+    def test_a_draft_for_users_is_built_for_users_under_its_banner(self):
+        user = 'categories = ["Things"]\naudience = "user"'
+        self.write("thing", PAGE.replace('categories = ["Things"]', user))
+        self.write("thing/part", PAGE.replace('status = "approved"\n', "").replace("A thing", "A part")
+                   .replace('categories = ["Things"]', user))
+        self.build("user")
+        part = self.out / "thing/part/index.html"
+        self.assertTrue(part.is_file(), "a draft marked for users was left out of the user build")
+        self.assertIn('<p class="hat draft"><b>This page is a draft.</b>', part.read_text(encoding="utf-8"))
+
     def test_a_draft_is_not_in_the_collected_goals(self):
         self.write("proposal", PAGE.replace('status = "approved"\n', "")
                    .replace("A thing exists so that something else can happen.", "A proposal is made."))
@@ -2037,6 +2061,24 @@ class PackageTests(unittest.TestCase):
 
     def shipped(self, name="SKILL.md"):
         return (wiki.SKILL / name).read_text(encoding="utf-8")
+
+    def test_sync_follows_the_skills_folder_a_project_already_has(self):
+        # .agents/skills wins where both exist, because .claude/skills is often a link to it; with neither,
+        # the skill goes to .claude/skills.
+        for folders, expected in (((".agents/skills", ".claude/skills"), ".agents/skills"),
+                                  ((".claude/skills",), ".claude/skills"),
+                                  ((), ".claude/skills")):
+            with self.subTest(folders=folders):
+                root = self.project()
+                (root / ".agents/skills").rmdir()
+                for folder in folders:
+                    (root / folder).mkdir(parents=True, exist_ok=True)
+                status, output = self.sync(root)
+                self.assertEqual(0, status, output)
+                self.assertTrue((root / expected / cli.SKILL_NAME / "SKILL.md").is_file(),
+                                f"the skill did not go to {expected}")
+                for other in sorted({".agents/skills", ".claude/skills"} - {expected}):
+                    self.assertFalse((root / other / cli.SKILL_NAME).exists(), f"the skill also went to {other}")
 
     def test_sync_puts_the_skill_where_it_is_told(self):
         root = self.project()
