@@ -163,8 +163,10 @@
   // scrolled, Tab stays inside it, Escape, Close or a click on the backdrop closes it, and closing puts focus
   // back on the picture or link that opened it.
   //
-  // While focus is inside a PDF's frame, the browser's own PDF viewer takes every key press, so Escape cannot
-  // reach the dialog from there. Close stays in view above the frame, and Tab still leads back to it.
+  // Escape closes the dialog unless focus is inside a PDF's frame, where the browser's own PDF viewer takes the
+  // keyboard and Escape never reaches the page. That is accepted rather than worked around: the frame stays
+  // focusable, so a reader can scroll and search the PDF with the keyboard, and Close is always in view above it,
+  // with Tab leading back to it.
   var dialogs = typeof HTMLDialogElement === "function" && "showModal" in HTMLDialogElement.prototype;
   var dialog = null;
   var opener = null;
@@ -178,8 +180,10 @@
 
   // A stop at each end of the dialog sends focus round to the control at the other end. A key listener cannot
   // do this: Tab pressed inside a PDF's frame never reaches the page, but the focus it moves lands on a stop.
+  // A stop is empty and hands focus on the instant it receives it, so a screen reader has nothing to announce
+  // there. It is not hidden from one either: a focusable element hidden that way is one it could land on unnamed.
   function stop(toLast) {
-    var edge = element("span", { "class": "edge", tabindex: "0", "aria-hidden": "true" });
+    var edge = element("span", { "class": "edge", tabindex: "0" });
     edge.addEventListener("focus", function () {
       var controls = dialog.querySelectorAll("a[href], button, iframe");
       controls[toLast ? controls.length - 1 : 0].focus();
@@ -191,16 +195,20 @@
     if (dialog) { return dialog; }
     dialog = element("dialog", { "class": "lightbox" });
     document.body.appendChild(dialog);
-    // The dialog covers the window, so a click that lands on the dialog itself is a click beside what it shows.
+    // The dialog covers the window, so a click that lands on the dialog itself is a click beside what it shows. It
+    // closes the dialog only when the press began there too: a press on a title or a caption, dragged out to
+    // select its text, ends on the dialog without being a click beside anything.
+    var pressed = false;
+    dialog.addEventListener("pointerdown", function (event) { pressed = event.target === dialog; });
     dialog.addEventListener("click", function (event) {
-      if (event.target === dialog) { dialog.close(); }
+      if (pressed && event.target === dialog) { dialog.close(); }
+      pressed = false;
     });
     dialog.addEventListener("close", function () {
       root.classList.remove("lightbox-open");
       // Emptied, so a PDF still loading stops, and the next opening starts clean.
       dialog.textContent = "";
       dialog.removeAttribute("aria-label");
-      dialog.removeAttribute("aria-labelledby");
       if (opener) { opener.focus(); opener = null; }
     });
     return dialog;
@@ -275,12 +283,13 @@
     actions.appendChild(element("a", { "class": "act", href: link.href, download: "" }, "Download"));
     actions.appendChild(shut);
     var bar = element("div", { "class": "bar" });
-    bar.appendChild(element("h2", { id: "lightbox-title" }, name));
+    bar.appendChild(element("h2", {}, name));
     bar.appendChild(actions);
     var sheet = element("div", { "class": "sheet" });
     sheet.appendChild(bar);
     sheet.appendChild(element("iframe", { title: name + " (PDF)", src: link.href }));
-    lightbox().setAttribute("aria-labelledby", "lightbox-title");
+    // Named by the title's text rather than by an id, which could match a heading id the build writes.
+    lightbox().setAttribute("aria-label", name);
     show("document", link, [sheet], shut);
   });
 

@@ -174,11 +174,11 @@ audited = "2026-09-15"
 
 ["pages/pdfs"]
 updated = "2026-09-15"
-digest = "1f0fc08937e0061a80dcfdb2726bd2d2b5961020a2f8de1ea259c053fde3cdec"
+digest = "467e0ab3f161f3b09989bbab69a895a58921ec5ade16b5a3e44bb6cd08979d13"
 
 ["pages/pictures"]
 updated = "2026-09-15"
-digest = "6466dd27cf1b26592ca6813815f84bf1a74c612687803cc9644a966f6aa9743e"
+digest = "0e74679eaa1dd5ad1381a9a1b132e6b67512861ff64f2e13f810af26db67131f"
 audited = "2026-09-15"
 
 ["pictures-toml"]

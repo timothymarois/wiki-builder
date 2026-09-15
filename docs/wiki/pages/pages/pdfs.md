@@ -65,10 +65,14 @@ click, a middle click, or a click with Ctrl, ⌘, Shift or Alt held does what th
 such as opening the PDF in a new tab.[^native] It is the lightbox pictures open in, described on
 [Pictures](pictures.md).
 
-Escape, `Close` or a click on the backdrop closes the lightbox, and focus goes back to the link.[^dialog]
-While it is open, the page behind cannot be used or scrolled, and Tab moves only between its controls and the
-PDF.[^dialog] **While focus is inside the PDF, the browser's PDF viewer takes every key press, so Escape
-cannot close the lightbox from there**, and `Close` stays in view above the PDF.[^frame]
+`Close` or a click on the backdrop closes the lightbox, and focus goes back to the link.[^dialog] A click
+closes it only when the press began on the backdrop too, so dragging out from the title to select it does
+not.[^dialog] While it is open, the page behind cannot be used or scrolled, and Tab moves only between its
+controls and the PDF.[^dialog]
+
+**Escape closes the lightbox unless focus is inside the PDF itself**, where the browser's PDF viewer takes the
+keyboard.[^frame] `Close` is always in view above the PDF.[^frame] The PDF stays in the Tab order, so a reader
+can scroll and search it with the keyboard.[^frame]
 
 **A phone or tablet opens the PDF itself instead**, and so does a browser with no PDF viewer of its own,
 because Safari on iOS draws only the first page of a PDF inside a page and older Chrome on Android offers to
@@ -95,9 +99,10 @@ download it.[^touch]
     the first, when Ctrl, ⌘, Shift or Alt is held, and for a link to another site.
 [^dialog]: `src/builder/assets/wiki.js` — `show()` opens one native `dialog` with `showModal()` and marks the
     page `lightbox-open`, which `src/builder/assets/wiki.css` stops scrolling; `stop()` keeps Tab inside the
-    dialog, a click on the dialog itself closes it, and its `close` listener in `lightbox()` puts focus back on
-    the opener.
-[^frame]: `src/builder/assets/wiki.js` — the comment above the lightbox, and `stop()`, which catches Tab
-    leaving the frame; `src/builder/assets/wiki.css` — `.lightbox .bar` sits above the `iframe`.
+    dialog, a click on the dialog itself closes it when its `pointerdown` landed there too, and its `close`
+    listener in `lightbox()` puts focus back on the opener.
+[^frame]: `src/builder/assets/wiki.js` — the comment above the lightbox states it, `showModal()` closes the
+    dialog on Escape the page receives, and `stop()` counts the `iframe` among the controls Tab reaches and
+    catches Tab leaving it; `src/builder/assets/wiki.css` — `.lightbox .bar` holds `Close` above the `iframe`.
 [^touch]: `src/builder/assets/wiki.js` — `showsPdfs()` is false when `(pointer: coarse)` matches or
     `navigator.pdfViewerEnabled` is false, and its comment gives the reason.
