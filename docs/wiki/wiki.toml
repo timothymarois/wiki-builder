@@ -36,7 +36,11 @@ pages = ["commands", "wiki-toml", "front-matter", "pictures-toml"]
 
 [[section]]
 title = "Agents"
-pages = ["skill", "installation-prompt", "review-prompt", "organization-prompt"]
+pages = ["skill"]
+
+[[section]]
+title = "Agent prompts"
+pages = ["installation-prompt", "review-prompt", "organization-prompt"]
 
 # Written by `wiki sync`. Which release of the tool these pages
 # were written against; `wiki check` says so when they differ.

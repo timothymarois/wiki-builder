@@ -1,7 +1,7 @@
 +++
 title = "Organization prompt"
 subtitle = "a prompt that has an agent review how a wiki's pages are grouped and laid out"
-status = "draft"
+status = "approved"
 goals = false
 intent = """
 The organization prompt exists so that an owner can have any agent review how a project's wiki is
