@@ -56,12 +56,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return None
         # The project holds what no page links to and nobody should read through a browser: a .env, and
         # the remotes and credentials under .git. Decoded first, so %2Egit is refused as .git is, and judged
-        # again where a link in the project really leads, so a link cannot reach .git or leave the project.
+        # again where a link in the project really leads, so a link cannot reach .git or a folder such as
+        # ~/.ssh. Inside the project only the parts below it count, so a project kept in a hidden folder
+        # is still served, and so is a site folder linked from elsewhere.
         path = urllib.parse.unquote(urllib.parse.urlsplit(self.path).path)
         root = Path(self.directory).resolve()
         target = Path(self.translate_path(self.path)).resolve()
-        if (any(part.startswith(".") for part in path.split("/")) or not target.is_relative_to(root)
-                or any(part.startswith(".") for part in target.relative_to(root).parts)):
+        real = target.relative_to(root).parts if target.is_relative_to(root) else target.parts
+        if any(part.startswith(".") for part in path.split("/")) or any(part.startswith(".") for part in real):
             self.send_error(404, "File not found")
             return None
         return super().send_head()

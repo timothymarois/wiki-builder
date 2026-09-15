@@ -19,7 +19,7 @@ DEFAULT_BUDGET = {"page": 500, "intent": 120, "goals": 3500, "calibrated": False
 TABLE_HEADER = re.compile(r"^\s*\[\[?\s*([^\[\]]+?)\s*\]\]?\s*(?:#.*)?$")
 VERSION_SETTING = re.compile(r"^\s*version\s*=")
 # The same line split around its value, so the value alone is replaced and a comment after it is kept.
-VERSION_VALUE = re.compile(r"""^(\s*version\s*=\s*)(?:"[^"\\]*"|'[^']*')(\s*#.*)?$""")
+VERSION_VALUE = re.compile(r"""^(\s*version\s*=\s*)(?:"(?:[^"\\]|\\.)*"|'[^']*')(\s*(?:#.*)?)$""")
 
 
 class WikiError(Exception):
@@ -33,7 +33,7 @@ def read_config(wiki_dir):
         raise WikiError(f"there is no {CONFIG} in {wiki_dir}")
     try:
         loaded = tomllib.loads(path.read_text(encoding="utf-8"))
-    except tomllib.TOMLDecodeError as error:
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as error:
         raise WikiError(f"{CONFIG} is unreadable: {error}") from error
 
     site = loaded.get("site", {})
@@ -68,9 +68,12 @@ def record_version(wiki_dir, version):
     except (tomllib.TOMLDecodeError, UnicodeDecodeError) as error:
         raise WikiError(f"{CONFIG} is unreadable: {error}") from error
     ending = "\r\n" if "\r\n" in text else "\n"
-    # Only inside [tool]: a version line in any other table is another setting.
+    # Only inside [tool]: a version line in any other table is another setting. Each line keeps the ending
+    # it was written with, and a line added takes the file's.
     setting = 'version = "%s"' % version
-    lines = text.splitlines()
+    rows = text.splitlines(keepends=True)
+    lines = [row.rstrip("\r\n") for row in rows]
+    ends = [row[len(line):] for row, line in zip(rows, lines)]
     table, header, written = None, None, False
     for index, row in enumerate(lines):
         heading = TABLE_HEADER.match(row)
@@ -80,17 +83,24 @@ def record_version(wiki_dir, version):
                 header = index
         elif table == "tool" and VERSION_SETTING.match(row):
             value = VERSION_VALUE.match(row)
-            lines[index] = (value.group(1) + '"%s"' % version + (value.group(2) or "")) if value else setting
+            lines[index] = (value.group(1) + '"%s"' % version + value.group(2)) if value else setting
             written = True
             break
     if not written and header is not None:
+        ends[header] = ends[header] or ending
         lines.insert(header + 1, setting)
+        ends.insert(header + 1, ends[header])
     elif not written:
         while lines and not lines[-1].strip():
             lines.pop()
-        lines += ["", "# Written by `wiki sync`. Which release of the tool these pages",
-                  "# were written against; `wiki check` says so when they differ.", "[tool]", setting]
-    text = ending.join(lines) + ending
+            ends.pop()
+        if ends:
+            ends[-1] = ends[-1] or ending
+        block = ["", "# Written by `wiki sync`. Which release of the tool these pages",
+                 "# were written against; `wiki check` says so when they differ.", "[tool]", setting]
+        lines += block
+        ends += [ending] * len(block)
+    text = "".join(line + end for line, end in zip(lines, ends))
     # Read back before saving: a line edit can be fooled, by a header inside a multi-line string or a
     # [[tool]] list, and the file must then be left as the project wrote it.
     tool = before.get("tool", {})

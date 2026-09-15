@@ -1554,6 +1554,10 @@ class WikiTests(unittest.TestCase):
                          "a picture on its own line is still wrapped in a paragraph")
         self.assertTrue((self.out / "images/thing.png").is_file(), "the picture was not copied")
 
+    def test_a_settings_file_that_is_not_utf8_is_a_sentence_not_a_traceback(self):
+        (self.root / "docs/wiki" / CONFIG).write_bytes(CONFIGURATION.replace("A Wiki", "Caf\xe9").encode("latin-1"))
+        self.refused("wiki.toml is unreadable")
+
     def test_an_unreadable_dates_file_is_a_sentence_not_a_traceback(self):
         (self.root / "docs/wiki" / wiki.DATES).write_text('["thing"]\nupdated = \n', encoding="utf-8")
         self.refused("updated.toml is unreadable")
@@ -1570,6 +1574,29 @@ class WikiTests(unittest.TestCase):
         wiki.write_ledger(images, {"../secret.png": {"depicts": [], "digest": "", "made": "by hand"}})
         self.refused("../secret.png")
         self.assertFalse((self.out / "secret.png").exists())
+
+    def test_a_page_named_with_a_space_and_an_accent_is_linked_and_listed(self):
+        # The markdown parser hands over a link already percent-encoded, so it is decoded before it is looked
+        # up; encoded again, it would name a folder that does not exist.
+        self.write("thing/café notes", PAGE.replace("A thing", "Café notes"))
+        self.write("thing", PAGE.replace("A thing does what it does.[^why]",
+                                         "A thing keeps [notes](thing/caf%C3%A9%20notes.md).[^why]"))
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertIn('href="caf%C3%A9%20notes/index.html"', page)
+        self.assertNotIn('href="caf%C3%A9%20notes/index.html"' + wiki.NEW_PAGE, page, "a page that exists is drawn red")
+        self.assertNotIn("caf%25", page, "an address was percent-encoded twice")
+        self.assertEqual([], wiki.dead_link_problems(self.root))
+        self.assertIn("(thing/caf%C3%A9%20notes/index.md)", (self.out / wiki.AGENT_INDEX).read_text(encoding="utf-8"))
+
+    def test_a_body_picture_named_with_a_space_is_found_and_carried(self):
+        images = self.root / "docs/wiki/images"
+        (images / "my pic.png").write_bytes(b"\x89PNG\r\n")
+        wiki.write_ledger(images, {"my pic.png": {"depicts": [], "digest": "", "made": "by hand"}})
+        self.write("thing", PAGE.replace("A thing does what it does.[^why]", "![A thing](<../images/my pic.png>)"))
+        self.build()
+        self.assertIn('src="../images/my%20pic.png"', (self.out / "thing/index.html").read_text(encoding="utf-8"))
+        self.assertTrue((self.out / "images/my pic.png").is_file(), "the picture was not copied")
 
     def test_a_file_name_cannot_write_into_a_link_or_a_picture(self):
         # A page's address and a picture's are their file names, written into an href or a src. A name holding
@@ -2077,25 +2104,30 @@ class ServingTests(unittest.TestCase):
                 self.assertEqual(status, response.status)
                 self.assertNotIn(b"secret", body)
 
-    def test_a_linked_file_is_served_only_from_where_it_really_is(self):
-        # A link inside the project reaches whatever it points at, so a file is judged by where it really
-        # is: inside a hidden folder, or outside the project, it is not found.
+    def test_a_linked_file_is_judged_by_where_it_really_is(self):
+        # A link in the project reaches whatever it points at, so a file whose real place is a hidden folder
+        # is not found. A site folder linked from elsewhere is still served.
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
         elsewhere = tempfile.TemporaryDirectory()
         self.addCleanup(elsewhere.cleanup)
-        root = Path(directory.name)
+        root, outside = Path(directory.name), Path(elsewhere.name)
         (root / ".git").mkdir()
         (root / ".git/config").write_text("token = secret", encoding="utf-8")
-        (Path(elsewhere.name) / "notes.txt").write_text("secret", encoding="utf-8")
+        (outside / ".ssh").mkdir()
+        (outside / ".ssh/key").write_text("secret", encoding="utf-8")
+        (outside / "site").mkdir()
+        (outside / "site/index.html").write_text("<p>the site</p>", encoding="utf-8")
         (root / "docs").mkdir()
         (root / "docs/gitlink").symlink_to(root / ".git")
-        (root / "docs/elsewhere").symlink_to(Path(elsewhere.name))
+        (root / "docs/keys").symlink_to(outside / ".ssh")
+        (root / "docs/site").symlink_to(outside / "site")
         _, fetch = self.serve_project(root)
-        for address in ("/docs/gitlink/config", "/docs/elsewhere/notes.txt"):
+        for address, status in (("/docs/gitlink/config", 404), ("/docs/keys/key", 404),
+                                ("/docs/site/index.html", 200)):
             with self.subTest(address=address):
                 response, body = fetch(address)
-                self.assertEqual(404, response.status)
+                self.assertEqual(status, response.status)
                 self.assertNotIn(b"secret", body)
 
     def test_the_server_answers_only_a_request_addressed_to_a_local_name(self):
@@ -2310,6 +2342,20 @@ class PackageTests(unittest.TestCase):
         written = settings.read_bytes()
         self.assertIn(f'version = "{wiki_version()}"\r\n'.encode(), written, "the release was not recorded")
         self.assertNotIn(b"\n", written.replace(b"\r\n", b""), "a line ending was changed")
+
+    def test_sync_changes_nothing_on_the_version_line_but_its_value(self):
+        version = wiki_version()
+        for before, after in (('[tool]\r\nversion = "0.0.0"\n', f'[tool]\r\nversion = "{version}"\n'),
+                              ('[tool]\nversion = "a\\"b"  # kept\n', f'[tool]\nversion = "{version}"  # kept\n'),
+                              ('[tool]\nversion = "0.0.0"   \n', f'[tool]\nversion = "{version}"   \n')):
+            with self.subTest(before=before):
+                root = self.project()
+                settings = root / "docs/wiki" / CONFIG
+                head = CONFIGURATION.replace(f'[tool]\nversion = "{version}"\n', "")
+                settings.write_bytes((head + before).encode("utf-8"))
+                status, output = self.sync(root, "--no-skill")
+                self.assertEqual(0, status, output)
+                self.assertEqual((head + after).encode("utf-8"), settings.read_bytes())
 
     def test_sync_keeps_a_comment_beside_the_version(self):
         root = self.project()

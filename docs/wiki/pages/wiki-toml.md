@@ -59,7 +59,7 @@ lists with the rest.[^version]
 | Condition | Message |
 |---|---|
 | the file is missing | `wiki: there is no wiki.toml in /path/to/notes/docs/wiki`[^read] |
-| the file is not valid TOML | `wiki: wiki.toml is unreadable:` and the parser's error[^read] |
+| the file is not valid TOML, or not UTF-8 | `wiki: wiki.toml is unreadable:` and the parser's error[^read] |
 | `site.name` is missing or empty | `wiki: wiki.toml has no site.name`[^read] |
 | there is no `[[section]]` | `wiki: wiki.toml lists no sections, so nothing would be reachable`[^read] |
 | a budget is not a positive whole number | `wiki: wiki.toml: budget.page must be a positive number of words`[^read] |
