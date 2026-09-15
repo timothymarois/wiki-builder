@@ -35,7 +35,7 @@ audited = "2026-09-14"
 
 ["checks/pdfs"]
 updated = "2026-09-15"
-digest = "72f486790dbcc9586a5420713c76aa4c2adc0f797ed76bd5af92185287b48238"
+digest = "7bc3a0033cd0f3c6de39503cf4b0561fe12cc628a9ef86c53bbb7079f0e5709a"
 
 ["checks/pictures"]
 updated = "2026-09-15"

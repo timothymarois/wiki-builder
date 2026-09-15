@@ -1790,10 +1790,13 @@ class WikiTests(unittest.TestCase):
         self.write("thing", PAGE.replace("It does it slowly.[^why]", f"It does it slowly, as {links} say.[^why]"))
 
     def pdf_problems(self):
-        """What `wiki check` says about PDFs, after a build has recorded the dates it would otherwise refuse."""
+        """What `wiki check` says about links to PDFs, after a build has recorded the dates it would otherwise refuse.
+
+        Only link refusals: a sentence quoted for citing nothing can hold a PDF's name too.
+        """
         self.build()
         problems, *_ = wiki.check(self.root)
-        return [problem for problem in problems if ".pdf" in problem]
+        return [problem for problem in problems if " links to " in problem and ".pdf" in problem]
 
     def test_a_build_carries_only_the_pdfs_its_pages_link(self):
         self.pdf("policy.pdf")
@@ -1851,6 +1854,43 @@ class WikiTests(unittest.TestCase):
                 self.assertEqual(1, len(problems), problems)
                 self.assertIn("outside the wiki's files folder", problems[0])
                 self.assertFalse((self.out / "files").exists(), "a PDF named through a folder was published")
+
+    def test_a_pdf_named_with_an_ampersand_is_published(self):
+        # The rendered page writes & as &amp; in an address, so the build has to read it back as &.
+        self.pdf("R&D.pdf")
+        self.link_pdf("../files/R&D.pdf")
+        self.assertEqual([], self.pdf_problems())
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        anchor = re.search(r'<a href="([^"]+)" class="pdf">the policy 1</a> <span class="pdfsize">', page)
+        self.assertIsNotNone(anchor, "the link to R&D.pdf is not a published PDF link")
+        self.assertTrue((self.out / "thing" / anchor.group(1).replace("%26", "&")).is_file(), "R&D.pdf leads nowhere")
+
+    # Every way markdown writes a link, so the check and the build can never judge one differently.
+    PDF_LINK_FORMS = (("a title", 'It does it slowly, as [the policy 1]({} "The policy") says.[^why]'),
+                      ("angle brackets", "It does it slowly, as [the policy 1](<{}>) says.[^why]"),
+                      ("a reference", "It does it slowly, as [the policy 1][pol] says.[^why]\n\n[pol]: {}"),
+                      ("a query", "It does it slowly, as [the policy 1]({}?x=1) says.[^why]"))
+
+    def test_every_form_of_link_to_a_pdf_outside_the_files_folder_is_refused(self):
+        (self.root / "docs/wiki/policy.pdf").write_bytes(b"%PDF-1.4\n")
+        for form, sentence in self.PDF_LINK_FORMS:
+            with self.subTest(form=form):
+                self.write("thing", PAGE.replace("It does it slowly.[^why]", sentence.format("../policy.pdf")))
+                problems = self.pdf_problems()
+                self.assertEqual(1, len(problems), problems)
+                self.assertIn("outside the wiki's files folder", problems[0])
+
+    def test_every_form_of_link_to_a_pdf_in_the_files_folder_is_published(self):
+        self.pdf("policy.pdf")
+        for form, sentence in self.PDF_LINK_FORMS:
+            with self.subTest(form=form):
+                self.write("thing", PAGE.replace("It does it slowly.[^why]", sentence.format("../files/policy.pdf")))
+                self.assertEqual([], self.pdf_problems())
+                page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+                anchor = re.search(r'<a href="([^"]+)" class="pdf"[^>]*>the policy 1</a> <span class="pdfsize">', page)
+                self.assertIsNotNone(anchor, "the link is not a published PDF link")
+                self.assertTrue((self.out / "thing" / anchor.group(1).partition("?")[0]).is_file(),
+                                f"{anchor.group(1)} leads nowhere")
 
     def test_a_pdf_linked_to_a_file_outside_the_files_folder_is_refused(self):
         # A symbolic link is copied as the file it points at: a PDF linked to the project's .env would publish it.

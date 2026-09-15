@@ -13,8 +13,8 @@ published.
 group = "Rules"
 rows = [
   { label = "Refusals", value = "a link outside files, a missing PDF, a PDF over 20 MB", cite = ["outside", "missing", "limit"] },
-  { label = "Scope", value = "every link in the text to a .pdf in the wiki", cite = "scope" },
-  { label = "Exceptions", value = "code, references, addresses outside the wiki", cite = "scope" },
+  { label = "Scope", value = "every PDF link the build writes, in any markdown form", cite = "scope" },
+  { label = "Exceptions", value = "code, addresses outside the wiki", cite = "scope" },
   { label = "Enforcement", value = "listed by wiki check; a link out of the folder stops the build", cite = ["check", "symlink"] },
   { label = "Clearing", value = "the fix each refusal names", cite = "check" },
 ]
@@ -40,13 +40,15 @@ is refused.[^limit]
 
 ## Scope
 
-Every markdown link in a page's text whose file name ends in `.pdf`, in any case, is checked.[^scope]
+**The check judges the links the build writes**, so it and the build never disagree about a link.[^scope]
+Every link whose file name ends in `.pdf`, in any case, is checked, whether markdown writes it plainly, with a
+title, in angle brackets, by reference or with a query after the name.[^scope] A link in a reference is
+checked too, and the citation check also refuses a PDF there, as [Citations](citations.md) describes.[^scope]
 
 ## Exceptions
 
 A link shown in code is not checked, and neither is a link to an address outside the wiki, such as a
-vendor's own PDF.[^scope] A link in a reference is left to the citation check, which refuses a PDF there,
-as [Citations](citations.md) describes.[^scope]
+vendor's own PDF.[^scope]
 
 ## Enforcement
 
@@ -69,7 +71,9 @@ correct the link, or make the PDF smaller.[^check]
 [^missing]: `src/builder/build.py` — `pdf_problems()` refuses a name the `files` folder holds no file for.
 [^limit]: `src/builder/build.py` — `pdf_problems()` refuses a file larger than `PDF_LIMIT`, 20 × `MEGABYTE`,
     and gives its size with `file_size()`.
-[^scope]: `src/builder/build.py` — `pdf_problems()` reads each link `prose_links()` yields, which blanks
-    references and code and skips a settled address, and keeps those `is_pdf()` accepts.
+[^scope]: `src/builder/build.py` — `rewrite_references()` records every link `is_pdf()` accepts, read back
+    from the rendered page with `html.unescape()` and its query set aside, into the `pdf_links` list `check()`
+    hands `build()`; `pdf_problems()` judges each one and finds its line with `link_line()`. Code is rendered
+    as text, and an address outside the wiki matches `SETTLED_LINK` first.
 [^symlink]: `src/builder/build.py` — `filed_pdf()`, called from `rewrite_references()`, raises `WikiError`
     when the file resolves outside the folder.
