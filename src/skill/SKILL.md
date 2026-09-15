@@ -14,7 +14,8 @@ itself.
 **The wiki is written for four readers, in words each of them can follow.** They are the stakeholders and
 the product owner, who decide what the system is for; the engineering team, who build and change it; and,
 in some wikis, its customers. None of them should need to read code to learn what the system does, and a
-page only an engineer can follow has failed three of its four readers. Every rule below serves one job:
+page that only an engineer can follow is unusable to the stakeholders, the product owner and the
+customers. Every rule below serves one job:
 **each reader sees how the system works without reading the code.**
 
 Nothing here is specific to one project. These rules travel with the wiki into any project that installs
@@ -137,10 +138,10 @@ reads it**, and the page serves all four without being written four times.
 
 | Reader | Reads | Comes for | Written so that it |
 |---|---|---|---|
-| Stakeholder | the intent, the lead and the goals page | whether the system does what it was meant to | states the purpose and the true shape in the stakeholder's own words, never the code's |
+| Stakeholder | the intent, the lead and the goals page | whether the system does what it was meant to | states what the system is for and what it does, in words the stakeholder uses, never function or field names |
 | Product owner | the lead, the headings, the infobox and the prose | the system's rules, limits and consequences | states each rule, limit and consequence plainly, with figures a person would notice |
 | Engineering team | the prose, the references and the reference pages | the behaviour to keep, and where it happens | cites every statement to its file and function, and gives each name the software owns exactly |
-| Customer | a page marked `audience = "user"`, built without references | how to use the system, and what to expect from it | describes what the customer does, sees and is refused, and nothing of the project's inside |
+| Customer | a page marked `audience = "user"`, built without references | how to use the system, and what to expect from it | describes what the customer does, sees and is refused, and names no owner, team, agent, branch, function or field |
 
 - **Plain words carry the sentence, and the exact name follows.** Say what happens in ordinary words, then
   give the name a person types or searches for, as code: "A session ends thirty minutes after its last
@@ -150,10 +151,10 @@ reads it**, and the page serves all four without being written four times.
   defines it. A word the stakeholders use themselves needs no definition; a word only the engineering team
   uses does.
 - **One page, not one per reader.** A stakeholder's version and an engineer's version of one thing drift
-  apart, and each goes wrong alone. The parts of a page already separate the readers.
-- **A page for customers speaks to them.** On a page marked `audience = "user"`, nothing assumes the
-  project's inside: no owner, agent, team, branch or internal name, and "you" for the person using the
-  system.
+  apart: a change reaches one of them and not the other. The intent, the lead, the infobox and the
+  references already separate what each reader reads.
+- **A page for customers speaks to them.** A page marked `audience = "user"` names no owner, engineering
+  team, agent, branch, function or field, and calls the person using the system "you".
 
 ## Intent
 
@@ -265,7 +266,8 @@ the section, a sentence's first clause answers the sentence. A reader who stops 
 
 **Pages about things of one kind share one layout**: the brands under a sites page, the providers under a
 payments page, the channels under a notifications page. A reader who has read one member knows where to
-look on every other, and compares two side by side instead of piecing together facts each page chose alone.
+look on every other, and compares two side by side instead of searching each page for a fact the others
+place elsewhere.
 
 - **The layout is designed once, for the family**: the headings every member carries, in one order, and
   the infobox groups and labels every member fills. The owner approves it.
@@ -553,7 +555,8 @@ serving nothing is still wrong, and a page over it is saying its intent has grow
    footnote the prose cites, or is marked missing.
 7. `wiki check` passes.
 8. A reader who has never read the source can follow the whole page, and each reader in
-   [Readers](#readers) finds what they came for in the part written for them.
+   [Readers](#readers) finds, in the parts of the page that table names for them, the facts it says they
+   come for.
 9. The behaviour the change touched, and every requirement stated for it, has a page or a section.
 10. Nothing on the page was invented: every statement traces to the code, the owner's words, or an
     outside service's own documentation.

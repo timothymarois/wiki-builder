@@ -42,8 +42,8 @@ enforced by the [Checks](checks.md).
 ## Readers
 
 The skill names the wiki's four readers, the stakeholders, the product owner, the engineering team and, in
-some wikis, customers, and the part of a page written for each.[^readers] A page is written once for all
-four, and a page for customers holds nothing of the project's inside.[^readers]
+some wikis, customers, and the part of a page written for each.[^readers] One page serves all four; a page
+for customers names no owner, team, agent, function, field or branch.[^readers]
 
 ## Sources
 
@@ -97,7 +97,8 @@ that failure expected rather than surprising.[^version]
     command and an endpoint.
 [^sync]: `src/builder/cli.py` — `sync()`.
 [^readers]: `src/skill/SKILL.md` — the opening paragraph and the Readers section, whose rules keep one page
-    for every reader and keep the project's inside off a page for customers;
+    for every reader and keep the owner, the team, agents, functions, fields and branches off a page for
+    customers;
     `src/skill/references/page-standard.md` — the eighth step of the self-edit.
 [^invent]: `src/skill/SKILL.md` — the Truthfulness section, whose first rule is never to invent, and the
     last item of its definition of done.
