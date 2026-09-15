@@ -53,7 +53,8 @@ the rest.[^missing]
 
 | Condition | Message |
 |---|---|
-| the file is not valid TOML | `wiki: PICTURES.toml is unreadable:` and the parser's error[^read] |
+| the file is not valid TOML, or a picture's entry is not a table | `wiki: PICTURES.toml is unreadable:` and the parser's error, then `; correct it by hand so each picture is a table`[^read] |
+| a table names a link to a file outside `images` | `wiki: PICTURES.toml lists flow.svg, which links to a file outside the images folder; put the picture itself in /path/to/notes/docs/wiki/images`[^missing] |
 | a table is named for a path, not a file name | `wiki: PICTURES.toml has a table for ../flow.svg, which is not a file name; name each table for a picture's file name alone, such as page-anatomy.svg`[^read] |
 | a page shows a picture with no table | `wiki: refunds/ shows flow.svg, which has no entry in PICTURES.toml`[^missing] |
 | a table names a file that is not in `images` | `wiki: PICTURES.toml lists refund-flow.svg, which is not in /path/to/notes/docs/wiki/images`[^missing] |
@@ -74,13 +75,14 @@ blessed = "the template gained a placeholder for the diagram script at the foot 
 
 [^read]: `src/builder/build.py` — `read_ledger()` reads `LEDGER` from the `images` folder inside the wiki
     folder, returns an empty record when the file is missing, and raises when the file is not valid TOML
-    or a table's name is not a file name.
+    or UTF-8, an entry is not a table, or a table's name is not a file name.
 [^keys]: `src/builder/build.py` — `picture_problems()` skips a table with no `depicts` or no `digest`, and
     `subject_digest()` fingerprints each path in `depicts` from the project root.
 [^write]: `src/builder/build.py` — `write_ledger()`, called by `bless()`, writes its own header and, for
     each picture, only `made`, `digest`, `depicts` and `blessed`.
 [^missing]: `src/builder/build.py` — `rewrite_references()` and `render_infobox()` refuse a picture with no
-    table, `write_site()` a table with no file, and `subject_digest()` a path that is missing or empty.
+    table, `write_site()` a table with no file or one linked outside `images`, and `subject_digest()` a
+    path that is missing or empty.
 [^check]: `src/builder/build.py` — `picture_problems()`, called from `check()`.
 [^example]: `docs/wiki/images/PICTURES.toml` — the `page-anatomy.svg` table.
 [^bless]: `src/builder/build.py` — `bless()` sets `digest` to what `subject_digest()` makes of `depicts`

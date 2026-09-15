@@ -33,7 +33,8 @@ rows = [
 
 A **page** is one markdown file in `docs/wiki/pages`, with a few lines of TOML front matter at the
 top.[^front] Every field the front matter can hold is listed on [Front matter](front-matter.md). Where the file sits is both its address and its place in the sidebar: a page in a folder
-named after another page nests beneath that page without being listed anywhere.[^tree] What the build
+named after another page nests beneath that page without being listed anywhere.[^tree] A link to a page or
+picture percent-encodes its file name, so a quote or colon in the name cannot break it.[^encoded] What the build
 makes of a page is described on [Site](site.md).
 
 ## Intent
@@ -108,3 +109,5 @@ on [Diagrams](pages/diagrams.md). The markdown a page is written in is described
     writes a page for each at its end.
 [^source]: `src/builder/build.py` — `render_source()` and the source directory in `write_site()`;
     `read_pages()` refuses a page whose file is named `source.md`, in any folder.
+[^encoded]: `src/builder/build.py` — `relative_directory()` and `relative_file()` percent-encode every
+    address they return.

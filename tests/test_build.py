@@ -1571,6 +1571,61 @@ class WikiTests(unittest.TestCase):
         self.refused("../secret.png")
         self.assertFalse((self.out / "secret.png").exists())
 
+    def test_a_file_name_cannot_write_into_a_link_or_a_picture(self):
+        # A page's address and a picture's are their file names, written into an href or a src. A name holding
+        # a quote would add an attribute of its own, and one holding a colon would read as a scheme.
+        images = self.root / "docs/wiki/images"
+        picture = 'q" onerror="alert(3).png'
+        (images / picture).write_bytes(b"\x89PNG\r\n")
+        wiki.write_ledger(images, {picture: {"depicts": [], "digest": "", "made": "by hand"}})
+        self.write("thing", PAGE.replace('status = "approved"', 'status = "approved"\nimage = %s' % json.dumps(picture)))
+        self.write('thing/x" onmouseover="alert(1)', PAGE.replace("A thing", "A quoted part"))
+        self.write("thing/javascript:alert(2)", PAGE.replace("A thing", "A scheme part"))
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertIn("A quoted part", page, "the page with a quote in its name is not in the sidebar")
+        self.assertNotIn('onmouseover="', page)
+        self.assertNotIn('onerror="', page)
+        self.assertNotIn('href="javascript:', page)
+        self.assertNotIn('"u":"javascript:', page)
+
+    def test_a_picture_linked_to_a_file_outside_the_images_folder_is_refused(self):
+        # Git keeps a symbolic link, and copying one copies what it points at: a picture linked to the
+        # project's .env would publish the secrets in it.
+        images = self.root / "docs/wiki/images"
+        (self.root / ".env").write_text("TOKEN=secret", encoding="utf-8")
+        (images / "diagram.png").symlink_to(self.root / ".env")
+        wiki.write_ledger(images, {"diagram.png": {"depicts": [], "digest": "", "made": "by hand"}})
+        self.write("thing", PAGE.replace("A thing does what it does.[^why]", "![A thing](../images/diagram.png)"))
+        self.refused("outside the images folder")
+        self.assertFalse((self.out / "images/diagram.png").exists(), "the linked file was published")
+
+    def test_a_record_of_the_wrong_shape_is_a_sentence_not_a_traceback(self):
+        wiki_dir = self.root / "docs/wiki"
+        for name, content, fragment in ((wiki.DATES, b'thing = "x"\n', "updated.toml"),
+                                        (wiki.DATES, b'["thing"]\nupdated = "caf\xe9"\n', "updated.toml"),
+                                        ("images/" + wiki.LEDGER, b'"thing.png" = 5\n', "pictures.toml")):
+            with self.subTest(name=name, content=content):
+                (wiki_dir / name).write_bytes(content)
+                try:
+                    self.refused(fragment)
+                finally:
+                    (wiki_dir / name).unlink()
+
+    def test_an_infobox_picture_that_is_not_one_name_is_refused(self):
+        self.write("thing", PAGE.replace('status = "approved"', 'status = "approved"\nimage = ["a.png", "b.png"]'))
+        self.refused("gives its image as")
+
+    def test_cleanup_stops_at_a_linked_folder_inside_the_site(self):
+        self.build()
+        (self.out / "real").mkdir()
+        (self.out / "real/only.txt").write_text("x", encoding="utf-8")
+        (self.out / "linked").symlink_to(self.out / "real")
+        record = self.out / wiki.BUILD_RECORD
+        record.write_text(record.read_text(encoding="utf-8") + "linked/only.txt\n", encoding="utf-8")
+        self.build()
+        self.assertTrue((self.out / "linked").is_symlink(), "cleanup removed a linked folder")
+
     def test_every_picture_name_that_is_not_a_file_name_is_refused(self):
         images = self.root / "docs/wiki/images"
         for name in ("", ".", "..", "sub\\thing.png"):
