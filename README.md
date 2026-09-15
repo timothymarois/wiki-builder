@@ -33,9 +33,9 @@ wiki build     render the pages into docs/wiki/site
 wiki check     every reason the wiki is not fit to read
 wiki coverage  list the source files no page cites
 wiki families  list child pages that share no declared layout
-wiki serve     build, serve, and open a browser at it
+wiki serve     build the site, serve it, and open it in a browser
 wiki sync      write the agent skill into the project, and record the release
-wiki publish   build with clean addresses, for a host
+wiki publish   build the site with clean addresses, for a host
 wiki user      build the reader-facing view, with everything internal removed
 wiki bless     record that a changed picture is still true
 wiki audit     record that pages were checked against the code today

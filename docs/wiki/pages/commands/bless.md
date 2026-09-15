@@ -1,6 +1,6 @@
 +++
 title = "wiki bless"
-subtitle = "record that a picture is still true"
+subtitle = "record that a picture is still true, and why"
 status = "approved"
 intent = """
 wiki bless exists so that a person who has looked at a picture whose subject changed can clear the check,

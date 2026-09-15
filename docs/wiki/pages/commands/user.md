@@ -1,6 +1,6 @@
 +++
 title = "wiki user"
-subtitle = "build the pages marked for users"
+subtitle = "build only the pages marked for users into a folder"
 status = "approved"
 intent = """
 wiki user exists so that the pages meant for people outside the project can be handed to them with

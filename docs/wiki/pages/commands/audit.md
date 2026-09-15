@@ -1,6 +1,6 @@
 +++
 title = "wiki audit"
-subtitle = "record that pages were checked against the code"
+subtitle = "record that pages were checked against the code today"
 status = "approved"
 intent = """
 wiki audit exists so that a reader can see when a page was last checked against the code, and a writer or an

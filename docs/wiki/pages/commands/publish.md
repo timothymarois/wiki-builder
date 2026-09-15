@@ -1,6 +1,6 @@
 +++
 title = "wiki publish"
-subtitle = "build the site for a host"
+subtitle = "build the site with clean addresses, for a host"
 status = "approved"
 intent = """
 wiki publish exists so that a wiki can be put on a web host with addresses that read cleanly. It should

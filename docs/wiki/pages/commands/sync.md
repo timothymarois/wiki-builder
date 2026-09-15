@@ -1,6 +1,6 @@
 +++
 title = "wiki sync"
-subtitle = "bring the skill and the recorded release up to date"
+subtitle = "write the skill into the project and record the release"
 status = "approved"
 intent = """
 wiki sync exists so that a project takes up a release of the tool in one step: the skill its agents read,

@@ -115,13 +115,13 @@ def main(argv=None):
                             ".agents/skills, or .claude/skills")
     skill.add_argument("--no-skill", action="store_true",
                        help="record the release without writing the skill")
-    served = commands.add_parser("serve", parents=[place], help="build, serve, and open a browser at it")
+    served = commands.add_parser("serve", parents=[place], help="build the site, serve it, and open it in a browser")
     served.add_argument("--port", type=int, default=PORT, help=f"the port to serve on; defaults to {PORT}")
     published = commands.add_parser("publish", parents=[place],
-                                     help="build with clean addresses, for a host")
+                                     help="build the site with clean addresses, for a host")
     published.add_argument("out", type=Path, metavar="OUT",
                            help="the folder to build into, relative to the working directory")
-    user = commands.add_parser("user", parents=[place], help="build the user's view into a directory")
+    user = commands.add_parser("user", parents=[place], help="build only the pages marked for users into a folder")
     user.add_argument("out", type=Path, metavar="OUT",
                         help="the folder to build into, relative to the working directory")
     blessed = commands.add_parser("bless", parents=[place],
