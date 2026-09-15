@@ -26,15 +26,39 @@ class WikiError(Exception):
     """Something the person running this must fix, phrased for them rather than for a stack trace."""
 
 
-def read_config(wiki_dir):
-    """Return (site, budget, sections) for a project, or raise saying what is missing."""
+def load_config(wiki_dir):
+    """The settings file as TOML, or raise saying it is missing or unreadable."""
     path = wiki_dir / CONFIG
     if not path.is_file():
         raise WikiError(f"there is no {CONFIG} in {wiki_dir}")
     try:
-        loaded = tomllib.loads(path.read_text(encoding="utf-8"))
+        return tomllib.loads(path.read_text(encoding="utf-8"))
     except (tomllib.TOMLDecodeError, UnicodeDecodeError) as error:
         raise WikiError(f"{CONFIG} is unreadable: {error}") from error
+
+
+def read_coverage(wiki_dir):
+    """The patterns naming the source files `wiki coverage` counts, as [include, exclude], or None.
+
+    A project keeps its source wherever it likes, so the tool counts only the files the project names.
+    """
+    table = load_config(wiki_dir).get("coverage")
+    if table is None:
+        return None
+    patterns = []
+    for key, required in (("include", True), ("exclude", False)):
+        value = table.get(key, None if required else []) if isinstance(table, dict) else None
+        if (not isinstance(value, list) or not all(isinstance(item, str) and item for item in value)
+                or (required and not value)):
+            raise WikiError(f"{CONFIG}: coverage.{key} must list patterns of files relative to the project, "
+                            f'such as {key} = ["src/**/*.py"]')
+        patterns.append(value)
+    return patterns
+
+
+def read_config(wiki_dir):
+    """Return (site, budget, sections) for a project, or raise saying what is missing."""
+    loaded = load_config(wiki_dir)
 
     site = loaded.get("site", {})
     if not site.get("name"):

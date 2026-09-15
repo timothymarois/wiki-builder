@@ -72,7 +72,7 @@ needs [Naming and grammar](references/naming-and-grammar.md) rather than the pag
 3. Open every file and function each page cites, and confirm it does exactly what the sentence says:
    numbers, defaults, names, messages and exit codes.
 4. Inventory the part of the code under review, as [Coverage](#coverage) describes, and name what no page
-   covers.
+   covers. When `wiki.toml` has a `[coverage]` table, start from what `wiki coverage` lists.
 5. Report each finding by page and line, with what is wrong and the fix, most severe first: false,
    undocumented, uncited, stale, writing.
 6. Run `wiki audit` with every page reviewed that had no finding, leaving out any page that says
@@ -520,7 +520,8 @@ owner asks for one.
 - **Every item has a home**: a page, or a section of one. An item only mentioned in passing, without its
   behaviour, is not covered.
 - **Walk it the other way too.** A source file whose behaviour a person meets, and that no reference cites,
-  is usually an undocumented feature.
+  is usually an undocumented feature. `wiki coverage` lists every such file, and every citation of a file
+  that no longer exists, once `wiki.toml` has a `[coverage]` table naming the source files.
 - **A new behaviour gets its page in the same change as its code.** Leave out internals a reader never
   meets, such as private helpers and test code.
 

@@ -1,6 +1,6 @@
 +++
 title = "Commands"
-subtitle = "the eight wiki commands, one page each"
+subtitle = "the nine wiki commands, one page each"
 status = "approved"
 intent = """
 The command reference exists so that a person using the tool can find the command for a job, and exactly
@@ -12,7 +12,7 @@ should be here, and nothing it does not.
 group = "Identity"
 rows = [
   { label = "Program", value = "wiki", cite = "program" },
-  { label = "Commands", value = "build, check, serve, sync, bless, publish, user, audit", cite = "commands" },
+  { label = "Commands", value = "build, check, coverage, serve, sync, bless, publish, user, audit", cite = "commands" },
   { label = "Shared options", value = "--root, --wiki, --help", cite = "place" },
 ]
 
@@ -34,7 +34,7 @@ and [PICTURES.toml](pictures-toml.md).
 Every command is typed the same way, as the program's help prints it.[^program]
 ```sh
 wiki [-h] [--version] [--root ROOT] [--wiki WIKI]
-            {build,check,sync,serve,publish,user,bless,audit} ...
+            {build,check,coverage,sync,serve,publish,user,bless,audit} ...
 ```
 
 ## Commands
@@ -43,6 +43,7 @@ wiki [-h] [--version] [--root ROOT] [--wiki WIKI]
 |---|---|
 | [`wiki build`](commands/build.md) | renders the pages into the site[^commands] |
 | [`wiki check`](commands/check.md) | lists every reason the wiki is not fit to read |
+| [`wiki coverage`](commands/coverage.md) | lists the source files no page cites |
 | [`wiki serve`](commands/serve.md) | builds the site and serves it on this machine |
 | [`wiki sync`](commands/sync.md) | writes the skill into the project and records the release |
 | [`wiki bless`](commands/bless.md) | records that a picture is still true, and why |
@@ -77,7 +78,7 @@ Some messages name only what is wrong, such as `wiki: no wiki at nowhere`,
 
 **Planned:** every message names what to do.{missing}
 
-[^program]: `src/builder/cli.py` — `main()` builds the `wiki` parser and its eight commands, and makes the
+[^program]: `src/builder/cli.py` — `main()` builds the `wiki` parser and its nine commands, and makes the
     command optional; `pyproject.toml` names the program under `[project.scripts]`.
 [^commands]: `src/builder/cli.py` — each command's `help` in `main()`, and what `run()` does for it.
 [^alone]: `src/builder/cli.py` — `run()` treats no command as `"serve"`.
@@ -85,7 +86,8 @@ Some messages name only what is wrong, such as `wiki: no wiki at nowhere`,
     on every command.
 [^wikipath]: `src/builder/build.py` — `wiki_of()` uses a given `--wiki` as it stands, and joins
     `docs/wiki` to the root only when none is given.
-[^version]: `src/builder/cli.py` — `main()` declares `--version` on the program only.
+[^version]: `src/builder/cli.py` — `main()` declares `--version` on the program only, printing `__version__`
+    from `src/builder/__init__.py`.
 [^exit]: `src/builder/cli.py` — `main()` returns 2 when there is no wiki and prints any `WikiError`
     before returning 1; `run()` returns 2 when `guard_output()` refuses; argparse exits 2 on a command
     line it cannot read; `src/builder/serve.py` — `serve()` returns 2 for a port in use.

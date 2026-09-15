@@ -39,7 +39,7 @@ as TOML.[^location]
 |---|---|---|---|
 | `site.name` | string | required | the name at the top of the sidebar and in every tab title[^read] |
 | `site.tagline` | string | none | a line under the name in the sidebar[^read] |
-| `site.url` | string | none | the site's full address, such as `https://docs.example.org`; `wiki publish` and `wiki user` write `sitemap.xml` under it[^url] |
+| `site.url` | string | none | the site's full address; `wiki publish` and `wiki user` write `sitemap.xml` under it[^url] |
 | `[[section]]` | table, repeated | required, at least one | a group in the sidebar, in the order written[^nav] |
 | `section.title` | string | empty | the group's heading[^nav] |
 | `section.pages` | list of page names | none | the pages that start a branch, by path without `.md`, such as `checks/budgets`[^nav] |
@@ -48,6 +48,8 @@ as TOML.[^location]
 | `budget.intent` | whole number | 120 | words an intent may use[^intent] |
 | `budget.goals` | whole number | 3500 | words the collected goals may use[^goals] |
 | `budget.calibrated` | true or false | false | whether the budgets have been measured against a reader[^calibrated] |
+| `coverage.include` | list of patterns | none | the source files [wiki coverage](commands/coverage.md) counts[^coverage] |
+| `coverage.exclude` | list of patterns | empty | files `wiki coverage` leaves out[^coverage] |
 | `tool.version` | string | none | the release `wiki sync` recorded[^version] |
 
 Any other key is ignored.[^read] A section that lists nothing gets no heading in the sidebar.[^nav]
@@ -64,6 +66,7 @@ lists with the rest.[^version]
 | `site.name` is missing or empty | `wiki: wiki.toml has no site.name`[^read] |
 | `site.url` is not a full address | `wiki: wiki.toml: site.url must be a full address starting with https:// or http://, such as https://docs.example.org`[^url] |
 | there is no `[[section]]` | `wiki: wiki.toml lists no sections, so nothing would be reachable`[^read] |
+| `coverage.include` or `coverage.exclude` is not a list, when `wiki coverage` runs | `wiki: wiki.toml: coverage.include must list patterns of files relative to the project, such as include = ["src/**/*.py"]`[^coverage] |
 | a budget is not a positive whole number | `wiki: wiki.toml: budget.page must be a positive number of words`[^read] |
 | a section lists a page that does not exist | `wiki: the navigation lists a page 'nope' that does not exist`[^nav] |
 | a section lists a category no approved page carries | `wiki: the navigation lists a category 'Payments' that no page belongs to`[^nav] |
@@ -111,3 +114,6 @@ version = "0.1.0"
 [^url]: `src/builder/config.py` — `read_config()` refuses a `site.url` that does not start with `https://` or
     `http://`; `src/builder/build.py` — `write_site()` writes `SITEMAP` under it when `build()` is asked for a
     sitemap.
+[^coverage]: `src/builder/config.py` — `read_coverage()` reads `include` and `exclude` from `[coverage]` and
+    refuses anything but a list of patterns; `src/builder/build.py` — `coverage()` counts the files they
+    match.
