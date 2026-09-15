@@ -25,6 +25,7 @@ rows = [
 group = "Rules"
 rows = [
   { label = "Scope", value = "the whole project", cite = "root" },
+  { label = "Hidden files", value = "never served", cite = "hidden" },
   { label = "Reach", value = "this machine only", cite = "loopback" },
   { label = "Caching", value = "none", cite = "cache" },
 ]
@@ -40,13 +41,14 @@ described on [Site](site.md).
 project, and a browser cannot follow a link above the folder it is served from.[^paths]
 
 That means anything that can reach the server can read every file in the project.[^root] For that reason, it
-answers only on this machine.[^loopback]
+answers only on this machine.[^loopback] **A hidden file is never served**: an address with any part
+starting with a full stop, such as `.env` or `.git/config`, is answered with page not found.[^hidden]
 
 ## Sources
 
 Code, settings and markdown files open **as text in the browser** instead of downloading, across 38 common
 file types.[^text] Anything else, such as the site's own pages and pictures, is served as it normally
-would be.[^text] A file named only `.env` has no suffix, so it is sent as a download.[^text]
+would be.[^text]
 
 ## Freshness
 
@@ -71,8 +73,9 @@ so, names `--port` as the way to pick another, and exits with 2.[^port]
     path from the page to that file.
 [^loopback]: `src/builder/serve.py` — `serve()` listens on `127.0.0.1` only.
 [^text]: `src/builder/serve.py` — `shown_as_text()` answers every suffix in `AS_TEXT` as `text/plain`, and
-    leaves every other type to the stock handler, which sends a name with no suffix as
-    `application/octet-stream`.
+    leaves every other type to the stock handler.
+[^hidden]: `src/builder/serve.py` — `Handler.send_head()` answers 404 when any part of the decoded path
+    starts with `.`.
 [^rebuild]: `src/builder/cli.py` — `run()` builds once before it calls `serve()`; `src/builder/serve.py` —
     `serve()` only serves.
 [^cache]: `src/builder/serve.py` — `Handler.end_headers()` sends `Cache-Control: no-store, must-revalidate`,

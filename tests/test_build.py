@@ -1863,6 +1863,37 @@ class ServingTests(unittest.TestCase):
         self.assertEqual(200, response.status)
         self.assertIn("no-store", response.getheader("Cache-Control") or "")
 
+    def test_a_hidden_file_is_never_served(self):
+        # The server shows the whole project, which holds secrets a page never links to: a .env, and every
+        # credential and remote in .git. A path with any part starting with a full stop is not found.
+        import http.client
+        import threading
+
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        root = Path(directory.name)
+        (root / ".env").write_text("TOKEN=secret", encoding="utf-8")
+        (root / ".git").mkdir()
+        (root / ".git/config").write_text("[remote]", encoding="utf-8")
+        (root / "wiki.css").write_text("body{}", encoding="utf-8")
+        server = serving.http.server.ThreadingHTTPServer(
+            ("127.0.0.1", 0), serving.functools.partial(serving.Handler, directory=directory.name))
+        self.addCleanup(server.server_close)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        self.addCleanup(server.shutdown)
+
+        for address, status in (("/.env", 404), ("/.git/config", 404), ("/%2Egit/config", 404),
+                                ("/.git/", 404), ("/wiki.css", 200)):
+            with self.subTest(address=address):
+                connection = http.client.HTTPConnection(*server.server_address)
+                self.addCleanup(connection.close)
+                connection.request("GET", address)
+                response = connection.getresponse()
+                body = response.read()
+                self.assertEqual(status, response.status)
+                self.assertNotIn(b"secret", body)
+
     def test_a_port_in_use_is_a_sentence_not_a_traceback(self):
         import contextlib
         import io

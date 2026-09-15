@@ -13,6 +13,7 @@ import argparse
 import functools
 import http.server
 import sys
+import urllib.parse
 from pathlib import Path
 
 # Anything a reference might point at. A type not listed here keeps whatever the stock handler decides.
@@ -39,6 +40,15 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def guess_type(self, path):
         return shown_as_text(path) or super().guess_type(path)
+
+    def send_head(self):
+        # The project holds what no page links to and nobody should read through a browser: a .env, and
+        # the remotes and credentials under .git. Decoded first, so %2Egit is refused as .git is.
+        path = urllib.parse.unquote(urllib.parse.urlsplit(self.path).path)
+        if any(part.startswith(".") for part in path.split("/")):
+            self.send_error(404, "File not found")
+            return None
+        return super().send_head()
 
     def end_headers(self):
         # Nothing here may be cached. The stock handler sends no cache headers at all, which leaves a
