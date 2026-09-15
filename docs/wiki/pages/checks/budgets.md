@@ -11,11 +11,11 @@ sitting. A page that outgrows its budget should be split rather than squeezed.
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Settings", value = "[budget] in wiki.toml", cite = "config" },
+  { label = "Setting", value = "[budget] in wiki.toml", cite = "config" },
 ]
 
 [[infobox]]
-group = "Defaults"
+group = "Values"
 rows = [
   { label = "Page limit", value = "500 words", cite = "defaults" },
   { label = "Intent limit", value = "120 words", cite = "defaults" },
@@ -25,9 +25,9 @@ rows = [
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Word count", value = "references and code blocks excluded", cite = "count" },
-  { label = "Page overrun", value = "listed by the check", cite = "over" },
-  { label = "Intent overrun", value = "build stopped", cite = "intent" },
+  { label = "Scope", value = "words outside references and code blocks", cite = "count" },
+  { label = "Exceptions", value = "the goals page, held to the goals limit", cite = "goals" },
+  { label = "Enforcement", value = "page overrun listed, intent overrun stopping the build", cite = ["over", "intent"] },
 ]
 +++
 
@@ -35,11 +35,13 @@ A wiki has three limits, counted in words: one for a page, one for an intent, an
 that collects every intent.[^defaults] A project can set its own under `[budget]` in `wiki.toml`, and
 each must be a positive whole number.[^config]
 
-## Counting
+## Scope
 
 A page is counted from its markdown, **leaving out its references and code blocks**, so citing costs
 nothing and a sample to copy, such as a prompt, costs nothing either.[^count]
 A table counts only the words in its cells, not its borders.[^count]
+
+## Exceptions
 
 The goals page is not held to the page limit.[^goals] What it collects is measured against the goals limit
 instead.[^goals]
@@ -49,7 +51,7 @@ instead.[^goals]
 A page over its limit is listed by the check.[^over] **An intent over its limit stops the build** before
 anything else is checked.[^intent] Every build and every check prints each page's word count.[^report]
 
-## Calibration
+### Calibration
 
 Until `[budget]` in `wiki.toml` sets `calibrated = true`, every build and check warns that the numbers are
 a guess that happens to be enforced.[^calibrated] What a project's readers will read is unknown until it is
