@@ -49,7 +49,8 @@ flowchart LR
 ## Drawing
 
 Only a page with a mermaid block loads Mermaid, and only as a diagram nears the screen; its block is drawn
-in three steps.[^block][^script][^theme]
+in three steps.[^block][^script][^theme] When Mermaid fails to arrive, such as over a dropped connection,
+it is fetched again the next time a diagram nears the screen.[^script]
 
 ```mermaid
 flowchart LR
@@ -89,7 +90,8 @@ diagrams are on [Checks](../checks.md), [Citations](../checks/citations.md) and
 [^script]: `src/builder/build.py` — `MERMAID` and `MERMAID_LICENSE` sit in the package's assets;
     `write_site()` names the script as `WIKI_MERMAID` only on a page with a diagram, and copies both into
     the site only when some page does; `src/builder/assets/wiki.js` — `loadMermaid()` fetches it once a
-    diagram comes within 600 pixels of the screen.
+    diagram comes within 600 pixels of the screen, stops watching once it loads, and returns to idle when
+    the fetch fails.
 [^theme]: `src/builder/assets/wiki.js` — `drawDiagrams()` keeps each diagram's text, sets Mermaid's theme
     to dark when the page's theme is dark or follows a dark system, and draws every `pre.mermaid`; the
     theme button and a change in the system's colour scheme call it again.
