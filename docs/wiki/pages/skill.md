@@ -20,7 +20,7 @@ rows = [
 group = "Contents"
 rows = [
   { label = "Instructions", value = "SKILL.md", cite = "contents" },
-  { label = "Worked examples", value = "page-standard.md, reference-standard.md", cite = "contents" },
+  { label = "Worked examples", value = "page-standard.md, page-families.md, reference-standard.md", cite = "contents" },
   { label = "Rule files", value = "naming-and-grammar.md, infobox.md, reference-pages.md, flowcharts.md", cite = "contents" },
 ]
 
@@ -34,10 +34,12 @@ rows = [
 
 The **skill**, `writing-wiki-pages`, is the instructions an agent follows to write a page: `SKILL.md`,
 and a `references` folder beside it.[^files] That folder holds the rules for naming, grammar, infoboxes,
-reference pages and flowcharts, and worked examples of an ordinary page and of two reference pages, a
-command and an endpoint, each written well and badly.[^contents] `SKILL.md` gives the steps for each
-task an agent is handed: a new page, a change in the code, a requirement not built yet, a failing check
-and a review.[^tasks] `wiki sync` copies it into the project, where agents read
+reference pages, page families and flowcharts, and worked examples of an ordinary page, of a family of
+pages, and of two reference pages, a command and an endpoint, each written well and badly.[^contents]
+`SKILL.md` gives the steps for each task an agent is handed: a new page, a change in the code, a
+requirement not built yet, a failing check, a review and organizing pages.[^tasks] **Pages about things of
+one kind share one layout**: the same headings in the same order and the same infobox labels, under a
+parent page that lists and compares them.[^families] `wiki sync` copies it into the project, where agents read
 it.[^sync] Some of the rules it teaches are enforced by the [Checks](checks.md). **It forbids an agent to
 invent**: everything on a page comes from the code, the owner's own words, or an outside service's own
 documentation, and a fact none of these gives is marked `{missing}` or left out.[^invent]
@@ -70,8 +72,11 @@ that failure expected rather than surprising.[^version]
     `SKILL`, which `src/builder/build.py` finds with `skill_dir()`.
 [^contents]: `src/skill/` — `SKILL.md`, and in `references/` the rule files `naming-and-grammar.md`,
     `infobox.md`, `reference-pages.md` and `flowcharts.md` and the worked examples `page-standard.md`, one
-    ordinary page, and `reference-standard.md`, a command and an endpoint.
-[^tasks]: `src/skill/SKILL.md` — the Tasks section, one list of steps for each of those five tasks.
+    ordinary page, `page-families.md`, a family of notification channels, and `reference-standard.md`, a
+    command and an endpoint.
+[^tasks]: `src/skill/SKILL.md` — the Tasks section, one list of steps for each of those six tasks.
+[^families]: `src/skill/SKILL.md` — the Page families section; `src/skill/references/page-families.md` —
+    the layout rules, the parent page, and a family done well and badly.
 [^sync]: `src/builder/cli.py` — `sync()`.
 [^invent]: `src/skill/SKILL.md` — the Truthfulness section, whose first rule is never to invent, and the
     last item of its definition of done.
