@@ -25,7 +25,7 @@ audited = "2026-09-14"
 
 ["checks/families"]
 updated = "2026-09-15"
-digest = "a39c7af173a7bc6a08bb3a7d313231ee9ba167b9ed66ac60d97253c9a3f4058c"
+digest = "d01fd01fe2760c80665060f2f912990b39f9491fe67a693ef7e86bcd398c1849"
 
 ["checks/headings"]
 updated = "2026-09-15"
