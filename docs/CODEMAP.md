@@ -78,9 +78,9 @@ inside it.
 them inside the package; a checkout leaves them where they were written, and `build.skill_dir()` finds
 them either way.
 
-## Tests (`tests/` — 274 cases)
+## Tests (`tests/` — 285 cases)
 
-`tests/test_build.py` (2843 lines). Each case builds a small wiki in a temporary directory, breaks exactly
+`tests/test_build.py` (2984 lines). Each case builds a small wiki in a temporary directory, breaks exactly
 one rule, and asserts the tool names it. Run them with:
 
 ```sh
@@ -100,6 +100,7 @@ docs/wiki/
   wiki.toml          the site's name, the reading budgets, the sidebar
   pages/**.md        a page's path is its address and its place in the sidebar
   images/            pictures, and PICTURES.toml recording what each shows
+  files/             PDFs a page links; a build copies only those
   UPDATED.toml       when each page last changed and was last audited. Written by the tool
   site/              the rendered site. Generated; never committed
 ```

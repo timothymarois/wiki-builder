@@ -71,6 +71,7 @@ flowchart LR
 | A link to a wiki page that does not exist[^deadlinks] | [Site](site.md) |
 | A page longer than its budget[^budget] | [Reading budgets](checks/budgets.md) |
 | A picture whose subject has changed[^pictures] | [Pictures](checks/pictures.md) |
+| A link to a PDF outside the files folder or missing from it, or a PDF over 20 MB[^pdfs] | [PDFs](checks/pdfs.md) |
 | A family member's heading or infobox label its parent's layout does not list, or a member its parent does not link[^families] | [Families](checks/families.md) |
 | A page edited since its date was recorded[^dates] | [Site](site.md) |
 | A wiki written against a different release of the tool[^version] | [Delivery](skill/delivery.md) |
@@ -78,8 +79,8 @@ flowchart LR
 ## Stoppages
 
 Some problems **stop the build** instead of joining the list, such as a missing `wiki.toml` or `goals.md`,
-a page with no title or intent, a page that no reader can reach, a sidebar naming a page that does not exist
-or a picture with no record.[^stop] When that happens, only that one problem is reported, as a single
+a page with no title or intent, a page that no reader can reach, a sidebar naming a page that does not exist,
+a picture with no record or a PDF that links to a file outside the files folder.[^stop] When that happens, only that one problem is reported, as a single
 sentence, and the command exits with 1.[^caught]
 
 [^check]: `src/builder/build.py` — `check()` builds into a temporary folder and gathers every problem;
@@ -93,10 +94,11 @@ sentence, and the command exits with 1.[^caught]
 [^deadlinks]: `src/builder/build.py` — `dead_link_problems()`.
 [^budget]: `src/builder/build.py` — `budget_problems()`.
 [^pictures]: `src/builder/build.py` — `picture_problems()`.
+[^pdfs]: `src/builder/build.py` — `pdf_problems()`.
 [^families]: `src/builder/build.py` — `family_problems()`.
 [^dates]: `src/builder/build.py` — `date_problems()`.
 [^version]: `src/builder/build.py` — `version_problems()`.
 [^stop]: `src/builder/config.py` — `read_config()`; `src/builder/build.py` — `read_pages()`,
-    `write_site()`, `render_nav()`, `render_infobox()`, `rewrite_references()` and `subject_digest()`
-    raise `WikiError`.
+    `write_site()`, `render_nav()`, `render_infobox()`, `rewrite_references()`, `filed_pdf()` and
+    `subject_digest()` raise `WikiError`.
 [^caught]: `src/builder/cli.py` — `main()` catches `WikiError`, prints it, and returns 1.

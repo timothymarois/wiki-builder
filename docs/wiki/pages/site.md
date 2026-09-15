@@ -94,7 +94,7 @@ banner.[^userdraft] Every field is listed on [Front matter](front-matter.md).
 [^removed]: `src/builder/build.py` — `clear_stale()`, called at the end of `write_site()`, unlinks each file
     that `BUILD_RECORD` lists and this build did not write, then writes the list anew; in a site with no
     list, it takes only the files a build names: pages, their markdown copies, `llms.txt`, and whatever
-    sits in `assets` and `images`.
+    sits in `assets`, `images` and `files`.
 [^guard]: `src/builder/cli.py` — `guard_output()` refuses a non-empty folder with no stylesheet from an
     earlier build.
 [^redlink]: `src/builder/build.py` — `rewrite_references()` adds `NEW_PAGE` to a link to a page the wiki
