@@ -1130,6 +1130,22 @@ class WikiTests(unittest.TestCase):
         goals = (self.out / "goals/index.html").read_text(encoding="utf-8")
         self.assertNotIn("A proposal is made.", goals)
 
+    def test_the_goals_date_moves_only_when_the_collected_goals_do(self):
+        # The goals page shows each approved page's title and intent, in sidebar order. A draft is not on
+        # it, so editing a draft's intent leaves the goals page's date where it was.
+        draft = PAGE.replace('status = "approved"\n', "").replace("A thing", "A proposal")
+        self.write("proposal", draft)
+        self.nav(CONFIGURATION.replace('pages = ["thing"]', 'pages = ["thing", "proposal"]'))
+        self.build(today="2026-01-02")
+        self.write("proposal", draft.replace("It should be plain what it is for.", "It should be plainer."))
+        self.build(today="2026-02-03")
+        self.assertEqual("2026-01-02", wiki.read_dates(self.root / "docs/wiki")["goals"]["updated"],
+                         "a draft's intent moved the goals page's date")
+        self.write("thing", PAGE.replace('title = "A thing"', 'title = "A renamed thing"'))
+        self.build(today="2026-03-04")
+        self.assertEqual("2026-03-04", wiki.read_dates(self.root / "docs/wiki")["goals"]["updated"],
+                         "a collected page's title changed and the goals page's date did not move")
+
     def test_a_draft_in_no_navigation_section_is_refused(self):
         # Every page is in the sidebar, so a draft nobody could reach is refused like any other page.
         self.write("proposal", PAGE.replace('status = "approved"\n', "").replace("A thing", "A proposal"))

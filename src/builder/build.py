@@ -1027,7 +1027,7 @@ def write_site(root, out, audience, link_root, today, record, wiki):
 
     changed = []
     for page_id in sorted(pages):
-        digest = page_digest(pages, page_id)
+        digest = page_digest(pages, page_id, sections)
         if dates.get(page_id, {}).get("digest") != digest:
             changed.append(page_id)
             # Updated, not replaced: the day the page was last audited stays true after an edit.
@@ -1736,13 +1736,18 @@ def pointing_problems(root, wiki=None):
     return problems
 
 
-def page_digest(pages, page_id):
+def page_digest(pages, page_id, sections):
     """What a page is, for the purpose of "has it changed": its own markdown, and for the page generated
-    from other pages' intents, those intents too. The template and the stylesheet are deliberately not
-    part of it -- restyling the site is not the page being updated."""
+    from other pages' intents, the titles and intents it collects, in its order. The template and the
+    stylesheet are deliberately not part of it -- restyling the site is not the page being updated.
+
+    The goals page is dated as the full wiki shows it, whichever build is run, so a user build does not
+    move a date the full wiki then moves back. A draft is not collected, so its intent is not part of it.
+    """
     content = pages[page_id]["raw"]
     if page_id == GOALS_ID:
-        content += "\n".join(pages[other]["intent"] for other in sorted(pages))
+        content += "".join("\n%s\n%s" % (pages[other]["title"], pages[other]["intent"])
+                           for other in goals_order(pages, sections, "internal"))
     return hashlib.sha256(content.encode("utf-8")).hexdigest()
 
 
@@ -1755,7 +1760,7 @@ def audit(root, page_names, wiki=None, today=None):
     before any is recorded, so a refused audit records nothing.
     """
     wiki = wiki_of(root, wiki)
-    _, budget, _ = read_config(wiki)
+    _, budget, sections = read_config(wiki)
     pages = read_pages(wiki / "pages", budget["intent"])
     dates = read_dates(wiki)
     today = today or datetime.date.today().isoformat()
@@ -1768,7 +1773,7 @@ def audit(root, page_names, wiki=None, today=None):
         if not pages[name]["meta"].get("goals", True):
             raise WikiError(f"{name}.md says goals = false, so it cites nothing and has nothing to audit; "
                             "leave it out")
-        if dates.get(name, {}).get("digest") != page_digest(pages, name):
+        if dates.get(name, {}).get("digest") != page_digest(pages, name, sections):
             raise WikiError(f"{name}.md has changed since its date was recorded; run `wiki build`, then "
                             "audit it again")
     for name in names:
@@ -1784,12 +1789,12 @@ def date_problems(root, wiki=None):
     committed, and read by someone under a date from before the edit.
     """
     wiki = wiki_of(root, wiki)
-    _, budget, _ = read_config(wiki)
+    _, budget, sections = read_config(wiki)
     pages = read_pages(wiki / "pages", budget["intent"])
     dates = read_dates(wiki)
     problems = []
     for page_id in sorted(pages):
-        if dates.get(page_id, {}).get("digest") != page_digest(pages, page_id):
+        if dates.get(page_id, {}).get("digest") != page_digest(pages, page_id, sections):
             problems.append(f"{page_id}.md has changed since its date was recorded; "
                             "run `wiki build`")
     for gone in sorted(set(dates) - set(pages)):

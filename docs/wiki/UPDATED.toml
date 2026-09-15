@@ -111,7 +111,7 @@ audited = "2026-09-14"
 
 ["goals"]
 updated = "2026-09-14"
-digest = "477e7d48e739489f5315f52ec9c1280243a6a356befcb847f8953111ceddc180"
+digest = "142b728ca0fb53efe157fd440ae1ccb2df83d5fc0e5eee1f756a5c8271b09d32"
 
 ["index"]
 updated = "2026-09-14"
@@ -160,7 +160,7 @@ audited = "2026-09-14"
 
 ["site"]
 updated = "2026-09-14"
-digest = "6446712817047d8ac2ebf092a3df531cf97f4ae180795710174636524448df21"
+digest = "7e35beda4a3c06c7c624d28774ef4cf86aa72d9c3fcd8a5a7a51614f0d966d2a"
 audited = "2026-09-14"
 
 ["site/agent-markdown"]
