@@ -1102,8 +1102,17 @@ class WikiTests(unittest.TestCase):
         self.draft()
         self.build()
         page = (self.out / "proposal/index.html").read_text(encoding="utf-8")
-        self.assertIn("This page is a draft", page)
-        self.assertLess(page.index("This page is a draft"), page.index("<h2"))
+        banner = '<p class="hat draft"><b>Draft</b> — not approved yet.</p>'
+        self.assertIn(banner, page)
+        self.assertLess(page.index(banner), page.index("<h2"))
+        self.assertNotIn("read it as a proposal", page)
+
+    def test_the_copy_for_agents_says_a_draft_is_one(self):
+        self.draft()
+        self.build()
+        copy = (self.out / "proposal/index.md").read_text(encoding="utf-8")
+        self.assertIn("**Status.** Draft, not approved yet.", copy)
+        self.assertNotIn("has not been approved yet", copy)
 
     def test_a_draft_is_in_the_sidebar(self):
         """Every page is in the navigation, whatever its status."""
@@ -1177,7 +1186,7 @@ class WikiTests(unittest.TestCase):
         self.build("user")
         part = self.out / "thing/part/index.html"
         self.assertTrue(part.is_file(), "a draft marked for users was left out of the user build")
-        self.assertIn('<p class="hat draft"><b>This page is a draft.</b>', part.read_text(encoding="utf-8"))
+        self.assertIn('<p class="hat draft"><b>Draft</b> — not approved yet.</p>', part.read_text(encoding="utf-8"))
 
     def test_a_github_address_puts_a_github_link_beside_the_site_name(self):
         # The link opens the project's GitHub page in a new tab, on every page, and a user build keeps it.
