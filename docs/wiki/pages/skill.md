@@ -36,17 +36,36 @@ The **skill**, `writing-wiki-pages`, is the instructions an agent follows to wri
 and a `references` folder beside it.[^files] That folder holds the rules for naming, grammar, infoboxes,
 reference pages, page families and flowcharts, and worked examples of an ordinary page, of a family of
 pages, and of two reference pages, a command and an endpoint, each written well and badly.[^contents]
-`SKILL.md` gives the steps for each task an agent is handed: a new page, a change in the code, a
-requirement not built yet, a failing check, a review and organizing pages.[^tasks] **Pages about things of
-one kind share one layout**: the same headings in the same order and the same infobox labels, under a
-parent page that lists and compares them.[^families] The skill names the wiki's four readers, the
-stakeholders, the product owner, the engineering team and, in some wikis, customers, and the part of a page
-written for each.[^readers] `wiki sync` copies it into the project, where agents read
-it.[^sync] Some of the rules it teaches are enforced by the [Checks](checks.md). **It forbids an agent to
-invent**: everything on a page comes from the code, the owner's own words, or an outside service's own
-documentation, and a fact none of these gives is marked `{missing}` or left out.[^invent]
+`wiki sync` copies it into the project, where agents read it.[^sync] Some of the rules it teaches are
+enforced by the [Checks](checks.md).
 
-## Home
+## Readers
+
+The skill names the wiki's four readers, the stakeholders, the product owner, the engineering team and, in
+some wikis, customers, and the part of a page written for each.[^readers] A page is written once for all
+four, and a page for customers holds nothing of the project's inside.[^readers]
+
+## Sources
+
+**The skill forbids an agent to invent**: everything on a page comes from the code, the owner's own words,
+or an outside service's own documentation, and a fact none of these gives is marked `{missing}` or left
+out.[^invent] Every sentence cites the file and function where the thing happens, or carries
+`{missing}`.[^cite]
+
+## Organization
+
+**Pages about things of one kind share one layout**: the same headings in the same order and the same
+infobox labels, under a parent page that lists and compares them.[^families] A subject that outgrows its
+page becomes a child page, not another heading.[^split]
+
+## Tasks
+
+`SKILL.md` gives the steps for each task an agent is handed: a new page, a change in the code, a
+requirement not built yet, a failing check, a review and organizing pages.[^tasks]
+
+## Syncing
+
+### Home
 
 The skill goes into the project's `.agents/skills` folder if there is one.[^home] Otherwise it goes into
 `.claude/skills`, which is created if it does not exist.[^home] The first is preferred because the second
@@ -60,7 +79,7 @@ hand.[^written]
 whatever else exists; the folder is created if it is missing.[^skilldir] `wiki sync --no-skill` records
 the release without writing the skill, and asking for both at once is refused.[^noskill]
 
-## Release
+### Release
 
 `wiki sync` also records, in `wiki.toml`, which release of the tool the project is on.[^record] It writes
 the `version` setting of the `[tool]` table, adding the setting or the whole table when it is missing, and
@@ -76,14 +95,19 @@ that failure expected rather than surprising.[^version]
     `infobox.md`, `reference-pages.md` and `flowcharts.md` and the worked examples `page-standard.md`, one
     ordinary page, `page-families.md`, a family of notification channels, and `reference-standard.md`, a
     command and an endpoint.
-[^tasks]: `src/skill/SKILL.md` — the Tasks section, one list of steps for each of those six tasks.
-[^families]: `src/skill/SKILL.md` — the Page families section; `src/skill/references/page-families.md` —
-    the layout rules, the parent page, and a family done well and badly.
-[^readers]: `src/skill/SKILL.md` — the opening paragraph and the Readers section;
-    `src/skill/references/page-standard.md` — the eighth step of the self-edit.
 [^sync]: `src/builder/cli.py` — `sync()`.
+[^readers]: `src/skill/SKILL.md` — the opening paragraph and the Readers section, whose rules keep one page
+    for every reader and keep the project's inside off a page for customers;
+    `src/skill/references/page-standard.md` — the eighth step of the self-edit.
 [^invent]: `src/skill/SKILL.md` — the Truthfulness section, whose first rule is never to invent, and the
     last item of its definition of done.
+[^cite]: `src/skill/SKILL.md` — the Citations section, where a reference names a file and function, and
+    the Citation coverage section, where every sentence carries a citation or `{missing}`.
+[^families]: `src/skill/SKILL.md` — the Page families section; `src/skill/references/page-families.md` —
+    the layout rules, the parent page, and a family done well and badly.
+[^split]: `src/skill/SKILL.md` — the Page shape section, whose last rule splits a subject into a child page
+    rather than another heading.
+[^tasks]: `src/skill/SKILL.md` — the Tasks section, one list of steps for each of those six tasks.
 [^home]: `src/builder/cli.py` — `skill_home()` tries `.agents/skills`, then `.claude/skills`, and falls
     back to `.claude/skills`.
 [^written]: `src/builder/cli.py` — `SKILL_NAME` names the folder; `sync()` compares each file's text before
