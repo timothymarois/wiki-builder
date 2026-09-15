@@ -60,7 +60,7 @@ the release without writing the skill, and asking for both at once is refused.[^
 
 `wiki sync` also records, in `wiki.toml`, which release of the tool the project is on.[^record] It writes
 the `version` setting of the `[tool]` table, adding the setting or the whole table when it is missing, and
-changes no other setting.[^record]
+changes no other setting, no line ending and no comment beside the version.[^record]
 
 **`wiki check` fails while that record is missing or names a different release**, and it says to run
 `wiki sync`.[^version] A newer release can add a check, and a new check finds old pages; the record makes
@@ -84,6 +84,7 @@ that failure expected rather than surprising.[^version]
 [^noskill]: `src/builder/cli.py` — `sync()` skips the copy when `skill` is false; `main()` puts
     `--no-skill` and `--skill-dir` in one mutually exclusive group.
 [^record]: `src/builder/config.py` — `record_version()` replaces the `version` line inside the `[tool]`
-    table, adds one under its header or appends the table, and refuses to write a file that would read
-    differently anywhere outside `[tool]`; `src/builder/cli.py` — `sync()` prints the recorded release.
+    table, keeping a comment after the value, adds one under its header or appends the table, writes the
+    file's own line endings back, and refuses to write a file that would read differently anywhere outside
+    `[tool]`; `src/builder/cli.py` — `sync()` prints the recorded release.
 [^version]: `src/builder/build.py` — `version_problems()`, called from `check()`.

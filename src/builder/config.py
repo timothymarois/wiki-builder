@@ -18,6 +18,8 @@ DEFAULT_BUDGET = {"page": 500, "intent": 120, "goals": 3500, "calibrated": False
 # A table's header, [name] or [[name]], with any comment after it; and the release's line inside [tool].
 TABLE_HEADER = re.compile(r"^\s*\[\[?\s*([^\[\]]+?)\s*\]\]?\s*(?:#.*)?$")
 VERSION_SETTING = re.compile(r"^\s*version\s*=")
+# The same line split around its value, so the value alone is replaced and a comment after it is kept.
+VERSION_VALUE = re.compile(r"""^(\s*version\s*=\s*)(?:"[^"\\]*"|'[^']*')(\s*#.*)?$""")
 
 
 class WikiError(Exception):
@@ -58,11 +60,14 @@ def record_version(wiki_dir, version):
     if not path.is_file():
         raise WikiError(f"there is no {CONFIG} in {wiki_dir}; write one with a [site] name and at least one "
                         "[[section]], then run `wiki sync` again")
-    text = path.read_text(encoding="utf-8")
     try:
+        # Read as written, so a file with Windows line endings is written back with them.
+        with path.open(encoding="utf-8", newline="") as stream:
+            text = stream.read()
         before = tomllib.loads(text)
-    except tomllib.TOMLDecodeError as error:
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as error:
         raise WikiError(f"{CONFIG} is unreadable: {error}") from error
+    ending = "\r\n" if "\r\n" in text else "\n"
     # Only inside [tool]: a version line in any other table is another setting.
     setting = 'version = "%s"' % version
     lines = text.splitlines()
@@ -74,7 +79,8 @@ def record_version(wiki_dir, version):
             if table == "tool" and not row.lstrip().startswith("[[") and header is None:
                 header = index
         elif table == "tool" and VERSION_SETTING.match(row):
-            lines[index] = setting
+            value = VERSION_VALUE.match(row)
+            lines[index] = (value.group(1) + '"%s"' % version + (value.group(2) or "")) if value else setting
             written = True
             break
     if not written and header is not None:
@@ -84,7 +90,7 @@ def record_version(wiki_dir, version):
             lines.pop()
         lines += ["", "# Written by `wiki sync`. Which release of the tool these pages",
                   "# were written against; `wiki check` says so when they differ.", "[tool]", setting]
-    text = "\n".join(lines) + "\n"
+    text = ending.join(lines) + ending
     # Read back before saving: a line edit can be fooled, by a header inside a multi-line string or a
     # [[tool]] list, and the file must then be left as the project wrote it.
     tool = before.get("tool", {})
@@ -96,4 +102,4 @@ def record_version(wiki_dir, version):
     if not unchanged:
         raise WikiError(f'{CONFIG} could not take the release without changing another setting; set version = '
                         f'"{version}" in its [tool] table by hand, then run `wiki sync` again')
-    path.write_text(text, encoding="utf-8", newline="\n")
+    path.write_text(text, encoding="utf-8", newline="")
