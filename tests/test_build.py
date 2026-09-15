@@ -2007,6 +2007,35 @@ class WikiTests(unittest.TestCase):
         self.assertIn("| [A part](part/index.md) | a number |", copy)
         self.assertNotIn("{family-table}", copy)
 
+    def test_a_value_with_a_line_break_stays_on_one_row_of_a_markdown_table(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part").replace('value = "a number"', 'value = "a\\nnumber | two"'))
+        self.family(labels=["Held to", "Today"], table=["Today"], linked=False, marker=True)
+        self.build()
+        copy = (self.out / "thing/index.md").read_text(encoding="utf-8")
+        self.assertIn("| [A part](part/index.md) | a number \\| two |", copy)
+
+    def test_a_family_table_marker_the_build_cannot_replace_is_refused(self):
+        # The build writes the table only where the marker is a paragraph of its own; inside a list, or indented
+        # into a code block, it would be left on the page as written.
+        for placed in ("- A list item.[^why]\n  {family-table}", "    {family-table}"):
+            with self.subTest(placed=placed):
+                self.write("thing/part", PAGE.replace("A thing", "A part"))
+                text = PAGE.replace("\n[[infobox]]", '\n[family]\nlabels = ["Held to", "Today"]\ntable = ["Today"]\n\n[[infobox]]', 1)
+                self.write("thing", text.replace("\n## Speed", "\n" + placed + "\n\n## Speed", 1)
+                           .replace("A thing does what it does.[^why]", "A thing has [a part](thing/part.md).[^why]"))
+                problems = wiki.family_problems(self.root)
+                self.assertEqual(1, len(problems), problems)
+                self.assertIn("thing.md has {family-table} where the build cannot write the table", problems[0])
+
+    def test_a_family_table_marker_written_twice_is_refused(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        self.family(labels=["Held to", "Today"], table=["Today"], linked=False, marker=True)
+        text = (self.pages / "thing.md").read_text(encoding="utf-8").replace("\n## Ground", "\n{family-table}\n\n## Ground", 1)
+        self.write("thing", text)
+        problems = wiki.family_problems(self.root)
+        self.assertEqual(1, len(problems), problems)
+        self.assertIn("thing.md has {family-table} 2 times", problems[0])
+
     def test_a_family_table_label_the_layout_does_not_list_is_refused(self):
         self.write("thing/part", PAGE.replace("A thing", "A part"))
         problems = self.family(labels=["Held to", "Today"], table=["Colour"], linked=False, marker=True)

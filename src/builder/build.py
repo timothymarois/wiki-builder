@@ -775,8 +775,8 @@ FAMILY_TABLE_LINE = re.compile(r"^[ \t]*\{family-table\}[ \t]*$", re.M)
 
 
 def markdown_cell(text):
-    """Text that sits in a markdown table cell without ending it."""
-    return str(text).replace("|", "\\|")
+    """Text that sits in one markdown table cell without ending the cell, the row, or opening a code span."""
+    return " ".join(str(text).splitlines()).replace("|", "\\|").replace("`", "\\`")
 
 
 def health_rows(pages, emitted, dates, citations):
@@ -2050,7 +2050,17 @@ def family_problems(root, wiki=None):
     problems = []
     for parent_id in sorted(pages):
         parent_path, meta, body = pages[parent_id]
-        marked = bool(FAMILY_TABLE_LINE.search(FENCED.sub("", body)))
+        # Judged as the build writes the page: the table replaces the marker only where the marker is a paragraph
+        # of its own, so one inside a list, a quote or an indented block would stay on the page as written.
+        written = FAMILY_TABLE in INLINE_CODE.sub("", FENCED.sub("", body))
+        placed = make_markdown()(body).count("<p>%s</p>" % FAMILY_TABLE) if written else 0
+        marked = placed > 0
+        if written and not placed:
+            problems.append(f"{parent_id}.md has {FAMILY_TABLE} where the build cannot write the table, such as in a "
+                            "list, a quote or an indented block; put it on a line of its own, with a blank line "
+                            "before and after")
+        elif placed > 1:
+            problems.append(f"{parent_id}.md has {FAMILY_TABLE} {placed} times; keep one, where the member table goes")
         if "family" not in meta:
             if marked:
                 problems.append(f"{parent_id}.md has {FAMILY_TABLE} but declares no [family]; declare the family's "
@@ -2085,10 +2095,10 @@ def family_problems(root, wiki=None):
             if label not in labels:
                 problems.append(f"{parent_id}.md: family.table lists {label!r}, which family.labels does not; add it "
                                 "to family.labels, or take it out of family.table")
-        if table is not None and not marked:
+        if table is not None and not written:
             problems.append(f"{parent_id}.md declares family.table but has no {FAMILY_TABLE}; put {FAMILY_TABLE} on "
                             "its own line where the member table goes")
-        if marked and table is None:
+        if written and table is None:
             problems.append(f"{parent_id}.md has {FAMILY_TABLE} but declares no family.table; add table = [...] "
                             "under [family], naming the infobox labels the member table compares")
         # The member table the build writes links every member, so the parent needs no link of its own to each.

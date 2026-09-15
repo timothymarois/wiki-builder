@@ -78,6 +78,13 @@ wiki: commands.md has {family-table} but declares no family.table; add table = [
 wiki: brief.md has {family-table} but declares no [family]; declare the family's layout, with table naming the infobox labels its member table compares
 ```
 
+A `{family-table}` the build cannot replace, such as one inside a list or an indented block, is refused, and so
+is a marker written more than once.[^tablecheck]
+```text
+wiki: commands.md has {family-table} where the build cannot write the table, such as in a list, a quote or an indented block; put it on a line of its own, with a blank line before and after
+wiki: commands.md has {family-table} 2 times; keep one, where the member table goes
+```
+
 ### Declaration
 
 A `family` that is not a table, and a `headings` or `labels` that is empty or is not a list of names, are
@@ -124,7 +131,8 @@ from the parent's text, such as from a table of the members.[^links]
     label in `table`, empty where the member states none; `write_site()` puts `family_table_html()` where the
     parent's `{family-table}` paragraph stands, and `family_table_markdown()` into its markdown copy.
 [^tablecheck]: `src/builder/build.py` — `family_problems()` refuses a `table` label outside `labels`, a
-    `table` with no line `FAMILY_TABLE_LINE` matches, and that line with no `table` or no `family`.
+    `table` with no marker, and a marker with no `table` or no `family`; it renders the parent with
+    `make_markdown()` and refuses a marker that is not a paragraph of its own, or is one more than once.
 [^scope]: `src/builder/build.py` — `family_problems()` checks `children_of()` the declaring page only, and
     `section_headings()` reads `SECTION_HEADING` outside `FENCED` code, dropping a closing run of `#` and
     every backtick.
