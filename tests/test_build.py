@@ -1470,6 +1470,32 @@ class WikiTests(unittest.TestCase):
                          "a picture on its own line is still wrapped in a paragraph")
         self.assertTrue((self.out / "images/thing.png").is_file(), "the picture was not copied")
 
+    def test_a_picture_named_outside_the_images_folder_is_refused(self):
+        # A build copies each picture into the site's images folder by the name its table carries. A name
+        # that climbs out of the folder would copy any file in the project to wherever the name points.
+        images = self.root / "docs/wiki/images"
+        (self.root / "docs/wiki/secret.png").write_bytes(b"\x89PNG\r\n")
+        wiki.write_ledger(images, {"../secret.png": {"depicts": [], "digest": "", "made": "by hand"}})
+        self.refused("../secret.png")
+        self.assertFalse((self.out / "secret.png").exists())
+
+    def test_a_build_carries_only_the_pictures_its_pages_show(self):
+        # A user build leaves internal pages out, and the pictures only they show go with them.
+        images = self.root / "docs/wiki/images"
+        for name in ("shown.png", "internal.png", "unused.png"):
+            (images / name).write_bytes(b"\x89PNG\r\n")
+        wiki.write_ledger(images, {name: {"depicts": [], "digest": "", "made": "by hand"}
+                                   for name in ("shown.png", "internal.png", "unused.png")})
+        self.write("thing", PAGE.replace('categories = ["Things"]', 'categories = ["Things"]\naudience = "user"')
+                   .replace("A thing does what it does.[^why]", "![Shown](../images/shown.png)"))
+        self.write("thing/part", PAGE.replace("A thing", "A part")
+                   .replace("A part does what it does.[^why]", "![Internal](../../images/internal.png)"))
+        self.build()
+        self.assertEqual(["internal.png", "shown.png"],
+                         sorted(path.name for path in (self.out / "images").iterdir()))
+        self.build("user")
+        self.assertEqual(["shown.png"], sorted(path.name for path in (self.out / "images").iterdir()))
+
     def test_an_infobox_picture_with_no_ledger_entry_is_refused(self):
         self.write("thing", PAGE.replace('subtitle = "the thing, its speed and its ground"',
                                          'subtitle = "the thing, its speed and its ground"\nimage = "absent.png"'))

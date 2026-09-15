@@ -142,11 +142,11 @@ digest = "ab6fa42eb14d26b2c62902ee570b17fe4f369e0da0e791491e381cb8a8c38e79"
 
 ["pages/pictures"]
 updated = "2026-09-14"
-digest = "5cdf5e592053e26c9302834238da0049f520526062e724d21426bfba993debc1"
+digest = "e1089cb77511573daf282b6bd49fe63c9762a0eff12671af04a1d4c870eaa5eb"
 
 ["pictures-toml"]
 updated = "2026-09-14"
-digest = "260c801663cb965f9a4953739a1b2035d1f9d9dbd18b52a229b1b63184f57152"
+digest = "277b95cb0a2ab6ed75d3f854e1c09f97d729023010a5d5b3733bf7d7cf7f138c"
 audited = "2026-09-14"
 
 ["review-prompt"]

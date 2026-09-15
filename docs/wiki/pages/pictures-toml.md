@@ -33,7 +33,8 @@ show a picture.[^read]
 
 ## Keys
 
-Each table is named for a picture's file name, such as `["refund-flow.svg"]`.[^read]
+Each table is named for a picture's file name, such as `["refund-flow.svg"]`, and a name holding a folder
+is refused.[^read]
 
 | Key | Type | Default | Meaning |
 |---|---|---|---|
@@ -52,6 +53,7 @@ the rest.[^missing]
 
 | Condition | Message |
 |---|---|
+| a table is named for a path, not a file name | `wiki: PICTURES.toml has a table for ../flow.svg, which is not a file name; name each table for a picture's file name alone, such as page-anatomy.svg`[^read] |
 | a page shows a picture with no table | `wiki: refunds/ shows flow.svg, which has no entry in PICTURES.toml`[^missing] |
 | a table names a file that is not in `images` | `wiki: PICTURES.toml lists refund-flow.svg, which is not in /path/to/notes/docs/wiki/images`[^missing] |
 | `depicts` names a path that is not in the project | `wiki: a picture says it shows src/gone.py, which is not in this project`[^missing] |
@@ -70,7 +72,8 @@ blessed = "the template gained a placeholder for the diagram script at the foot 
 ```
 
 [^read]: `src/builder/build.py` — `read_ledger()` reads `LEDGER` from the `images` folder inside the wiki
-    folder, and returns an empty record when the file is missing.
+    folder, returns an empty record when the file is missing, and raises when a table's name is not a
+    file name.
 [^keys]: `src/builder/build.py` — `picture_problems()` skips a table with no `depicts` or no `digest`, and
     `subject_digest()` fingerprints each path in `depicts` from the project root.
 [^write]: `src/builder/build.py` — `write_ledger()`, called by `bless()`, writes its own header and, for
