@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -8,7 +8,7 @@
 {{llm_links}}
 <script>
 (function(){var r=document.documentElement;r.className+=" js";
-try{var t=localStorage.getItem("wiki-theme");if(t==="dark"||t==="light"){r.setAttribute("data-theme",t);}}catch(e){}})();
+try{var t=localStorage.getItem("wiki-theme");if(t==="dark"){r.setAttribute("data-theme","dark");}else if(t==="auto"){r.removeAttribute("data-theme");}}catch(e){}})();
 </script>
 </head>
 <body>
@@ -23,7 +23,7 @@ try{var t=localStorage.getItem("wiki-theme");if(t==="dark"||t==="light"){r.setAt
   <div class="doc">
     <div class="tabs">
 {{tabs}}
-      <button class="theme" type="button" title="Light, dark, or follow the system">Auto</button>
+      <button class="theme" type="button" title="Light, dark, or follow the system">Light</button>
     </div>
     <article class="art">
 {{crumbs}}      <h1>{{title}}</h1>
