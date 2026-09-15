@@ -2041,12 +2041,26 @@ class ServingTests(unittest.TestCase):
         self.assertEqual(200, response.status)
         self.assertIn("no-store", response.getheader("Cache-Control") or "")
 
+    def serve_project(self, root):
+        """A running server rooted at a project, and a function that fetches an address from it."""
+        server = serving.http.server.ThreadingHTTPServer(
+            ("127.0.0.1", 0), serving.functools.partial(serving.Handler, directory=str(root)))
+        self.addCleanup(server.server_close)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        self.addCleanup(server.shutdown)
+
+        def fetch(address, host=None):
+            connection = http.client.HTTPConnection(*server.server_address)
+            self.addCleanup(connection.close)
+            connection.request("GET", address, headers={"Host": host} if host else {})
+            response = connection.getresponse()
+            return response, response.read()
+
+        return server, fetch
+
     def test_a_hidden_file_is_never_served(self):
         # The server shows the whole project, which holds secrets a page never links to: a .env, and every
         # credential and remote in .git. A path with any part starting with a full stop is not found.
-        import http.client
-        import threading
-
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
         root = Path(directory.name)
@@ -2054,23 +2068,59 @@ class ServingTests(unittest.TestCase):
         (root / ".git").mkdir()
         (root / ".git/config").write_text("[remote]", encoding="utf-8")
         (root / "wiki.css").write_text("body{}", encoding="utf-8")
-        server = serving.http.server.ThreadingHTTPServer(
-            ("127.0.0.1", 0), serving.functools.partial(serving.Handler, directory=directory.name))
-        self.addCleanup(server.server_close)
-        thread = threading.Thread(target=server.serve_forever, daemon=True)
-        thread.start()
-        self.addCleanup(server.shutdown)
+        _, fetch = self.serve_project(root)
 
         for address, status in (("/.env", 404), ("/.git/config", 404), ("/%2Egit/config", 404),
                                 ("/.git/", 404), ("/wiki.css", 200)):
             with self.subTest(address=address):
-                connection = http.client.HTTPConnection(*server.server_address)
-                self.addCleanup(connection.close)
-                connection.request("GET", address)
-                response = connection.getresponse()
-                body = response.read()
+                response, body = fetch(address)
                 self.assertEqual(status, response.status)
                 self.assertNotIn(b"secret", body)
+
+    def test_a_linked_file_is_served_only_from_where_it_really_is(self):
+        # A link inside the project reaches whatever it points at, so a file is judged by where it really
+        # is: inside a hidden folder, or outside the project, it is not found.
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        elsewhere = tempfile.TemporaryDirectory()
+        self.addCleanup(elsewhere.cleanup)
+        root = Path(directory.name)
+        (root / ".git").mkdir()
+        (root / ".git/config").write_text("token = secret", encoding="utf-8")
+        (Path(elsewhere.name) / "notes.txt").write_text("secret", encoding="utf-8")
+        (root / "docs").mkdir()
+        (root / "docs/gitlink").symlink_to(root / ".git")
+        (root / "docs/elsewhere").symlink_to(Path(elsewhere.name))
+        _, fetch = self.serve_project(root)
+        for address in ("/docs/gitlink/config", "/docs/elsewhere/notes.txt"):
+            with self.subTest(address=address):
+                response, body = fetch(address)
+                self.assertEqual(404, response.status)
+                self.assertNotIn(b"secret", body)
+
+    def test_the_server_answers_only_a_request_addressed_to_a_local_name(self):
+        # A web page can give its own domain the address 127.0.0.1 and then read the server as part of its
+        # own site. A request addressed by any other name is refused.
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        (Path(directory.name) / "wiki.css").write_text("body{}", encoding="utf-8")
+        server, fetch = self.serve_project(directory.name)
+        port = server.server_address[1]
+        for host, status in (("attacker.example", 403), (f"attacker.example:{port}", 403),
+                             (f"localhost:{port}", 200), (f"127.0.0.1:{port}", 200)):
+            with self.subTest(host=host):
+                response, body = fetch("/wiki.css", host)
+                self.assertEqual(status, response.status)
+                self.assertEqual(status == 200, body == b"body{}")
+
+    def test_every_answer_tells_the_browser_not_to_guess_its_type(self):
+        # A text file answered as text must not be read as a page by a browser that guesses from its contents.
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        (Path(directory.name) / "notes.txt").write_text("<script>alert(1)</script>", encoding="utf-8")
+        _, fetch = self.serve_project(directory.name)
+        response, _ = fetch("/notes.txt")
+        self.assertEqual("nosniff", response.getheader("X-Content-Type-Options"))
 
     def test_a_port_in_use_is_a_sentence_not_a_traceback(self):
         import contextlib
