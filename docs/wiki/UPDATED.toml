@@ -55,7 +55,7 @@ audited = "2026-09-14"
 
 ["commands/build"]
 updated = "2026-09-14"
-digest = "01d7bd7b609a263051239334971a383c3a61df562a9ff9dba989c4df5fe79aed"
+digest = "58f3297efc03d6d0b6e0767e45fe7d2c629433f692bb210a17cd2ed6660aa6e3"
 audited = "2026-09-14"
 
 ["commands/check"]
@@ -101,7 +101,7 @@ digest = "a127f1e4124cca30e367f399a6f0e8f1f46d46b057f54b44cf6d96314f79f15d"
 
 ["front-matter"]
 updated = "2026-09-14"
-digest = "a651ad9a61bfe79b40db87193155f6abd5ed4086a0ce4c328c884ff29138b5d6"
+digest = "5d15e1a73acba5ef90da22e302a2381a76de8172a7ec0755e6ea3f37ee8bd6b9"
 audited = "2026-09-14"
 
 ["front-matter/infobox"]
@@ -128,7 +128,7 @@ digest = "d3b8e29d79cf55e844e2235158f1b04e5253931ad987db233425b81aa5d52694"
 
 ["pages"]
 updated = "2026-09-14"
-digest = "c75c0e36ba1f1e6c286256b5cf90d97c74c918f01f8d2b9c814de79c82d0e905"
+digest = "78d50a54fcf55c4a643066c0048fe66e4a6ca07d202b6931da4a51d3934d19f5"
 audited = "2026-09-14"
 
 ["pages/diagrams"]
@@ -146,7 +146,7 @@ digest = "e1089cb77511573daf282b6bd49fe63c9762a0eff12671af04a1d4c870eaa5eb"
 
 ["pictures-toml"]
 updated = "2026-09-14"
-digest = "cefd6072b1842eaeb02d288ff1e8f14948ccea6abbc83e224ba6bd31cb45d9de"
+digest = "77b7d96d8b98831110088c3819e59076726065459f9c7ec79dd42c6f71794e2c"
 audited = "2026-09-14"
 
 ["review-prompt"]

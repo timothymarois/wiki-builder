@@ -27,6 +27,7 @@ import shutil
 import sys
 import tempfile
 import tomllib
+import urllib.parse
 from importlib import resources
 from pathlib import Path
 
@@ -175,6 +176,9 @@ def read_pages(pages_dir, intent_budget):
         if meta.get("audience", "internal") not in AUDIENCES:
             raise WikiError(f"{path.name} gives its audience as {meta['audience']!r}; an audience is "
                             "\"internal\" or \"user\"")
+        if not isinstance(meta.get("image", ""), str):
+            raise WikiError(f"{path.name} gives its image as {meta['image']!r}; name one picture recorded in "
+                            f"{LEDGER}, such as image = \"page-anatomy.svg\"")
         for required in ("title", "intent"):
             if not str(meta.get(required, "")).strip():
                 raise WikiError(f"{path.name} has no {required}; every page must say what it is for")
@@ -216,10 +220,15 @@ def read_dates(wiki):
     path = wiki / DATES
     if not path.is_file():
         return {}
+    fix = "restore it from version control, since `wiki build` and `wiki audit` write it"
     try:
-        return tomllib.loads(path.read_text(encoding="utf-8"))
-    except tomllib.TOMLDecodeError as error:
-        raise WikiError(f"{DATES} is unreadable: {error}") from error
+        dates = tomllib.loads(path.read_text(encoding="utf-8"))
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as error:
+        raise WikiError(f"{DATES} is unreadable: {error}; {fix}") from error
+    for page_id in sorted(dates):
+        if not isinstance(dates[page_id], dict):
+            raise WikiError(f"{DATES} is unreadable: {page_id} is not a table; {fix}")
+    return dates
 
 
 def write_dates(wiki, dates):
@@ -252,10 +261,14 @@ def read_ledger(images_dir):
     path = images_dir / LEDGER
     if not path.is_file():
         return {}
+    fix = "correct it by hand so each picture is a table"
     try:
         ledger = tomllib.loads(path.read_text(encoding="utf-8"))
-    except tomllib.TOMLDecodeError as error:
-        raise WikiError(f"{LEDGER} is unreadable: {error}") from error
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as error:
+        raise WikiError(f"{LEDGER} is unreadable: {error}; {fix}") from error
+    for name in sorted(ledger):
+        if not isinstance(ledger[name], dict):
+            raise WikiError(f"{LEDGER} is unreadable: {name} is not a table; {fix}")
     # A build copies each picture by the name its table carries, so a name that climbed out of the folder
     # would copy any file in the project into the site.
     for name in sorted(ledger):
@@ -350,13 +363,18 @@ LINK_SUFFIX = "index.html"
 
 
 def relative_directory(from_directory, to_directory):
-    """A link from one page's directory to another's."""
-    rel = posixpath.relpath("/" + to_directory, "/" + (from_directory or "."))
+    """A link from one page's directory to another's.
+
+    Percent-encoded, because the address is made of file names and is written into an href: a quote in a
+    name would end the attribute, and a colon would read as a scheme such as javascript:.
+    """
+    rel = urllib.parse.quote(posixpath.relpath("/" + to_directory, "/" + (from_directory or ".")))
     return ("./" if rel == "." else rel + "/") + LINK_SUFFIX
 
 
 def relative_file(from_directory, to_file):
-    return posixpath.relpath("/" + to_file, "/" + (from_directory or "."))
+    """A link from one page's directory to a file in the site, percent-encoded for the same reason."""
+    return urllib.parse.quote(posixpath.relpath("/" + to_file, "/" + (from_directory or ".")))
 
 
 # --------------------------------------------------------------------------------------------------
@@ -1175,6 +1193,10 @@ def write_site(root, out, audience, link_root, today, record, wiki):
     for name in sorted(ledger):
         if not (images_dir / name).is_file():
             raise WikiError(f"{LEDGER} lists {name}, which is not in {images_dir}")
+        # A symbolic link is copied as the file it points at, so one leading out of the folder would publish it.
+        if not (images_dir / name).resolve().is_relative_to(images_dir.resolve()):
+            raise WikiError(f"{LEDGER} lists {name}, which links to a file outside the images folder; put the "
+                            f"picture itself in {images_dir}")
     if shown:
         (out / "images").mkdir(parents=True, exist_ok=True)
         for name in sorted(shown):
@@ -1213,7 +1235,8 @@ def clear_stale(out, written):
             continue
         path.unlink()
         parent = path.parent
-        while parent.resolve() != inside and not any(parent.iterdir()):
+        # A linked folder is left in place: it is a link someone made, not a folder a build emptied.
+        while parent.resolve() != inside and not parent.is_symlink() and not any(parent.iterdir()):
             parent.rmdir()
             parent = parent.parent
     listed = "".join(name + "\n" for name in made)

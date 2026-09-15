@@ -59,6 +59,7 @@ Every problem below stops the build, and names the page's file.[^validation]
 | the page gives `kicker` | `wiki: refunds.md gives its subtitle as kicker, which is now called subtitle; rename kicker to subtitle`[^refusals] |
 | `audience` is not `"internal"` or `"user"` | `wiki: refunds.md gives its audience as 'reader'; an audience is "internal" or "user"`[^refusals] |
 | `image` names a picture with no record | `wiki: refunds.md shows flow.svg, which has no entry in PICTURES.toml`[^image] |
+| `image` is not one name | `wiki: refunds.md gives its image as ['a.svg', 'b.svg']; name one picture recorded in PICTURES.toml, such as image = "page-anatomy.svg"`[^image] |
 
 ## Example
 
@@ -101,7 +102,7 @@ Refunds exist so that a customer who was charged wrongly gets their money back w
     `render_categories()` names them in the bar `template.html` puts after the page's text.
 [^image]: `src/builder/build.py` — `render_infobox()` shows `image` at the top of the infobox with
     `image_caption`, empty when absent, under it, and raises the message for a picture with no entry in
-    `PICTURES.toml`.
+    `PICTURES.toml`; `read_pages()` refuses an `image` that is not a string.
 [^infobox]: `src/builder/build.py` — `render_infobox()` shows the `infobox` groups in the order written, and
     none when it is absent.
 [^refusals]: `src/builder/build.py` — `read_pages()` raises the messages for a missing or empty `title` or
