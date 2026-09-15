@@ -50,6 +50,8 @@ wiki [-h] [--version] [--root ROOT] [--wiki WIKI]
 | [`wiki user`](commands/user.md) | builds only the pages marked for users, with everything internal removed |
 | [`wiki audit`](commands/audit.md) | records that pages were checked against the code today |
 
+Each command's page, such as [wiki build](commands/build.md), gives its usage, options, arguments, output and exit codes.
+
 Typing `wiki` with no command is the same as `wiki serve`.[^alone]
 
 ## Shared options

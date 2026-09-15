@@ -17,7 +17,13 @@ rows = [
 [[infobox]]
 group = "Values"
 rows = [
-  { label = "Link ending", value = "none", note = "an address ends in a folder", cite = "publish" },
+  { label = "Output folder", value = "OUT", note = "relative to the working directory", cite = "usage" },
+]
+
+[[infobox]]
+group = "Rules"
+rows = [
+  { label = "Files written", value = "OUT, UPDATED.toml", cite = ["publish", "dates"] },
 ]
 
 [[infobox]]

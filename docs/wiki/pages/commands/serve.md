@@ -11,14 +11,19 @@ show what was just built, and only to this machine.
 group = "Identity"
 rows = [
   { label = "Command", value = "wiki serve", note = "or wiki alone", cite = ["usage", "alone"] },
-  { label = "Options", value = "--port, --root, --wiki", cite = "usage" },
+  { label = "Options", value = "--port", cite = "usage" },
 ]
 
 [[infobox]]
 group = "Values"
 rows = [
-  { label = "Address", value = "127.0.0.1", cite = "serve" },
   { label = "Default port", value = "8787", cite = "usage" },
+]
+
+[[infobox]]
+group = "Rules"
+rows = [
+  { label = "Files written", value = "the site, UPDATED.toml", cite = ["serve", "dates"] },
 ]
 
 [[infobox]]

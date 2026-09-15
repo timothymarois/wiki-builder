@@ -17,8 +17,7 @@ rows = [
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Reason", value = "required", cite = "exit" },
-  { label = "Record file", value = "rewritten whole", cite = "ledger" },
+  { label = "Files written", value = "PICTURES.toml", note = "rewritten whole", cite = "ledger" },
 ]
 
 [[infobox]]

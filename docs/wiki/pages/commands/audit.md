@@ -18,9 +18,7 @@ rows = [
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Record", value = "UPDATED.toml", cite = "record" },
-  { label = "Edited page", value = "refused until built", cite = "exit" },
-  { label = "Footer", value = "Last audited, or never", cite = "footer" },
+  { label = "Files written", value = "UPDATED.toml", cite = "record" },
 ]
 
 [[infobox]]
