@@ -1930,6 +1930,16 @@ class WikiTests(unittest.TestCase):
         self.assertIn('<a href="../files/note.pdf" class="pdf">the policy 2</a> '
                       '<span class="pdfsize">(PDF, 3 KB)</span>', page)
 
+    def test_a_pdf_size_reads_right_at_its_edges(self):
+        # An empty file is no kilobyte, and a byte under a megabyte rounds up to a megabyte, not to 1024 KB.
+        for size, label in ((0, "0 KB"), (1, "1 KB"), (self.MEGABYTE - 1, "1.0 MB"), (self.MEGABYTE, "1.0 MB")):
+            with self.subTest(size=size):
+                self.pdf("policy.pdf", size)
+                self.link_pdf("../files/policy.pdf")
+                self.build()
+                page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+                self.assertIn('<span class="pdfsize">(PDF, %s)</span>' % label, page)
+
     def test_two_builds_of_a_wiki_with_a_pdf_are_identical(self):
         self.pdf("policy.pdf", 2516582)
         self.link_pdf("../files/policy.pdf")

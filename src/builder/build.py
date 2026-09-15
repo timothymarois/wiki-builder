@@ -531,10 +531,12 @@ def file_size(size):
     """A file's size as a reader reads it: whole kilobytes under a megabyte, megabytes to one place above it.
 
     Rounded up, so a size never reads smaller than the file, and counted in 1,024s, as the limit on a PDF is,
-    so a PDF the check refuses never reads as inside the limit.
+    so a PDF the check refuses never reads as inside the limit. A file that rounds up to 1,024 kilobytes is a
+    megabyte, and an empty file is no kilobyte at all.
     """
-    if size < MEGABYTE:
-        return "%d KB" % max(1, -(-size // 1024))
+    kilobytes = -(-size // 1024)
+    if kilobytes < 1024:
+        return "%d KB" % kilobytes
     return "%d.%d MB" % divmod(-(-size * 10 // MEGABYTE), 10)
 
 
