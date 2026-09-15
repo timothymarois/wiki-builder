@@ -1993,6 +1993,25 @@ class WikiTests(unittest.TestCase):
         self.assertEqual(1, len(problems), problems)
         self.assertIn("thing.md: family.headings must list", problems[0])
 
+    def test_a_family_heading_is_compared_as_the_page_shows_it(self):
+        # A closing run of hashes and backticks around a name change nothing a reader sees.
+        self.write("thing/part", PAGE.replace("A thing", "A part").replace("## Speed", "## Speed ##")
+                   .replace("## Ground", "## `Ground`"))
+        self.assertEqual([], self.family(headings=["Speed", "Ground"]))
+
+    def test_an_empty_family_list_is_refused_with_how_to_leave_it_out(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        problems = self.family(headings=[])
+        self.assertEqual(1, len(problems), problems)
+        self.assertIn("leave family.headings out", problems[0])
+
+    def test_a_family_that_is_not_a_table_is_refused(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        self.write("thing", PAGE.replace('status = "approved"', 'status = "approved"\nfamily = ["Speed"]'))
+        problems = wiki.family_problems(self.root)
+        self.assertEqual(1, len(problems), problems)
+        self.assertIn("thing.md: family must be a table", problems[0])
+
     def test_children_of_a_parent_with_no_family_are_not_checked(self):
         self.write("thing/part", PAGE.replace("A thing", "A part").replace("## Ground", "## Colour"))
         self.assertEqual([], wiki.family_problems(self.root))
@@ -2052,6 +2071,21 @@ class WikiTests(unittest.TestCase):
                  "`docs/wiki/site/`, `images/`, `functions/_middleware.js` and `Source/Gone.h`.")
         self.write("thing", PAGE.replace("[^why]: The reason — `Source/Thing.h`.", notes))
         self.assertEqual([("thing.md", "Source/Gone.h")], self.covering(["Source/*.h"])["missing"])
+
+    def test_a_citation_with_a_line_number_counts_its_file(self):
+        self.source("Source/Thing.h")
+        self.write("thing", PAGE.replace("`Source/Thing.h`", "`Source/Thing.h:12`"))
+        report = self.covering(["Source/*.h"])
+        self.assertEqual([], report["uncited"], "a citation with a line number did not count its file")
+        self.assertEqual([], report["missing"])
+
+    def test_a_coverage_pattern_that_leads_outside_the_project_is_refused(self):
+        self.source("Source/Thing.h")
+        for pattern in ("../*.py", "/etc/*.conf", "Source/../../*.h"):
+            with self.subTest(pattern=pattern):
+                with self.assertRaises(wiki.WikiError) as caught:
+                    self.covering([pattern])
+                self.assertIn("leads outside the project", str(caught.exception))
 
     def test_a_folder_citation_covers_none_of_the_files_in_it(self):
         self.source("Source/Thing.h")

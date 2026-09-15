@@ -52,6 +52,13 @@ def read_coverage(wiki_dir):
                 or (required and not value)):
             raise WikiError(f"{CONFIG}: coverage.{key} must list patterns of files relative to the project, "
                             f'such as {key} = ["src/**/*.py"]')
+        # The report reads only the project: a pattern that climbs out of it, or starts from the top of the
+        # disk, would count files the project does not own.
+        for pattern in value:
+            parts = pattern.replace("\\", "/").split("/")
+            if pattern.startswith(("/", "\\")) or re.match(r"[A-Za-z]:", pattern) or ".." in parts:
+                raise WikiError(f"{CONFIG}: coverage.{key} holds {pattern!r}, which leads outside the project; "
+                                'write each pattern relative to the project, such as "src/**/*.py"')
         patterns.append(value)
     return patterns
 

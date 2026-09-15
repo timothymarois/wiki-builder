@@ -1898,8 +1898,12 @@ def pages_by_id(root, wiki=None):
 
 
 def section_headings(body):
-    """A page's second-level headings in order, leaving out any shown in a code sample."""
-    return [match.group(1) for match in SECTION_HEADING.finditer(FENCED.sub("", body))]
+    """A page's second-level headings in order, as the page shows them, leaving out any in a code sample.
+
+    A closing run of hashes and the backticks around a name are markdown, not words a reader sees.
+    """
+    return [re.sub(r"[ \t]+#+$", "", match.group(1)).replace("`", "").strip()
+            for match in SECTION_HEADING.finditer(FENCED.sub("", body))]
 
 
 def family_problems(root, wiki=None):
@@ -1916,15 +1920,19 @@ def family_problems(root, wiki=None):
         parent_path, meta, body = pages[parent_id]
         if "family" not in meta:
             continue
-        family = meta["family"] if isinstance(meta["family"], dict) else {"headings": meta["family"]}
-        layout = {"headings": family.get("headings"), "labels": family.get("labels")}
+        if not isinstance(meta["family"], dict):
+            problems.append(f"{parent_id}.md: family must be a table, written [family], holding headings and "
+                            'labels, such as headings = ["Usage", "Output"]')
+            continue
+        layout = {"headings": meta["family"].get("headings"), "labels": meta["family"].get("labels")}
+        # An empty list would refuse every name a member uses, which is never what a writer meant.
         wrong = [key for key, value in layout.items()
-                 if value is not None and (not isinstance(value, list)
+                 if value is not None and (not isinstance(value, list) or not value
                                            or not all(isinstance(item, str) and item for item in value))]
         for key in wrong:
             example = '["Usage", "Output"]' if key == "headings" else '["Command", "Files written"]'
             problems.append(f"{parent_id}.md: family.{key} must list the {key[:-1]}s every member of the family "
-                            f"may use, such as {key} = {example}")
+                            f"may use, such as {key} = {example}, or leave family.{key} out to check no {key}")
         if wrong:
             continue
         prose = INLINE_CODE.sub("", FENCED.sub("", body))
@@ -2038,14 +2046,18 @@ def bless(root, picture, reason, wiki=None):
     return f"wiki: {picture} blessed -- {reason.strip()}"
 
 
+# A line number, or a range of lines, after a cited file: src/app.py:12 or src/app.py:12-34.
+LINE_NUMBER = re.compile(r":\d+(?:-\d+)?$")
+
+
 def cited_paths(body):
-    """Every project path a page's references name in backticks, as written.
+    """Every project path a page's references name in backticks, as written, without a line number.
 
     A code block shows a reference rather than making one, so fenced code is taken out first.
     """
     for note in FOOTNOTE.finditer(FENCED.sub("", body)):
         for code in INLINE_CODE.findall(note.group(1)):
-            name = code.strip("`").strip()
+            name = LINE_NUMBER.sub("", code.strip("`").strip())
             if name and not any(mark in name for mark in (" ", "://", "*")) and not name.startswith(("/", "-")):
                 yield name
 
