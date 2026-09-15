@@ -25,6 +25,9 @@ AS_TEXT = (".md", ".txt", ".rst", ".toml", ".ini", ".cfg", ".conf", ".env",
 
 PLAIN = "text/plain; charset=utf-8"
 
+# The names a request may address the server by: it listens on 127.0.0.1 only.
+LOCAL_NAMES = ("127.0.0.1", "localhost", "::1")
+
 
 def shown_as_text(path):
     """The type to answer with, or None to leave the decision where it was.
@@ -42,10 +45,23 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         return shown_as_text(path) or super().guess_type(path)
 
     def send_head(self):
+        # A web page can give its own domain the address 127.0.0.1 and read this server as its own site, so
+        # a request addressed by any other name is refused.
+        try:
+            host = urllib.parse.urlsplit("//" + (self.headers.get("Host") or "")).hostname
+        except ValueError:
+            host = None
+        if host not in LOCAL_NAMES:
+            self.send_error(403, "wiki serve answers only at 127.0.0.1 or localhost")
+            return None
         # The project holds what no page links to and nobody should read through a browser: a .env, and
-        # the remotes and credentials under .git. Decoded first, so %2Egit is refused as .git is.
+        # the remotes and credentials under .git. Decoded first, so %2Egit is refused as .git is, and judged
+        # again where a link in the project really leads, so a link cannot reach .git or leave the project.
         path = urllib.parse.unquote(urllib.parse.urlsplit(self.path).path)
-        if any(part.startswith(".") for part in path.split("/")):
+        root = Path(self.directory).resolve()
+        target = Path(self.translate_path(self.path)).resolve()
+        if (any(part.startswith(".") for part in path.split("/")) or not target.is_relative_to(root)
+                or any(part.startswith(".") for part in target.relative_to(root).parts)):
             self.send_error(404, "File not found")
             return None
         return super().send_head()
@@ -59,6 +75,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store, must-revalidate")
         self.send_header("Pragma", "no-cache")
         self.send_header("Expires", "0")
+        # A file answered as text stays text: a browser that guessed from its contents could run it as a page.
+        self.send_header("X-Content-Type-Options", "nosniff")
         super().end_headers()
 
     def log_message(self, fmt, *args):

@@ -26,6 +26,7 @@ group = "Rules"
 rows = [
   { label = "Scope", value = "the whole project", cite = "root" },
   { label = "Hidden files", value = "never served", cite = "hidden" },
+  { label = "Host names", value = "127.0.0.1, localhost", cite = "host" },
   { label = "Reach", value = "this machine only", cite = "loopback" },
   { label = "Caching", value = "none", cite = "cache" },
 ]
@@ -42,13 +43,17 @@ project, and a browser cannot follow a link above the folder it is served from.[
 
 That means anything that can reach the server can read every file in the project.[^root] For that reason, it
 answers only on this machine.[^loopback] **A hidden file is never served**: an address with any part
-starting with a full stop, such as `.env` or `.git/config`, is answered with page not found.[^hidden]
+starting with a full stop, such as `.env` or `.git/config`, is answered with page not found, and so is a
+file that a link in the project leads into a hidden folder or out of the project.[^hidden] It answers only a
+request addressed to 127.0.0.1 or localhost, so a web page that gives its own domain that address cannot
+read the project through it.[^host]
 
 ## Sources
 
 Code, settings and markdown files open **as text in the browser** instead of downloading, across 38 common
 file types.[^text] Anything else, such as the site's own pages and pictures, is served as it normally
-would be.[^text]
+would be.[^text] Every answer tells the browser not to guess another type, so a text file is never read as
+a page.[^sniff]
 
 ## Freshness
 
@@ -75,7 +80,10 @@ so, names `--port` as the way to pick another, and exits with 2.[^port]
 [^text]: `src/builder/serve.py` — `shown_as_text()` answers every suffix in `AS_TEXT` as `text/plain`, and
     leaves every other type to the stock handler.
 [^hidden]: `src/builder/serve.py` — `Handler.send_head()` answers 404 when any part of the decoded path
-    starts with `.`.
+    starts with `.`, or when the file it resolves to is outside the project or has such a part inside it.
+[^host]: `src/builder/serve.py` — `Handler.send_head()` answers 403 when the request's `Host` names
+    anything but `LOCAL_NAMES`.
+[^sniff]: `src/builder/serve.py` — `Handler.end_headers()` sends `X-Content-Type-Options: nosniff`.
 [^rebuild]: `src/builder/cli.py` — `run()` builds once before it calls `serve()`; `src/builder/serve.py` —
     `serve()` only serves.
 [^cache]: `src/builder/serve.py` — `Handler.end_headers()` sends `Cache-Control: no-store, must-revalidate`,
