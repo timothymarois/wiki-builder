@@ -1944,19 +1944,143 @@ class WikiTests(unittest.TestCase):
 
     # --- page families -------------------------------------------------------------------------------
 
-    def family(self, headings=None, labels=None, parent=PAGE, linked=True):
-        """The thing page declaring a family, with a link to its part when `linked`; returns its problems."""
-        table = "[family]\n"
-        if headings is not None:
-            table += "headings = %s\n" % json.dumps(headings)
-        if labels is not None:
-            table += "labels = %s\n" % json.dumps(labels)
-        text = parent.replace("\n[[infobox]]", "\n" + table + "\n[[infobox]]", 1)
+    def family(self, headings=None, labels=None, parent=PAGE, linked=True, table=None, marker=False):
+        """The thing page declaring a family, with a link to its part when `linked` and the table marker when
+        `marker`; returns the family problems."""
+        declaration = "[family]\n"
+        for key, value in (("headings", headings), ("labels", labels), ("table", table)):
+            if value is not None:
+                declaration += "%s = %s\n" % (key, json.dumps(value))
+        text = parent.replace("\n[[infobox]]", "\n" + declaration + "\n[[infobox]]", 1)
         if linked:
             text = text.replace("A thing does what it does.[^why]",
                                 "A thing does what it does, and has [a part](thing/part.md).[^why]")
+        if marker:
+            text = text.replace("\n## Speed", "\n{family-table}\n\n## Speed", 1)
         self.write("thing", text)
         return wiki.family_problems(self.root)
+
+    def table_cells(self, page, name):
+        """The rows of the generated table of that name on a built page, each a list of its cells' text."""
+        table = page[page.index('<table class="w %s">' % name):]
+        table = table[:table.index("</table>")]
+        return [[re.sub(r"<[^>]+>", "", cell) for cell in re.findall(r"<t[hd]>(.*?)</t[hd]>", row)]
+                for row in re.findall(r"<tr>(.*?)</tr>", table, re.S)]
+
+    def test_a_family_table_lists_each_member_with_its_infobox_values(self):
+        # A member that states no value for a column leaves its cell empty, so the gap shows.
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        self.write("thing/bit", PAGE.replace("A thing", "A bit")
+                   .replace('  { label = "Today", value = "a number", cite = "why" },\n', ""))
+        problems = self.family(labels=["Held to", "Today"], table=["Today", "Held to"], linked=False, marker=True)
+        self.assertEqual([], problems, "a parent whose table lists every member was refused")
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertEqual([["", "Today", "Held to"], ["A bit", "", "a promise"], ["A part", "a number", "a promise"]],
+                         self.table_cells(page, "family"))
+        self.assertIn('<a href="part/index.html">A part</a>', page)
+        self.assertNotIn("{family-table}", page)
+
+    def test_a_family_table_in_a_user_build_lists_only_members_marked_for_users(self):
+        user = 'categories = ["Things"]\naudience = "user"'
+        self.write("thing/part", PAGE.replace("A thing", "A part").replace('categories = ["Things"]', user))
+        self.write("thing/bit", PAGE.replace("A thing", "A bit"))
+        self.family(labels=["Held to", "Today"], table=["Today"], linked=False, marker=True,
+                    parent=PAGE.replace('categories = ["Things"]', user))
+        self.build("user")
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertEqual([["", "Today"], ["A part", "a number"]], self.table_cells(page, "family"))
+
+    def test_a_family_table_is_in_the_parent_markdown_copy(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        self.family(labels=["Held to", "Today"], table=["Today"], linked=False, marker=True)
+        self.build()
+        copy = (self.out / "thing/index.md").read_text(encoding="utf-8")
+        self.assertIn("| [A part](part/index.md) | a number |", copy)
+        self.assertNotIn("{family-table}", copy)
+
+    def test_a_family_table_label_the_layout_does_not_list_is_refused(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        problems = self.family(labels=["Held to", "Today"], table=["Colour"], linked=False, marker=True)
+        self.assertEqual(1, len(problems), problems)
+        self.assertIn("thing.md: family.table lists 'Colour', which family.labels does not", problems[0])
+
+    def test_a_family_table_needs_both_its_list_and_its_marker(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        problems = self.family(labels=["Held to", "Today"], table=["Today"])
+        self.assertEqual(1, len(problems), problems)
+        self.assertIn("thing.md declares family.table but has no {family-table}", problems[0])
+        problems = self.family(labels=["Held to", "Today"], marker=True)
+        self.assertEqual(1, len(problems), problems)
+        self.assertIn("thing.md has {family-table} but declares no family.table", problems[0])
+
+    def test_a_family_table_marker_on_a_page_with_no_family_is_refused(self):
+        self.write("thing", PAGE.replace("\n## Speed", "\n{family-table}\n\n## Speed", 1))
+        problems = wiki.family_problems(self.root)
+        self.assertEqual(1, len(problems), problems)
+        self.assertIn("thing.md has {family-table} but declares no [family]", problems[0])
+
+    def test_a_family_table_marker_is_not_taken_for_a_sentence(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        self.family(labels=["Held to", "Today"], table=["Today"], linked=False, marker=True)
+        self.assertEqual([], [problem for problem in wiki.uncited_problems(self.root) if "family-table" in problem])
+
+    # --- health page ---------------------------------------------------------------------------------
+
+    HEALTH = '''+++
+title = "Health"
+subtitle = "every page's status, sources, marks and dates"
+goals = false
+status = "approved"
+intent = """
+The health page exists so that an owner sees which pages to check first.
+"""
++++
+
+Every page, with its sources and dates.
+'''
+
+    def health(self, text=None):
+        """The health page, listed in the navigation beside the front page and the goals."""
+        self.write("health", text or self.HEALTH)
+        self.nav(CONFIGURATION.replace('pages = ["index", "goals"]', 'pages = ["index", "goals", "health"]'))
+
+    def test_a_health_page_lists_every_page_with_its_status_counts_and_dates(self):
+        self.health()
+        self.build()
+        page = (self.out / "health/index.html").read_text(encoding="utf-8")
+        self.assertIn("3 pages, 0 drafts waiting on the owner, 1 never audited, 1 claim with no source", page)
+        rows = self.table_cells(page, "health")
+        self.assertEqual(["Page", "Status", "Words", "Cited", "Missing", "Updated", "Audited"], rows[0])
+        thing = rows[1]
+        self.assertEqual(["A thing", "approved", "1", "1", "2 January 2026", "never"], thing[:2] + thing[3:])
+        self.assertTrue(thing[2].isdigit(), thing)
+        # Pages that cite nothing cannot be audited, so they come last with their citation cells empty.
+        self.assertEqual([["Goals", "", "", ""], ["Front", "", "", ""]],
+                         [[row[0], row[3], row[4], row[6]] for row in rows[2:]])
+        self.assertNotIn("Health", [row[0] for row in rows], "the health page listed itself")
+
+    def test_an_audited_page_follows_the_pages_never_audited(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        self.health()
+        self.build()
+        wiki.audit(self.root, ["thing"], today="2026-01-03")
+        self.build()
+        rows = self.table_cells((self.out / "health/index.html").read_text(encoding="utf-8"), "health")
+        self.assertEqual(["A part", "A thing"], [row[0] for row in rows[1:3]])
+        self.assertEqual("3 January 2026", rows[2][6])
+
+    def test_the_health_table_is_in_the_health_page_markdown_copy(self):
+        self.health()
+        self.build()
+        copy = (self.out / "health/index.md").read_text(encoding="utf-8")
+        self.assertIn("| [A thing](../thing/index.md) | approved |", copy)
+
+    def test_a_user_build_carries_no_health_table(self):
+        self.write("thing", PAGE.replace('categories = ["Things"]', 'categories = ["Things"]\naudience = "user"'))
+        self.health(self.HEALTH.replace('status = "approved"', 'status = "approved"\naudience = "user"'))
+        self.build("user")
+        self.assertNotIn('class="w health"', (self.out / "health/index.html").read_text(encoding="utf-8"))
 
     def test_a_family_member_with_a_heading_its_layout_does_not_list_is_refused(self):
         self.write("thing/part", PAGE.replace("A thing", "A part").replace("## Ground", "## Colour"))

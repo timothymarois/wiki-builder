@@ -42,7 +42,7 @@ page is for and how it is laid out is described on [Pages](pages.md), and the fi
 | `image` | string | none | a picture recorded in `PICTURES.toml`, shown at the top of the infobox[^image] |
 | `image_caption` | string | empty | the caption under that picture[^image] |
 | `infobox` | list of tables, written `[[infobox]]` | none | the infobox's groups, in the order written[^infobox] |
-| `family` | table, written `[family]` | none | on a parent page, the layout its child pages follow: `headings` in order, and the infobox `labels` they may use, as [Families](checks/families.md) describes[^family] |
+| `family` | table, written `[family]` | none | on a parent page, the layout its child pages follow: `headings` in order, the infobox `labels` they may use, and the `table` of labels its member table compares, as [Families](checks/families.md) describes[^family] |
 
 Any other field is ignored, except `kicker`, which is refused.[^fields]
 

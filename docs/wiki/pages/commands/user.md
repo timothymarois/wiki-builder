@@ -11,7 +11,7 @@ nothing internal left in. It should never carry a reference, a missing-source ma
 group = "Identity"
 rows = [
   { label = "Command", value = "wiki user", cite = "usage" },
-  { label = "Argument", value = "OUT", cite = "usage" },
+  { label = "Arguments", value = "OUT", cite = "usage" },
 ]
 
 [[infobox]]

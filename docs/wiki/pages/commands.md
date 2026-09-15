@@ -11,8 +11,9 @@ should be here, and nothing it does not.
 # Every command page uses these headings, in this order, and only these infobox labels.
 [family]
 headings = ["Usage", "Options", "Arguments", "Output", "Exit codes"]
-labels = ["Command", "Arguments", "Argument", "Options", "Output folder", "Default port", "Files written",
+labels = ["Command", "Arguments", "Options", "Output folder", "Default port", "Files written",
           "Success", "Problems", "Misuse"]
+table = ["Arguments", "Options", "Files written"]
 
 [[infobox]]
 group = "Identity"
@@ -60,6 +61,8 @@ wiki [-h] [--version] [--root ROOT] [--wiki WIKI]
 | [`wiki audit`](commands/audit.md) | records that pages were checked against the code today |
 
 Each command's page, such as [wiki build](commands/build.md), gives its usage, options, arguments, output and exit codes.
+
+{family-table}
 
 Typing `wiki` with no command is the same as `wiki serve`.[^alone]
 

@@ -129,6 +129,8 @@ Use these words in commits, reviews and conversation. They are the generator's.
 - **Reference page** — a page for something a person calls or configures: a command, an endpoint, a
   published function, a settings file, a form.
 - **Goals page** — every page's intent, collected. Generated, never written.
+- **Health page** — every page's status, citations, claims with no source and audit date, written by the
+  build onto `health.md` when the wiki has one.
 - **Source view** — the Source tab, showing a page's own markdown.
 - **Audience** — `internal`, the default, or `user`, which `wiki user` builds.
 
@@ -282,6 +284,9 @@ place elsewhere.
 - **The parent declares the layout** as `[family]` in its front matter, with `headings` in order and the
   infobox `labels` a member may use. `wiki check` then refuses a member that uses anything else, and a member
   the parent does not link; `wiki families` lists the parents whose children declare no layout.
+- **The build writes the member table** when the parent names the labels to compare as `table` and puts
+  `{family-table}` on its own line where the table goes: one row per member, from each member's infobox, with
+  an empty cell where a member states no value.
 
 **Read [Page families](references/page-families.md) before organizing pages, and before writing a page
 into a family.** It holds how to find a family, how to design its layout, what the parent holds, and a

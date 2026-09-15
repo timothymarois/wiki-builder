@@ -64,8 +64,9 @@ sentence, and a place in the sidebar.
 - **Its lead says what every member has in common and names the sections each member covers**, so a
   reader knows the layout before opening a member.
 - **It lists every member in one table**: a row for each member and a column for each value the members
-  share, so the members compare at a glance and a missing member shows as a missing row. Every row cites,
-  as every table row does.
+  share, so the members compare at a glance and a missing member shows as a missing row. Declare its columns
+  as `table`, as [Declaration](#declaration) shows, and the build writes it from each member's infobox, so
+  the table always matches the member pages.
 - **A fact true of every member is stated once, on the parent**, and each member links to it rather than
   repeating it.
 
@@ -78,13 +79,18 @@ to it:
 [family]
 headings = ["Delivery", "Limits", "Failures", "Opting out"]
 labels = ["Channel", "Setting", "Delivery", "Daily limit", "Retries", "Opting out"]
+table = ["Delivery", "Daily limit", "Retries"]
 ```
 
 - **`headings`** lists the second-level headings, in order. A member may leave any of them out; a heading the
   list does not hold, or one out of its order, is refused.
 - **`labels`** lists the infobox labels a member may use, in any group and any order. A label the list does
   not hold is refused.
-- **The parent links every member**, or the check names the member it does not link.
+- **`table`** lists the infobox labels the parent's member table compares, each one a label `labels` holds.
+  The parent puts `{family-table}` on its own line where the table goes, and the build writes one row per
+  member, linked, with each member's value for each label, and an empty cell where a member states none.
+- **The parent links every member**, or the check names the member it does not link. A parent with
+  `{family-table}` links every member through the table.
 - **Each refusal names both fixes**: rename the heading or label on the member, or add it to the list on the
   parent, for every member.
 - **`wiki families`** lists every parent of two or more children that declares no family, with each child's

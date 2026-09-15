@@ -9,7 +9,7 @@ url = "https://wiki-builder.marois.dev"
 
 [[section]]
 title = "Start"
-pages = ["index", "brief", "goals"]
+pages = ["index", "brief", "goals", "health"]
 
 [[section]]
 title = "Guides"

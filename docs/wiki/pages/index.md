@@ -22,4 +22,5 @@ build makes the [site](site.md), and the [local server](serving.md) shows it on 
 [checks](checks.md) are the reason the tool exists, [continuous integration](continuous-integration.md) runs
 them on every push, and the [commands](commands.md) show how to use it.
 
-The [goals page](goals.md) collects what every part of the tool is for.
+The [goals page](goals.md) collects what every part of the tool is for. The [health page](health.md) lists
+every page with its sources, its claims with no source, and when it was last audited.

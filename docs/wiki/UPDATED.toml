@@ -25,7 +25,7 @@ audited = "2026-09-14"
 
 ["checks/families"]
 updated = "2026-09-15"
-digest = "ee0a737f6735cd23ac2d83a76e124abb9c4f036f4910a788d5861f923dbf2e81"
+digest = "a39c7af173a7bc6a08bb3a7d313231ee9ba167b9ed66ac60d97253c9a3f4058c"
 
 ["checks/headings"]
 updated = "2026-09-15"
@@ -44,7 +44,7 @@ audited = "2026-09-14"
 
 ["commands"]
 updated = "2026-09-15"
-digest = "d6d6c93bd644a767dc33eb84d757258e50eb5bbee0ad99c0e661c9cea281770e"
+digest = "4758e354db3fbf68751c3d93955a8b3bd6d7c82d4a11ec901f276ff03f71000d"
 audited = "2026-09-14"
 
 ["commands/audit"]
@@ -77,7 +77,7 @@ digest = "ae3d309bf473693196ac48c7abe60b8d0bd7505715811adfe381381fb046c76c"
 
 ["commands/publish"]
 updated = "2026-09-15"
-digest = "bd9453e82a8e7ba98b6ab914cda7c55c70b3d4b7f55d0175ae68782cda73eeac"
+digest = "d2d783c48852d4ad2e9bcccd798c1e9952de3f122ff6b8037e237c297b996a56"
 audited = "2026-09-14"
 
 ["commands/serve"]
@@ -92,7 +92,7 @@ audited = "2026-09-14"
 
 ["commands/user"]
 updated = "2026-09-15"
-digest = "73cd6daf97ccbfbaafa86d3c8dc7b78eb3ff968da6dfb0ca03ea32f87f97dfdb"
+digest = "f42b2798d0a4a128b09cb3a8a2dfb2e0cb95b223185a50b33fe0868a544a668d"
 
 ["continuous-integration"]
 updated = "2026-09-14"
@@ -113,7 +113,7 @@ digest = "147c9792a975619a73fbbe517bb87b65a00d6a3643432599e3952305a8b82a6a"
 
 ["front-matter"]
 updated = "2026-09-15"
-digest = "871e0b14cafffba4bb550f199cdfd8eee263c1505e4d7cae31624921d46b69a4"
+digest = "0377333ecefed4eba0888578b1b68af466f02cbfd7098219228c3f688d991c89"
 audited = "2026-09-14"
 
 ["front-matter/infobox"]
@@ -125,9 +125,13 @@ audited = "2026-09-14"
 updated = "2026-09-15"
 digest = "e0bd9d881dbb7862816e8342cb7ae9234d786602dd4a8becf75bb42fd727bdb0"
 
+["health"]
+updated = "2026-09-15"
+digest = "835bad818a2a6dd94016b84dc5a62b54fb6b4653ea6a16c3db55c383950014a6"
+
 ["index"]
-updated = "2026-09-14"
-digest = "f926c30c58ee1afe1af77a9b8aaef0bb2f3b59ce16e442c34264d671252c3243"
+updated = "2026-09-15"
+digest = "7b1b3fbb69331e745f1d28260f178cf5b6792259e61ab6bb45be3aa31412d92e"
 
 ["installation"]
 updated = "2026-09-15"
