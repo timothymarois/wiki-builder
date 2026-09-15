@@ -80,7 +80,8 @@ flowchart LR
 
 Some problems **stop the build** instead of joining the list, such as a missing `wiki.toml` or `goals.md`,
 a page with no title or intent, a page that no reader can reach, a sidebar naming a page that does not exist,
-a picture with no record or a PDF that links to a file outside the files folder.[^stop] When that happens, only that one problem is reported, as a single
+a picture with no record, a PDF that links to a file outside the files folder, or a files folder that is a
+symbolic link.[^stop] When that happens, only that one problem is reported, as a single
 sentence, and the command exits with 1.[^caught]
 
 [^check]: `src/builder/build.py` — `check()` builds into a temporary folder and gathers every problem;

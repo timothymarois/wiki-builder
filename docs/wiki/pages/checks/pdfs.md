@@ -15,7 +15,7 @@ rows = [
   { label = "Refusals", value = "a link outside files, a missing PDF, a PDF over 20 MB", cite = ["outside", "missing", "limit"] },
   { label = "Scope", value = "every PDF link the build writes, in any markdown form", cite = "scope" },
   { label = "Exceptions", value = "code, addresses outside the wiki", cite = "scope" },
-  { label = "Enforcement", value = "listed by wiki check; a link out of the folder stops the build", cite = ["check", "symlink"] },
+  { label = "Enforcement", value = "listed by wiki check; a link out of the folder, or a linked folder, stops the build", cite = ["check", "symlink"] },
   { label = "Clearing", value = "the fix each refusal names", cite = "check" },
 ]
 +++
@@ -53,10 +53,12 @@ vendor's own PDF.[^scope]
 ## Enforcement
 
 `wiki check` lists every problem and exits with 1.[^check] **A PDF that is a symbolic link to a file
-outside the `files` folder stops the build**, so no build publishes the file it points at.[^symlink]
+outside the `files` folder stops the build, and so does a `files` folder that is itself a symbolic link**, so
+no build publishes a file from outside the wiki.[^symlink]
 
 ```text
-wiki: refunds.md links to terms.pdf, which links to a file outside the files folder; put the PDF itself in /path/to/notes/docs/wiki/files
+wiki: refunds.md links to terms.pdf, which links to a file outside the files folder; put the PDF itself in the wiki's files folder
+wiki: the wiki's files folder is a symbolic link, so a build would publish whatever it points at; make files a folder of its own inside the wiki, and put the PDFs in it
 ```
 
 ## Clearing
@@ -76,4 +78,4 @@ correct the link, or make the PDF smaller.[^check]
     hands `build()`; `pdf_problems()` judges each one and finds its line with `link_line()`. Code is rendered
     as text, and an address outside the wiki matches `SETTLED_LINK` first.
 [^symlink]: `src/builder/build.py` — `filed_pdf()`, called from `rewrite_references()`, raises `WikiError`
-    when the file resolves outside the folder.
+    when the file resolves outside the folder, and `write_site()` raises it when `FILES` is a symbolic link.

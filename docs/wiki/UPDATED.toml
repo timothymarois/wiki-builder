@@ -10,7 +10,7 @@ digest = "5b5ceb9bb423176211478611f0ae22a120fcc5c066b5cd8940b36bcc8e00bcfd"
 
 ["checks"]
 updated = "2026-09-15"
-digest = "6c7b0622b6e15a6ed022d43d112f7e936b25632422ac9fc01fecee74a062fd78"
+digest = "4c85ab510c4f444c3829df68a9240fe15393f7f7ca63ec4e8e82e2c39ec96099"
 audited = "2026-09-14"
 
 ["checks/budgets"]
@@ -35,7 +35,7 @@ audited = "2026-09-14"
 
 ["checks/pdfs"]
 updated = "2026-09-15"
-digest = "7bc3a0033cd0f3c6de39503cf4b0561fe12cc628a9ef86c53bbb7079f0e5709a"
+digest = "bc7080045444e322afdac165a84647ec8006ad804125ef4308f12106b8eda423"
 
 ["checks/pictures"]
 updated = "2026-09-15"
@@ -174,7 +174,7 @@ audited = "2026-09-15"
 
 ["pages/pdfs"]
 updated = "2026-09-15"
-digest = "7eba4b5e37d8a2b23fd31079e97b2ef169b3fb762a7cb0a8dea857aed4dff81a"
+digest = "1f0fc08937e0061a80dcfdb2726bd2d2b5961020a2f8de1ea259c053fde3cdec"
 
 ["pages/pictures"]
 updated = "2026-09-15"

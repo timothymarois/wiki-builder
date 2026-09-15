@@ -1898,8 +1898,26 @@ class WikiTests(unittest.TestCase):
         (self.root / "docs/wiki/files").mkdir(parents=True)
         (self.root / "docs/wiki/files/policy.pdf").symlink_to(self.root / ".env")
         self.link_pdf("../files/policy.pdf")
-        self.refused("outside the files folder")
+        with self.assertRaises(wiki.WikiError) as caught:
+            self.build()
+        # No absolute path: a message names the wiki's own folders, the same on every machine.
+        self.assertEqual("thing.md links to policy.pdf, which links to a file outside the files folder; put the PDF "
+                         "itself in the wiki's files folder", str(caught.exception))
         self.assertFalse((self.out / "files/policy.pdf").exists(), "the linked file was published")
+
+    def test_a_files_folder_that_is_a_symbolic_link_is_refused(self):
+        # With the folder itself a link, the file and the folder resolve to the same place elsewhere, so a
+        # containment test that resolves both would publish whatever the folder points at.
+        (self.root / "elsewhere").mkdir()
+        (self.root / "elsewhere/secret.pdf").write_bytes(b"%PDF-1.4\n")
+        (self.root / "docs/wiki/files").symlink_to(self.root / "elsewhere")
+        self.link_pdf("../files/secret.pdf")
+        with self.assertRaises(wiki.WikiError) as caught:
+            self.build()
+        self.assertEqual("the wiki's files folder is a symbolic link, so a build would publish whatever it points "
+                         "at; make files a folder of its own inside the wiki, and put the PDFs in it",
+                         str(caught.exception))
+        self.assertFalse((self.out / "files/secret.pdf").exists(), "a PDF from outside the wiki was published")
 
     def test_a_pdf_link_shows_the_pdfs_size(self):
         self.pdf("policy.pdf", 2516582)

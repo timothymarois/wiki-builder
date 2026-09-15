@@ -52,7 +52,8 @@ The rules are in the [Refund policy](../files/refund-policy.pdf).
 **Only a PDF directly in the `files` folder is published.**[^link] A link to a PDF anywhere else, or in a
 folder inside `files`, would lead nowhere once the site is on a host, so `wiki check` refuses it.[^refused]
 A PDF larger than 20 MB is refused too.[^limit] A PDF that is a symbolic link to a file outside the folder
-stops the build, so the file it points at is never published.[^symlink] A PDF no page links any more is
+stops the build, and so does a `files` folder that is itself a symbolic link, so no file from outside the
+wiki is published.[^symlink] A PDF no page links any more is
 removed from the site by the next build.[^stale]
 
 ## Viewer
@@ -84,7 +85,8 @@ download it.[^touch]
 [^copy]: `src/builder/build.py` — `markdown_copy()` points a PDF link `filed_pdf()` finds at the site's copy.
 [^refused]: `src/builder/build.py` — `pdf_problems()`, called from `check()`.
 [^limit]: `src/builder/build.py` — `pdf_problems()` refuses a PDF over `PDF_LIMIT`, 20 × `MEGABYTE`.
-[^symlink]: `src/builder/build.py` — `filed_pdf()` raises `WikiError` when the file resolves outside the folder.
+[^symlink]: `src/builder/build.py` — `filed_pdf()` raises `WikiError` when the file resolves outside the folder,
+    and `write_site()` raises it when `FILES` is a symbolic link.
 [^stale]: `src/builder/build.py` — `clear_stale()` deletes a file an earlier build wrote and this one did not.
 [^viewer]: `src/builder/assets/wiki.js` — the click listener for `a.pdf[href]` calls `show()` with the link's
     text as an `h2`, an `iframe` of the PDF, and `Open in new tab`, `Download` and `Close`;

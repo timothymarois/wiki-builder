@@ -523,7 +523,7 @@ def filed_pdf(source_path, address, files_dir):
         return None
     if not (files_dir / name).resolve().is_relative_to(files_dir.resolve()):
         raise WikiError(f"{source_path.name} links to {name}, which links to a file outside the files folder; put "
-                        f"the PDF itself in {files_dir}")
+                        "the PDF itself in the wiki's files folder")
     return name
 
 
@@ -1232,6 +1232,11 @@ def write_site(root, out, audience, link_root, today, record, wiki, sitemap=Fals
     ledger = read_ledger(images_dir)
     shown = set()
     files_dir = wiki / FILES
+    # A folder that is itself a link resolves, with every file in it, to wherever it points, so the test that keeps
+    # a PDF inside the folder would pass anything there.
+    if files_dir.is_symlink():
+        raise WikiError(f"the wiki's {FILES} folder is a symbolic link, so a build would publish whatever it points "
+                        f"at; make {FILES} a folder of its own inside the wiki, and put the PDFs in it")
     pdfs = set()
     site_root = (link_root or out)
     today = today or datetime.date.today().isoformat()
