@@ -1509,6 +1509,14 @@ class WikiTests(unittest.TestCase):
                          "a picture on its own line is still wrapped in a paragraph")
         self.assertTrue((self.out / "images/thing.png").is_file(), "the picture was not copied")
 
+    def test_an_unreadable_dates_file_is_a_sentence_not_a_traceback(self):
+        (self.root / "docs/wiki" / wiki.DATES).write_text('["thing"]\nupdated = \n', encoding="utf-8")
+        self.refused("updated.toml is unreadable")
+
+    def test_an_unreadable_picture_record_is_a_sentence_not_a_traceback(self):
+        (self.root / "docs/wiki/images" / wiki.LEDGER).write_text('["thing.png"\n', encoding="utf-8")
+        self.refused("pictures.toml is unreadable")
+
     def test_a_picture_named_outside_the_images_folder_is_refused(self):
         # A build copies each picture into the site's images folder by the name its table carries. A name
         # that climbs out of the folder would copy any file in the project to wherever the name points.

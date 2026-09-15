@@ -215,7 +215,10 @@ def read_dates(wiki):
     path = wiki / DATES
     if not path.is_file():
         return {}
-    return tomllib.loads(path.read_text(encoding="utf-8"))
+    try:
+        return tomllib.loads(path.read_text(encoding="utf-8"))
+    except tomllib.TOMLDecodeError as error:
+        raise WikiError(f"{DATES} is unreadable: {error}") from error
 
 
 def write_dates(wiki, dates):
@@ -248,7 +251,10 @@ def read_ledger(images_dir):
     path = images_dir / LEDGER
     if not path.is_file():
         return {}
-    ledger = tomllib.loads(path.read_text(encoding="utf-8"))
+    try:
+        ledger = tomllib.loads(path.read_text(encoding="utf-8"))
+    except tomllib.TOMLDecodeError as error:
+        raise WikiError(f"{LEDGER} is unreadable: {error}") from error
     # A build copies each picture by the name its table carries, so a name that climbed out of the folder
     # would copy any file in the project into the site.
     for name in sorted(ledger):
