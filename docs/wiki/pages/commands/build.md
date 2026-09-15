@@ -68,6 +68,7 @@ it wrote in `.wiki-build` inside the folder, and deletes only files from that li
 |---|---|---|
 | `0` | the site is written[^exit] | `wiki: 3 pages written to /path/to/notes/docs/wiki/site` |
 | `1` | a problem stops the build[^stop] | the problem, such as `wiki: there is no goals.md; the collected goals need a page to be collected onto` |
+| `1` | `UPDATED.toml` or `PICTURES.toml` is not valid TOML[^unreadable] | `wiki: UPDATED.toml is unreadable:` and the parser's error |
 | `2` | there is no wiki where it was pointed[^exit] | `wiki: no wiki at nowhere` |
 | `2` | the site folder holds files the tool did not write[^exit] | `wiki: /path/to/notes/docs/wiki/site is not empty and was not written by this tool; remove it yourself if you meant to replace it` |
 | `2` | an option it does not know[^exit] | `wiki: error: unrecognized arguments: --unknown` |
@@ -84,5 +85,7 @@ it wrote in `.wiki-build` inside the folder, and deletes only files from that li
     files `BUILD_RECORD` lists that the build did not write again, then records what it wrote.
 [^exit]: `src/builder/cli.py` — `main()` returns 2 with no wiki and prints a `WikiError` before returning 1;
     `run()` returns 2 when `guard_output()` refuses; argparse exits 2 on an option it does not know.
+[^unreadable]: `src/builder/build.py` — `read_dates()` and `read_ledger()` raise a `WikiError` naming the
+    file when it is not valid TOML.
 [^stop]: `src/builder/cli.py` — `main()` prints a `WikiError` and returns 1; `src/builder/build.py` —
     `write_site()` raises a `WikiError` for a wiki with no `goals.md`.

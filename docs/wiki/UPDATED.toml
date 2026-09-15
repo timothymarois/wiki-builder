@@ -55,7 +55,7 @@ audited = "2026-09-14"
 
 ["commands/build"]
 updated = "2026-09-14"
-digest = "abeed36d648d876477d554f4518092c4adf644893d620492dee9dc33bf4722ab"
+digest = "01d7bd7b609a263051239334971a383c3a61df562a9ff9dba989c4df5fe79aed"
 audited = "2026-09-14"
 
 ["commands/check"]
@@ -146,7 +146,7 @@ digest = "e1089cb77511573daf282b6bd49fe63c9762a0eff12671af04a1d4c870eaa5eb"
 
 ["pictures-toml"]
 updated = "2026-09-14"
-digest = "277b95cb0a2ab6ed75d3f854e1c09f97d729023010a5d5b3733bf7d7cf7f138c"
+digest = "cefd6072b1842eaeb02d288ff1e8f14948ccea6abbc83e224ba6bd31cb45d9de"
 audited = "2026-09-14"
 
 ["review-prompt"]
