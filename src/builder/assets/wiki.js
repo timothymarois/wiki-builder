@@ -105,14 +105,21 @@
   var diagramText = diagrams.map(function (pre) { return pre.textContent; });
   // idle until a diagram nears the screen, loading while the script arrives, ready once it can draw.
   var mermaidState = "idle";
+  // What watches for a diagram nearing the screen; it stops watching once Mermaid has loaded.
+  var nearing = null;
 
   function loadMermaid() {
     if (mermaidState !== "idle") { return; }
     mermaidState = "loading";
     var script = document.createElement("script");
     script.src = WIKI_MERMAID;
-    script.onload = function () { mermaidState = "ready"; drawDiagrams(); };
-    script.onerror = function () { mermaidState = "idle"; };
+    script.onload = function () {
+      mermaidState = "ready";
+      if (nearing) { nearing.disconnect(); }
+      drawDiagrams();
+    };
+    // A failed fetch, such as on a dropped connection, is tried again when a diagram next nears the screen.
+    script.onerror = function () { mermaidState = "idle"; script.remove(); };
     document.head.appendChild(script);
   }
 
@@ -132,9 +139,8 @@
   if (diagrams.length) {
     if ("IntersectionObserver" in window) {
       // 600px ahead of the screen, so a diagram is usually drawn by the time the reader reaches it.
-      var nearing = new IntersectionObserver(function (entries) {
+      nearing = new IntersectionObserver(function (entries) {
         if (entries.some(function (entry) { return entry.isIntersecting; })) {
-          nearing.disconnect();
           loadMermaid();
         }
       }, { rootMargin: "600px 0px" });
