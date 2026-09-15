@@ -25,7 +25,8 @@ audited = "2026-09-14"
 
 ["checks/families"]
 updated = "2026-09-15"
-digest = "3376dda8b34a450ebf2db441150b31a84b3f9db4e8c97c62daa5e8dd631d7fd0"
+digest = "d4e95b706484ab2bc34348cc06dc39cbc6df4e52b5dc9c6b1ebfc171ea35c247"
+audited = "2026-09-15"
 
 ["checks/headings"]
 updated = "2026-09-15"
@@ -69,11 +70,13 @@ audited = "2026-09-14"
 
 ["commands/coverage"]
 updated = "2026-09-15"
-digest = "e0e38f8c68e320a194607e41bc0bbcadccdad31ac34006d61326d1ef6eadcb4b"
+digest = "0b8eedd326388afb551a520d374b79e15f6b6c5f4d7b95442731c1c151dc35c9"
+audited = "2026-09-15"
 
 ["commands/families"]
 updated = "2026-09-15"
 digest = "c722347820c3f73c9aab06b1421144fa000dfeb62f029a2eb52946554c31f8e6"
+audited = "2026-09-15"
 
 ["commands/publish"]
 updated = "2026-09-15"
@@ -102,14 +105,17 @@ audited = "2026-09-14"
 ["deployment-cloudflare"]
 updated = "2026-09-15"
 digest = "1ae141adcf96d602a29211411e8362d86395f4680b41e67f6d72aa0244273684"
+audited = "2026-09-15"
 
 ["deployment-cloudflare/authentication"]
 updated = "2026-09-14"
 digest = "4bcf0633c2f7af2175c3bdd0102c82fd971f45004efebdba19cd5ea9d604cf8b"
+audited = "2026-09-15"
 
 ["deployment-github"]
 updated = "2026-09-15"
 digest = "e5fbb877900d022954de5b110d29ab6bf9bf9c270b1144d44c5c1ce3dd23d462"
+audited = "2026-09-15"
 
 ["front-matter"]
 updated = "2026-09-15"
@@ -159,10 +165,12 @@ audited = "2026-09-14"
 ["pages/markdown"]
 updated = "2026-09-14"
 digest = "ab6fa42eb14d26b2c62902ee570b17fe4f369e0da0e791491e381cb8a8c38e79"
+audited = "2026-09-15"
 
 ["pages/pictures"]
 updated = "2026-09-14"
 digest = "e1089cb77511573daf282b6bd49fe63c9762a0eff12671af04a1d4c870eaa5eb"
+audited = "2026-09-15"
 
 ["pictures-toml"]
 updated = "2026-09-15"
@@ -201,6 +209,7 @@ audited = "2026-09-14"
 ["skill/delivery"]
 updated = "2026-09-15"
 digest = "fea70b8a8c36d5645445ea71669e8dc8b6e48e3beac221dffda11e92f7859676"
+audited = "2026-09-15"
 
 ["wiki-toml"]
 updated = "2026-09-15"
