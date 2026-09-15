@@ -29,7 +29,9 @@ member knows where to look on every other, and can set two members side by side.
 
 **The layout is designed once, for the whole family**, before its members are written or rewritten.
 
-1. **List the questions a reader asks of every member**, not the facts the first page happened to hold.
+1. **List the questions each reader asks of every member**, for each reader the Readers section of
+   `SKILL.md` names: the stakeholder, the product owner, the engineering team and, when the family is for
+   customers, the customer. Take the questions, not the facts the first page happened to hold.
 2. **Name each answer as a heading**, by the naming method in `SKILL.md`: how fast a notice arrives is
    **Delivery**; how many can be sent is **Limits**; what happens when one fails is **Failures**; how a
    person stops them is **Opting out**.
