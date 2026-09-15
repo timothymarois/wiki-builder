@@ -1,7 +1,7 @@
 +++
 title = "Delivery"
 subtitle = "the skill's folder in a project, and the release that wiki.toml records"
-status = "draft"
+status = "approved"
 intent = """
 Delivery exists so that a change to the skill's rules reaches a project only when that project asks for
 it, and arrives where the project reviews it.

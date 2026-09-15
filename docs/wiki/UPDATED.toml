@@ -110,8 +110,8 @@ digest = "6d2fc369995b7f34f8e78d81051f11074d2c64b8d5845c3c8716fe5d3a7b103c"
 audited = "2026-09-14"
 
 ["goals"]
-updated = "2026-09-14"
-digest = "142b728ca0fb53efe157fd440ae1ccb2df83d5fc0e5eee1f756a5c8271b09d32"
+updated = "2026-09-15"
+digest = "e0bd9d881dbb7862816e8342cb7ae9234d786602dd4a8becf75bb42fd727bdb0"
 
 ["index"]
 updated = "2026-09-14"
@@ -180,7 +180,7 @@ audited = "2026-09-14"
 
 ["skill/delivery"]
 updated = "2026-09-15"
-digest = "65b0e8038ce71c7c9bb7e8db53bfb007ea4fefa80de96e90048858ebba67f95c"
+digest = "58ad5d5d2e831cc2878fa4e445050d7da9fae78dddf6d0f45de44b85366bdc26"
 
 ["wiki-toml"]
 updated = "2026-09-14"
