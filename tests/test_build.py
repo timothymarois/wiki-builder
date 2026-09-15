@@ -2143,6 +2143,17 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(wiki_version(), recorded.get("tool", {}).get("version"), "the release was not recorded")
         self.assertEqual({"version_label": "kept"}, recorded["notes"], "another table's setting was changed")
 
+    def test_sync_records_the_release_under_a_header_that_carries_a_comment(self):
+        root = self.project()
+        settings = root / "docs/wiki" / CONFIG
+        settings.write_text(CONFIGURATION.replace(f'[tool]\nversion = "{wiki_version()}"\n',
+                                                  '[tool]  # written by wiki sync\nname = "kept"\n'),
+                            encoding="utf-8")
+        status, output = self.sync(root, "--no-skill")
+        self.assertEqual(0, status, output)
+        recorded = tomllib.loads(settings.read_text(encoding="utf-8"))
+        self.assertEqual({"name": "kept", "version": wiki_version()}, recorded.get("tool"))
+
     def test_sync_records_the_release_when_only_a_comment_names_its_table(self):
         root = self.project()
         settings = root / "docs/wiki" / CONFIG

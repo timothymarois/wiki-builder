@@ -71,7 +71,7 @@ def record_version(wiki_dir, version):
         heading = TABLE_HEADER.match(row)
         if heading:
             table = heading.group(1)
-            if row.strip() == "[tool]" and header is None:
+            if table == "tool" and not row.lstrip().startswith("[[") and header is None:
                 header = index
         elif table == "tool" and VERSION_SETTING.match(row):
             lines[index] = setting
