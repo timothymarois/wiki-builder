@@ -99,8 +99,8 @@ a private repository needs a paid plan.[^plans]
 
 ## Example
 
-wiki-builder's own `pages` workflow checks and publishes its wiki on every push to `main`.[^pages] It
-serves the result at wiki-builder.marois.dev.{missing}
+wiki-builder's own `pages` workflow checks and publishes its wiki on every push to `main`.[^pages] Its
+`deploy` job names https://wiki-builder.marois.dev as the address of the `github-pages` environment.[^address]
 
 ## External links
 
@@ -113,9 +113,11 @@ serves the result at wiki-builder.marois.dev.{missing}
 [^pages]: `.github/workflows/pages.yml` — the `build` job checks the wiki and runs `wiki publish _site`,
     and the `deploy` job runs `actions/deploy-pages`, on every push to `main`.
 [^flow]: `.github/workflows/pages.yml` — runs `on` a push to `main` or `workflow_dispatch`; the `build`
-    job checks the wiki through `./`, runs `wiki publish _site`, writes `_site/CNAME` and uploads the site
+    job checks the wiki through `./`, runs `wiki publish _site` and uploads the site
     with `actions/upload-pages-artifact`; `deploy` needs `build` and runs `actions/deploy-pages`.
     `action.yml` — its last step runs `wiki check`, and a failing step stops the job.
+[^address]: `.github/workflows/pages.yml` — the `deploy` job's `environment` sets `url` to
+    `https://wiki-builder.marois.dev`.
 [^order]: `.github/workflows/pages.yml` — `deploy` needs `build`, whose first step after checkout is the
     check.
 [^action]: `action.yml` — installs wiki-builder with `pip` into the Python `actions/setup-python` puts on
