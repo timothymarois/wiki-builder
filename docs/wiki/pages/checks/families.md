@@ -63,16 +63,17 @@ wiki: commands.md does not link commands/audit.md, a member of its family; link 
 
 ### Declaration
 
-A `headings` or `labels` that is not a list of names is refused, and the family's members are not checked
-until it is.[^declare]
+A `family` that is not a table, and a `headings` or `labels` that is empty or is not a list of names, are
+refused, and the family's members are not checked until each is fixed.[^declare]
 ```text
-wiki: checks.md: family.headings must list the headings every member of the family may use, such as headings = ["Usage", "Output"]
+wiki: checks.md: family.headings must list the headings every member of the family may use, such as headings = ["Usage", "Output"], or leave family.headings out to check no headings
 ```
 
 ## Scope
 
 The check reads the direct children of each page that declares `[family]`: their second-level headings
-outside code samples, and every infobox label in every group.[^scope] A grandchild belongs to its own
+outside code samples, compared as the page shows them without a closing run of `#` or backticks, and every
+infobox label in every group.[^scope] A grandchild belongs to its own
 parent's family, when that parent declares one.[^scope]
 
 ## Exceptions
@@ -92,7 +93,8 @@ added to the list on the parent for every member.[^clearing] A missing link is c
 from the parent's text, such as from a table of the members.[^links]
 
 [^declare]: `src/builder/build.py` — `family_problems()` reads `headings` and `labels` from a page's `family`
-    table, reports one that is not a list of names, and skips that family's members.
+    table, reports a `family` that is not a table and a list that is empty or holds anything but names, and
+    skips that family's members.
 [^headings]: `src/builder/build.py` — `family_problems()` compares each member's `section_headings()` with
     `headings`, refusing a heading the list does not hold and one placed before a heading the list puts
     first.
@@ -101,7 +103,8 @@ from the parent's text, such as from a table of the members.[^links]
 [^links]: `src/builder/build.py` — `family_problems()` resolves each link in the parent's text with
     `linked_page()`, and refuses a member none of them reaches.
 [^scope]: `src/builder/build.py` — `family_problems()` checks `children_of()` the declaring page only, and
-    `section_headings()` reads `SECTION_HEADING` outside `FENCED` code.
+    `section_headings()` reads `SECTION_HEADING` outside `FENCED` code, dropping a closing run of `#` and
+    every backtick.
 [^exceptions]: `src/builder/build.py` — `family_problems()` checks only the headings and labels a member
     uses, checks a key only when the family declares it, and skips a page with no `family`.
 [^enforcement]: `src/builder/build.py` — `check()` adds `family_problems()` to the problems it lists.

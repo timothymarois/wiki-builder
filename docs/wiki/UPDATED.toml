@@ -25,7 +25,7 @@ audited = "2026-09-14"
 
 ["checks/families"]
 updated = "2026-09-15"
-digest = "ac94baf25d8f7f35db7f9658c9cca96eb9ade2e8b1e3d912480dd4e484466ba5"
+digest = "ee0a737f6735cd23ac2d83a76e124abb9c4f036f4910a788d5861f923dbf2e81"
 
 ["checks/headings"]
 updated = "2026-09-15"
@@ -69,7 +69,7 @@ audited = "2026-09-14"
 
 ["commands/coverage"]
 updated = "2026-09-15"
-digest = "ff205c2c90f004189d892f7295e2e12791a36b114cacb33711bb8d7d92abb5de"
+digest = "01a394710d3be492d443a31646089536744e41e78e7e0a2377f55eea8f8699b9"
 
 ["commands/families"]
 updated = "2026-09-15"
