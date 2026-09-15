@@ -17,7 +17,7 @@ rows = [
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Location", value = ".agents/skills, else .claude/skills", note = "unless --skill-dir names one", cite = ["home", "skilldir"] },
+  { label = "Skill folder", value = ".agents/skills, else .claude/skills", note = "unless --skill-dir names one", cite = ["home", "skilldir"] },
   { label = "Release record", value = "wiki.toml", note = "checked by wiki check", cite = ["record", "version"] },
 ]
 +++
