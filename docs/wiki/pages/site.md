@@ -56,7 +56,7 @@ leads nowhere.[^deadlink]
 
 Each page ends with the day it last changed.[^dates] **That date moves only when the page's own text
 does**: restyling or rebuilding the site leaves every date alone.[^dates] The goals page is the exception:
-its date moves whenever any page's intent changes, including a draft's.[^goalsdate]
+its date moves with the titles, intents and order it lists.[^goalsdate]
 
 The record of dates is committed with the pages, because a date taken from the clock would say "today"
 forever.[^dates] Every command that builds the site records dates, and `wiki check` never does.[^record]
@@ -110,7 +110,8 @@ banner.[^userdraft] Every field is listed on [Front matter](front-matter.md).
 [^audited]: `src/builder/build.py` — `render_page()` adds `Last audited` after `Last updated`, with `never`
     when there is none, and `write_site()` keeps a page's `audited` when its date moves, and passes none
     for a page whose front matter says `goals = false`.
-[^goalsdate]: `src/builder/build.py` — `page_digest()` adds every page's intent to the goals page's hash.
+[^goalsdate]: `src/builder/build.py` — `page_digest()` adds to the goals page's hash the title and intent of
+    each page `goals_order()` collects for the full wiki, in that order, so a draft's intent is left out.
 [^search]: `src/builder/assets/wiki.js` — the search listener filters on `page.t`, the title, and keeps
     eight; `src/builder/build.py` — `write_site()` adds each category to the index as `Category:` and its
     name.
