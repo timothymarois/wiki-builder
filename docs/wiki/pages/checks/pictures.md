@@ -18,9 +18,10 @@ rows = [
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Fingerprint", value = "bytes of every depicted file", cite = "digest" },
-  { label = "Blessing", value = "reason required", cite = "bless" },
-  { label = "New picture", value = "unguarded until blessed", cite = "unguarded" },
+  { label = "Scope", value = "bytes of every depicted file", cite = "digest" },
+  { label = "Exceptions", value = "a new picture, unguarded until blessed", cite = "unguarded" },
+  { label = "Enforcement", value = "build stopped for a picture with no record", cite = "missing" },
+  { label = "Clearing", value = "wiki bless, with a reason", cite = "bless" },
 ]
 +++
 
@@ -29,25 +30,26 @@ shows.[^ledger] The check fingerprints those files and fails when **they have ch
 was made**.[^check] Nothing about the files is assumed, so any project can say what a picture shows
 without adopting a convention for its own assets.[^digest]
 
-## Records
+## Scope
 
-A page showing a picture that has no record stops the build, and so does a record for a picture file that
-is missing.[^missing] A record whose `depicts` names a path that is not in the project, or a folder holding
-no files, stops the check.[^subject] A record naming a folder covers every file in it, so a change to any of those files
-flags the picture.[^digest]
+A record naming a folder covers every file in it, so a change to any of those files flags the
+picture.[^digest]
 
-## Blessing
-
-`wiki bless` takes a picture and a reason, and records the current fingerprint along with the
-reason.[^bless] **A reason is required**, because it is the record that the picture was looked at.[^bless]
+## Exceptions
 
 A picture whose record has no fingerprint yet is never checked.[^unguarded] **A new picture is unguarded
 until it is blessed for the first time.**[^unguarded]
 
-## Page anatomy
+## Enforcement
 
-The picture of a page's parts shows the page template.[^here] If the template changes, the check on wiki-builder's
-own wiki fails until the picture is redrawn or blessed.[^here]
+A page showing a picture that has no record stops the build, and so does a record for a picture file that
+is missing.[^missing] A record whose `depicts` names a path that is not in the project, or a folder holding
+no files, stops the check.[^subject]
+
+## Clearing
+
+`wiki bless` takes a picture and a reason, and records the current fingerprint along with the
+reason.[^bless] **A reason is required**, because it is the record that the picture was looked at.[^bless]
 
 [^ledger]: `src/builder/build.py` — `read_ledger()` reads `LEDGER` from the images folder.
 [^check]: `src/builder/build.py` — `picture_problems()` compares each recorded `digest` with
@@ -61,5 +63,3 @@ own wiki fails until the picture is redrawn or blessed.[^here]
 [^bless]: `src/builder/build.py` — `bless()` refuses an empty reason and writes `digest` and `blessed`
     through `write_ledger()`.
 [^unguarded]: `src/builder/build.py` — `picture_problems()` checks an entry only when it has a `digest`.
-[^here]: `docs/wiki/images/PICTURES.toml` — `page-anatomy.svg` depicts `src/builder/assets/template.html`,
-    read by `picture_problems()`.

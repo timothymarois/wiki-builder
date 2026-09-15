@@ -12,21 +12,19 @@ rule plainly rather than quoting who asked for it.
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Checks", value = "pointing words, vague actors, attribution, empty words", cite = "checks" },
-  { label = "Refused openings", value = "this, that, these, those, our, here", note = "in a title or infobox name", cite = "names" },
-  { label = "Pages checked", value = "every page, including one excused from citations", cite = "pages" },
-  { label = "Code", value = "not checked", cite = "code" },
+  { label = "Refusals", value = "pointing words, vague actors, attribution, empty words", cite = "checks" },
+  { label = "Scope", value = "every page, including one excused from citations", cite = "pages" },
+  { label = "Exceptions", value = "words inside code", cite = "code" },
 ]
 +++
 
 The wording checks refuse a name or a sentence that points at the page, hides who acts, quotes the owner
 instead of stating a rule, or uses a word that carries no fact.[^checks] Each names the field it found, or
-the page and line of the sentence.[^checks] Every page is checked, including one excused from
-citations.[^pages] Words inside code are left alone, because a sample shows text as written, and capital
-letters make no difference.[^code] Headings are held to the pointing words on
-[Headings](headings.md).
+the page and line of the sentence.[^checks]
 
-## Pointing words
+## Refusals
+
+### Pointing words
 
 A page title, infobox group or infobox label that opens with *this*, *that*, *these*, *those*, *our* or
 *here* is refused, and the check asks for the thing itself.[^names] A sentence, subtitle or intent is refused when *this*, *these* or *our* comes directly
@@ -34,29 +32,26 @@ before *repository*, *repositories*, *repo*, *project*, *site*, *website*, *wiki
 *codebase*, because to a reader who arrived from a search, `this repository` is no repository at
 all.[^prose]
 
-## Vague actors
+### Vague actors
 
 A word that says an unnamed person acts is refused wherever it stands whole: `nobody`, `somebody`,
 `someone`, `anyone`, `anybody`, `everyone`, `everybody`, and `no one` written with a space or a
-hyphen.[^actors] The check reads the title, subtitle and
-intent, every infobox group, label, value and note, and every sentence, but no heading.[^actors] Such a
+hyphen.[^actors] Such a
 word hides the fact a reader needs, so a page names the reader, the owner, an agent or the part of the
 system that acts.[^actors]
 
-## Attribution
+### Attribution
 
 A page that tells a rule as a quote of the owner is refused, because the quote dates the page and argues
 instead of describing.[^attribution] Where a requirement came from is recorded with the work that
 implements it.[^attribution] Two kinds of wording are refused: `the owner` or `the owner's ruling`, with or
 without a comma, followed by a date written as year, month and day, such as `the owner, 2026-09-14`; and
-`the owner` followed by `said`, `says`, `asked`, `wrote` or `ruled`.[^attribution] The check reads the subtitle, intent and every sentence, but no title, heading or
-infobox row.[^attribution]
+`the owner` followed by `said`, `says`, `asked`, `wrote` or `ruled`.[^attribution]
 
-## Empty words
+### Empty words
 
 A word that carries no fact is refused wherever the vague-actor check looks, with what to write
-instead.[^empty] `may`, `just`, `some` and `new` have plain uses too, so the writer
-judges them.[^empty]
+instead.[^empty]
 
 | Kind | Words refused |
 |---|---|
@@ -69,6 +64,18 @@ judges them.[^empty]
 | Empty amounts | `a number of`, `reasonable`[^empty] |
 | Vague references | `the one`, `the ones`[^empty] |
 | Infobox values | a value that is only `yes`, `configurable`, `varies` or `depends`[^values] |
+
+## Scope
+
+Every page is checked, including one excused from citations.[^pages] Headings are held to the pointing words
+on [Headings](headings.md). The vague-actor check reads the title, subtitle and intent, every infobox group,
+label, value and note, and every sentence, but no heading.[^actors] The attribution check reads the subtitle,
+intent and every sentence, but no title, heading or infobox row.[^attribution]
+
+## Exceptions
+
+Words inside code are left alone, because a sample shows text as written, and capital letters make no
+difference.[^code] `may`, `just`, `some` and `new` have plain uses too, so the writer judges them.[^empty]
 
 [^checks]: `src/builder/build.py` — `pointing_problems()`, `vague_actor_problems()`, `attribution_problems()`
     and `empty_word_problems()`, each called from `check()`, and each naming the field, or the page and line.

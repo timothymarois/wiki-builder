@@ -73,6 +73,9 @@ depicts = ["src/builder/assets/template.html"]
 blessed = "the template gained a placeholder for the diagram script at the foot of the page; nothing a reader sees moved"
 ```
 
+The picture of a page's parts shows the page template.[^anatomy] If the template changes, the check on
+wiki-builder's own wiki fails until the picture is redrawn or blessed.[^anatomy]
+
 [^read]: `src/builder/build.py` — `read_ledger()` reads `LEDGER` from the `images` folder inside the wiki
     folder, returns an empty record when the file is missing, and raises when the file is not valid TOML
     or UTF-8, an entry is not a table, or a table's name is not a file name.
@@ -87,3 +90,5 @@ blessed = "the template gained a placeholder for the diagram script at the foot 
 [^example]: `docs/wiki/images/PICTURES.toml` — the `page-anatomy.svg` table.
 [^bless]: `src/builder/build.py` — `bless()` sets `digest` to what `subject_digest()` makes of `depicts`
     now and `blessed` to the reason given, then calls `write_ledger()`.
+[^anatomy]: `docs/wiki/images/PICTURES.toml` — `page-anatomy.svg` depicts `src/builder/assets/template.html`,
+    read by `picture_problems()`.

@@ -13,18 +13,15 @@ describes, or say plainly that nothing was found.
 group = "Identity"
 rows = [
   { label = "Syntax", value = "markdown footnote", cite = "render" },
-  { label = "Mark", value = "{missing}", note = "for no source", cite = "mark" },
 ]
 
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Unit checked", value = "sentence", cite = "uncited" },
-  { label = "Infobox rows", value = "cited, or marked missing", cite = "rows" },
-  { label = "Code samples", value = "not checked", cite = "excused" },
-  { label = "Refused reference", value = "a link containing .md", cite = "document" },
-  { label = "Outside documentation", value = "allowed, as a link without .md", cite = "document" },
-  { label = "Exempt pages", value = "any page with goals = false", cite = "exempt" },
+  { label = "Refusals", value = "an uncited sentence, table row or infobox row, and a reference linking to .md", cite = ["uncited", "rowcite", "rows", "document"] },
+  { label = "Scope", value = "every sentence, table row and infobox row", cite = ["uncited", "rowcite", "rows"] },
+  { label = "Exceptions", value = "code samples, the header row, any page with goals = false", cite = ["excused", "rowcite", "exempt"] },
+  { label = "Clearing", value = "the red mark, written {missing}", cite = "mark" },
 ]
 +++
 
@@ -32,7 +29,9 @@ A **citation** is a numbered mark at a claim, with its reference at the foot of 
 markdown footnote.[^render] Three checks hold citations to account: one each for a sentence and an infobox
 row that cite nothing, and one for a reference that cites the wrong kind of thing.[^three]
 
-## Silence
+## Refusals
+
+### Silence
 
 Every sentence must carry a citation, or the red mark that says there is none.[^uncited] If one does not,
 the check names the page and the line, and quotes the sentence.[^uncited] **The check looks for the mark,
@@ -53,21 +52,34 @@ flowchart LR
 ```
 
 A citation after the full stop belongs to its sentence, and **a sentence never borrows its neighbour's
-citation**.[^uncited] A version number does not end a sentence, but an abbreviation followed by a capital
-does, so `Dr. Smith` is read as two sentences.[^boundary] A sentence directly under a heading is checked
-like any other.[^heading]
+citation**.[^uncited]
 
-Five things are excused: a statement with no letters; a sentence linking to any markdown file, even a
-missing page, which the check described on [Site](../site.md) refuses on its own; a list item that is only
-a link; a code sample; and a picture with its caption.[^excused] **Every table row carries a citation, or the red mark, in at
-least one of its cells**; a table whose rows cite nothing is a gap, not an excuse.[^rowcite]
-The header row is exempt.[^rowcite]
+**Every table row carries a citation, or the red mark, in at least one of its cells**; a table whose rows cite
+nothing is a gap, not an excuse.[^rowcite]
 
 An infobox row cites a footnote the page's text also cites, and carries that citation's number, or is
 marked as having no source; a row with neither, or citing a footnote no sentence uses, is refused.[^rows]
-A page that says `goals = false` is excused from both rules, whatever it describes.[^exempt]
 
-## Red mark
+### Documents
+
+A reference whose link contains `.md` anywhere is refused, because a page of prose is only another claim
+that can be wrong in the same way.[^document] Outside documentation passes when its address has no `.md`,
+so **a README on GitHub is refused like a project document**.[^document] A reference that names a document
+without linking to it passes, and so does one that names nothing.[^document]
+
+## Scope
+
+A version number does not end a sentence, but an abbreviation followed by a capital does, so `Dr. Smith` is
+read as two sentences.[^boundary] A sentence directly under a heading is checked like any other.[^heading]
+
+## Exceptions
+
+Five things are excused: a statement with no letters; a sentence linking to any markdown file, even a missing
+page, which the check described on [Site](../site.md) refuses on its own; a list item that is only a link; a
+code sample; and a picture with its caption.[^excused] The header row is exempt.[^rowcite] A page that says
+`goals = false` is excused from the rules for sentences and infobox rows, whatever it describes.[^exempt]
+
+## Clearing
 
 Where nothing can be cited, the writer puts the word *missing* in curly braces, and it renders as a red
 question mark in brackets.[^mark] **It is a fine answer; silence is not.**[^uncited] It means the thing is
@@ -77,12 +89,6 @@ counts for nothing.[^code]
 
 Every build and check prints how many sources each page cites and how many claims it marks, with totals
 for the wiki.[^counts] `wiki check` also lists every marked claim by page and line, without failing.[^marks]
-## Documents
-
-A reference whose link contains `.md` anywhere is refused, because a page of prose is only another claim
-that can be wrong in the same way.[^document] Outside documentation passes when its address has no `.md`,
-so **a README on GitHub is refused like a project document**.[^document] A reference that names a document
-without linking to it passes, and so does one that names nothing.[^document]
 
 [^render]: `src/builder/build.py` — `footnote_reference()`, `footnote_item()` and `footnote_block()`,
     registered in `make_markdown()`.

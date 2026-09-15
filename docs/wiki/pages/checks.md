@@ -35,6 +35,8 @@ first.[^check] It exits with 0 for a sound wiki, 1 when it finds a problem, and 
 such as pointed where there is no wiki.[^check] The same check runs on every push and pull request
 through [Continuous integration](continuous-integration.md). A check proves that a sentence cites
 something, not that the citation is true; an agent checks that from the [Review prompt](review-prompt.md).
+Each check's page, such as [Citations](checks/citations.md), covers its refusals, scope, exceptions,
+enforcement and clearing.
 
 ## Order
 
@@ -65,6 +67,7 @@ flowchart LR
 | A picture whose subject has changed[^pictures] | [Pictures](checks/pictures.md) |
 | A page edited since its date was recorded[^dates] | [Site](site.md) |
 | A wiki written against a different release of the tool[^version] | [Delivery](skill/delivery.md) |
+
 ## Stoppages
 
 Some problems **stop the build** instead of joining the list, such as a missing `wiki.toml` or `goals.md`,
