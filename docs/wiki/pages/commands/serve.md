@@ -1,6 +1,6 @@
 +++
 title = "wiki serve"
-subtitle = "build the site and read it in a browser"
+subtitle = "build the site, serve it, and open it in a browser"
 status = "approved"
 intent = """
 wiki serve exists so that a person can read the wiki as it stands by typing one command. It should always
