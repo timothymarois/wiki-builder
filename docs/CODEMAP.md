@@ -37,7 +37,7 @@ The kind of CI other projects include is `action.yml` at the root.
 | File | Holds |
 |---|---|
 | `build.py` | The generator and every check. Reads pages, writes a site, returns the reasons a wiki is not fit to read |
-| `cli.py` | What `wiki` does when typed: build, check, coverage, serve, sync, bless, publish, user, audit |
+| `cli.py` | What `wiki` does when typed: build, check, coverage, families, serve, sync, bless, publish, user, audit |
 | `config.py` | `wiki.toml` — a project's site name, reading budgets and sidebar — and the release it was written against |
 | `serve.py` | A local server rooted at the project, so a citation opens the file it names as readable text |
 | `assets/wiki.css` | The look. Lifted from a prototype its owner approved; light and dark |
@@ -78,9 +78,9 @@ inside it.
 them inside the package; a checkout leaves them where they were written, and `build.skill_dir()` finds
 them either way.
 
-## Tests (`tests/` — 229 cases)
+## Tests (`tests/` — 251 cases)
 
-`tests/test_build.py` (2433 lines). Each case builds a small wiki in a temporary directory, breaks exactly
+`tests/test_build.py` (2628 lines). Each case builds a small wiki in a temporary directory, breaks exactly
 one rule, and asserts the tool names it. Run them with:
 
 ```sh

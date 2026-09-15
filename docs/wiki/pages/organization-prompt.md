@@ -56,7 +56,8 @@ review the whole sidebar, one section at a time.
    docs/wiki/wiki.toml.
 3. Do not edit any page. Do not run `wiki build`, `wiki serve` or `wiki audit`, which rewrite the page
    dates; `wiki check` writes nothing and may be run.
-4. Build an inventory with a script, not by eye. For every page under docs/wiki/pages: its path, title,
+4. Run `wiki families`, which lists every parent whose children declare no layout, with each child's
+   headings. Then build an inventory with a script, not by eye. For every page under docs/wiki/pages: its path, title,
    parent (the page its folder is named after), sidebar section, second-level headings in order outside
    code blocks, and infobox group and label names. The front matter between the +++ fences is TOML.
 
@@ -103,8 +104,8 @@ your own preference, or a new fact: every proposal moves or renames what the pag
 ## Report
 
 1. One line: the part reviewed, the commit, and how many families you found.
-2. Each family, the largest first: its members, where they differ, the proposed layout, and each
-   member's mapping onto it.
+2. Each family, the largest first: its members, where they differ, the proposed layout written as the
+   [family] table its parent would declare, and each member's mapping onto it.
 3. Parent pages to add or change: the sections the lead names, and the table's columns.
 4. Placement findings, one line each: the page, what is wrong, and the move.
 5. For the owner, one line each: every new page that needs an intent, every sentence a change would
@@ -116,7 +117,8 @@ Rank every finding by how much it changes what a reader can compare or find.
 ## Fixing
 
 To have the agent apply what the owner approved instead of reporting it, replace the third step of "Before
-starting" with: "Apply only the layouts and moves I approve, moving every sentence with its citation and
+starting" with: "Apply only the layouts and moves I approve, declaring each layout as `[family]` on its parent,
+moving every sentence with its citation and
 cutting none, run `wiki check` until it reports 0 problems, and list every page you changed, one line
 each." A parent page the agent adds is a draft until the owner approves its intent.[^draft]
 

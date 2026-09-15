@@ -8,6 +8,12 @@ a way documentation has been seen to rot, and together they should name every pr
 sentences a person can act on.
 """
 
+# Every check page uses these headings, in this order, and only these infobox labels.
+[family]
+headings = ["Refusals", "Scope", "Exceptions", "Enforcement", "Clearing"]
+labels = ["Syntax", "Setting", "Record", "Command", "Page limit", "Intent limit", "Goals limit", "Refusals",
+          "Scope", "Exceptions", "Enforcement", "Clearing"]
+
 [[infobox]]
 group = "Identity"
 rows = [
@@ -65,6 +71,7 @@ flowchart LR
 | A link to a wiki page that does not exist[^deadlinks] | [Site](site.md) |
 | A page longer than its budget[^budget] | [Reading budgets](checks/budgets.md) |
 | A picture whose subject has changed[^pictures] | [Pictures](checks/pictures.md) |
+| A family member's heading or infobox label its parent's layout does not list, or a member its parent does not link[^families] | [Families](checks/families.md) |
 | A page edited since its date was recorded[^dates] | [Site](site.md) |
 | A wiki written against a different release of the tool[^version] | [Delivery](skill/delivery.md) |
 
@@ -86,6 +93,7 @@ sentence, and the command exits with 1.[^caught]
 [^deadlinks]: `src/builder/build.py` — `dead_link_problems()`.
 [^budget]: `src/builder/build.py` — `budget_problems()`.
 [^pictures]: `src/builder/build.py` — `picture_problems()`.
+[^families]: `src/builder/build.py` — `family_problems()`.
 [^dates]: `src/builder/build.py` — `date_problems()`.
 [^version]: `src/builder/build.py` — `version_problems()`.
 [^stop]: `src/builder/config.py` — `read_config()`; `src/builder/build.py` — `read_pages()`,

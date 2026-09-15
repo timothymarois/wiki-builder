@@ -69,6 +69,27 @@ sentence, and a place in the sidebar.
 - **A fact true of every member is stated once, on the parent**, and each member links to it rather than
   repeating it.
 
+## Declaration
+
+Once the owner approves a layout, the parent's front matter declares it, and `wiki check` holds every member
+to it:
+
+```toml
+[family]
+headings = ["Delivery", "Limits", "Failures", "Opting out"]
+labels = ["Channel", "Setting", "Delivery", "Daily limit", "Retries", "Opting out"]
+```
+
+- **`headings`** lists the second-level headings, in order. A member may leave any of them out; a heading the
+  list does not hold, or one out of its order, is refused.
+- **`labels`** lists the infobox labels a member may use, in any group and any order. A label the list does
+  not hold is refused.
+- **The parent links every member**, or the check names the member it does not link.
+- **Each refusal names both fixes**: rename the heading or label on the member, or add it to the list on the
+  parent, for every member.
+- **`wiki families`** lists every parent of two or more children that declares no family, with each child's
+  headings side by side, and every nested title that repeats a word of its parent's title. It only reports.
+
 ---
 
 ## Done well
@@ -199,3 +220,4 @@ engineer finds through the references. **Delivery** is what a reader of either p
    no second-level heading of its own.
 4. Every member's infobox uses the family's groups and labels.
 5. The parent's lead names the sections every member covers, and its table lists every member.
+6. The parent declares the layout as `[family]`, and `wiki check` passes.

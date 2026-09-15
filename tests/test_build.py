@@ -1942,6 +1942,78 @@ class WikiTests(unittest.TestCase):
         self.assertIn("Last updated", footer)
         self.assertNotIn("audited", footer)
 
+    # --- page families -------------------------------------------------------------------------------
+
+    def family(self, headings=None, labels=None, parent=PAGE, linked=True):
+        """The thing page declaring a family, with a link to its part when `linked`; returns its problems."""
+        table = "[family]\n"
+        if headings is not None:
+            table += "headings = %s\n" % json.dumps(headings)
+        if labels is not None:
+            table += "labels = %s\n" % json.dumps(labels)
+        text = parent.replace("\n[[infobox]]", "\n" + table + "\n[[infobox]]", 1)
+        if linked:
+            text = text.replace("A thing does what it does.[^why]",
+                                "A thing does what it does, and has [a part](thing/part.md).[^why]")
+        self.write("thing", text)
+        return wiki.family_problems(self.root)
+
+    def test_a_family_member_with_a_heading_its_layout_does_not_list_is_refused(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part").replace("## Ground", "## Colour"))
+        problems = self.family(headings=["Speed", "Ground"])
+        self.assertEqual(1, len(problems), problems)
+        self.assertIn("thing/part.md: the heading 'Colour' is not in the family layout on thing.md", problems[0])
+        self.assertIn("family.headings", problems[0])
+
+    def test_a_family_member_may_leave_a_heading_out_but_not_reorder_them(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part").replace("## Speed\n\nIt does it slowly.[^why]\n\n", ""))
+        self.assertEqual([], self.family(headings=["Speed", "Ground"]), "leaving out a heading was refused")
+        swapped = PAGE.replace("A thing", "A part").replace("## Speed", "## First").replace("## Ground", "## Speed")
+        self.write("thing/part", swapped.replace("## First", "## Ground"))
+        problems = self.family(headings=["Speed", "Ground"])
+        self.assertEqual(1, len(problems), problems)
+        self.assertIn("comes before", problems[0])
+
+    def test_a_family_member_with_an_infobox_label_its_layout_does_not_list_is_refused(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        problems = self.family(headings=["Speed", "Ground"], labels=["Held to"])
+        self.assertEqual(1, len(problems), problems)
+        self.assertIn("the infobox label 'Today' is not in the family layout on thing.md", problems[0])
+        self.assertIn("family.labels", problems[0])
+
+    def test_a_family_parent_that_does_not_link_a_member_is_refused(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        problems = self.family(headings=["Speed", "Ground"], linked=False)
+        self.assertEqual(1, len(problems), problems)
+        self.assertIn("thing.md does not link thing/part.md", problems[0])
+
+    def test_a_family_layout_that_is_not_a_list_is_refused(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        problems = self.family(headings="Speed")
+        self.assertEqual(1, len(problems), problems)
+        self.assertIn("thing.md: family.headings must list", problems[0])
+
+    def test_children_of_a_parent_with_no_family_are_not_checked(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part").replace("## Ground", "## Colour"))
+        self.assertEqual([], wiki.family_problems(self.root))
+
+    def test_check_names_a_member_that_strays_from_its_family(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part").replace("## Ground", "## Colour"))
+        self.family(headings=["Speed", "Ground"])
+        self.build()
+        problems, _, _, _ = wiki.check(self.root)
+        self.assertTrue(any("is not in the family layout" in problem for problem in problems), problems)
+
+    def test_families_lists_children_that_share_no_layout_and_titles_that_repeat_the_parent(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part").replace("## Ground", "## Colour"))
+        self.write("thing/notes", PAGE.replace("A thing", "Thing notes"))
+        lines = wiki.families_report(self.root)
+        self.assertIn("thing.md declares no family for its 2 children", lines)
+        self.assertIn("  thing/part.md: Speed, Colour", lines)
+        self.assertIn("  thing/notes.md: Speed, Ground", lines)
+        self.assertIn("thing/notes.md is titled 'Thing notes', which repeats 'thing' from its parent's title "
+                      "'A thing'; a nested page's title names only what sets it apart", lines)
+
     # --- coverage ------------------------------------------------------------------------------------
 
     def source(self, *names):
