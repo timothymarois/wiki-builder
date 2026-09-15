@@ -13,7 +13,6 @@ group = "Identity"
 rows = [
   { label = "Name", value = "writing-wiki-pages", cite = "files" },
   { label = "Command", value = "wiki sync", cite = "sync" },
-  { label = "Options", value = "--skill-dir, --no-skill", cite = ["skilldir", "noskill"] },
 ]
 
 [[infobox]]
@@ -27,23 +26,27 @@ rows = [
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Location", value = ".agents/skills, else .claude/skills", note = "unless --skill-dir names one", cite = ["home", "skilldir"] },
-  { label = "Release record", value = "wiki.toml", note = "checked by wiki check", cite = ["record", "version"] },
+  { label = "Sources", value = "the code, the owner's words, an outside service's documentation", cite = "invent" },
+  { label = "Readers", value = "stakeholders, product owner, engineering team, customers", cite = "readers" },
 ]
 +++
 
 The **skill**, `writing-wiki-pages`, is the instructions an agent follows to write a page: `SKILL.md`,
-and a `references` folder beside it.[^files] That folder holds the rules for naming, grammar, infoboxes,
-reference pages, page families and flowcharts, and worked examples of an ordinary page, of a family of
-pages, and of two reference pages, a command and an endpoint, each written well and badly.[^contents]
-`wiki sync` copies it into the project, where agents read it.[^sync] Some of the rules it teaches are
+and a `references` folder of rules and worked examples beside it.[^files][^contents] `wiki sync` copies it
+into a project, as [Delivery](skill/delivery.md) describes.[^sync] Some of the rules it teaches are
 enforced by the [Checks](checks.md).
 
 ## Readers
 
-The skill names the wiki's four readers, the stakeholders, the product owner, the engineering team and, in
-some wikis, customers, and the part of a page written for each.[^readers] One page serves all four; a page
-for customers names no owner, team, agent, function, field or branch.[^readers]
+The skill writes one page for four readers, the stakeholders, the product owner, the engineering team and,
+in some wikis, customers, so that each learns what the system does without reading its code.[^readers] One
+page serves all four; a page for customers names no owner, team, agent, function, field or
+branch.[^readers]
+
+## Intent
+
+Every page opens with an intent, two to four sentences from the owner saying what the thing is for, and
+every sentence on the page must serve it.[^intent]
 
 ## Sources
 
@@ -52,42 +55,52 @@ or an outside service's own documentation, and a fact none of these gives is mar
 out.[^invent] Every sentence cites the file and function where the thing happens, or carries
 `{missing}`.[^cite]
 
-## Organization
+## Page standard
+
+A page gives its answer first, in its lead and in the first line of each section, and states
+consequences, not mechanisms.[^standard] A subject that outgrows its
+page becomes a child page, not another heading.[^split]
+
+## Naming
+
+Every title, heading, infobox label and category is a noun phrase naming the answer a reader wants, never
+the writer's question, and a name the software owns is written exactly as the software spells it.[^naming]
+
+## Page families
 
 **Pages about things of one kind share one layout**: the same headings in the same order and the same
-infobox labels, under a parent page that lists and compares them.[^families] A subject that outgrows its
-page becomes a child page, not another heading.[^split]
+infobox labels, under a parent page that lists and compares them.[^families]
+
+## Reference pages
+
+A page for a command, endpoint, published function, settings file, event or form takes a fixed set of
+sections, gives every input its type, default and meaning, and quotes every error word for word.[^reference]
+
+## Infobox
+
+The infobox gives a thing's names, figures and rules as labelled rows, and every row cites a
+footnote the prose also cites.[^infobox]
+
+## Diagrams
+
+A flow, a sequence or a set of states is drawn as a Mermaid diagram of about ten steps, and every
+step is something the cited code does.[^diagrams]
+
+## Exclusions
+
+A page never carries a name only the code knows, a unit a reader cannot feel, a task or
+ticket, a gap list, an apology, marketing, or an attribution to whoever asked for a rule.[^exclusions]
+
+## Coverage
+
+Every behaviour a person meets, and every requirement the owner states, has a page or a section, found by
+listing the code rather than the wiki.[^coverage] A requirement not built yet is written on its page and
+marked `{missing}`.[^missing]
 
 ## Tasks
 
 `SKILL.md` gives the steps for each task an agent is handed: a new page, a change in the code, a
 requirement not built yet, a failing check, a review and organizing pages.[^tasks]
-
-## Syncing
-
-### Home
-
-The skill goes into the project's `.agents/skills` folder if there is one.[^home] Otherwise it goes into
-`.claude/skills`, which is created if it does not exist.[^home] The first is preferred because the second
-is often a link to it, and writing through the link would write the same place twice.[^home]
-
-The skill lands in a folder named after itself, and a file is rewritten only when its text has
-changed.[^written] A file that a newer release no longer ships stays in the project until it is deleted by
-hand.[^written]
-
-`wiki sync --skill-dir` names the folder instead, relative to the project, and the skill goes there
-whatever else exists; the folder is created if it is missing.[^skilldir] `wiki sync --no-skill` records
-the release without writing the skill, and asking for both at once is refused.[^noskill]
-
-### Release
-
-`wiki sync` also records, in `wiki.toml`, which release of the tool the project is on.[^record] It writes
-the `version` setting of the `[tool]` table, adding the setting or the whole table when it is missing, and
-changes no other setting, no line ending and no comment beside the version.[^record]
-
-**`wiki check` fails while that record is missing or names a different release**, and it says to run
-`wiki sync`.[^version] A newer release can add a check, and a new check finds old pages; the record makes
-that failure expected rather than surprising.[^version]
 
 [^files]: `src/builder/cli.py` — `SKILL_NAME` names the skill; `sync()` copies every markdown file under
     `SKILL`, which `src/builder/build.py` finds with `skill_dir()`.
@@ -98,27 +111,34 @@ that failure expected rather than surprising.[^version]
 [^sync]: `src/builder/cli.py` — `sync()`.
 [^readers]: `src/skill/SKILL.md` — the opening paragraph and the Readers section, whose rules keep one page
     for every reader and keep the owner, the team, agents, functions, fields and branches off a page for
-    customers;
-    `src/skill/references/page-standard.md` — the eighth step of the self-edit.
+    customers; `src/skill/references/page-standard.md` — the eighth step of the self-edit.
+[^intent]: `src/skill/SKILL.md` — the Vocabulary entry for an intent, the Intent section, where every
+    sentence serves the intent and an intent comes from the owner, and the Owner approval section.
 [^invent]: `src/skill/SKILL.md` — the Truthfulness section, whose first rule is never to invent, and the
     last item of its definition of done.
 [^cite]: `src/skill/SKILL.md` — the Citations section, where a reference names a file and function, and
     the Citation coverage section, where every sentence carries a citation or `{missing}`.
-[^families]: `src/skill/SKILL.md` — the Page families section; `src/skill/references/page-families.md` —
-    the layout rules, the parent page, and a family done well and badly.
+[^standard]: `src/skill/SKILL.md` — the Page shape section, which answers first, and the Voice section,
+    which states the consequence rather than the mechanism; `src/skill/references/page-standard.md` — a
+    page written that way beside the same page written badly.
 [^split]: `src/skill/SKILL.md` — the Page shape section, whose last rule splits a subject into a child page
     rather than another heading.
+[^naming]: `src/skill/SKILL.md` — the Naming section; `src/skill/references/naming-and-grammar.md` — names
+    a writer chooses as noun phrases, and names the software owns written exactly as the software spells
+    them.
+[^families]: `src/skill/SKILL.md` — the Page families section; `src/skill/references/page-families.md` —
+    the layout rules, the parent page, and a family done well and badly.
+[^reference]: `src/skill/SKILL.md` — the Reference pages section; `src/skill/references/reference-pages.md`
+    — a layout for each of those surfaces, and the contract every input and error meets;
+    `src/skill/references/reference-standard.md` — a command page and an endpoint page, each done well and
+    badly.
+[^infobox]: `src/skill/SKILL.md` — the Infobox section; `src/skill/references/infobox.md` — the groups
+    Identity, Values and Rules, the keys a row takes, and an example.
+[^diagrams]: `src/skill/SKILL.md` — the Diagrams section; `src/skill/references/flowcharts.md` — when a
+    diagram is drawn, which kind, and its shapes, direction and labels.
+[^exclusions]: `src/skill/SKILL.md` — the Exclusions table.
+[^coverage]: `src/skill/SKILL.md` — the Coverage section, whose first rule inventories from the code, never
+    from the wiki.
+[^missing]: `src/skill/SKILL.md` — the Missing citations section, where a requirement the owner gives before
+    it is built is written now and marked.
 [^tasks]: `src/skill/SKILL.md` — the Tasks section, one list of steps for each of those six tasks.
-[^home]: `src/builder/cli.py` — `skill_home()` tries `.agents/skills`, then `.claude/skills`, and falls
-    back to `.claude/skills`.
-[^written]: `src/builder/cli.py` — `SKILL_NAME` names the folder; `sync()` compares each file's text before
-    writing it, and deletes nothing.
-[^skilldir]: `src/builder/cli.py` — `skill_home()` joins a given folder to the project root before trying
-    either convention.
-[^noskill]: `src/builder/cli.py` — `sync()` skips the copy when `skill` is false; `main()` puts
-    `--no-skill` and `--skill-dir` in one mutually exclusive group.
-[^record]: `src/builder/config.py` — `record_version()` replaces the `version` line inside the `[tool]`
-    table, keeping a comment after the value, adds one under its header or appends the table, writes the
-    file's own line endings back, and refuses to write a file that would read differently anywhere outside
-    `[tool]`; `src/builder/cli.py` — `sync()` prints the recorded release.
-[^version]: `src/builder/build.py` — `version_problems()`, called from `check()`.

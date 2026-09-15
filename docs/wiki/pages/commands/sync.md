@@ -32,7 +32,7 @@ rows = [
 +++
 
 `wiki sync` copies the skill into the project, and records in `wiki.toml` the release it came
-from.[^sync] Why the skill lives in the project is described on [Skill](../skill.md).
+from.[^sync] Why the skill lives in the project is described on [Delivery](../skill/delivery.md).
 
 ## Usage
 

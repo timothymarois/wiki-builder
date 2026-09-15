@@ -64,7 +64,7 @@ flowchart LR
 | A page longer than its budget[^budget] | [Reading budgets](checks/budgets.md) |
 | A picture whose subject has changed[^pictures] | [Pictures](checks/pictures.md) |
 | A page edited since its date was recorded[^dates] | [Site](site.md) |
-| A wiki written against a different release of the tool[^version] | [Skill](skill.md) |
+| A wiki written against a different release of the tool[^version] | [Delivery](skill/delivery.md) |
 ## Stoppages
 
 Some problems **stop the build** instead of joining the list, such as a missing `wiki.toml` or `goals.md`,

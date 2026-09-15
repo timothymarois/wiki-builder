@@ -9,8 +9,8 @@ updated = "2026-09-14"
 digest = "d3d7e8d6ccbd9c00624b3cf0f46090c33a6b742b4197fd64fcacb224b3c6d30b"
 
 ["checks"]
-updated = "2026-09-14"
-digest = "b721f80ac3a396685e4069f889f0f411eaa021e2e9c50fb85638a5b708696105"
+updated = "2026-09-15"
+digest = "1c7807079e103756f4f692e175c270927da4bb074e8d19d16d5361118e109f2a"
 audited = "2026-09-14"
 
 ["checks/budgets"]
@@ -74,8 +74,8 @@ digest = "2e17ab22a113e7a8fc8efa9d1fe4ecba414d390cf815a77f7f20bea554c7932a"
 audited = "2026-09-14"
 
 ["commands/sync"]
-updated = "2026-09-14"
-digest = "ea9002a1242fc50f898ba17f5efa1ff5f92649710e59ffd62ef9420a454eb67c"
+updated = "2026-09-15"
+digest = "73f9b3a5f5fa23cc4db7b5f9442fa4b5c1c3a0820f770e19e0001b2a3c046c8a"
 audited = "2026-09-14"
 
 ["commands/user"]
@@ -175,8 +175,12 @@ audited = "2026-09-14"
 
 ["skill"]
 updated = "2026-09-15"
-digest = "62e811283ae5b5379b452fbe9b2842138a9e91312cd7f057491fcdc51b4dcd95"
+digest = "66a14bf4c52fa91a8299be5eefc583ecbe840349a0b57971ec77cf4425342cd3"
 audited = "2026-09-14"
+
+["skill/delivery"]
+updated = "2026-09-15"
+digest = "65b0e8038ce71c7c9bb7e8db53bfb007ea4fefa80de96e90048858ebba67f95c"
 
 ["wiki-toml"]
 updated = "2026-09-14"
