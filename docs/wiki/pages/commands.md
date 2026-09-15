@@ -1,6 +1,6 @@
 +++
 title = "Commands"
-subtitle = "the nine wiki commands, one page each"
+subtitle = "the ten wiki commands, one page each"
 status = "approved"
 intent = """
 The command reference exists so that a person using the tool can find the command for a job, and exactly
@@ -8,11 +8,17 @@ how to type it, without reading the code. Every command, option, argument and ex
 should be here, and nothing it does not.
 """
 
+# Every command page uses these headings, in this order, and only these infobox labels.
+[family]
+headings = ["Usage", "Options", "Arguments", "Output", "Exit codes"]
+labels = ["Command", "Arguments", "Argument", "Options", "Output folder", "Default port", "Files written",
+          "Success", "Problems", "Misuse"]
+
 [[infobox]]
 group = "Identity"
 rows = [
   { label = "Program", value = "wiki", cite = "program" },
-  { label = "Commands", value = "build, check, coverage, serve, sync, bless, publish, user, audit", cite = "commands" },
+  { label = "Commands", value = "build, check, coverage, families, serve, sync, bless, publish, user, audit", cite = "commands" },
   { label = "Shared options", value = "--root, --wiki, --help", cite = "place" },
 ]
 
@@ -34,7 +40,8 @@ and [PICTURES.toml](pictures-toml.md).
 Every command is typed the same way, as the program's help prints it.[^program]
 ```sh
 wiki [-h] [--version] [--root ROOT] [--wiki WIKI]
-            {build,check,coverage,sync,serve,publish,user,bless,audit} ...
+            {build,check,coverage,families,sync,serve,publish,user,bless,audit}
+            ...
 ```
 
 ## Commands
@@ -44,6 +51,7 @@ wiki [-h] [--version] [--root ROOT] [--wiki WIKI]
 | [`wiki build`](commands/build.md) | renders the pages into the site[^commands] |
 | [`wiki check`](commands/check.md) | lists every reason the wiki is not fit to read |
 | [`wiki coverage`](commands/coverage.md) | lists the source files no page cites |
+| [`wiki families`](commands/families.md) | lists the child pages that share no declared layout |
 | [`wiki serve`](commands/serve.md) | builds the site and serves it on this machine |
 | [`wiki sync`](commands/sync.md) | writes the skill into the project and records the release |
 | [`wiki bless`](commands/bless.md) | records that a picture is still true, and why |
@@ -78,7 +86,7 @@ Some messages name only what is wrong, such as `wiki: no wiki at nowhere`,
 
 **Planned:** every message names what to do.{missing}
 
-[^program]: `src/builder/cli.py` — `main()` builds the `wiki` parser and its nine commands, and makes the
+[^program]: `src/builder/cli.py` — `main()` builds the `wiki` parser and its ten commands, and makes the
     command optional; `pyproject.toml` names the program under `[project.scripts]`.
 [^commands]: `src/builder/cli.py` — each command's `help` in `main()`, and what `run()` does for it.
 [^alone]: `src/builder/cli.py` — `run()` treats no command as `"serve"`.

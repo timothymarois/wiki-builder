@@ -12,7 +12,7 @@ from pathlib import Path
 
 from . import __version__
 from .build import (ASSETS, SITEMAP, SKILL, audit, bless, build, check, citation_counts, coverage,
-                    missing_marks, report, wiki_of)
+                    families_report, missing_marks, report, wiki_of)
 from .config import CONFIG, WikiError, read_config, record_version
 from .serve import serve
 
@@ -105,6 +105,8 @@ def main(argv=None):
     commands.add_parser("build", parents=[place], help="render the pages into the site")
     commands.add_parser("check", parents=[place], help="every reason the wiki is not fit to read")
     commands.add_parser("coverage", parents=[place], help="list the source files no page cites")
+    commands.add_parser("families", parents=[place],
+                        help="list the child pages that share no declared layout")
     synced = commands.add_parser("sync", parents=[place],
                                  help="write the skill into the project and record the release")
     skill = synced.add_mutually_exclusive_group()
@@ -160,6 +162,12 @@ def run(args, root, wiki):
     if command == "audit":
         for line in audit(root, args.pages, wiki):
             print(line)
+        return 0
+
+    if command == "families":
+        # A report, not a gate: whether pages are things of one kind is for a person to decide.
+        for line in families_report(root, wiki):
+            print("wiki: " + line)
         return 0
 
     if command == "coverage":

@@ -81,14 +81,15 @@ needs [Naming and grammar](references/naming-and-grammar.md) rather than the pag
 ### Organization
 
 1. Read [Page families](references/page-families.md).
-2. List every page in the part of the wiki to organize, with its title, intent and headings.
+2. Run `wiki families`, then list every page in the part of the wiki to organize, with its title, intent
+   and headings.
 3. Group the pages about things of one kind into families, each nested under one parent page.
 4. Design each family's layout: the headings every member carries, in order, and the infobox groups and
    labels every member fills.
 5. Show the owner the families, their layouts and every page that moves, and change nothing until the
    owner approves.
 6. Move each page, rewrite each member to its family's layout keeping every citation, and give each parent
-   its lead and member table.
+   its lead, its member table and its `[family]` declaration.
 7. Run `wiki check`, which names every link a move broke.
 
 ## Wiki structure
@@ -278,6 +279,9 @@ place elsewhere.
 - **Only pages of one kind are a family.** A topic beside its settings page and its errors page is not one,
   and each keeps the shape its subject needs. Reference pages take their layouts from
   [Reference pages](references/reference-pages.md).
+- **The parent declares the layout** as `[family]` in its front matter, with `headings` in order and the
+  infobox `labels` a member may use. `wiki check` then refuses a member that uses anything else, and a member
+  the parent does not link; `wiki families` lists the parents whose children declare no layout.
 
 **Read [Page families](references/page-families.md) before organizing pages, and before writing a page
 into a family.** It holds how to find a family, how to design its layout, what the parent holds, and a

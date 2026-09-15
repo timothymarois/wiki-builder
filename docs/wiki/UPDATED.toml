@@ -10,7 +10,7 @@ digest = "d3d7e8d6ccbd9c00624b3cf0f46090c33a6b742b4197fd64fcacb224b3c6d30b"
 
 ["checks"]
 updated = "2026-09-15"
-digest = "02b781639bdcb88cb666f56a8be45bce13b9bd8b69c0500cc9187bbd2ea24e22"
+digest = "d5cce6617e5fe9989cf10be75ba5d90f6abfaf466a2f4c93de86394868ff730b"
 audited = "2026-09-14"
 
 ["checks/budgets"]
@@ -22,6 +22,10 @@ audited = "2026-09-14"
 updated = "2026-09-15"
 digest = "cfe82d899585949d961f1859b5725ade9235472479af1ece38958dbcc8b8d9af"
 audited = "2026-09-14"
+
+["checks/families"]
+updated = "2026-09-15"
+digest = "ac94baf25d8f7f35db7f9658c9cca96eb9ade2e8b1e3d912480dd4e484466ba5"
 
 ["checks/headings"]
 updated = "2026-09-15"
@@ -40,7 +44,7 @@ audited = "2026-09-14"
 
 ["commands"]
 updated = "2026-09-15"
-digest = "098cdac14d689e3fd2e519b0f9cd091eb0d7572361f8eeb229a5d7236cce70d6"
+digest = "d6d6c93bd644a767dc33eb84d757258e50eb5bbee0ad99c0e661c9cea281770e"
 audited = "2026-09-14"
 
 ["commands/audit"]
@@ -66,6 +70,10 @@ audited = "2026-09-14"
 ["commands/coverage"]
 updated = "2026-09-15"
 digest = "ff205c2c90f004189d892f7295e2e12791a36b114cacb33711bb8d7d92abb5de"
+
+["commands/families"]
+updated = "2026-09-15"
+digest = "ae3d309bf473693196ac48c7abe60b8d0bd7505715811adfe381381fb046c76c"
 
 ["commands/publish"]
 updated = "2026-09-15"
@@ -104,8 +112,8 @@ updated = "2026-09-15"
 digest = "147c9792a975619a73fbbe517bb87b65a00d6a3643432599e3952305a8b82a6a"
 
 ["front-matter"]
-updated = "2026-09-14"
-digest = "5d15e1a73acba5ef90da22e302a2381a76de8172a7ec0755e6ea3f37ee8bd6b9"
+updated = "2026-09-15"
+digest = "871e0b14cafffba4bb550f199cdfd8eee263c1505e4d7cae31624921d46b69a4"
 audited = "2026-09-14"
 
 ["front-matter/infobox"]
@@ -132,7 +140,7 @@ digest = "0ece72c7eece710475776dcd2cd9b48e9a96d7e07ebf8fc8b501dc38ff6c0607"
 
 ["organization-prompt"]
 updated = "2026-09-15"
-digest = "f3289d6031ebc27f36686df6e0c0509a095e9532905d8f8db310cc2553423c4b"
+digest = "db9e68c0022a9c318439e8963057f7b918c061ee5b5f701898d0ec01f723a7ed"
 
 ["pages"]
 updated = "2026-09-14"

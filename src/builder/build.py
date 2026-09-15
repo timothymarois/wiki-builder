@@ -1883,6 +1883,114 @@ def version_problems(site, version):
     return []
 
 
+# A second-level heading: the sections the members of a family share.
+SECTION_HEADING = re.compile(r"^##[ \t]+(.+?)[ \t]*$", re.M)
+
+
+def pages_by_id(root, wiki=None):
+    """The pages folder, and every page's path, front matter and body by its id."""
+    pages_dir = wiki_of(root, wiki) / "pages"
+    found = {}
+    for path in sorted(pages_dir.rglob("*.md")):
+        meta, body = read_front_matter(path)
+        found[path.relative_to(pages_dir).with_suffix("").as_posix()] = (path, meta, body)
+    return pages_dir, found
+
+
+def section_headings(body):
+    """A page's second-level headings in order, leaving out any shown in a code sample."""
+    return [match.group(1) for match in SECTION_HEADING.finditer(FENCED.sub("", body))]
+
+
+def family_problems(root, wiki=None):
+    """Members of a declared family that stray from its layout, and members their parent does not link.
+
+    A parent opts in with [family] in its front matter: `headings`, the second-level headings its members
+    use, in that order, and `labels`, the infobox labels a member may use. A member may leave out any of
+    them, so a section that does not apply is simply not written, and a key the family does not declare is
+    not checked. Each problem names both fixes: change the member, or change the layout on the parent.
+    """
+    pages_dir, pages = pages_by_id(root, wiki)
+    problems = []
+    for parent_id in sorted(pages):
+        parent_path, meta, body = pages[parent_id]
+        if "family" not in meta:
+            continue
+        family = meta["family"] if isinstance(meta["family"], dict) else {"headings": meta["family"]}
+        layout = {"headings": family.get("headings"), "labels": family.get("labels")}
+        wrong = [key for key, value in layout.items()
+                 if value is not None and (not isinstance(value, list)
+                                           or not all(isinstance(item, str) and item for item in value))]
+        for key in wrong:
+            example = '["Usage", "Output"]' if key == "headings" else '["Command", "Files written"]'
+            problems.append(f"{parent_id}.md: family.{key} must list the {key[:-1]}s every member of the family "
+                            f"may use, such as {key} = {example}")
+        if wrong:
+            continue
+        prose = INLINE_CODE.sub("", FENCED.sub("", body))
+        linked = {linked_page(parent_path, link.group(2).partition("#")[0], pages_dir)
+                  for link in MARKDOWN_LINK.finditer(prose) if not link.group(1).startswith("!")}
+        headings, labels = layout["headings"], layout["labels"]
+        for child_id in children_of(parent_id, set(pages)):
+            _, child_meta, child_body = pages[child_id]
+            if child_id not in linked:
+                problems.append(f"{parent_id}.md does not link {child_id}.md, a member of its family; link every "
+                                "member from the parent, such as in a table of the members")
+            previous = None
+            for heading in section_headings(child_body) if headings is not None else []:
+                if heading not in headings:
+                    problems.append(f"{child_id}.md: the heading {heading!r} is not in the family layout on "
+                                    f"{parent_id}.md; rename it to one of {', '.join(headings)}, or add it to "
+                                    "family.headings there")
+                    continue
+                if previous is not None and headings.index(heading) <= headings.index(previous):
+                    problems.append(f"{child_id}.md: the heading {previous!r} comes before {heading!r}, but "
+                                    f"family.headings on {parent_id}.md lists {heading!r} first; order the "
+                                    "headings as it lists them")
+                previous = heading
+            rows = [row for group in child_meta.get("infobox", []) for row in group.get("rows", [])]
+            for row in rows if labels is not None else []:
+                label = str(row.get("label", ""))
+                if label not in labels:
+                    problems.append(f"{child_id}.md: the infobox label {label!r} is not in the family layout on "
+                                    f"{parent_id}.md; rename it to one of {', '.join(labels)}, or add it to "
+                                    "family.labels there")
+    return problems
+
+
+def families_report(root, wiki=None):
+    """What `wiki families` prints: parents whose children share no declared layout, and nested titles that
+    repeat their parent's.
+
+    A report, not a check. Whether pages are things of one kind is a person's judgement, so it shows each
+    child's headings side by side, which is what a family declaration would compare, and decides nothing.
+    """
+    _, pages = pages_by_id(root, wiki)
+    lines, declared, undeclared = [], 0, 0
+    for parent_id in sorted(pages):
+        meta = pages[parent_id][1]
+        children = children_of(parent_id, set(pages))
+        if "family" in meta:
+            declared += 1
+        elif len(children) >= 2:
+            undeclared += 1
+            lines.append(f"{parent_id}.md declares no family for its {len(children)} children")
+            lines += [f"  {child}.md: {', '.join(section_headings(pages[child][2])) or 'no headings'}"
+                      for child in children]
+        parent_title = str(meta.get("title", ""))
+        parent_words = {word.rstrip("s") for word in re.findall(r"[a-z]+", parent_title.lower()) if len(word) > 3}
+        for child in children:
+            title = str(pages[child][1].get("title", ""))
+            repeated = [word for word in re.findall(r"[a-z]+", title.lower())
+                        if len(word) > 3 and word.rstrip("s") in parent_words]
+            if repeated:
+                lines.append(f"{child}.md is titled {title!r}, which repeats {repeated[0]!r} from its parent's "
+                             f"title {parent_title!r}; a nested page's title names only what sets it apart")
+    lines.append(f"{declared} famil{'y' if declared == 1 else 'ies'} declared; {undeclared} parent"
+                 f"{'' if undeclared == 1 else 's'} with two or more children declaring none")
+    return lines
+
+
 def check(root, wiki=None, version=None):
     """Every reason the wiki is not fit to read, as sentences rather than a diff.
 
@@ -1909,6 +2017,7 @@ def check(root, wiki=None, version=None):
         problems += empty_word_problems(root, wiki)
         problems += uncited_problems(root, wiki)
         problems += infobox_problems(root, wiki)
+        problems += family_problems(root, wiki)
         if version:
             site, _, _ = read_config(wiki)
             problems += version_problems(site, version)
