@@ -248,7 +248,14 @@ def read_ledger(images_dir):
     path = images_dir / LEDGER
     if not path.is_file():
         return {}
-    return tomllib.loads(path.read_text(encoding="utf-8"))
+    ledger = tomllib.loads(path.read_text(encoding="utf-8"))
+    # A build copies each picture by the name its table carries, so a name that climbed out of the folder
+    # would copy any file in the project into the site.
+    for name in sorted(ledger):
+        if name in ("", ".", "..") or "/" in name or "\\" in name:
+            raise WikiError(f"{LEDGER} has a table for {name}, which is not a file name; name each table for "
+                            "a picture's file name alone, such as page-anatomy.svg")
+    return ledger
 
 
 def write_ledger(images_dir, ledger):
@@ -455,13 +462,14 @@ def render_contents(entries):
             % "".join(item(entry, children) for entry, children in groups))
 
 
-def rewrite_references(body, directory, site_root, root, images, page_ids, pages_dir, source_path):
+def rewrite_references(body, directory, site_root, root, images, page_ids, pages_dir, source_path, shown):
     """Point every link and picture where it will actually resolve from this page's directory.
 
     A page is written beside its fellows, so its author links the way the repository reads: a sibling
     page as name.md, anything else by its path. Both are translated here -- the sibling to a clean
     address, the path to wherever it sits relative to this page -- so one link works while reading the
-    markdown and again in the browser.
+    markdown and again in the browser. Each picture the body shows is added to `shown`, the pictures the
+    site carries.
     """
     here = site_root / directory if directory else site_root
 
@@ -476,6 +484,7 @@ def rewrite_references(body, directory, site_root, root, images, page_ids, pages
             name = posixpath.basename(address)
             if name not in images:
                 raise WikiError(f"{directory or 'the main page'} shows {name}, which has no entry in {LEDGER}")
+            shown.add(name)
             resolved = relative_file(directory, "images/" + name)
         else:
             # The author wrote the link relative to their own file, so resolve it from there. Inside the
@@ -965,6 +974,7 @@ def write_site(root, out, audience, link_root, today, record, wiki):
               for name in ("wiki.css", "wiki.js")}
     images_dir = wiki / "images"
     ledger = read_ledger(images_dir)
+    shown = set()
     site_root = (link_root or out)
     today = today or datetime.date.today().isoformat()
     dates = read_dates(wiki)
@@ -1081,10 +1091,13 @@ def write_site(root, out, audience, link_root, today, record, wiki):
         # Outside code only: a sample that shows the mark shows it as written.
         body = "".join(part if CODE_HTML.fullmatch(part) else MISSING.sub(MISSING_CITATION, part)
                        for part in CODE_HTML.split(body))
-        body = rewrite_references(body, directory, site_root, root, ledger, set(pages),
-                                  wiki / "pages", page["path"])
+        # References are taken out first, so a picture shown only in one never reaches a user build.
         if audience == "user":
             body = for_user(body)
+        body = rewrite_references(body, directory, site_root, root, ledger, set(pages),
+                                  wiki / "pages", page["path"], shown)
+        if page["meta"].get("image"):
+            shown.add(page["meta"]["image"])
         # The source view names paths and internal identifiers by its nature, so it is internal only.
         with_source = audience != "user"
         # The markdown copy is the page as written, references and marks included, so it goes where the
@@ -1151,13 +1164,15 @@ def write_site(root, out, audience, link_root, today, record, wiki):
     if diagrams_used:
         for name in (MERMAID, MERMAID_LICENSE):
             written.append(copy_if_changed(ASSETS / name, assets / name))
-    if ledger:
+    # Every recorded picture must exist, but only those a written page shows are copied: a picture on an
+    # internal page stays out of a user build.
+    for name in sorted(ledger):
+        if not (images_dir / name).is_file():
+            raise WikiError(f"{LEDGER} lists {name}, which is not in {images_dir}")
+    if shown:
         (out / "images").mkdir(parents=True, exist_ok=True)
-        for name in sorted(ledger):
-            source = images_dir / name
-            if not source.is_file():
-                raise WikiError(f"{LEDGER} lists {name}, which is not in {images_dir}")
-            written.append(copy_if_changed(source, out / "images" / name))
+        for name in sorted(shown):
+            written.append(copy_if_changed(images_dir / name, out / "images" / name))
 
     # Whatever the site no longer makes goes, so a page that was deleted leaves nothing behind.
     kept = {path.resolve() for path in written}

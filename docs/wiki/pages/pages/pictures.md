@@ -26,7 +26,8 @@ rows = [
 
 A picture is a file in the wiki's `images` folder, shown on a page as a markdown image or at the top of the
 infobox.[^ledger][^infobox] Every picture has a record in `PICTURES.toml`, and the build stops when a page
-shows a picture that has none.[^ledger] What the record holds is described on
+shows a picture that has none.[^ledger] A build copies only the pictures its pages show, so a picture on
+an internal page stays out of a [user build](../commands/user.md).[^copied] What the record holds is described on
 [PICTURES.toml](../pictures-toml.md), and how a changed picture is caught on
 [Pictures](../checks/pictures.md).
 
@@ -57,6 +58,9 @@ caption beneath.[^lightbox] A click or the Escape key closes it again.[^lightbox
 
 [^ledger]: `src/builder/build.py` — `rewrite_references()` points a picture at `images/` by its file name,
     and raises when that name has no entry in `LEDGER`, which is `PICTURES.toml`.
+[^copied]: `src/builder/build.py` — `write_site()` copies into `images/` only the pictures that
+    `rewrite_references()` and a written page's `image` add to `shown`, after `for_user()` has removed the
+    references from a user build.
 [^infobox]: `src/builder/build.py` — `render_infobox()` shows the front matter's `image` at the top of the
     infobox with `image_caption` under it, and raises when the picture has no entry in `LEDGER`.
 [^caption]: `src/builder/build.py` — `WikiRenderer.image()` draws a figure captioned with the title, or with
