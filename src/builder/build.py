@@ -1175,15 +1175,45 @@ def write_site(root, out, audience, link_root, today, record, wiki):
             written.append(copy_if_changed(images_dir / name, out / "images" / name))
 
     # Whatever the site no longer makes goes, so a page that was deleted leaves nothing behind.
-    kept = {path.resolve() for path in written}
-    for path in sorted(out.rglob("*"), reverse=True):
-        if path.is_file() and path.resolve() not in kept:
-            path.unlink()
-    for path in sorted(out.rglob("*"), reverse=True):
-        if path.is_dir() and not any(path.iterdir()):
-            path.rmdir()
+    clear_stale(out, written)
     return counts, goals_words, budget, sorted(
         page_id for page_id in pages if pages[page_id]["status"] != "approved")
+
+
+# The files a build wrote, listed inside the site, one path to a line.
+BUILD_RECORD = ".wiki-build"
+
+
+def clear_stale(out, written):
+    """Delete each file an earlier build wrote and this one did not, then record what this one wrote.
+
+    A site folder can hold files a person put there for its host, such as a CNAME naming the domain, and
+    those are not the build's to delete. A site written before builds kept a record has none, so there the
+    build takes only the kinds of file it makes.
+    """
+    record = out / BUILD_RECORD
+    made = sorted({path.relative_to(out).as_posix() for path in written})
+    if record.is_file():
+        earlier = record.read_text(encoding="utf-8").splitlines()
+    else:
+        earlier = [path.relative_to(out).as_posix() for path in sorted(out.rglob("*"))
+                   if path.is_file() and (path.name in ("index.html", AGENT_COPY, AGENT_INDEX)
+                                          or path.relative_to(out).parts[0] in ("assets", "images"))]
+    inside = out.resolve()
+    for name in sorted(set(earlier) - set(made) - {""}, reverse=True):
+        path = out / name
+        # The record is text in a folder anyone can edit, so a name leading out of the site is not removed.
+        if not path.is_file() or not path.resolve().is_relative_to(inside):
+            continue
+        path.unlink()
+        parent = path.parent
+        while parent.resolve() != inside and not any(parent.iterdir()):
+            parent.rmdir()
+            parent = parent.parent
+    listed = "".join(name + "\n" for name in made)
+    # Left alone when it lists the same files, so a build that changed nothing touches nothing.
+    if not record.is_file() or record.read_text(encoding="utf-8") != listed:
+        record.write_text(listed, encoding="utf-8", newline="\n")
 
 
 def copy_if_changed(source, destination):
