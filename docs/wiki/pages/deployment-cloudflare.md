@@ -11,6 +11,7 @@ it from the repository on every push, with no workflow file to keep.
 [[infobox]]
 group = "Identity"
 rows = [
+  { label = "Host", value = "Cloudflare Pages", cite = "git" },
   { label = "Commands", value = "wiki check, wiki publish", cite = ["exit", "publish"] },
 ]
 
@@ -25,6 +26,7 @@ rows = [
 group = "Rules"
 rows = [
   { label = "Condition", value = "wiki check passes", cite = "exit" },
+  { label = "Custom domain", value = "added under the project's custom domains", cite = "domains" },
 ]
 +++
 

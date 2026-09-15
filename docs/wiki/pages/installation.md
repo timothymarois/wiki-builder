@@ -18,7 +18,7 @@ rows = [
 group = "Requirements"
 rows = [
   { label = "Python", value = "3.11 or newer", cite = "package" },
-  { label = "Dependency", value = "mistune, pinned exactly", cite = "package" },
+  { label = "Parser", value = "mistune, pinned exactly", cite = "package" },
   { label = "Runner", value = "uv or pip", cite = "uv" },
 ]
 

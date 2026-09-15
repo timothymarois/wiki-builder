@@ -11,8 +11,8 @@ one workflow and a DNS record.
 [[infobox]]
 group = "Identity"
 rows = [
-  { label = "Command", value = "wiki publish", cite = "pages" },
   { label = "Host", value = "GitHub Pages", cite = "pages" },
+  { label = "Commands", value = "wiki check, wiki publish", cite = ["flow", "pages"] },
 ]
 
 [[infobox]]
@@ -34,7 +34,7 @@ A project on GitHub publishes its wiki with one workflow that checks the wiki, b
 is published.[^order] What `wiki publish` makes is described on [wiki publish](commands/publish.md), and
 the same guide for Cloudflare on [Cloudflare](deployment-cloudflare.md).
 
-## Workflow
+## Build
 
 Every push to `main`, or a run started by hand, checks the wiki, publishes it only when the check passes,
 and deploys what was published.[^flow]
