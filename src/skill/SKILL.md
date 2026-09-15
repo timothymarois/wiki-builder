@@ -1,6 +1,6 @@
 ---
 name: writing-wiki-pages
-description: Use when writing, updating, reviewing or fixing the pages of a wiki that the `wiki` command builds and checks — a folder holding `wiki.toml` and `pages/` — including a new page, a page the code has moved on from, an owner's requirement not built yet, a failing `wiki check`, or the name or wording of anything a reader sees there. It supplies the page contract, citations, naming, voice, and the steps for each of those tasks. Do not use for documentation written for builders, such as a README, codemap or contributing guide.
+description: Use when writing, updating, reviewing or fixing the pages of a wiki that the `wiki` command builds and checks — a folder holding `wiki.toml` and `pages/` — including a new page, a page the code has moved on from, an owner's requirement not built yet, a failing `wiki check`, pages to organize or restructure, or the name or wording of anything a reader sees there. It supplies the page contract, citations, naming, voice, and the steps for each of those tasks. Do not use for documentation written for builders, such as a README, codemap or contributing guide.
 ---
 
 # Writing wiki pages
@@ -29,7 +29,8 @@ needs [Naming and grammar](references/naming-and-grammar.md) rather than the pag
 
 1. Read [Page standard](references/page-standard.md). For a command, endpoint, published function, event,
    settings file or form, read [Reference pages](references/reference-pages.md) and
-   [Reference standard](references/reference-standard.md) too.
+   [Reference standard](references/reference-standard.md) too. When the page's siblings are the same kind
+   of thing as it, read [Page families](references/page-families.md) and write to the layout they share.
 2. Read the code the page describes. Every statement comes from it, the owner's words, or an outside
    service's own documentation.
 3. Write the intent first, from the owner's words, set `status = "draft"`, and ask the owner to approve it.
@@ -74,6 +75,19 @@ needs [Naming and grammar](references/naming-and-grammar.md) rather than the pag
    undocumented, uncited, stale, writing.
 6. Run `wiki audit` with every page reviewed that had no finding, leaving out any page that says
    `goals = false`.
+
+### Organization
+
+1. Read [Page families](references/page-families.md).
+2. List every page in the part of the wiki to organize, with its title, intent and headings.
+3. Group the pages about things of one kind into families, each nested under one parent page.
+4. Design each family's layout: the headings every member carries, in order, and the infobox groups and
+   labels every member fills.
+5. Show the owner the families, their layouts and every page that moves, and change nothing until the
+   owner approves.
+6. Move each page, rewrite each member to its family's layout keeping every citation, and give each parent
+   its lead and member table.
+7. Run `wiki check`, which names every link a move broke.
 
 ## Wiki structure
 
@@ -220,6 +234,26 @@ the section, a sentence's first clause answers the sentence. A reader who stops 
 - **Three to five sections.** More, and the page is two pages.
 - **Split rather than swell.** A subject that needs its own treatment becomes a child page and a link, not
   another heading; the sidebar nests it.
+
+## Page families
+
+**Pages about things of one kind share one layout**: the brands under a sites page, the providers under a
+payments page, the channels under a notifications page. A reader who has read one member knows where to
+look on every other, and compares two side by side instead of piecing together facts each page chose alone.
+
+- **The layout is designed once, for the family**: the headings every member carries, in one order, and
+  the infobox groups and labels every member fills. The owner approves it.
+- **A heading that does not apply to a member is left out**, never renamed or replaced. A member that needs
+  a section the others lack changes the layout for the whole family, or gets a child page.
+- **The parent introduces the family**: its lead names the sections every member covers, and one table
+  lists every member with the values the members share.
+- **Only pages of one kind are a family.** A topic beside its settings page and its errors page is not one,
+  and each keeps the shape its subject needs. Reference pages take their layouts from
+  [Reference pages](references/reference-pages.md).
+
+**Read [Page families](references/page-families.md) before organizing pages, and before writing a page
+into a family.** It holds how to find a family, how to design its layout, what the parent holds, and a
+family done well and badly.
 
 ## Voice
 
@@ -487,7 +521,8 @@ serving nothing is still wrong, and a page over it is saying its intent has grow
 3. The prose holds no name only the code knows, no unit a reader cannot feel, and no task or gap list.
 4. Every sentence states something read from the code and carries its own citation, or `{missing}`;
    anything uncertain says so.
-5. Mechanism links out instead of being retold, and a subject of its own is a child page.
+5. Mechanism links out instead of being retold, a subject of its own is a child page, and a page in a
+   family follows the family's layout.
 6. The infobox gives the thing's names, values and rules under noun labels, and every row cites a
    footnote the prose cites, or is marked missing.
 7. `wiki check` passes.
