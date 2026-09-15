@@ -163,7 +163,7 @@ Before you call a page done, read it once for each of these. They are quick and 
    already be said on the page.
 8. **Read the page once as each reader.** The stakeholder reads the intent and the lead and knows what the
    thing is for; the product owner reads the headings and the infobox and knows its rules and limits; an
-   engineer follows any sentence to its code. A part that fails its reader is rewritten for that reader.
+   engineer follows any sentence to its code. Rewrite each part that leaves its reader without those facts.
 
 ## Conventions
 

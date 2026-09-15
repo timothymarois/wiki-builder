@@ -50,8 +50,8 @@ Each member then keeps to the layout:
   citation. A value the member does not have is left out; a value the owner requires and nothing provides
   is marked missing.
 - **A section the others lack changes the layout.** Add it to every member it applies to, with the owner's
-  approval, or give that member a child page for it. A member that grows sections of its own is how a
-  family stops being one.
+  approval, or give that member a child page for it. A member with sections of its own can no longer be
+  compared with its siblings section by section.
 - **Third-level headings follow the member.** Inside a section of the layout, a member divides its content
   as its own subject needs.
 - **A member's title names only what sets it apart**: **Email**, not "Email notification channel".
@@ -177,8 +177,8 @@ reader who found the limits on one page has to hunt for them on the other.
 **A reader who has read one member knows where everything is on the next.** Limits is the second section
 on both pages, under the same word, so a reader goes straight to it.
 
-**A gap shows.** Text messages are never sent again, and the Failures section says so. In the failed
-version the same fact is simply absent, and nothing tells a reader it was ever looked for.
+**Every member states the same facts.** Text messages are never sent again, and the Failures section says
+so. In the failed version the same fact is absent, and nothing tells a reader it was ever looked for.
 
 **The parent compares.** One table answers "which channel is faster" and "which one retries" without
 opening either page, and a channel with no row is a channel with no page.
@@ -189,8 +189,7 @@ engineer finds through the references. **Delivery** is what a reader of either p
 **The same fact has the same name.** "Sending limits" on one page and nothing on the other become
 **Limits** on both; "Unsubscribe handling" becomes **Opting out**, the words a person uses.
 
-**Nothing is forced to fit.** A section that did not apply to a member would be left out, not renamed into
-something that did.
+**A section that does not apply to a member is left out**, never renamed into a section that does.
 
 ## Definition of done
 
