@@ -73,6 +73,6 @@ wiki: 20 of 21 source files cited; 1 citation names a file that does not exist
     code, dropping a trailing line number with `LINE_NUMBER`; `coverage()` counts a name that is a file, and reports one as missing only when it has an
     extension, sits under a folder the project has, and does not exist.
 [^exit]: `src/builder/cli.py` — `run()` returns 0 after the report and 2 when `coverage()` returns `None`;
-    `main()` returns 1 for a `WikiError`, which `read_coverage()`, refusing an absolute pattern or one with a
-    `..` part, and `coverage()` in `src/builder/` raise,
-    and 2 with no wiki; argparse exits 2 on an option it does not know.
+    `main()` returns 1 for a `WikiError`, which `read_coverage()` in `src/builder/config.py`, refusing an
+    absolute pattern or one with a `..` part, and `coverage()` in `src/builder/build.py` raise, and 2 with
+    no wiki; argparse exits 2 on an option it does not know.

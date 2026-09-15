@@ -56,7 +56,7 @@ wiki: commands/sync.md: the heading 'Output' comes before 'Options', but family.
 
 A member's infobox label that `labels` does not list is refused, whichever group holds it.[^labels]
 ```text
-wiki: commands/check.md: the infobox label 'Name' is not in the family layout on commands.md; rename it to one of Command, Arguments, Argument, Options, Output folder, Default port, Files written, Success, Problems, Misuse, or add it to family.labels there
+wiki: commands/check.md: the infobox label 'Name' is not in the family layout on commands.md; rename it to one of Command, Arguments, Options, Output folder, Default port, Files written, Success, Problems, Misuse, or add it to family.labels there
 ```
 
 ### Parent links
@@ -87,7 +87,7 @@ wiki: commands.md has {family-table} 2 times; keep one, where the member table g
 
 ### Declaration
 
-A `family` that is not a table, and a `headings` or `labels` that is empty or is not a list of names, are
+A `family` that is not a table, and a `headings`, `labels` or `table` that is empty or is not a list of names, are
 refused, and the family's members are not checked until each is fixed.[^declare]
 ```text
 wiki: checks.md: family.headings must list the headings every member of the family may use, such as headings = ["Usage", "Output"], or leave family.headings out to check no headings
@@ -116,8 +116,8 @@ A refused member passes once its heading or label is renamed to one the family l
 added to the list on the parent for every member.[^clearing] A missing link is cleared by linking the member
 from the parent's text, such as from a table of the members.[^links]
 
-[^declare]: `src/builder/build.py` — `family_problems()` reads `headings` and `labels` from a page's `family`
-    table, reports a `family` that is not a table and a list that is empty or holds anything but names, and
+[^declare]: `src/builder/build.py` — `family_problems()` reads `headings`, `labels` and `table` from a page's
+    `family` table, reports a `family` that is not a table and a list that is empty or holds anything but names, and
     skips that family's members.
 [^headings]: `src/builder/build.py` — `family_problems()` compares each member's `section_headings()` with
     `headings`, refusing a heading the list does not hold and one placed before a heading the list puts
@@ -126,7 +126,7 @@ from the parent's text, such as from a table of the members.[^links]
     `labels` does not hold.
 [^links]: `src/builder/build.py` — `family_problems()` resolves each link in the parent's text with
     `linked_page()`, refuses a member none of them reaches, and counts every member linked when the parent
-    has both `table` and a line `FAMILY_TABLE_LINE` matches.
+    has both `table` and a `{family-table}` that `make_markdown()` renders as a paragraph of its own.
 [^table]: `src/builder/build.py` — `family_table_rows()` takes each written member's infobox value for every
     label in `table`, empty where the member states none; `write_site()` puts `family_table_html()` where the
     parent's `{family-table}` paragraph stands, and `family_table_markdown()` into its markdown copy.
