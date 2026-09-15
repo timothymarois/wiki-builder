@@ -33,7 +33,7 @@ Each of those was added after the failure it prevents actually happened.
 Nothing to install. [uv](https://docs.astral.sh/uv/) runs it from a pinned version:
 
 ```sh
-uvx --from git+https://github.com/timothymarois/wiki-builder@v0.3.0 wiki --help
+uvx --from git+https://github.com/timothymarois/wiki-builder@v0.3.1 wiki --help
 ```
 
 In a project, that goes in one wrapper the repository commits:
@@ -42,7 +42,7 @@ In a project, that goes in one wrapper the repository commits:
 #!/bin/sh
 # scripts/dev-wiki.sh
 set -eu
-WIKI_VERSION=v0.3.0        # the pin. Bump this to update.
+WIKI_VERSION=v0.3.1        # the pin. Bump this to update.
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 exec uvx --from "git+https://github.com/timothymarois/wiki-builder@$WIKI_VERSION" \
      wiki "$@" --root "$ROOT"
