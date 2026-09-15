@@ -17,7 +17,7 @@ the project commits:
 #!/bin/sh
 # scripts/dev-wiki.sh
 set -eu
-WIKI_VERSION=v0.3.1        # the pin. Bump this to update.
+WIKI_VERSION=v0.3.2        # the pin. Bump this to update.
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 exec uvx --from "git+https://github.com/timothymarois/wiki-builder@$WIKI_VERSION" \
      wiki "$@" --root "$ROOT"
@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: timothymarois/wiki-builder@v0.3.1
+      - uses: timothymarois/wiki-builder@v0.3.2
 ```
 
 ## More
