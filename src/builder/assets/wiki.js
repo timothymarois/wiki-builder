@@ -44,14 +44,14 @@
   }
 
   // --- theme --------------------------------------------------------------------------------------
-  // Three states, not two: following the system is the default, and a reader who has chosen light or
-  // dark keeps that choice on this device. The stored value is read again in the page head, before
+  // Three states, not two: light is the default, and a reader who chooses dark, or auto to follow the
+  // system, keeps that choice on this device. The stored value is read again in the page head, before
   // anything paints, so switching pages never flashes the other theme.
-  var ORDER = ["auto", "light", "dark"];
+  var ORDER = ["light", "dark", "auto"];
   var themeButton = document.querySelector(".theme");
 
   function stored() {
-    try { return localStorage.getItem("wiki-theme") || "auto"; } catch (e) { return "auto"; }
+    try { return localStorage.getItem("wiki-theme") || "light"; } catch (e) { return "light"; }
   }
 
   function showTheme(mode) {

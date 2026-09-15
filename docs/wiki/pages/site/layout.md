@@ -48,8 +48,8 @@ and a page loads it only as a diagram nears the screen.[^diagram] How to write o
 
 A picture written in the page's markdown is captioned with the title given after its address, or with its
 alt text when it has no title.[^picture] Clicking a picture opens it whole, with its caption, and a click or
-Escape closes it again.[^lightbox] The theme button beside the tabs steps through Auto, Light and Dark, and
-the browser remembers the choice; Auto follows the system.[^theme]
+Escape closes it again.[^lightbox] The theme button beside the tabs steps through Light, Dark and Auto, starting at
+Light, and the browser remembers the choice; Auto follows the system.[^theme]
 
 ## Footer
 
@@ -103,9 +103,10 @@ button.[^narrow]
     text when it has none.
 [^lightbox]: `src/builder/assets/wiki.js` — the lightbox opens a clicked picture from the page or the
     infobox with its caption, sized to the window, and a click or Escape closes it.
-[^theme]: `src/builder/assets/wiki.js` — the theme button steps through `auto`, `light` and `dark` and keeps
-    the choice in the browser's storage; `src/builder/assets/template.html` applies it before the page is
-    drawn.
+[^theme]: `src/builder/assets/wiki.js` — the theme button steps through `light`, `dark` and `auto`, starting
+    at `light` when nothing is stored, and keeps the choice in the browser's storage;
+    `src/builder/assets/template.html` starts every page with `data-theme="light"` and applies a stored choice
+    before the page is drawn.
 [^pace]: `src/builder/build.py` — `reading_minutes()` divides by `READING_PACE`, 250, and rounds up to a
     whole minute, never fewer than one.
 [^outside]: `src/builder/build.py` — `rewrite_references()` adds `OUTSIDE` to a link matching

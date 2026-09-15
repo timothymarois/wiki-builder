@@ -6,6 +6,6 @@
 # when the change did not alter what the picture shows.
 
 ["page-anatomy.svg"]
-digest = "sha256:946976250433ee89e85c968e72b162ed90a797704af7a1ed9281b42bbea1bf9e"
+digest = "sha256:8c3c03819c4d1f5af0e7e93c4c9ff3f8ecfacf398250dee69a7760a75dff9f99"
 depicts = ["src/builder/assets/template.html"]
-blessed = "the template gained a trail of the pages above a child page; the picture draws a top page, which has none"
+blessed = "the theme button now starts at Light, and the picture's button label was changed from Auto to Light to match"

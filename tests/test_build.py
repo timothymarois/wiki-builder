@@ -1184,6 +1184,14 @@ class WikiTests(unittest.TestCase):
         self.assertTrue(part.is_file(), "a draft marked for users was left out of the user build")
         self.assertIn('<p class="hat draft"><b>This page is a draft.</b>', part.read_text(encoding="utf-8"))
 
+    def test_a_page_starts_in_the_light_theme(self):
+        # Light is the theme a reader sees until they choose Dark or Auto, even with scripts turned off.
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertIn('<html lang="en" data-theme="light">', page)
+        self.assertIn('<button class="theme" type="button" title="Light, dark, or follow the system">Light</button>',
+                      page)
+
     def test_a_draft_is_not_in_the_collected_goals(self):
         self.write("proposal", PAGE.replace('status = "approved"\n', "")
                    .replace("A thing exists so that something else can happen.", "A proposal is made."))
