@@ -65,7 +65,7 @@ inside it.
 
 | File | Holds |
 |---|---|
-| `SKILL.md` | The steps for each task, and how to write a page: the intent contract, naming, what may never appear, the voice |
+| `SKILL.md` | The steps for each task, and how to write a page: the four readers and the part each reads, the intent contract, naming, page families, what may never appear, the voice |
 | `references/page-standard.md` | The worked example — a page done well, the same content done badly, and the difference |
 | `references/reference-standard.md` | The same for reference pages — a command and an endpoint, each done well and badly |
 | `references/page-families.md` | Pages about things of one kind: finding a family, designing its shared layout, the parent page, and a family done well and badly |
