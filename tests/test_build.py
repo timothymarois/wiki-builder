@@ -1359,9 +1359,31 @@ class WikiTests(unittest.TestCase):
         self.build()
         self.assertTrue((self.out / "thing/part/index.html").is_file())
         (self.pages / "thing/part.md").unlink()
-        shutil.rmtree(self.out)
         self.build()
         self.assertFalse((self.out / "thing/part").exists())
+
+    def test_a_file_the_build_did_not_write_is_kept(self):
+        # A host reads files placed beside the site by hand, such as a CNAME naming its domain. A build
+        # deletes only what an earlier build wrote.
+        self.build()
+        (self.out / "CNAME").write_text("wiki.example.org\n", encoding="utf-8")
+        (self.out / ".well-known").mkdir()
+        (self.out / ".well-known/security.txt").write_text("Contact: mailto:a@example.org\n", encoding="utf-8")
+        self.build()
+        self.assertTrue((self.out / "CNAME").is_file(), "a rebuild deleted a file the build never wrote")
+        self.assertTrue((self.out / ".well-known/security.txt").is_file())
+
+    def test_a_site_with_no_build_record_loses_only_what_a_build_writes(self):
+        # A site written before builds kept a record still has its old pages cleared, and nothing else.
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        self.build()
+        (self.out / wiki.BUILD_RECORD).unlink()
+        (self.pages / "thing/part.md").unlink()
+        (self.out / "CNAME").write_text("wiki.example.org\n", encoding="utf-8")
+        self.build()
+        self.assertFalse((self.out / "thing/part").exists(), "a page from the earlier build was left behind")
+        self.assertTrue((self.out / "CNAME").is_file(), "a file the build never wrote was deleted")
+        self.assertTrue((self.out / wiki.BUILD_RECORD).is_file(), "the build kept no record")
 
     def test_a_wiki_with_no_pages_is_a_failure_not_an_empty_site(self):
         for path in self.pages.glob("*.md"):

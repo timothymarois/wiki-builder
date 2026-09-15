@@ -55,7 +55,7 @@ audited = "2026-09-14"
 
 ["commands/build"]
 updated = "2026-09-14"
-digest = "cf0eaf70ef2ef8265ff7621f9b3a3d898bfc3018a570f9fac158c8908868af3c"
+digest = "abeed36d648d876477d554f4518092c4adf644893d620492dee9dc33bf4722ab"
 audited = "2026-09-14"
 
 ["commands/check"]
@@ -160,7 +160,7 @@ audited = "2026-09-14"
 
 ["site"]
 updated = "2026-09-14"
-digest = "2c342cffeb7db2edf9be411144e658ee3847ae099ed8c0cb7513d62f2e293a1b"
+digest = "6446712817047d8ac2ebf092a3df531cf97f4ae180795710174636524448df21"
 audited = "2026-09-14"
 
 ["site/agent-markdown"]

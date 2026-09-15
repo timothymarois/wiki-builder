@@ -59,6 +59,8 @@ wiki: 3 pages written to /path/to/notes/docs/wiki/site
 
 It refuses to write into a folder that is not empty and was not made by an earlier build.[^guard] A build
 that stops partway has already copied its stylesheet, so the next build still accepts the folder.[^partway]
+A file put in the folder by hand, such as a host's `CNAME`, survives every build: a build lists the files
+it wrote in `.wiki-build` inside the folder, and deletes only files from that list.[^record]
 
 ## Exit codes
 
@@ -78,6 +80,8 @@ that stops partway has already copied its stylesheet, so the next build still ac
 [^guard]: `src/builder/cli.py` — `guard_output()`.
 [^partway]: `src/builder/build.py` — `write_site()` copies `wiki.css` into `assets` before it writes any
     page, and `src/builder/cli.py` — `guard_output()` accepts a folder that holds it.
+[^record]: `src/builder/build.py` — `clear_stale()`, called at the end of `write_site()`, unlinks only the
+    files `BUILD_RECORD` lists that the build did not write again, then records what it wrote.
 [^exit]: `src/builder/cli.py` — `main()` returns 2 with no wiki and prints a `WikiError` before returning 1;
     `run()` returns 2 when `guard_output()` refuses; argparse exits 2 on an option it does not know.
 [^stop]: `src/builder/cli.py` — `main()` prints a `WikiError` and returns 1; `src/builder/build.py` —
