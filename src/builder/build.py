@@ -19,6 +19,7 @@ import argparse
 import datetime
 import hashlib
 import html as html_module
+import http.client
 import json
 import os
 import posixpath
@@ -26,9 +27,12 @@ import re
 import shutil
 import sys
 import tempfile
+import threading
+import time
 import tomllib
 import urllib.parse
-from importlib import resources
+import urllib.request
+from importlib import metadata, resources
 from pathlib import Path
 
 import mistune
@@ -54,6 +58,15 @@ MERMAID_LICENSE = "mermaid-12.0.0.LICENSE"
 MERMAID_BLOCK = re.compile(r'<pre><code class="language-mermaid">(.*?)</code></pre>', re.S)
 # A code block exactly as markdown renders it: a bare <pre>, through its own closing tag.
 BARE_PRE = re.compile(r"(<pre>.*?</pre>)", re.S)
+
+# `wiki check` says when a newer release of the tool is published, so a project does not stay on an old one
+# without knowing. A release is a plain vX.Y.Z tag; the wait is short, because the answer is news and the
+# check must not be slowed for it; and one setting switches the question off.
+DISTRIBUTION = "wiki-builder"
+RELEASE_TAG = re.compile(r"refs/tags/v(\d+)\.(\d+)\.(\d+)")
+RELEASE_VERSION = re.compile(r"(\d+)\.(\d+)\.(\d+)")
+RELEASE_TIMEOUT = 2.5
+NO_RELEASE_CHECK = "WIKI_NO_RELEASE_CHECK"
 
 
 def skill_dir():
@@ -2168,6 +2181,89 @@ def families_report(root, wiki=None):
     lines.append(f"{declared} famil{'y' if declared == 1 else 'ies'} declared; {undeclared} parent"
                  f"{'' if undeclared == 1 else 's'} with two or more children declaring none")
     return lines
+
+
+def newest_release(advertisement):
+    """The highest plain vX.Y.Z tag in a git server's list of references, as numbers, or None.
+
+    Compared as numbers, because as text v0.9.0 sorts after v0.10.0. A candidate, a tag's peeled `^{}` line
+    and a tag of any other shape are not releases, however high their numbers.
+    """
+    releases = []
+    for line in advertisement.splitlines():
+        # A reference line is its length, its object and its name; the first also carries capabilities.
+        tag = RELEASE_TAG.fullmatch(line.split("\0")[0].rpartition(" ")[2])
+        if tag:
+            releases.append(tuple(int(part) for part in tag.groups()))
+    return max(releases, default=None)
+
+
+def release_repository():
+    """Where wiki-builder is published, as the installed package's own metadata records it, or None."""
+    try:
+        addresses = metadata.metadata(DISTRIBUTION).get_all("Project-URL") or []
+    except metadata.PackageNotFoundError:
+        return None
+    for entry in addresses:
+        label, _, address = entry.partition(",")
+        if label.strip() == "Homepage" and address.strip().startswith("https://"):
+            return address.strip()
+    return None
+
+
+def latest_release(timeout=RELEASE_TIMEOUT):
+    """The newest release published where the package says it lives, or None if it names nowhere.
+
+    Asked of the git server over HTTPS, the question `git ls-remote` asks: it needs no token, no git on the
+    machine, and none of the allowance the GitHub API gives callers without a token. A server that cannot be
+    reached raises, and the caller decides that means no answer.
+    """
+    repository = release_repository()
+    if repository is None:
+        return None
+    request = urllib.request.Request(repository.rstrip("/") + ".git/info/refs?service=git-upload-pack",
+                                     headers={"User-Agent": DISTRIBUTION})
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        return newest_release(response.read().decode("utf-8"))
+
+
+def newer_release(version, lookup=None, environ=None, timeout=RELEASE_TIMEOUT):
+    """Start asking whether a release newer than `version` is published; return the wait for the notice.
+
+    The notice is news, never a problem: offline, refused, rate-limited, slow or unreadable
+    all mean no notice and nothing said. The question runs beside the check rather than after it, and the
+    wait ends at a deadline counted from the start, because a socket's timeout does not bound the name
+    lookup before it. Nothing is written or cached, since a check writes nothing.
+    """
+    environ = os.environ if environ is None else environ
+    running = RELEASE_VERSION.fullmatch(version)
+    if environ.get(NO_RELEASE_CHECK) or not running:
+        return lambda: None
+    # Looked up when asked, not when defined, so a test can answer in place of the server.
+    lookup = lookup or latest_release
+    answer = []
+
+    def ask():
+        try:
+            answer.append(lookup())
+        except (OSError, ValueError, http.client.HTTPException):
+            pass
+
+    deadline = time.monotonic() + timeout
+    # A daemon, so a lookup still waiting when the check ends never keeps the command from exiting.
+    worker = threading.Thread(target=ask, daemon=True)
+    worker.start()
+
+    def notice():
+        worker.join(max(0.0, deadline - time.monotonic()))
+        newest = answer[0] if answer else None
+        if newest is None or newest <= tuple(int(part) for part in running.groups()):
+            return None
+        latest = "%d.%d.%d" % newest
+        return (f"wiki-builder {latest} is released and this is {version}; to take it up, change the pinned "
+                f"release to v{latest}, run `wiki sync`, then run `wiki check`")
+
+    return notice
 
 
 def check(root, wiki=None, version=None):

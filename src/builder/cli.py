@@ -12,7 +12,7 @@ from pathlib import Path
 
 from . import __version__
 from .build import (ASSETS, SITEMAP, SKILL, audit, bless, build, check, citation_counts, coverage,
-                    families_report, missing_marks, report, wiki_of)
+                    families_report, missing_marks, newer_release, report, wiki_of)
 from .config import CONFIG, WikiError, read_config, record_version
 from .serve import serve
 
@@ -188,6 +188,8 @@ def run(args, root, wiki):
         return 0
 
     if command == "check":
+        # Asked before the pages are checked, so the answer arrives while they are.
+        release = newer_release(__version__)
         problems, counts, goals_words, budget = check(root, wiki, __version__)
         for problem in problems:
             print("wiki: " + problem, file=sys.stderr)
@@ -195,6 +197,10 @@ def run(args, root, wiki):
         for mark in missing_marks(root, wiki):
             print("wiki: " + mark)
         report(counts, goals_words, budget, citations=citation_counts(root, wiki))
+        # Not a problem either: a newer release is news, and never fails the check.
+        notice = release()
+        if notice:
+            print("wiki: " + notice)
         print("wiki: %d page%s, %d problem%s" % (len(counts), "" if len(counts) == 1 else "s",
                                                 len(problems), "" if len(problems) == 1 else "s"))
         return 1 if problems else 0

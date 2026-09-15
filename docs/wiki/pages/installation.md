@@ -110,6 +110,8 @@ every push and pull request and cannot drift unnoticed between local runs, as de
 
 An update is a new tag in the script, then `wiki sync` to rewrite the skill and record the release.[^sync]
 `wiki check` fails until that release is recorded, and names every page a new rule breaks.[^version]
+`wiki check` also says when a newer release is published than the release it runs, and never fails
+for it.[^newer]
 
 [^package]: `pyproject.toml` — `[project.scripts]` names the `wiki` command, `requires-python` asks for
     3.11 or newer, and `dependencies` pins `mistune==3.3.4`.
@@ -132,3 +134,5 @@ An update is a new tag in the script, then `wiki sync` to rewrite the skill and 
     as the exit code.
 [^version]: `src/builder/build.py` — `version_problems()`, called from `check()`, which gathers every
     problem at once.
+[^newer]: `src/builder/build.py` — `newer_release()`; `src/builder/cli.py` — `run()` prints its notice for
+    `check`, and returns the same status with it or without it.

@@ -6,16 +6,23 @@ plus the properties the whole scheme rests on: addresses that resolve wherever t
 that writes nowhere but its output, and a tool that names nothing about any project it documents.
 """
 
+import contextlib
 import http.client
+import io
 import json
+import os
 from pathlib import Path
 import re
 import shutil
 import sys
 import tempfile
 import threading
+import time
 import tomllib
 import unittest
+from unittest import mock
+import urllib.error
+import urllib.request
 
 from builder import build as wiki
 from builder import cli, serve as serving
@@ -24,6 +31,16 @@ from builder.config import CONFIG, WikiError
 # The installed package, wherever it is: the tests prove what a project gets, not what the source tree
 # happens to hold.
 PACKAGE = Path(wiki.__file__).resolve().parent
+
+
+def setUpModule():
+    # No case reaches the network. Every check a case runs has the release lookup switched off, a case about
+    # the lookup hands it an answer instead of a server, and opening an address fails the case outright.
+    for guard in (mock.patch.dict(os.environ, {wiki.NO_RELEASE_CHECK: "1"}),
+                  mock.patch.object(urllib.request, "urlopen",
+                                    side_effect=AssertionError("a case reached the network"))):
+        guard.start()
+        unittest.addModuleCleanup(guard.stop)
 
 
 def wiki_version():
@@ -2401,6 +2418,38 @@ Every page, with its sources and dates.
                                         "--wiki", str(self.root / "docs/wiki")])
         self.assertEqual(0, status, output)
 
+    def run_with_newest_release(self, newest, command="check"):
+        """A command run with the release lookup switched on, answered by `newest`; and whether it asked."""
+        asked = []
+        with mock.patch.dict(os.environ), mock.patch.object(wiki, "latest_release",
+                                                            lambda: asked.append(True) or newest):
+            os.environ.pop(wiki.NO_RELEASE_CHECK)
+            status, output = self.run_main(["--root", str(self.root), command])
+        return status, output, bool(asked)
+
+    def test_check_announces_a_newer_release_and_keeps_its_result(self):
+        # The notice is news, not a problem: the exit status and the problem count stay what the pages earn,
+        # on a wiki that fails (its dates were never recorded) and on one that passes.
+        notice = (f"wiki: wiki-builder 99.0.0 is released and this is {wiki_version()}; to take it up, change "
+                  "the pinned release to v99.0.0, run `wiki sync`, then run `wiki check`")
+        count = re.compile(r"wiki: \d+ pages?, \d+ problems?")
+        for expected, prepare in ((1, lambda: None), (0, self.build)):
+            prepare()
+            with self.subTest(status=expected):
+                quiet_status, quiet, _ = self.run_with_newest_release(None)
+                status, told, asked = self.run_with_newest_release((99, 0, 0))
+                self.assertTrue(asked, "the check never asked which release is newest")
+                self.assertEqual((expected, expected), (quiet_status, status), told)
+                self.assertIn(notice, told)
+                self.assertNotIn("is released", quiet)
+                self.assertEqual(count.search(quiet).group(), count.search(told).group())
+
+    def test_only_the_check_asks_which_release_is_newest(self):
+        status, output, asked = self.run_with_newest_release((99, 0, 0), command="build")
+        self.assertEqual(0, status, output)
+        self.assertFalse(asked, "a build asked which release is newest")
+        self.assertNotIn("is released", output)
+
     def test_the_program_alone_builds_and_serves(self):
         # `wiki` with no command is `wiki serve`, and serve is the only command that declares a port.
         from unittest import mock
@@ -2437,6 +2486,98 @@ Every page, with its sources and dates.
         page = (self.out / "thing/index.html").read_text(encoding="utf-8")
         self.assertIn('href="../../AGENTS.md"', page,
                       "a link out of the site was counted from the staging directory")
+
+
+class ReleaseTests(unittest.TestCase):
+    """The notice that a newer release is published: news for the owner, never a reason to fail or to wait."""
+
+    # What a git server answers when asked for its references, as `git ls-remote` asks: one reference a line,
+    # the first carrying the server's capabilities after a NUL, and an annotated tag followed by its peeled line.
+    ADVERTISEMENT = "".join((
+        "001e# service=git-upload-pack\n0000",
+        "0155" + "a" * 40 + " HEAD\0multi_ack symref=HEAD:refs/heads/main\n",
+        "003f" + "b" * 40 + " refs/heads/main\n",
+        "003f" + "c" * 40 + " refs/tags/v0.9.0\n",
+        "0042" + "d" * 40 + " refs/tags/v0.9.0^{}\n",
+        "0040" + "e" * 40 + " refs/tags/v0.10.0\n",
+        "0043" + "f" * 40 + " refs/tags/v0.10.0^{}\n",
+        "0044" + "1" * 40 + " refs/tags/v1.0.0-rc1\n",
+        "003e" + "2" * 40 + " refs/tags/2.0.0\n",
+        "003d" + "3" * 40 + " refs/tags/v3.0\n",
+        "0047" + "4" * 40 + " refs/tags/release-v4.0.0\n",
+        "0041" + "5" * 40 + " refs/tags/v5.0.0.1\n",
+        "0000",
+    ))
+
+    def notice(self, version, lookup, environ=None, timeout=None):
+        """The notice `wiki check` would print, and whatever reached standard error while it was decided."""
+        said = io.StringIO()
+        with contextlib.redirect_stderr(said):
+            wait = wiki.newer_release(version, lookup, {} if environ is None else environ,
+                                      wiki.RELEASE_TIMEOUT if timeout is None else timeout)
+            notice = wait()
+        return notice, said.getvalue()
+
+    def test_releases_are_compared_as_numbers_and_only_plain_tags_count(self):
+        # As text, v0.9.0 sorts after v0.10.0; a candidate, a peeled line or a tag of another shape is no
+        # release, however high its numbers.
+        self.assertEqual((0, 10, 0), wiki.newest_release(self.ADVERTISEMENT))
+        others = self.ADVERTISEMENT.replace("refs/tags/v0.", "refs/tags/x0.")
+        for name, advertisement in (("no tags", "001e# service=git-upload-pack\n0000"),
+                                    ("only other shapes", others),
+                                    ("not a git answer", "<html>rate limited</html>")):
+            with self.subTest(name):
+                self.assertIsNone(wiki.newest_release(advertisement))
+
+    def test_a_newer_release_is_announced_with_what_to_do(self):
+        notice, said = self.notice("0.9.0", lambda: (0, 10, 0))
+        self.assertEqual("wiki-builder 0.10.0 is released and this is 0.9.0; to take it up, change the pinned "
+                         "release to v0.10.0, run `wiki sync`, then run `wiki check`", notice)
+        self.assertEqual("", said)
+
+    def test_the_same_or_an_older_release_is_not_announced(self):
+        for newest in ((0, 4, 0), (0, 3, 9), None):
+            with self.subTest(newest=newest):
+                self.assertEqual((None, ""), self.notice("0.4.0", lambda: newest))
+
+    def test_a_failed_lookup_announces_nothing_and_says_nothing(self):
+        for failure in (urllib.error.URLError("offline"),
+                        urllib.error.HTTPError("https://example.test", 429, "Too Many Requests", {}, None),
+                        TimeoutError("timed out"), http.client.IncompleteRead(b""),
+                        UnicodeDecodeError("utf-8", b"\xff", 0, 1, "invalid start byte")):
+            def lookup():
+                raise failure
+            with self.subTest(failure=type(failure).__name__):
+                self.assertEqual((None, ""), self.notice("0.4.0", lookup))
+
+    def test_a_slow_lookup_is_abandoned_at_the_deadline(self):
+        released = threading.Event()
+        self.addCleanup(released.set)
+        started = time.monotonic()
+        notice, said = self.notice("0.4.0", lambda: released.wait(60) and (9, 0, 0), timeout=0.05)
+        self.assertEqual((None, ""), (notice, said))
+        self.assertLess(time.monotonic() - started, 5, "the check waited on a lookup past its deadline")
+
+    def test_the_opt_out_skips_the_lookup(self):
+        asked = []
+        notice, _ = self.notice("0.4.0", lambda: asked.append(True) or (9, 0, 0),
+                                environ={wiki.NO_RELEASE_CHECK: "1"})
+        self.assertIsNone(notice)
+        self.assertEqual([], asked, "the lookup ran although it was switched off")
+
+    def test_the_lookup_asks_the_git_server_the_package_names(self):
+        # The address comes from the installed package's own metadata, and the question is the one git asks.
+        repository = wiki.release_repository()
+        self.assertRegex(repository or "", r"^https://\S+/wiki-builder$")
+        asked = []
+
+        def urlopen(request, timeout):
+            asked.append((request.full_url, timeout))
+            return contextlib.nullcontext(io.BytesIO(self.ADVERTISEMENT.encode()))
+
+        with mock.patch.object(urllib.request, "urlopen", urlopen):
+            self.assertEqual((0, 10, 0), wiki.latest_release())
+        self.assertEqual([(repository + ".git/info/refs?service=git-upload-pack", wiki.RELEASE_TIMEOUT)], asked)
 
 
 class ServingTests(unittest.TestCase):

@@ -65,7 +65,7 @@ audited = "2026-09-14"
 
 ["commands/check"]
 updated = "2026-09-15"
-digest = "bf6c90fcfdcbab4960a8e4f3d256735ee351f49650b91bb8a7a7aeb7f4c36783"
+digest = "eee414b9a39227c1ca6a37a7a8d3a5db1f671c2cae38258ebaaf70e4effcc2f4"
 audited = "2026-09-14"
 
 ["commands/coverage"]
@@ -99,8 +99,8 @@ digest = "e9f053e91c62be98fdb94a4adca6f4dba71c493a6f7a8e2b651f6b00ca61e7ea"
 audited = "2026-09-15"
 
 ["continuous-integration"]
-updated = "2026-09-14"
-digest = "3c7b81c9bc25fdab14b1c3d1693255a54ab7b4c16ccc8078bf3968b05235f268"
+updated = "2026-09-15"
+digest = "a30b0106498654370877913b44d9f35fb610881bf832a6063b46a6997ff0c124"
 audited = "2026-09-14"
 
 ["deployment-cloudflare"]
@@ -142,7 +142,7 @@ digest = "7b1b3fbb69331e745f1d28260f178cf5b6792259e61ab6bb45be3aa31412d92e"
 
 ["installation"]
 updated = "2026-09-15"
-digest = "03ff87d4e1a6dedbfd9ea7f5feb0666625d42e9240c752bfc9b5abf5737227b9"
+digest = "c1d6e35133e9dedea9dee3295cc96c3bfee1c1ed3ca534524f09e54c1ea03e2e"
 audited = "2026-09-14"
 
 ["installation-prompt"]
@@ -204,7 +204,7 @@ audited = "2026-09-14"
 
 ["skill"]
 updated = "2026-09-15"
-digest = "7ad443bb8325881bfcc164b97e02b34fc8f09734e3b1617b3b560bcd4bf454bf"
+digest = "a05621e99f7cfbb43caca566ac8b0810bb1c6069abde136a9f8648450afe1aaa"
 audited = "2026-09-14"
 
 ["skill/delivery"]

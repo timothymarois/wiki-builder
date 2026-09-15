@@ -100,7 +100,7 @@ marked `{missing}`.[^missing]
 ## Tasks
 
 `SKILL.md` gives the steps for each task an agent is handed: a new page, a change in the code, a
-requirement not built yet, a failing check, a review and organizing pages.[^tasks]
+requirement not built yet, a failing check, a newer release, a review and organizing pages.[^tasks]
 
 [^files]: `src/builder/cli.py` — `SKILL_NAME` names the skill; `sync()` copies every markdown file under
     `SKILL`, which `src/builder/build.py` finds with `skill_dir()`.
@@ -142,4 +142,4 @@ requirement not built yet, a failing check, a review and organizing pages.[^task
     from the wiki.
 [^missing]: `src/skill/SKILL.md` — the Missing citations section, where a stated requirement not built yet
     is written now and marked.
-[^tasks]: `src/skill/SKILL.md` — the Tasks section, one list of steps for each of those six tasks.
+[^tasks]: `src/skill/SKILL.md` — the Tasks section, one list of steps for each of those seven tasks.

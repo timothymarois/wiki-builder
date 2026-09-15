@@ -60,6 +60,17 @@ wiki: these budgets are PROVISIONAL -- 500 words a page, 3500 for the collected 
 wiki: 3 pages, 1 problem
 ```
 
+When a newer wiki-builder release is published than the release running, the line before the last names it and
+says how to take it up, and the check's result stays what the pages earn.[^newer] The question goes to
+GitHub while the pages are checked, and the answer is awaited for at most two and a half seconds; offline,
+refused or slow, the check prints no notice and no error.[^newer] Setting `WIKI_NO_RELEASE_CHECK` to any
+value but empty leaves the question unasked.[^optout] Run by release 0.4.0 after 0.5.0 was
+published:[^newer]
+```text
+wiki: wiki-builder 0.5.0 is released and this is 0.4.0; to take it up, change the pinned release to v0.5.0, run `wiki sync`, then run `wiki check`
+wiki: 40 pages, 0 problems
+```
+
 ## Exit codes
 
 | Code | Condition | Message |
@@ -79,3 +90,10 @@ wiki: 3 pages, 1 problem
 [^exit]: `src/builder/cli.py` — `run()` returns 1 when there are problems and 0 when there are none;
     `main()` returns 2 with no wiki; argparse exits 2 on an option it does not know.
 [^stop]: `src/builder/cli.py` — `main()` catches `WikiError`, prints it, and returns 1.
+[^newer]: `src/builder/build.py` — `newer_release()` asks `latest_release()` on a thread of its own before
+    the pages are checked, waits no longer than `RELEASE_TIMEOUT`, 2.5 seconds, and gives no notice when the
+    lookup fails or the release is not newer; `latest_release()` reads the tags from the git server at the
+    package's `Homepage` address; `src/builder/cli.py` — `run()` prints the notice before the count and
+    returns the same status either way.
+[^optout]: `src/builder/build.py` — `newer_release()` gives no notice, and asks nothing, when the variable
+    `NO_RELEASE_CHECK` names is set to a value that is not empty.

@@ -64,6 +64,19 @@ needs [Naming and grammar](references/naming-and-grammar.md) rather than the pag
    serves nothing in the intent. A reference that does not establish its sentence is not a citation.
 3. Change nothing the problems do not name, and run `wiki check` again.
 
+### Newer release
+
+`wiki check` prints `wiki-builder X is released and this is Y` when a newer release of the tool is published.
+It is news, not a problem: the check passes or fails exactly as it would without it.
+
+1. Say so in the report of the work: both releases, and that taking up the newer one means changing the
+   pinned release, running `wiki sync`, then running `wiki check`.
+2. Change nothing for it. The pinned release, the skill and `wiki.toml` stay as they are unless the task
+   asks for the update; a release is never taken up silently.
+3. When the task asks for it, change the pin everywhere the project names one, such as a wrapper script and
+   a CI step, run `wiki sync`, then run `wiki check` and follow [Failing check](#failing-check) for any rule
+   the newer release adds.
+
 ### Review
 
 1. Read this skill and every reference in full: they are the standard. Report findings, and edit a page

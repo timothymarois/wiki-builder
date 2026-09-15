@@ -43,6 +43,9 @@ wiki audit     record that pages were checked against the code today
 
 ## Updating
 
+`wiki check` prints a line when a newer release is published than the one it runs. The line never fails the
+check, and `WIKI_NO_RELEASE_CHECK=1` skips the lookup. To take a release up:
+
 1. Bump `WIKI_VERSION` in the wrapper.
 2. Run `./scripts/dev-wiki.sh sync` to update the skill and record the release.
 3. Run `./scripts/dev-wiki.sh check`. A release that adds a check names every page the new rule finds.

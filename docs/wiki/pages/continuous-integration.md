@@ -58,7 +58,9 @@ jobs:
 
 The action installs the tool from its own copy, at the release named in `uses:`, so the check that runs is
 the check that release ships.[^install] A wiki synced against a different release fails, and the check says
-to run `wiki sync`.[^version]
+to run `wiki sync`.[^version] The check also says when a newer release is published than the release named in
+`uses:`, without failing the job, and leaves that question unasked wherever `WIKI_NO_RELEASE_CHECK` is set,
+as [wiki check](commands/check.md) describes.[^newer]
 
 ## Repository workflows
 
@@ -73,6 +75,9 @@ it passes is described on [GitHub Pages](deployment-github.md).
     empty by default, which leaves the tool's own `docs/wiki`.
 [^install]: `action.yml` — installs `github.action_path` with `pip`, after `actions/setup-python`.
 [^version]: `src/builder/build.py` — `version_problems()`, called from `check()`.
+[^newer]: `src/builder/build.py` — `newer_release()`, which asks nothing when `NO_RELEASE_CHECK` is set;
+    `src/builder/cli.py` — `run()` prints its notice for `check`, and returns the same status with it or
+    without it.
 [^ci]: `.github/workflows/tests.yml` and `.github/workflows/wiki.yml` — both run `on` a push to `main`
     and on a pull request; `.github/workflows/pages.yml` — runs `on` a push to `main`.
 [^tests]: `.github/workflows/tests.yml` — the `python-version` matrix, then `pip install .` and the
