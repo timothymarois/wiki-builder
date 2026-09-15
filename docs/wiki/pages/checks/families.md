@@ -1,10 +1,10 @@
 +++
 title = "Families"
 subtitle = "headings and infobox labels outside a declared family's layout, and members the parent does not link"
-status = "draft"
+status = "approved"
 categories = ["Refusals"]
 intent = """
-The families check exists so that pages about things of one kind keep the layout the owner approved, and a
+The families check exists so that pages about things of one kind keep their approved layout, and a
 reader who has read one member knows where to look on every other. It should be easy to fix: each refusal
 names the member, the heading or label, and both ways to make it pass.
 """

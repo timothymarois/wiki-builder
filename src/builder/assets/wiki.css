@@ -1,12 +1,12 @@
-/* The wiki's look. Lifted verbatim from the prototype the owner approved on 2026-09-13; the palette and
-   proportions are Wikipedia's own. Do not restyle without the owner: the sign-off was on these bytes.
+/* The wiki's look. Lifted verbatim from the approved prototype; the palette and proportions are
+   Wikipedia's own. Restyling needs approval: the sign-off was on these bytes.
 
    The one block that is not from the prototype is "figures", at the foot. The prototype drew a debug glyph
-   where a picture would go, because it had no pictures; the owner asked for pictures of the real thing on
-   2026-09-13. That block follows the infobox's idiom rather than inventing one.
+   where a picture would go, because it had no pictures; a page shows pictures of the real thing. That
+   block follows the infobox's idiom rather than inventing one.
 
-   On 2026-09-14 the owner asked for tables and code blocks in a page to look like the wiki's own: a page's
-   tables now take the prototype's table.w, and code blocks take the source view's frame. */
+   Tables and code blocks in a page look like the wiki's own: a page's tables take the prototype's table.w,
+   and code blocks take the source view's frame. */
 
 :root{
   --page:#fff; --surface:#f8f9fa; --sunk:#eaecf0; --shade:#f1f3f5;
@@ -54,8 +54,8 @@ code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;backgroun
    slid that far before it pinned, which reads as the whole sidebar twitching on the first scroll.
    The column keeps its own background so the tint still runs the full height.
    The rail is exactly the window's height and never scrolls as a whole: the logo and search stay put, and
-   only the page list beneath them scrolls, on its own, without handing the scroll on to the article. The
-   owner, 2026-09-14: the logo was hidden whenever the article was scrolled. */
+   only the page list beneath them scrolls, on its own, without handing the scroll on to the article. Before
+   this, the logo was hidden whenever the article was scrolled. */
 .rail{background:var(--surface);padding:0;font-size:13px}
 .rail-in{position:sticky;top:0;box-sizing:border-box;height:100vh;height:100dvh;
   --pad-l:14px;--pad-r:12px;
@@ -197,6 +197,8 @@ sup.ref a{padding:0 1px}
    looks for the source, and says there is not one: it is not built yet, or nobody has found where it
    happens. */
 sup.nocite{color:var(--red);font-weight:700;cursor:help}
+/* On the health page, a count of claims with no source above 0 takes the same red as the mark. */
+table.health td.missing{color:var(--red);font-weight:700}
 ol.refs{font-size:12.5px;padding-left:22px;margin:8px 0}
 ol.refs li{margin:2px 0;overflow-wrap:anywhere;border-radius:2px;scroll-margin-top:16px}
 /* Follow a citation and the reference it lands on lights up, fading in so the eye is drawn to the change

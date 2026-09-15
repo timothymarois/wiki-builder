@@ -6,11 +6,11 @@
 
 ["brief"]
 updated = "2026-09-15"
-digest = "7d877e17816686caa14f87b8ba1cf91a3e14ebed3806d70ea14738adb7a6b551"
+digest = "5b5ceb9bb423176211478611f0ae22a120fcc5c066b5cd8940b36bcc8e00bcfd"
 
 ["checks"]
 updated = "2026-09-15"
-digest = "d5cce6617e5fe9989cf10be75ba5d90f6abfaf466a2f4c93de86394868ff730b"
+digest = "d98f9dfa5d862cc5bc277800754775ff02160983d7bc18dedb9bfd29007ef7f6"
 audited = "2026-09-14"
 
 ["checks/budgets"]
@@ -25,7 +25,7 @@ audited = "2026-09-14"
 
 ["checks/families"]
 updated = "2026-09-15"
-digest = "d01fd01fe2760c80665060f2f912990b39f9491fe67a693ef7e86bcd398c1849"
+digest = "3376dda8b34a450ebf2db441150b31a84b3f9db4e8c97c62daa5e8dd631d7fd0"
 
 ["checks/headings"]
 updated = "2026-09-15"
@@ -39,7 +39,7 @@ audited = "2026-09-14"
 
 ["checks/wording"]
 updated = "2026-09-15"
-digest = "db86e4cd62ce02976d590a87ad4c0bb59b5c5d9fd54e2af11f5f1ee920d24d00"
+digest = "f3db56dcb013b4b8a29714dbbd90b7d981a086f5f5821c8a47e17d764b241b74"
 audited = "2026-09-14"
 
 ["commands"]
@@ -49,7 +49,7 @@ audited = "2026-09-14"
 
 ["commands/audit"]
 updated = "2026-09-15"
-digest = "a0eb98b9b0c9745bd5cabc712495aa670c605b84d89abdab6284a9cf1e3f6e22"
+digest = "b088f80e41f00005bf8c7bd16b9f469523850a55e5ebc66478156bdb086a686b"
 audited = "2026-09-14"
 
 ["commands/bless"]
@@ -59,7 +59,7 @@ audited = "2026-09-14"
 
 ["commands/build"]
 updated = "2026-09-15"
-digest = "cefd8532bbc069501f624dc42b3c6f4abdbde04885a0b8c8e718255c671d6ccd"
+digest = "7dc4f10571d2064aa5c9d4320ecba33caa973508eb77b7b2c6cde18dbb951e54"
 audited = "2026-09-14"
 
 ["commands/check"]
@@ -69,11 +69,11 @@ audited = "2026-09-14"
 
 ["commands/coverage"]
 updated = "2026-09-15"
-digest = "01a394710d3be492d443a31646089536744e41e78e7e0a2377f55eea8f8699b9"
+digest = "e0e38f8c68e320a194607e41bc0bbcadccdad31ac34006d61326d1ef6eadcb4b"
 
 ["commands/families"]
 updated = "2026-09-15"
-digest = "ae3d309bf473693196ac48c7abe60b8d0bd7505715811adfe381381fb046c76c"
+digest = "c722347820c3f73c9aab06b1421144fa000dfeb62f029a2eb52946554c31f8e6"
 
 ["commands/publish"]
 updated = "2026-09-15"
@@ -109,7 +109,7 @@ digest = "4bcf0633c2f7af2175c3bdd0102c82fd971f45004efebdba19cd5ea9d604cf8b"
 
 ["deployment-github"]
 updated = "2026-09-15"
-digest = "147c9792a975619a73fbbe517bb87b65a00d6a3643432599e3952305a8b82a6a"
+digest = "e5fbb877900d022954de5b110d29ab6bf9bf9c270b1144d44c5c1ce3dd23d462"
 
 ["front-matter"]
 updated = "2026-09-15"
@@ -123,11 +123,11 @@ audited = "2026-09-14"
 
 ["goals"]
 updated = "2026-09-15"
-digest = "e0bd9d881dbb7862816e8342cb7ae9234d786602dd4a8becf75bb42fd727bdb0"
+digest = "44a8db0a43f6cf9c0615d6dcb904801b510492f6003969dcfb80d57b1fb1ad5e"
 
 ["health"]
 updated = "2026-09-15"
-digest = "835bad818a2a6dd94016b84dc5a62b54fb6b4653ea6a16c3db55c383950014a6"
+digest = "69ef3a627c674f53bbbca51cd10350b883ed596da9fcaa5062a485332a61fa05"
 
 ["index"]
 updated = "2026-09-15"
@@ -140,15 +140,15 @@ audited = "2026-09-14"
 
 ["installation-prompt"]
 updated = "2026-09-15"
-digest = "0ece72c7eece710475776dcd2cd9b48e9a96d7e07ebf8fc8b501dc38ff6c0607"
+digest = "5e433f944d394388091c4961321709145c9aa7b650318175037ac3a5cad43543"
 
 ["organization-prompt"]
 updated = "2026-09-15"
-digest = "db9e68c0022a9c318439e8963057f7b918c061ee5b5f701898d0ec01f723a7ed"
+digest = "a8581f33f7f82cbc457c141d8954e4e37faa2f29a27bf4dfac8fee5e3accfc20"
 
 ["pages"]
-updated = "2026-09-14"
-digest = "78d50a54fcf55c4a643066c0048fe66e4a6ca07d202b6931da4a51d3934d19f5"
+updated = "2026-09-15"
+digest = "d91935c1b08a36d1f639c0824886c838cc6ebe5aef4b3c9ee46c50195deb45e9"
 audited = "2026-09-14"
 
 ["pages/diagrams"]
@@ -171,7 +171,7 @@ audited = "2026-09-14"
 
 ["review-prompt"]
 updated = "2026-09-15"
-digest = "8f6cae6c3898e2919a33e639e866da3830183a91e587640cf1380acb1d5bdfa1"
+digest = "df3229eaf5c11e99147d26690e905d379d6581aa74309ce90363dccf2eec3bac"
 
 ["serving"]
 updated = "2026-09-14"
@@ -195,7 +195,7 @@ audited = "2026-09-14"
 
 ["skill"]
 updated = "2026-09-15"
-digest = "66a14bf4c52fa91a8299be5eefc583ecbe840349a0b57971ec77cf4425342cd3"
+digest = "7ad443bb8325881bfcc164b97e02b34fc8f09734e3b1617b3b560bcd4bf454bf"
 audited = "2026-09-14"
 
 ["skill/delivery"]

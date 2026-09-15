@@ -18,7 +18,7 @@ rows = [
 [[infobox]]
 group = "Defaults"
 rows = [
-  { label = "Status", value = "draft", note = "until the owner approves it", cite = "status" },
+  { label = "Status", value = "draft", note = "until it is approved", cite = "status" },
   { label = "Intent limit", value = "120 words", cite = "required" },
 ]
 
@@ -51,9 +51,9 @@ page.[^exempt] The same setting excuses a page from citing anything, whatever it
 ## Approval
 
 **A page is a draft until its front matter says `status = "approved"`.**[^status] A draft is listed in the sidebar like any other
-page, and opens with a banner saying that the owner has not approved it.[^draft] Search, the categories and the goals
-page offer only approved pages.[^approved] What a part of the system is for is the owner's decision, and
-an agent that drafts a page has not made it.[^status]
+page, and opens with a banner saying that it has not been approved yet.[^draft] Search, the categories and the goals
+page offer only approved pages.[^approved] What a part of the system is for needs approval, and
+an agent that drafts a page does not approve it.[^status]
 
 A page that no reader can reach from the sidebar stops the build, whether it is a draft or not.[^reach]
 

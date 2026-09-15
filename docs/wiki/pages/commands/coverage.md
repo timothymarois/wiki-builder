@@ -1,9 +1,9 @@
 +++
 title = "wiki coverage"
 subtitle = "list the source files no page cites"
-status = "draft"
+status = "approved"
 intent = """
-wiki coverage exists so that an owner or an agent can see which of the project's source files no page
+wiki coverage exists so that a writer or an agent can see which of the project's source files no page
 cites, and which citations name a file that no longer exists, without reading every page. It should report
 and never block: each gap is a line to act on, not a failed command.
 """

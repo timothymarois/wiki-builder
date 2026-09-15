@@ -39,18 +39,18 @@ member knows where to look on every other, and can set two members side by side.
    fails. Every member keeps that order.
 4. **Choose the infobox rows the same way**: the names and figures a reader compares across members, in
    the groups [Infobox](infobox.md) describes, with the same label on every member.
-5. **Show the owner the layout before rewriting any page to it.** The layout decides what every member
-   covers, and that is the owner's decision.
+5. **Ask for approval of the layout before rewriting any page to it.** The layout decides what every
+   member covers, so it needs approval.
 
 Each member then keeps to the layout:
 
 - **The same headings, in the same order.** A heading that does not apply to a member is left out, never
   renamed and never replaced by another. An empty section is never written.
 - **The same infobox groups and labels, in the same order**, each filled with the member's own value and
-  citation. A value the member does not have is left out; a value the owner requires and nothing provides
-  is marked missing.
-- **A section the others lack changes the layout.** Add it to every member it applies to, with the owner's
-  approval, or give that member a child page for it. A member with sections of its own can no longer be
+  citation. A value the member does not have is left out; a value a stated requirement
+  asks for and nothing provides is marked missing.
+- **A section the others lack changes the layout.** Add it to every member it applies to, once the new
+  layout is approved, or give that member a child page for it. A member with sections of its own can no longer be
   compared with its siblings section by section.
 - **Third-level headings follow the member.** Inside a section of the layout, a member divides its content
   as its own subject needs.
@@ -72,7 +72,7 @@ sentence, and a place in the sidebar.
 
 ## Declaration
 
-Once the owner approves a layout, the parent's front matter declares it, and `wiki check` holds every member
+Once a layout is approved, the parent's front matter declares it, and `wiki check` holds every member
 to it:
 
 ```toml
@@ -221,7 +221,7 @@ engineer finds through the references. **Delivery** is what a reader of either p
 ## Definition of done
 
 1. Every set of pages about things of one kind nests under one parent and shares one layout.
-2. The owner approved each layout.
+2. Each layout is approved.
 3. Every member carries the layout's headings in its order, leaving out only those that do not apply, and
    no second-level heading of its own.
 4. Every member's infobox uses the family's groups and labels.

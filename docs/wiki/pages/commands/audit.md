@@ -3,9 +3,9 @@ title = "wiki audit"
 subtitle = "record that pages were checked against the code"
 status = "approved"
 intent = """
-wiki audit exists so that a reader can see when a page was last checked against the code, and an owner can
-see which pages have gone longest without a check. It should record only a check of the page as it stands,
-and never move the day a page was updated.
+wiki audit exists so that a reader can see when a page was last checked against the code, and a writer or an
+agent can see which pages have gone longest without a check. It should record only a check of the page as
+it stands, and never move the day a page was updated.
 """
 
 [[infobox]]

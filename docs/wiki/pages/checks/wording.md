@@ -18,8 +18,8 @@ rows = [
 ]
 +++
 
-The wording checks refuse a name or a sentence that points at the page, hides who acts, quotes the owner
-instead of stating a rule, or uses a word that carries no fact.[^checks] Each names the field it found, or
+The wording checks refuse a name or a sentence that points at the page, hides who acts, attributes a rule to a
+person instead of stating it, or uses a word that carries no fact.[^checks] Each names the field it found, or
 the page and line of the sentence.[^checks]
 
 ## Refusals
@@ -37,14 +37,14 @@ all.[^prose]
 A word that says an unnamed person acts is refused wherever it stands whole: `nobody`, `somebody`,
 `someone`, `anyone`, `anybody`, `everyone`, `everybody`, and `no one` written with a space or a
 hyphen.[^actors] Such a
-word hides the fact a reader needs, so a page names the reader, the owner, an agent or the part of the
+word hides the fact a reader needs, so a page names the reader, the writer, an agent or the part of the
 system that acts.[^actors]
 
 ### Attribution
 
-A page that tells a rule as a quote of the owner is refused, because the quote dates the page and argues
-instead of describing.[^attribution] Where a requirement came from is recorded with the work that
-implements it.[^attribution] Two kinds of wording are refused: `the owner` or `the owner's ruling`, with or
+A rule attributed to a person with a date, or with a verb of saying, is refused, because the attribution
+dates the page and argues instead of describing.[^attribution] Where a requirement came from is recorded
+with the work that implements it.[^attribution] Two kinds of wording are refused: `the owner` or `the owner's ruling`, with or
 without a comma, followed by a date written as year, month and day, such as `the owner, 2026-09-14`; and
 `the owner` followed by `said`, `says`, `asked`, `wrote` or `ruled`.[^attribution]
 

@@ -4,10 +4,9 @@ subtitle = "a prompt that has an agent install wiki-builder in a project"
 status = "approved"
 goals = false
 intent = """
-The installation prompt exists so that an owner can have their own agent install wiki-builder in any
-project and start its wiki correctly, without learning the tool first. The agent should finish with a wiki
-that covers what the code does and passes its checks, and first pages whose intents wait for the owner's
-approval.
+The installation prompt exists so that an agent can install wiki-builder in any project and start its
+wiki correctly, without the project's team learning the tool first. The agent should finish with a wiki
+that covers what the code does and passes its checks, and first pages whose intents wait for approval.
 """
 
 [[infobox]]
@@ -65,9 +64,9 @@ Install wiki-builder in this project and start its wiki.
      is installed, and follow it.
    - A change in behaviour updates the page that describes it, in the same commit. Behaviour a
      person meets that no page describes gets its page, or a section of one.
-   - A requirement the owner gives goes onto its page when it is given, marked {missing} until code
+   - A stated requirement goes onto its page when it is stated, marked {missing} until code
      implements it. The change that builds it replaces the mark with a citation to that code.
-   - An intent is the owner's to approve; a new page is a draft until they do.
+   - An intent needs approval; a new page is a draft until its intent is approved.
    - Finish only when `./scripts/dev-wiki.sh check` reports 0 problems.
 
 5. Finish when `wiki check` reports 0 problems.

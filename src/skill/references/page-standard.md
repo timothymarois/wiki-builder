@@ -177,5 +177,5 @@ refuses a reference that cites a `.md`, because a page of prose is not an answer
 happen" — it is another claim that can be wrong in the same way.
 
 **A page that never surprised its writer probably was not read carefully enough.** Writing a page from
-the code routinely turns up things the owner believed that are not true. If yours turned up nothing, you
-summarised another document instead of reading what runs.
+the code routinely turns up assumptions in the stated requirements that are not true. If yours turned up
+nothing, you summarised another document instead of reading what runs.

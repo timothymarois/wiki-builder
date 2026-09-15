@@ -3,8 +3,8 @@ title = "Skill"
 subtitle = "the writing-wiki-pages instructions that wiki sync puts in a project"
 status = "approved"
 intent = """
-The skill exists so that an agent writing a page, in any project, writes it the way the owner approved
-without each project inventing its own rules. A change to those rules should reach a project only when
+The skill exists so that an agent writing a page, in any project, writes it by the approved rules,
+without each project inventing its own. A change to those rules should reach a project only when
 that project asks for it, and arrive where the project reviews it.
 """
 
@@ -26,7 +26,7 @@ rows = [
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Sources", value = "the code, the owner's words, an outside service's documentation", cite = "invent" },
+  { label = "Sources", value = "the code, the stated requirements, an outside service's documentation", cite = "invent" },
   { label = "Readers", value = "stakeholders, product owner, engineering team, customers", cite = "readers" },
 ]
 +++
@@ -40,17 +40,17 @@ enforced by the [Checks](checks.md).
 
 The skill writes one page for four readers, the stakeholders, the product owner, the engineering team and,
 in some wikis, customers, so that each learns what the system does without reading its code.[^readers] One
-page serves all four; a page for customers names no owner, team, agent, function, field or
+page serves all four; a page for customers names no team, agent, function, field or
 branch.[^readers]
 
 ## Intent
 
-Every page opens with an intent, two to four sentences from the owner saying what the thing is for, and
-every sentence on the page must serve it.[^intent]
+Every page opens with an intent, two to four sentences from the stated requirements saying what the thing
+is for, and every sentence on the page must serve it.[^intent]
 
 ## Sources
 
-**The skill forbids an agent to invent**: everything on a page comes from the code, the owner's own words,
+**The skill forbids an agent to invent**: everything on a page comes from the code, the stated requirements,
 or an outside service's own documentation, and a fact none of these gives is marked `{missing}` or left
 out.[^invent] Every sentence cites the file and function where the thing happens, or carries
 `{missing}`.[^cite]
@@ -93,7 +93,7 @@ ticket, a gap list, an apology, marketing, or an attribution to whoever asked fo
 
 ## Coverage
 
-Every behaviour a person meets, and every requirement the owner states, has a page or a section, found by
+Every behaviour a person meets, and every stated requirement, has a page or a section, found by
 listing the code rather than the wiki.[^coverage] A requirement not built yet is written on its page and
 marked `{missing}`.[^missing]
 
@@ -110,10 +110,11 @@ requirement not built yet, a failing check, a review and organizing pages.[^task
     command and an endpoint.
 [^sync]: `src/builder/cli.py` — `sync()`.
 [^readers]: `src/skill/SKILL.md` — the opening paragraph and the Readers section, whose rules keep one page
-    for every reader and keep the owner, the team, agents, functions, fields and branches off a page for
+    for every reader and keep the team, agents, functions, fields and branches off a page for
     customers; `src/skill/references/page-standard.md` — the eighth step of the self-edit.
 [^intent]: `src/skill/SKILL.md` — the Vocabulary entry for an intent, the Intent section, where every
-    sentence serves the intent and an intent comes from the owner, and the Owner approval section.
+    sentence serves the intent and an intent comes from the stated requirements, and the section on
+    approving an intent.
 [^invent]: `src/skill/SKILL.md` — the Truthfulness section, whose first rule is never to invent, and the
     last item of its definition of done.
 [^cite]: `src/skill/SKILL.md` — the Citations section, where a reference names a file and function, and
@@ -139,6 +140,6 @@ requirement not built yet, a failing check, a review and organizing pages.[^task
 [^exclusions]: `src/skill/SKILL.md` — the Exclusions table.
 [^coverage]: `src/skill/SKILL.md` — the Coverage section, whose first rule inventories from the code, never
     from the wiki.
-[^missing]: `src/skill/SKILL.md` — the Missing citations section, where a requirement the owner gives before
-    it is built is written now and marked.
+[^missing]: `src/skill/SKILL.md` — the Missing citations section, where a stated requirement not built yet
+    is written now and marked.
 [^tasks]: `src/skill/SKILL.md` — the Tasks section, one list of steps for each of those six tasks.

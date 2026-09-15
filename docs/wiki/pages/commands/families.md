@@ -1,9 +1,9 @@
 +++
 title = "wiki families"
 subtitle = "list the child pages that share no declared layout"
-status = "draft"
+status = "approved"
 intent = """
-wiki families exists so that an owner or an agent can see child pages that are shaped on their own, side by
+wiki families exists so that a writer or an agent can see child pages that are shaped on their own, side by
 side, before deciding whether they are one family. It should report and decide nothing, because whether
 pages are things of one kind is a person's judgement.
 """

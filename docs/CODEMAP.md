@@ -40,7 +40,7 @@ The kind of CI other projects include is `action.yml` at the root.
 | `cli.py` | What `wiki` does when typed: build, check, coverage, families, serve, sync, bless, publish, user, audit |
 | `config.py` | `wiki.toml` — a project's site name, reading budgets and sidebar — and the release it was written against |
 | `serve.py` | A local server rooted at the project, so a citation opens the file it names as readable text |
-| `assets/wiki.css` | The look. Lifted from a prototype its owner approved; light and dark |
+| `assets/wiki.css` | The look. Lifted from an approved prototype; light and dark |
 | `assets/wiki.js` | Search over an inlined index, the theme switch, the mobile menu, the lightbox, copy |
 | `assets/template.html` | The page, as named holes |
 | `assets/mermaid-12.0.0.min.js` | Mermaid, pinned and bundled: draws `mermaid` blocks with no network; copied only into a site that has a diagram |
@@ -80,7 +80,7 @@ them either way.
 
 ## Tests (`tests/` — 274 cases)
 
-`tests/test_build.py` (2844 lines). Each case builds a small wiki in a temporary directory, breaks exactly
+`tests/test_build.py` (2843 lines). Each case builds a small wiki in a temporary directory, breaks exactly
 one rule, and asserts the tool names it. Run them with:
 
 ```sh

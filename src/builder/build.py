@@ -48,8 +48,7 @@ ASSETS = resources.files(__package__) / "assets"
 
 # Diagrams are drawn by Mermaid, the diagram language GitHub draws from a ```mermaid block. Its browser build
 # ships inside the package, pinned by its name, so a wiki draws them served, published, or opened straight
-# off disk with no network. The owner, 2026-09-14: "implement mermaid". Mermaid is MIT licensed; its licence
-# travels with it.
+# off disk with no network. Mermaid is MIT licensed; its licence travels with it.
 MERMAID = "mermaid-12.0.0.min.js"
 MERMAID_LICENSE = "mermaid-12.0.0.LICENSE"
 MERMAID_BLOCK = re.compile(r'<pre><code class="language-mermaid">(.*?)</code></pre>', re.S)
@@ -111,8 +110,8 @@ INTERNAL_BLOCK = re.compile(r'<aside class="cites"[^>]*>.*?</aside>', re.S)
 INTERNAL_MARKER = re.compile(r'<sup class="ref[^"]*"[^>]*>.*?</sup>', re.S)
 
 # A missing citation. Every statement on a page is either traced to the code or marked here, in the place
-# a reader already looks for a source. The owner, 2026-09-14: "every statement, fact, requirement, logic,
-# beahvior mentions all require a citation or unknown citation." Two things put the mark there -- the
+# a reader already looks for a source, because every statement, fact, requirement and behaviour needs a
+# citation or this mark. Two things put the mark there -- the
 # thing is not built yet, or nobody has found where it happens -- and for a reader the consequence is the
 # same: do not take this on faith. Written {missing} in the prose, or missing = true on an infobox row.
 # Never shown to a user.
@@ -197,12 +196,12 @@ def read_pages(pages_dir, intent_budget):
             "subtitle": meta.get("subtitle", ""),
             "hatnote": meta.get("hatnote", ""),
             "audience": meta.get("audience", "internal"),
-            # Draft until the owner says otherwise. A page states what part of the system is for, and
-            # that is the owner's to decide -- an agent may draft one, and drafting is not deciding.
+            # Draft until approved. A page states what part of the system is for, and that needs approval
+            # -- an agent may draft one, and drafting is not approving.
             "status": meta.get("status", "draft"),
             "categories": list(meta.get("categories", [])),
             # Neither a reference nor a code block is read the way prose is: one is followed, the other
-            # copied or run. The owner, 2026-09-14, chose not to count code blocks.
+            # copied or run. Code blocks are not counted.
             "words": counted_words(body),
         }
     if not pages:
@@ -284,7 +283,7 @@ def write_ledger(images_dir, ledger):
         "# What each picture shows, and what its subject hashed to when the picture was made.",
         "#",
         "# The gate fails when a depicted asset has moved and its picture has not been re-made, because a",
-        "# wiki the owner reads instead of the source cannot afford a picture of something that no longer",
+        "# wiki read instead of the source cannot afford a picture of something that no longer",
         "# exists. Clear it by re-rendering, or by `wiki bless <picture> \"<reason>\"`",
         "# when the change did not alter what the picture shows.",
         "",
@@ -351,8 +350,7 @@ def slugify(text):
 #
 # "index.html" by default, because that link works in both places a wiki gets read: served over a port,
 # and opened straight off disk by double-clicking a file. A bare "plants/" works only when something is
-# serving it -- a browser handed a directory over file:// lists its contents instead of showing the page,
-# which is what the owner hit.
+# serving it -- a browser handed a directory over file:// lists its contents instead of showing the page.
 #
 # Empty for publishing, where "plants/" is the address and nothing ends in .html. That is the only place
 # the difference is worth having, and it is a flag rather than the default.
@@ -553,8 +551,7 @@ def render_source(raw, copy_link=""):
     the block, so what is copied is exactly the file.
 
     Above it, a link to the page's markdown copy, opened as the file itself: the one place a person looking
-    for the markdown already goes. The owner, 2026-09-14: "update markdown tab to be in source. but a link
-    to the markdown file instead"."""
+    for the markdown already goes, in place of a separate markdown tab."""
     link = ('<p class="hat">The page as a markdown file: <a href="%s">%s</a></p>'
             % (copy_link, posixpath.basename(copy_link))) if copy_link else ""
     return link + ('<div class="srcbox"><button class="copy" type="button">Copy</button>'
@@ -609,8 +606,8 @@ def render_infobox(page, audience, directory, images, cited=None):
                                     "the text instead")
                 value = '<a href="%s"%s>%s</a>' % (html_module.escape(str(link), quote=True), OUTSIDE, value)
             # A row may name the requirement that promises it. That identifier is traceability for
-            # whoever next checks the page against the code, and it is never rendered: the owner did not
-            # want a badge beside the rows that carry one.
+            # the next review of the page against the code, and it is never rendered: a row that carries
+            # one shows no badge beside it.
             if row.get("missing") and audience != "user":
                 missing = True
                 value += " " + MISSING_CITATION
@@ -659,9 +656,8 @@ def render_nav(sections, pages, categories, current, directory, audience):
     because a page that lives at a/b/c is a child of the page at a/b. Nothing has to be listed twice, and
     a new page appears in the right place by being put in the right directory.
     """
-    # Every page is in the sidebar, draft or not. The owner, 2026-09-14: "all pages should always be on
-    # the nav regardless of status". A draft still says so above everything else on it, and search, the
-    # categories and the goals still offer only what has been approved.
+    # Every page is in the sidebar, draft or not. A draft still says so above everything else on it, and
+    # search, the categories and the goals still offer only what has been approved.
     visible = {page_id for page_id in pages
                if visible_to(audience, pages[page_id]["audience"])}
 
@@ -780,11 +776,10 @@ def markdown_cell(text):
 
 
 def health_rows(pages, emitted, dates, citations):
-    """Every written page but the health page, in the order it lists them, with the cells it shows for each.
+    """Every written page but the health page, A to Z by title, with the cells it shows for each.
 
-    Pages that cite code and were never audited come first, then the longest since their audit, then the
-    pages that cite nothing, which cannot be audited and show no citation counts. Only recorded dates are
-    shown, never days since one, so two builds of one wiki write the same page.
+    A page that cites nothing cannot be audited, so it shows no citation counts and no audit date. Only
+    recorded dates are shown, never days since one, so two builds of one wiki write the same page.
     """
     rows = []
     for page_id in emitted:
@@ -794,7 +789,7 @@ def health_rows(pages, emitted, dates, citations):
         cites = page["meta"].get("goals", True)
         cited, missing = citations.get(page_id, (0, 0))
         audited = dates.get(page_id, {}).get("audited", "")
-        order = (0 if not audited else 1, audited) if cites else (2, "")
+        order = (str(page["title"]).lower(), page_id)
         cells = ["approved" if page["status"] == "approved" else "draft", str(page["words"]),
                  str(cited) if cites else "", str(missing) if cites else "",
                  spoken_date(dates[page_id]["updated"]),
@@ -811,7 +806,7 @@ def health_summary(pages, rows):
     drafts = sum(1 for page_id, _ in rows if pages[page_id]["status"] != "approved")
     never = sum(1 for _, cells in rows if cells[5] == "never")
     missing = sum(int(cells[3]) for _, cells in rows if cells[3])
-    return "%s, %s waiting on the owner, %d never audited, %s with no source" % (
+    return "%s, %s waiting on approval, %d never audited, %s with no source" % (
         counted(len(rows), "page"), counted(drafts, "draft"), never, counted(missing, "claim"))
 
 
@@ -821,7 +816,8 @@ def health_html(pages, rows, directory):
     body = "".join('<tr><td><a href="%s">%s</a></td>%s</tr>'
                    % (relative_directory(directory, page_directory(page_id)),
                       html_module.escape(pages[page_id]["title"]),
-                      "".join("<td>%s</td>" % html_module.escape(cell) for cell in cells))
+                      "".join(('<td class="missing">%s</td>' if index == 3 and cell not in ("", "0") else "<td>%s</td>")
+                              % html_module.escape(cell) for index, cell in enumerate(cells)))
                    for page_id, cells in rows)
     return ('<p>%s</p>\n<div class="wt"><table class="w health"><thead><tr>%s</tr></thead><tbody>%s</tbody>'
             "</table></div>\n" % (html_module.escape(health_summary(pages, rows)), head, body))
@@ -936,8 +932,8 @@ def reading_minutes(words):
 
 
 def page_stats(words, cited=None, missing=None):
-    """The counts a page's footer carries, written out. The owner, 2026-09-14: "in the footer we should have
-    stats such as word count, est reading time, missing citation stats ... rendered based on the build"."""
+    """The counts a page's footer carries, written out: its words, its reading time and its citations, all
+    counted by the build."""
     minutes = reading_minutes(words)
     stats = ["%d word%s" % (words, "" if words == 1 else "s"),
              "about %d minute%s to read" % (minutes, "" if minutes == 1 else "s")]
@@ -976,8 +972,8 @@ def render_page(title, subtitle, hatnote, body_html, infobox, categories_bar, na
         "nav": nav,
         "title": html_module.escape(title),
         "subtitle": html_module.escape(subtitle),
-        "hatnote": (('      <p class="hat draft"><b>This page is a draft.</b> The owner has not approved '
-                     'what it says this part of the system is for, so read it as a proposal rather than as '
+        "hatnote": (('      <p class="hat draft"><b>This page is a draft.</b> What it says this part of the '
+                     'system is for has not been approved yet, so read it as a proposal rather than as '
                      'the wiki.</p>\n' if draft else "")
                     + ('      <p class="hat">%s</p>' % html_module.escape(hatnote) if hatnote else "")),
         "infobox": infobox,
@@ -1005,8 +1001,7 @@ def render_page(title, subtitle, hatnote, body_html, infobox, categories_bar, na
 #
 # An agent reads markdown far better than a rendered page, and a static host answers one address with one
 # file whoever asks, so each page is published twice: rendered, and as a markdown copy beside it, with
-# llms.txt at the root listing every copy. The owner, 2026-09-14: "can we have llm rendering where llm sees
-# the md instead of html?" The shape is the llms.txt proposal's.
+# llms.txt at the root listing every copy. The shape is the llms.txt proposal's.
 
 AGENT_INDEX = "llms.txt"
 AGENT_COPY = "index.md"
@@ -1060,7 +1055,7 @@ def markdown_copy(page, directory, page_ids, pages_dir, ledger, extra=""):
     if page["subtitle"]:
         head += ["_%s_" % page["subtitle"], ""]
     if page["status"] != "approved":
-        head += ["**Status.** Draft: the owner has not approved what this page says the thing is for.", ""]
+        head += ["**Status.** Draft: what this page says the thing is for has not been approved yet.", ""]
     head += ["**Intent.** " + " ".join(page["intent"].split()), ""]
     body = outside_code(page["body"].strip("\n"), lambda text: MARKDOWN_LINK.sub(readdress, text))
     return "\n".join(head) + "\n" + body + "\n" + extra
@@ -1552,8 +1547,8 @@ def statements(block):
     """The statements in one block of prose: each sentence of each list item, or each row of a table.
 
     A table's rows are read one at a time, and its header is not read at all: a header names the columns
-    and states nothing. The owner, 2026-09-14: "a table row must have at least one citation in any of the
-    columns of its row" -- a table held as a whole let one cited row carry every row beside it.
+    and states nothing. A table row needs at least one citation in any of its columns -- a table held as a
+    whole let one cited row carry every row beside it.
     """
     if block.startswith("|"):
         rows = block.split("\n")
@@ -1771,14 +1766,14 @@ def wording_places(path, pages_dir, fields=WORDED_FIELDS):
     return places
 
 
-# A rule told as something somebody said: a dated quote of the owner, or "the owner said". A reader wants the
-# rule; a page that quotes whoever asked for it dates itself and argues instead of describing.
+# A rule told as something somebody said: a dated quote such as "The owner, 2026-09-14", or "the owner said".
+# A reader wants the rule; a page that quotes the request for it dates itself and argues instead of describing.
 ATTRIBUTION = re.compile(r"\bthe owner(?:'s ruling)?,?\s+\d{4}-\d{2}-\d{2}|\bthe owner (?:said|says|asked|wrote|ruled)\b",
                          re.I)
 
 
 def attribution_problems(root, wiki=None):
-    """Pages that attribute a rule to the owner instead of stating it.
+    """Pages that attribute a rule to a person instead of stating it.
 
     Where a requirement came from is recorded with the work that implements it, never on the page. Code is
     left alone, because a sample shows text as written.
@@ -1788,12 +1783,12 @@ def attribution_problems(root, wiki=None):
     for path in sorted(pages_dir.rglob("*.md")):
         for place, text in wording_places(path, pages_dir, ("subtitle", "intent")):
             if ATTRIBUTION.search(text):
-                problems.append(f"{place} attributes a rule to the owner; state the rule itself")
+                problems.append(f"{place} attributes a rule to a person; state the rule itself")
     return problems
 
 
 # A vague actor: a sentence saying that an unnamed person did, did not, or may do something. It hides the one fact
-# a reader needs -- who -- so a page names the reader, the owner, an agent, or the part of the system that acts.
+# a reader needs -- who -- so a page names the reader, the writer, an agent, or the part of the system that acts.
 VAGUE_ACTOR = re.compile(r"\b(nobody|somebody|someone|anyone|anybody|everyone|everybody|no[ -]one)\b", re.I)
 
 
@@ -1809,7 +1804,7 @@ def vague_actor_problems(root, wiki=None):
             found = VAGUE_ACTOR.search(text)
             if found:
                 problems.append(f"{place} says {found.group(0).lower()!r} instead of naming who acts; name the "
-                                "reader, the owner, an agent or the part that acts")
+                                "reader, the writer, an agent or the part that acts")
     return problems
 
 
@@ -1873,9 +1868,8 @@ def dead_link_problems(root, wiki=None):
     """Links to a page the wiki does not have.
 
     A link that leads nowhere looks exactly like one that leads somewhere until somebody follows it, and a
-    reader who does has been told a page exists that does not. The owner, 2026-09-14: a link to a missing
-    page is drawn red, "and that could be part of our dead link checks". Code is left alone, because a
-    sample shows a link as written; a link outside the pages, or off the site, is not a page link at all.
+    reader who does has been told a page exists that does not, so a link to a missing page is drawn red
+    and this check refuses it. Code is left alone, because a sample shows a link as written; a link outside the pages, or off the site, is not a page link at all.
     """
     pages_dir = wiki_of(root, wiki) / "pages"
     page_ids = {path.relative_to(pages_dir).with_suffix("").as_posix() for path in pages_dir.rglob("*.md")}
@@ -1908,9 +1902,8 @@ def pointing_problems(root, wiki=None):
     """Names and sentences that point at the project instead of naming it.
 
     A title, infobox group or label that opens "This" or "Our" names nothing outside the page it sits on,
-    and "this repository" in a sentence means nothing to a reader who arrived from a search or a link. The
-    owner's ruling, 2026-09-14, on "This site" and "This repository": never this kind of wording. Code is
-    left alone, because a message the software prints is quoted as it is.
+    and "this repository" in a sentence means nothing to a reader who arrived from a search or a link, so
+    "This site", "This repository" and wording of their kind are never written. Code is left alone, because a message the software prints is quoted as it is.
     """
     pages_dir = wiki_of(root, wiki) / "pages"
     problems = []
@@ -2312,7 +2305,7 @@ def report(counts, goals_words, budget, drafts=(), citations=None):
               % (cited, "" if cited == 1 else "s", missing, "" if missing == 1 else "s"))
     print("wiki: the collected goals read in %d words" % goals_words)
     if drafts:
-        print("wiki: %d page%s waiting on the owner, in the sidebar but not in search, the categories "
+        print("wiki: %d page%s waiting on approval, in the sidebar but not in search, the categories "
               "or the goals: %s"
               % (len(drafts), "" if len(drafts) == 1 else "s", ", ".join(drafts)))
     if not budget.get("calibrated"):
