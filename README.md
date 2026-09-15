@@ -63,7 +63,7 @@ jobs:
 
 ## More
 
-- [Brief](https://wiki-builder.marois.dev/brief/): what it is for, and what it refuses
+- [Brief](https://wiki-builder.marois.dev/brief/): purpose, reasoning, users, scope and outside systems
 - [Skill](https://wiki-builder.marois.dev/skill/): the instructions an agent follows to write a page
 - [GitHub Pages](https://wiki-builder.marois.dev/deployment-github/) and
   [Cloudflare](https://wiki-builder.marois.dev/deployment-cloudflare/): publishing a wiki
