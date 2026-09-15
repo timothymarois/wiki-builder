@@ -14,6 +14,7 @@ rows = [
   { label = "Name", value = "wiki-builder" },
   { label = "Author", value = "Timothy Marois" },
   { label = "Website", value = "marois.dev", link = "https://marois.dev" },
+  { label = "Source", value = "github.com/timothymarois/wiki-builder", link = "https://github.com/timothymarois/wiki-builder" },
 ]
 
 [[infobox]]

@@ -6,6 +6,6 @@
 # when the change did not alter what the picture shows.
 
 ["page-anatomy.svg"]
-digest = "sha256:8c3c03819c4d1f5af0e7e93c4c9ff3f8ecfacf398250dee69a7760a75dff9f99"
+digest = "sha256:fda745f6d63c36a5b4a197288d8f2f0c70aa30c621120680c753607b543e1471"
 depicts = ["src/builder/assets/template.html"]
-blessed = "the theme button now starts at Light, and the picture's button label was changed from Auto to Light to match"
+blessed = "the logo row gained a GitHub link that appears only when site.github is set; the picture shows a page without one, and nothing else a reader sees moved"

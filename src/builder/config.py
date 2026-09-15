@@ -74,6 +74,10 @@ def read_config(wiki_dir):
     if url is not None and not (isinstance(url, str) and url.startswith(("https://", "http://"))):
         raise WikiError(f"{CONFIG}: site.url must be a full address starting with https:// or http://, "
                         "such as https://docs.example.org")
+    github = site.get("github")
+    if github is not None and not (isinstance(github, str) and github.startswith("https://")):
+        raise WikiError(f"{CONFIG}: site.github must be a full address starting with https://, "
+                        "such as https://github.com/example/project")
     if not loaded.get("section"):
         raise WikiError(f"{CONFIG} lists no sections, so nothing would be reachable")
 

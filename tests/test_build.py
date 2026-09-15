@@ -1184,6 +1184,27 @@ class WikiTests(unittest.TestCase):
         self.assertTrue(part.is_file(), "a draft marked for users was left out of the user build")
         self.assertIn('<p class="hat draft"><b>This page is a draft.</b>', part.read_text(encoding="utf-8"))
 
+    def test_a_github_address_puts_a_github_link_beside_the_site_name(self):
+        # The link opens the project's GitHub page in a new tab, on every page, and a user build keeps it.
+        self.nav(CONFIGURATION.replace('name = "A Wiki"', 'name = "A Wiki"\ngithub = "https://github.com/example/project"'))
+        link = ('<a class="github" href="https://github.com/example/project" target="_blank" '
+                'rel="noopener noreferrer" aria-label="GitHub" title="GitHub">')
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertIn(link, page)
+        self.assertIn("<svg", page[page.index(link):])
+        self.write("thing", PAGE.replace('categories = ["Things"]', 'categories = ["Things"]\naudience = "user"'))
+        self.build("user")
+        self.assertIn(link, (self.out / "thing/index.html").read_text(encoding="utf-8"))
+
+    def test_no_github_link_is_drawn_without_a_github_address(self):
+        self.build()
+        self.assertNotIn('class="github"', (self.out / "thing/index.html").read_text(encoding="utf-8"))
+
+    def test_a_github_address_that_is_not_a_full_address_is_refused(self):
+        self.nav(CONFIGURATION.replace('name = "A Wiki"', 'name = "A Wiki"\ngithub = "github.com/example/project"'))
+        self.refused("site.github")
+
     def test_a_page_starts_in_the_light_theme(self):
         # Light is the theme a reader sees until they choose Dark or Auto, even with scripts turned off.
         self.build()
