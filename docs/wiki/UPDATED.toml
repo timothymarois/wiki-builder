@@ -50,12 +50,12 @@ audited = "2026-09-14"
 
 ["commands/audit"]
 updated = "2026-09-15"
-digest = "b088f80e41f00005bf8c7bd16b9f469523850a55e5ebc66478156bdb086a686b"
+digest = "1d82441ad2800b4b6673183f3f11b888a11790ea658dd493b65dbba51a8d649f"
 audited = "2026-09-14"
 
 ["commands/bless"]
 updated = "2026-09-15"
-digest = "8195975be7f41781b15bae5256e5c19a641f2bdf80b9bc977af0ceb7eb10303a"
+digest = "f16dbea0f86b2ab0c801612f323c2fa142f3b5d6c4adf661572425a3a43fcc77"
 audited = "2026-09-14"
 
 ["commands/build"]
@@ -80,22 +80,23 @@ audited = "2026-09-15"
 
 ["commands/publish"]
 updated = "2026-09-15"
-digest = "d2d783c48852d4ad2e9bcccd798c1e9952de3f122ff6b8037e237c297b996a56"
+digest = "95bde3fbde5d7fa62027ecaaeea68203e5c1095c876c4e999ed9e9a8c306cabb"
 audited = "2026-09-14"
 
 ["commands/serve"]
 updated = "2026-09-15"
-digest = "a77032ff1f838a72b47a42db74160211513ce5f9140a52f928e65fb72bab2959"
+digest = "188f63f8288fafb8567164fd40028889dc76b3ef0dda84d6abde55698f35bbae"
 audited = "2026-09-14"
 
 ["commands/sync"]
 updated = "2026-09-15"
-digest = "78c106fc7cf3a3233c4769578ba9a916c636260852b451fde73a54f834938b7d"
+digest = "6eebc107ab54c3d4c0e3a673e2ab503c67788141d83dd1a3a2ca655d5ac04dc9"
 audited = "2026-09-14"
 
 ["commands/user"]
 updated = "2026-09-15"
-digest = "f42b2798d0a4a128b09cb3a8a2dfb2e0cb95b223185a50b33fe0868a544a668d"
+digest = "e9f053e91c62be98fdb94a4adca6f4dba71c493a6f7a8e2b651f6b00ca61e7ea"
+audited = "2026-09-15"
 
 ["continuous-integration"]
 updated = "2026-09-14"
@@ -104,7 +105,7 @@ audited = "2026-09-14"
 
 ["deployment-cloudflare"]
 updated = "2026-09-15"
-digest = "1ae141adcf96d602a29211411e8362d86395f4680b41e67f6d72aa0244273684"
+digest = "5de07ec1c8b6943c5302b74c9d01e406580cb138246a8136ab6e85314182f231"
 audited = "2026-09-15"
 
 ["deployment-cloudflare/authentication"]
@@ -114,7 +115,7 @@ audited = "2026-09-15"
 
 ["deployment-github"]
 updated = "2026-09-15"
-digest = "e5fbb877900d022954de5b110d29ab6bf9bf9c270b1144d44c5c1ce3dd23d462"
+digest = "b0d97e8f0d35cd38c79f9f52724a8e79aefa35c4afa196614b5bc9130c221f54"
 audited = "2026-09-15"
 
 ["front-matter"]

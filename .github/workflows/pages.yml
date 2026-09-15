@@ -24,7 +24,6 @@ jobs:
       # Installs wiki-builder and checks the wiki. Nothing below runs if the check fails.
       - uses: ./
       - run: wiki publish _site
-      - run: echo "wiki-builder.marois.dev" > _site/CNAME
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
           path: _site

@@ -55,7 +55,7 @@ build settings are entered then.[^git]
 
 | Setting | Value |
 |---|---|
-| Framework preset | none{missing} |
+| Framework preset | none[^preset] |
 | Build command | the command above[^exit] |
 | Build output directory | `_site`[^publish] |
 | Python version | the build image's default, newer than wiki-builder's 3.11 floor[^image][^floor] |
@@ -80,6 +80,8 @@ in a site.[^limits]
     its build command and build output directory are set.
 [^output]: Cloudflare Docs — [Build configuration](https://developers.cloudflare.com/pages/configuration/build-configuration/):
     the build output directory is where the build command writes the built version of the site.
+[^preset]: Cloudflare Docs — [Build configuration](https://developers.cloudflare.com/pages/configuration/build-configuration/):
+    a project not using a preset sets its own build command.
 [^image]: Cloudflare Docs — [Build image](https://developers.cloudflare.com/pages/configuration/build-image/):
     the current image's default Python is 3.13.3, and `PYTHON_VERSION` selects another; its tools list
     `pip` and do not list `git`.
