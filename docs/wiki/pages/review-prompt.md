@@ -30,7 +30,8 @@ covers the rest, by having an agent read each cited source against its sentence,
 does that no page mentions. The check never reads inside a code block, so the prompt is also the only
 check a diagram gets.[^fenced] It works in any project
 that uses wiki-builder, and names nothing about the project it is used in. Installing the tool in the first
-place has its own [Installation prompt](installation-prompt.md).
+place has its own [Installation prompt](installation-prompt.md), and reviewing how the pages are grouped
+and laid out has its own [Organization prompt](organization-prompt.md).
 
 Before handing the prompt to an agent, replace `PART` with the part to review: a sidebar section, a page
 with the pages beneath it, or a component of the project. Left as it is, the prompt has the agent choose

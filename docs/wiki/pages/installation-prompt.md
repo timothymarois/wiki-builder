@@ -29,7 +29,8 @@ the project's first pages by the skill that installation puts in the project.[^s
 documentation duties to the project's agent instructions, so every later agent loads the skill and updates
 the wiki with the code. The agent is done
 when `wiki check` reports no problems.[^check] The prompt names nothing about the project it is used in,
-and checking the wiki once it exists has its own [Review prompt](review-prompt.md).
+and checking the wiki once it exists has its own [Review prompt](review-prompt.md), and reviewing how its
+pages are grouped and laid out has its own [Organization prompt](organization-prompt.md).
 
 ## Prompt
 
