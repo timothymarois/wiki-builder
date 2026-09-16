@@ -47,8 +47,8 @@ and a page loads it only as a diagram nears the screen.[^diagram] How to write o
 [Diagrams](../pages/diagrams.md).
 
 A picture written in the page's markdown is captioned with the title given after its address, or with its
-alt text when it has no title.[^picture] Clicking a picture opens it whole, with its caption, and a click or
-Escape closes it again.[^lightbox] The theme button beside the tabs steps through Light, Dark and Auto, starting at
+alt text when it has no title.[^picture] Clicking a picture opens it whole, with its caption, in the lightbox
+described on [Pictures](../pages/pictures.md).[^lightbox] The theme button beside the tabs steps through Light, Dark and Auto, starting at
 Light, and the browser remembers the choice; Auto follows the system.[^theme]
 
 ## Footer
@@ -102,7 +102,7 @@ button.[^narrow]
 [^picture]: `src/builder/build.py` — `WikiRenderer.image()` captions a picture with its title, or its alt
     text when it has none.
 [^lightbox]: `src/builder/assets/wiki.js` — the lightbox opens a clicked picture from the page or the
-    infobox with its caption, sized to the window, and a click or Escape closes it.
+    infobox with its caption, sized to the window, in the native dialog `show()` also opens for a PDF.
 [^theme]: `src/builder/assets/wiki.js` — the theme button steps through `light`, `dark` and `auto`, starting
     at `light` when nothing is stored, and keeps the choice in the browser's storage;
     `src/builder/assets/template.html` starts every page with `data-theme="light"` and applies a stored choice

@@ -10,7 +10,7 @@ digest = "5b5ceb9bb423176211478611f0ae22a120fcc5c066b5cd8940b36bcc8e00bcfd"
 
 ["checks"]
 updated = "2026-09-15"
-digest = "d98f9dfa5d862cc5bc277800754775ff02160983d7bc18dedb9bfd29007ef7f6"
+digest = "4c85ab510c4f444c3829df68a9240fe15393f7f7ca63ec4e8e82e2c39ec96099"
 audited = "2026-09-14"
 
 ["checks/budgets"]
@@ -20,7 +20,7 @@ audited = "2026-09-14"
 
 ["checks/citations"]
 updated = "2026-09-15"
-digest = "cfe82d899585949d961f1859b5725ade9235472479af1ece38958dbcc8b8d9af"
+digest = "cd8e85d6d926653a682cef6e06c57294423faa04fed4ede3f0f78d333ca6b462"
 audited = "2026-09-14"
 
 ["checks/families"]
@@ -32,6 +32,10 @@ audited = "2026-09-15"
 updated = "2026-09-15"
 digest = "96f581d8d0c1d9357b117477338cf0528226dc2e811dae060b9ac8893384f364"
 audited = "2026-09-14"
+
+["checks/pdfs"]
+updated = "2026-09-15"
+digest = "2326a55c721a85b7ea775369036fa8d432ec3c58bf1d542ab41390cf09121f09"
 
 ["checks/pictures"]
 updated = "2026-09-15"
@@ -75,7 +79,7 @@ audited = "2026-09-15"
 
 ["commands/families"]
 updated = "2026-09-15"
-digest = "c722347820c3f73c9aab06b1421144fa000dfeb62f029a2eb52946554c31f8e6"
+digest = "1320e36f62d490f14e1c6ff49ba92556734988fdd71b5f7302025d59b1c88d20"
 audited = "2026-09-15"
 
 ["commands/publish"]
@@ -130,7 +134,7 @@ audited = "2026-09-14"
 
 ["goals"]
 updated = "2026-09-15"
-digest = "44a8db0a43f6cf9c0615d6dcb904801b510492f6003969dcfb80d57b1fb1ad5e"
+digest = "97014ea4c871296d8500ae3e65858d233efbb54032f060bd81082bf3a9a6364f"
 
 ["health"]
 updated = "2026-09-15"
@@ -155,7 +159,7 @@ digest = "a8581f33f7f82cbc457c141d8954e4e37faa2f29a27bf4dfac8fee5e3accfc20"
 
 ["pages"]
 updated = "2026-09-15"
-digest = "d91935c1b08a36d1f639c0824886c838cc6ebe5aef4b3c9ee46c50195deb45e9"
+digest = "0b4e778af4cbdbd413f1c8b68bba402e77af984a81935faa25e840e75998277f"
 audited = "2026-09-14"
 
 ["pages/diagrams"]
@@ -168,9 +172,13 @@ updated = "2026-09-14"
 digest = "ab6fa42eb14d26b2c62902ee570b17fe4f369e0da0e791491e381cb8a8c38e79"
 audited = "2026-09-15"
 
+["pages/pdfs"]
+updated = "2026-09-15"
+digest = "752dfd0c3174ea3557820ec0dbc48c93c67914c0ea92421e35d07b66b4003495"
+
 ["pages/pictures"]
-updated = "2026-09-14"
-digest = "e1089cb77511573daf282b6bd49fe63c9762a0eff12671af04a1d4c870eaa5eb"
+updated = "2026-09-15"
+digest = "2bcf47f3f7c3cade99c48336ab460913be9b45cbfddc621a88bfd676ff8fff2b"
 audited = "2026-09-15"
 
 ["pictures-toml"]
@@ -188,8 +196,8 @@ digest = "bdae27b452daa99993bdd47159d5303dde0db9b1d5670ed06555059afd648abe"
 audited = "2026-09-14"
 
 ["site"]
-updated = "2026-09-14"
-digest = "7e35beda4a3c06c7c624d28774ef4cf86aa72d9c3fcd8a5a7a51614f0d966d2a"
+updated = "2026-09-15"
+digest = "8ef312617562f1dec1f5c76eebafb672158492c0674f81bc5a72694729c196ec"
 audited = "2026-09-14"
 
 ["site/agent-markdown"]
@@ -199,7 +207,7 @@ audited = "2026-09-14"
 
 ["site/layout"]
 updated = "2026-09-15"
-digest = "5c489afb10e64db04a82a91b13f339a0facea5cb3d98a0ce42975ec59958a2c6"
+digest = "66371371259fc601c3b5f4dac1effe4ea98dbb7f805e9a8babd2de8846049b94"
 audited = "2026-09-14"
 
 ["skill"]

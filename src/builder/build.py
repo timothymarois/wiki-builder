@@ -77,6 +77,12 @@ GOALS_ID = "goals"
 
 LEDGER = "PICTURES.toml"
 
+# PDFs a page links live in this folder beside the pictures, and a build carries only the ones a page links.
+# The limit is one fixed figure for every wiki, not a setting.
+FILES = "files"
+MEGABYTE = 1024 * 1024
+PDF_LIMIT = 20 * MEGABYTE
+
 # When each page last changed, and what it looked like then. Committed, because the rendered site is not:
 # a date taken from the clock on every build would say "today" forever and tell a reader nothing. The
 # date moves only when the page's own content moves, which is also what decides whether it is rewritten.
@@ -485,14 +491,70 @@ def render_contents(entries):
             % "".join(item(entry, children) for entry, children in groups))
 
 
-def rewrite_references(body, directory, site_root, root, images, page_ids, pages_dir, source_path, shown):
+def is_pdf(address):
+    """Whether a link's address names a PDF, by its file name, leaving out any query or fragment after it."""
+    return urllib.parse.unquote(address.partition("#")[0].partition("?")[0]).lower().endswith(".pdf")
+
+
+def filed_name(source_path, address, files_dir):
+    """The file name a link gives a PDF directly in the wiki's files folder, or None when it leads anywhere else.
+
+    Only a plain file name directly in the folder counts: a link through a folder inside it, or out of it and
+    back, would publish a file from wherever the path led. The author wrote the link relative to their own
+    file, so it is resolved from there, and both sides are resolved for the reason `linked_page()` gives.
+    """
+    address = urllib.parse.unquote(address)
+    name = posixpath.basename(address)
+    if name in ("", ".", "..") or "\\" in name:
+        return None
+    if (source_path.parent / posixpath.dirname(address)).resolve() != files_dir.resolve():
+        return None
+    return name
+
+
+def filed_pdf(source_path, address, files_dir):
+    """The name of the PDF in the files folder a link leads to, or None when the folder holds no such file.
+
+    A symbolic link is copied as the file it points at, so one leading out of the folder stops the build
+    rather than publish whatever it reaches.
+    """
+    name = filed_name(source_path, address, files_dir)
+    if name is None or not (files_dir / name).is_file():
+        return None
+    if not (files_dir / name).resolve().is_relative_to(files_dir.resolve()):
+        raise WikiError(f"{source_path.name} links to {name}, which links to a file outside the files folder; put "
+                        "the PDF itself in the wiki's files folder")
+    return name
+
+
+def file_size(size):
+    """A file's size as a reader reads it: whole kilobytes under a megabyte, megabytes to one place above it.
+
+    Rounded up, so a size never reads smaller than the file, and counted in 1,024s, as the limit on a PDF is,
+    so a PDF the check refuses never reads as inside the limit. A file that rounds up to 1,024 kilobytes is a
+    megabyte, and an empty file is no kilobyte at all.
+    """
+    kilobytes = -(-size // 1024)
+    if kilobytes < 1024:
+        return "%d KB" % kilobytes
+    return "%d.%d MB" % divmod(-(-size * 10 // MEGABYTE), 10)
+
+
+# A PDF link as rewrite_references() leaves it, carrying its size until the size is written after the link.
+PDF_ANCHOR = re.compile(r'(<a href="[^"]*" class="pdf") data-size="([^"]*)"([^>]*>.*?</a>)', re.S)
+
+
+def rewrite_references(body, directory, site_root, root, images, page_ids, pages_dir, source_path, shown,
+                       files_dir, linked, found):
     """Point every link and picture where it will actually resolve from this page's directory.
 
     A page is written beside its fellows, so its author links the way the repository reads: a sibling
     page as name.md, anything else by its path. Both are translated here -- the sibling to a clean
     address, the path to wherever it sits relative to this page -- so one link works while reading the
     markdown and again in the browser. Each picture the body shows is added to `shown`, the pictures the
-    site carries.
+    site carries, and each PDF in the files folder it links to `linked`, the PDFs the site carries. A PDF
+    link is marked with its class and size, for the viewer and for the size written after it. Every PDF
+    link, published or not, is added to `found` as (page file, address), for `pdf_problems()` to judge.
     """
     here = site_root / directory if directory else site_root
 
@@ -510,6 +572,20 @@ def rewrite_references(body, directory, site_root, root, images, page_ids, pages
             shown.add(name)
             resolved = relative_file(directory, "images/" + name)
         else:
+            # A PDF in the files folder is published beside the pages. One anywhere else keeps the path below,
+            # which leads nowhere once published, and `wiki check` refuses it through pdf_problems(). The address
+            # is read back from the rendered page, where & is written &amp;, and a query is no part of the file.
+            written = html_module.unescape(address)
+            path, question, query = written.partition("?")
+            if is_pdf(path):
+                found.append((source_path, written + (("#" + html_module.unescape(fragment)) if fragment else "")))
+                name = filed_pdf(source_path, path, files_dir)
+                if name is not None:
+                    linked.add(name)
+                    return '%s="%s%s%s" class="pdf" data-size="%s"' % (
+                        attribute, relative_file(directory, FILES + "/" + name),
+                        html_module.escape(question + query, quote=True), ("#" + fragment) if fragment else "",
+                        file_size((files_dir / name).stat().st_size))
             # Inside the pages tree it is a sibling page and becomes a clean address; anywhere else it is a
             # path in the repository and becomes a path from this page to it.
             target_id = linked_page(source_path, address, pages_dir)
@@ -1028,12 +1104,13 @@ def copy_address(from_directory, page_id):
                                                 "/" + (from_directory or ".")))
 
 
-def markdown_copy(page, directory, page_ids, pages_dir, ledger, extra=""):
+def markdown_copy(page, directory, page_ids, pages_dir, ledger, files_dir, linked, extra=""):
     """A page as an agent reads it: title, subtitle and intent, then the body and references as written.
 
     Only addresses move. The author linked a sibling page as name.md from the pages folder, and the copy
-    sits in the page's own folder in the site, so a link to a page points at that page's copy and a
-    picture at the site's copy of the picture. Code is left alone: a sample shows a link as written.
+    sits in the page's own folder in the site, so a link to a page points at that page's copy, a picture at
+    the site's copy of the picture, and a PDF in the files folder at the site's copy of the PDF, which is
+    added to `linked` so the site carries it. Code is left alone: a sample shows a link as written.
     """
     def readdress(match):
         opening, target, closing = match.groups()
@@ -1044,6 +1121,14 @@ def markdown_copy(page, directory, page_ids, pages_dir, ledger, extra=""):
             name = posixpath.basename(address)
             return opening + relative_file(directory, "images/" + name) + closing if name in ledger \
                 else match.group(0)
+        path, question, query = address.partition("?")
+        if is_pdf(path):
+            name = filed_pdf(page["path"], path, files_dir)
+            if name is None:
+                return match.group(0)
+            linked.add(name)
+            return (opening + relative_file(directory, FILES + "/" + name) + question + query
+                    + ("#" + fragment if fragment else "") + closing)
         target_id = linked_page(page["path"], address, pages_dir)
         if target_id in page_ids:
             return opening + copy_address(directory, target_id) + ("#" + fragment if fragment else "") + closing
@@ -1112,10 +1197,11 @@ def agent_index(site, order, pages):
 
 
 def build(root, out, audience, link_root=None, today=None, record=True, links="file", wiki_dir=None,
-          sitemap=False):
+          sitemap=False, pdf_links=None):
     """Write the whole site, and return the per-page word counts.
 
-    `links` is "file" -- links that work served and off disk alike -- or "clean" for publishing.
+    `links` is "file" -- links that work served and off disk alike -- or "clean" for publishing. A list given
+    as `pdf_links` receives every link to a PDF the build writes, as (page file, address).
 
     `out` is where the bytes go; `link_root` is where the site will be read from, which is not always the
     same place -- a check renders into a temporary directory to inspect what the real one would contain,
@@ -1125,12 +1211,13 @@ def build(root, out, audience, link_root=None, today=None, record=True, links="f
     was = LINK_SUFFIX
     LINK_SUFFIX = "" if links == "clean" else "index.html"
     try:
-        return write_site(root, out, audience, link_root, today, record, wiki_of(root, wiki_dir), sitemap)
+        return write_site(root, out, audience, link_root, today, record, wiki_of(root, wiki_dir), sitemap,
+                          [] if pdf_links is None else pdf_links)
     finally:
         LINK_SUFFIX = was
 
 
-def write_site(root, out, audience, link_root, today, record, wiki, sitemap=False):
+def write_site(root, out, audience, link_root, today, record, wiki, sitemap=False, pdf_links=None):
     """Everything a build does, once the kind of link it emits has been settled."""
     site, budget, sections = read_config(wiki)
     pages = read_pages(wiki / "pages", budget["intent"])
@@ -1144,6 +1231,13 @@ def write_site(root, out, audience, link_root, today, record, wiki, sitemap=Fals
     images_dir = wiki / "images"
     ledger = read_ledger(images_dir)
     shown = set()
+    files_dir = wiki / FILES
+    # A folder that is itself a link resolves, with every file in it, to wherever it points, so the test that keeps
+    # a PDF inside the folder would pass anything there.
+    if files_dir.is_symlink():
+        raise WikiError(f"the wiki's {FILES} folder is a symbolic link, so a build would publish whatever it points "
+                        f"at; make {FILES} a folder of its own inside the wiki, and put the PDFs in it")
+    pdfs = set()
     site_root = (link_root or out)
     today = today or datetime.date.today().isoformat()
     dates = read_dates(wiki)
@@ -1270,7 +1364,10 @@ def write_site(root, out, audience, link_root, today, record, wiki, sitemap=Fals
         if audience == "user":
             body = for_user(body)
         body = rewrite_references(body, directory, site_root, root, ledger, set(pages),
-                                  wiki / "pages", page["path"], shown)
+                                  wiki / "pages", page["path"], shown, files_dir, pdfs,
+                                  [] if pdf_links is None else pdf_links)
+        # A PDF's size follows its link, so a reader knows what a click will fetch.
+        body = PDF_ANCHOR.sub(r'\1\3 <span class="pdfsize">(PDF, \2)</span>', body)
         if page["meta"].get("image"):
             shown.add(page["meta"]["image"])
         # Written in after the references are pointed, because their links already resolve from this page.
@@ -1286,7 +1383,7 @@ def write_site(root, out, audience, link_root, today, record, wiki, sitemap=Fals
         if with_source:
             extra = (goals_markdown(pages, goals_order(pages, sections, audience), directory) if page_id == GOALS_ID
                      else health_markdown(pages, health, directory) if health is not None else "")
-            copy = markdown_copy(page, directory, set(emitted), wiki / "pages", ledger, extra)
+            copy = markdown_copy(page, directory, set(emitted), wiki / "pages", ledger, files_dir, pdfs, extra)
             if family_table:
                 copy = outside_code(copy, lambda text: FAMILY_TABLE_LINE.sub(
                     lambda _: family_table_markdown(pages, family_table, directory), text))
@@ -1366,6 +1463,11 @@ def write_site(root, out, audience, link_root, today, record, wiki, sitemap=Fals
         (out / "images").mkdir(parents=True, exist_ok=True)
         for name in sorted(shown):
             written.append(copy_if_changed(images_dir / name, out / "images" / name))
+    # Only the PDFs a written page links are copied, each one already found to be a file of the folder's own.
+    if pdfs:
+        (out / FILES).mkdir(parents=True, exist_ok=True)
+        for name in sorted(pdfs):
+            written.append(copy_if_changed(files_dir / name, out / FILES / name))
 
     # Whatever the site no longer makes goes, so a page that was deleted leaves nothing behind.
     clear_stale(out, written)
@@ -1391,7 +1493,7 @@ def clear_stale(out, written):
     else:
         earlier = [path.relative_to(out).as_posix() for path in sorted(out.rglob("*"))
                    if path.is_file() and (path.name in ("index.html", AGENT_COPY, AGENT_INDEX)
-                                          or path.relative_to(out).parts[0] in ("assets", "images"))]
+                                          or path.relative_to(out).parts[0] in ("assets", "images", FILES))]
     inside = out.resolve()
     for name in sorted(set(earlier) - set(made) - {""}, reverse=True):
         path = out / name
@@ -1477,6 +1579,9 @@ def picture_problems(root, wiki=None):
 
 # A link to a document, inside a footnote's reference.
 DOCUMENT_LINK = re.compile(r"\]\(([^)]*\.md[^)]*)\)")
+# A link to a PDF the wiki keeps, inside a footnote's reference: a document too, however it is published. An
+# outside service's own PDF, linked by its full address, is that service's documentation.
+PDF_DOCUMENT_LINK = re.compile(r"\]\((?![a-z][a-z0-9+.-]*:|//)([^)\s]*\.pdf(?:#[^)\s]*)?)\)", re.I)
 
 
 def citation_problems(root, wiki=None):
@@ -1491,7 +1596,8 @@ def citation_problems(root, wiki=None):
     for path in sorted(pages_dir.rglob("*.md")):
         text = path.read_text(encoding="utf-8")
         for note in FOOTNOTE.finditer(text):
-            for link in DOCUMENT_LINK.finditer(note.group(1)):
+            links = list(DOCUMENT_LINK.finditer(note.group(1))) + list(PDF_DOCUMENT_LINK.finditer(note.group(1)))
+            for link in sorted(links, key=lambda found: found.start()):
                 problems.append(
                     f"{path.relative_to(pages_dir)} cites {link.group(1)}, which is a document; "
                     "a reference names the code that does the thing, or an outside service's own documentation")
@@ -1862,6 +1968,28 @@ def empty_word_problems(root, wiki=None):
     return problems
 
 
+def prose_links(path):
+    """Every link a page's prose makes, as (line, target), leaving out pictures and addresses already settled.
+
+    Footnotes and code are blanked rather than removed, so every link keeps its line; inline code keeps its
+    width too. Code is left alone because a sample shows a link as written, and a reference is held to the
+    citation check instead.
+    """
+    text = path.read_text(encoding="utf-8")
+    _, body = read_front_matter(path)
+    first = text[:len(text) - len(body)].count("\n") + 1
+
+    def blank(match):
+        return "\n" * match.group(0).count("\n")
+
+    body = FENCED.sub(blank, FOOTNOTE.sub(blank, body))
+    body = INLINE_CODE.sub(lambda code: " " * len(code.group(0)), body)
+    for link in MARKDOWN_LINK.finditer(body):
+        opening, target, _ = link.groups()
+        if not opening.startswith("!") and not SETTLED_LINK.match(target):
+            yield first + body[:link.start()].count("\n"), target
+
+
 def dead_link_problems(root, wiki=None):
     """Links to a page the wiki does not have.
 
@@ -1873,26 +2001,59 @@ def dead_link_problems(root, wiki=None):
     page_ids = {path.relative_to(pages_dir).with_suffix("").as_posix() for path in pages_dir.rglob("*.md")}
     problems = []
     for path in sorted(pages_dir.rglob("*.md")):
-        text = path.read_text(encoding="utf-8")
-        _, body = read_front_matter(path)
-        first = text[:len(text) - len(body)].count("\n") + 1
-
-        def blank(match):
-            return "\n" * match.group(0).count("\n")
-
-        # Blanked rather than removed, so every link keeps its line; inline code keeps its width too.
-        body = FENCED.sub(blank, FOOTNOTE.sub(blank, body))
-        body = INLINE_CODE.sub(lambda code: " " * len(code.group(0)), body)
-        for link in MARKDOWN_LINK.finditer(body):
-            opening, target, _ = link.groups()
-            address = target.partition("#")[0]
-            if opening.startswith("!") or SETTLED_LINK.match(target):
-                continue
-            target_id = linked_page(path, address, pages_dir)
+        for line, target in prose_links(path):
+            target_id = linked_page(path, target.partition("#")[0], pages_dir)
             if target_id is not None and target_id not in page_ids:
-                problems.append(f"{path.relative_to(pages_dir)}:{first + body[:link.start()].count(chr(10))}: "
-                                f"links to {target}, which is no page in the wiki; write that page, or link "
-                                "to one that exists")
+                problems.append(f"{path.relative_to(pages_dir)}:{line}: links to {target}, which is no page in the "
+                                "wiki; write that page, or link to one that exists")
+    return problems
+
+
+def link_line(path, spellings, searched):
+    """":<line>" for where a page's file writes a link, or "" when no spelling of its address is in the file.
+
+    The build records a link from the rendered page, which keeps no line, so its address is found in the file
+    again: after the links already found on that page, so a PDF linked twice is named at each line.
+    """
+    text = path.read_text(encoding="utf-8")
+    for spelling in spellings:
+        at = text.find(spelling, searched.get(path, 0))
+        at = text.find(spelling) if at == -1 else at
+        if at != -1:
+            searched[path] = at + len(spelling)
+            return ":%d" % (text[:at].count("\n") + 1)
+    return ""
+
+
+def pdf_problems(root, wiki, links):
+    """Links to a PDF that would be dead once published, or too large to publish.
+
+    `links` holds every PDF link a build wrote, as `build()` records them in `pdf_links`, so the check judges
+    each link as the build wrote it, in whatever form the markdown gave it: with a title, in angle brackets, by
+    reference, or with a query. A build carries a PDF only from the wiki's files folder, so a link to one
+    anywhere else works while the project is served and leads nowhere on a host. A PDF in that folder past the
+    limit is refused as well.
+    """
+    wiki = wiki_of(root, wiki)
+    pages_dir, files_dir = wiki / "pages", wiki / FILES
+    problems, searched = [], {}
+    for path, written in links:
+        shown = urllib.parse.unquote(written)
+        place = f"{path.relative_to(pages_dir)}{link_line(path, (written, shown), searched)}: links to {shown}"
+        address = written.partition("#")[0].partition("?")[0]
+        name = filed_name(path, address, files_dir)
+        if name is None:
+            name = posixpath.basename(urllib.parse.unquote(address))
+            link = posixpath.join(os.path.relpath(files_dir, path.parent).replace(os.sep, "/"), name)
+            problems.append(f"{place}, which is outside the wiki's files folder and would be dead once "
+                            f"published; put {name} in the files folder and link it as {link}")
+        elif not (files_dir / name).is_file():
+            problems.append(f"{place}, which does not exist; put {name} in the wiki's files folder, or correct "
+                            "the link")
+        elif (files_dir / name).stat().st_size > PDF_LIMIT:
+            problems.append(f"{place}, which is {file_size((files_dir / name).stat().st_size)}, over the "
+                            f"{PDF_LIMIT // MEGABYTE} MB a PDF may be; make it smaller, such as by compressing "
+                            "its pictures, or split it into parts")
     return problems
 
 
@@ -2180,8 +2341,10 @@ def check(root, wiki=None, version=None):
     problems = []
     with tempfile.TemporaryDirectory() as work:
         # Checked as it will be read: from the place the site is actually served from.
+        # The PDF links are the ones this build writes, so the check can never read a link the build does not.
+        pdf_links = []
         counts, goals_words, budget, _ = build(root, Path(work) / "site", "internal",
-                                               wiki / "site", record=False, wiki_dir=wiki)
+                                               wiki / "site", record=False, wiki_dir=wiki, pdf_links=pdf_links)
         problems += budget_problems(counts, goals_words, budget)
         problems += picture_problems(root, wiki)
         problems += date_problems(root, wiki)
@@ -2189,6 +2352,7 @@ def check(root, wiki=None, version=None):
         problems += heading_problems(root, wiki)
         problems += pointing_problems(root, wiki)
         problems += dead_link_problems(root, wiki)
+        problems += pdf_problems(root, wiki, pdf_links)
         problems += attribution_problems(root, wiki)
         problems += vague_actor_problems(root, wiki)
         problems += empty_word_problems(root, wiki)

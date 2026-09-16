@@ -19,7 +19,7 @@ rows = [
 group = "Rules"
 rows = [
   { label = "Caption", value = "the title, else the alt text", cite = "caption" },
-  { label = "Opening whole", value = "a click, closed by a click or Escape", cite = "lightbox" },
+  { label = "Opening whole", value = "a click, closed by Close, Escape or the backdrop", cite = "lightbox" },
   { label = "Unrecorded picture", value = "the build stops", cite = "ledger" },
 ]
 +++
@@ -54,7 +54,12 @@ image_caption = "The parts of a page"
 ## Lightbox
 
 Clicking a picture in the text or in the infobox opens it over the page, sized to the window, with its
-caption beneath.[^lightbox] A click or the Escape key closes it again.[^lightbox]
+caption beneath.[^lightbox] The Close button, the Escape key or a click on the dark backdrop closes it, and a
+click on the picture itself does not.[^lightbox] **A PDF opens in the same lightbox**, as [PDFs](pdfs.md)
+describes, and it behaves the same way for both, except that Escape does not close it while focus is inside a
+PDF, whose viewer takes the keyboard.[^dialog] While it is open, the page behind cannot be used or scrolled, and Tab
+moves only between the lightbox's own controls.[^dialog] Closing it puts focus back on the picture that
+opened it.[^dialog]
 
 [^ledger]: `src/builder/build.py` — `rewrite_references()` points a picture at `images/` by its file name,
     and raises when that name has no entry in `LEDGER`, which is `PICTURES.toml`.
@@ -67,6 +72,13 @@ caption beneath.[^lightbox] A click or the Escape key closes it again.[^lightbox
     the alt text when there is no title.
 [^figure]: `src/builder/build.py` — `write_site()` takes a lone figure out of its paragraph with
     `LONE_FIGURE`.
-[^lightbox]: `src/builder/assets/wiki.js` — the lightbox opens a clicked `figure.fig img` or `.ib .pic img`
-    with its caption, and a click anywhere or Escape closes it; `src/builder/assets/wiki.css` — `.lightbox img`
-    holds the picture within 96% of the window's width and 88% of its height.
+[^lightbox]: `src/builder/assets/wiki.js` — a click on `figure.fig img` or `.ib .pic img` opens the lightbox
+    with the picture and its caption, which closes from its Close button, from Escape, or from a click that
+    lands on the dialog itself rather than the picture, when its `pointerdown` landed there too; `src/builder/assets/wiki.css` — `.lightbox img` holds
+    the picture within 96% of the window's width and 88% of its height, and `.lightbox::backdrop` darkens the
+    page.
+[^dialog]: `src/builder/assets/wiki.js` — `show()` opens one native `dialog` with `showModal()` for a picture
+    or a PDF and marks the page `lightbox-open`, which `src/builder/assets/wiki.css` stops scrolling; `stop()`
+    keeps Tab inside the dialog, and `closed()` empties the dialog, releases the page and puts focus back on the
+    picture, whether `dismiss()` calls it for the Close button and the backdrop or the `close` event does for
+    Escape; the comment above the lightbox says Escape inside a PDF's frame goes to the PDF's viewer.

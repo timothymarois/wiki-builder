@@ -18,7 +18,7 @@ rows = [
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Refusals", value = "an uncited sentence, table row or infobox row, and a reference linking to .md", cite = ["uncited", "rowcite", "rows", "document"] },
+  { label = "Refusals", value = "an uncited sentence, table row or infobox row, and a reference linking to .md or a PDF the wiki keeps", cite = ["uncited", "rowcite", "rows", "document", "pdfcite"] },
   { label = "Scope", value = "every sentence, table row and infobox row", cite = ["uncited", "rowcite", "rows"] },
   { label = "Exceptions", value = "code samples, the header row, any page with goals = false", cite = ["excused", "rowcite", "exempt"] },
   { label = "Clearing", value = "the red mark, written {missing}", cite = "mark" },
@@ -62,10 +62,10 @@ marked as having no source; a row with neither, or citing a footnote no sentence
 
 ### Documents
 
-A reference whose link contains `.md` anywhere is refused, because a page of prose is only another claim
-that can be wrong in the same way.[^document] Outside documentation passes when its address has no `.md`,
-so **a README on GitHub is refused like a project document**.[^document] A reference that names a document
-without linking to it passes, and so does one that names nothing.[^document]
+A reference whose link contains `.md` anywhere, **or names a PDF inside the wiki**, is refused, because a
+document is another claim that can be wrong in the same way.[^document][^pdfcite] Outside documentation
+passes when its address has no `.md`, so **a README on GitHub is refused like a project document**.[^document]
+A reference naming a document without linking it passes, as does one naming nothing.[^document]
 
 ## Scope
 
@@ -120,3 +120,5 @@ for the wiki.[^counts] `wiki check` also lists every marked claim by page and li
 [^marks]: `src/builder/build.py` — `missing_marks()`, printed by `run()` in `src/builder/cli.py`.
 [^document]: `src/builder/build.py` — `citation_problems()` matches `DOCUMENT_LINK`, a markdown link whose
     address contains `.md` anywhere, inside each footnote; its comment gives the reason.
+[^pdfcite]: `src/builder/build.py` — `citation_problems()` also matches `PDF_DOCUMENT_LINK`, a markdown link to
+    a `.pdf` address with no scheme and no leading `//`, inside each footnote.

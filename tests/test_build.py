@@ -1778,6 +1778,230 @@ class WikiTests(unittest.TestCase):
                                          'subtitle = "the thing, its speed and its ground"\nimage = "absent.png"'))
         self.refused("pictures.toml")
 
+    # --- PDFs --------------------------------------------------------------------------------------
+    # A wiki keeps its PDFs in a files folder beside images. A build carries only the PDFs a page links, and
+    # the check refuses a link that would be dead once published, or a PDF too large to publish.
+
+    MEGABYTE = 1024 * 1024
+
+    def pdf(self, name, size=3000):
+        """A PDF of `size` bytes in the wiki's files folder, written sparse so a large one costs no disk."""
+        path = self.root / "docs/wiki/files" / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("wb") as stream:
+            stream.write(b"%PDF-1.4\n")
+            stream.truncate(size)
+        return path
+
+    def link_pdf(self, *targets):
+        """The thing page, linking each target from one sentence."""
+        links = ", ".join(f"[the policy {index}]({target})" for index, target in enumerate(targets, 1))
+        self.write("thing", PAGE.replace("It does it slowly.[^why]", f"It does it slowly, as {links} say.[^why]"))
+
+    def pdf_problems(self):
+        """What `wiki check` says about links to PDFs, after a build has recorded the dates it would otherwise refuse.
+
+        Only link refusals: a sentence quoted for citing nothing can hold a PDF's name too.
+        """
+        self.build()
+        problems, *_ = wiki.check(self.root)
+        return [problem for problem in problems if " links to " in problem and ".pdf" in problem]
+
+    def test_a_build_carries_only_the_pdfs_its_pages_link(self):
+        self.pdf("policy.pdf")
+        self.pdf("unlinked.pdf")
+        self.link_pdf("../files/policy.pdf")
+        self.build()
+        self.assertEqual(["policy.pdf"], sorted(path.name for path in (self.out / "files").iterdir()))
+        self.write("thing", PAGE)
+        self.build()
+        self.assertFalse((self.out / "files").exists(), "a PDF no page links any more was left in the site")
+
+    def test_a_pdf_linked_only_from_an_internal_page_stays_out_of_a_user_build(self):
+        self.pdf("public.pdf")
+        self.pdf("internal.pdf")
+        self.write("thing", PAGE.replace('categories = ["Things"]', 'categories = ["Things"]\naudience = "user"')
+                   .replace("It does it slowly.[^why]", "It does it slowly, as [the terms](../files/public.pdf) say.[^why]"))
+        self.write("thing/part", PAGE.replace("A thing", "A part")
+                   .replace("It does it slowly.[^why]", "It does it slowly, as [the notes](../../files/internal.pdf) say.[^why]"))
+        self.build("user")
+        self.assertEqual(["public.pdf"], sorted(path.name for path in (self.out / "files").iterdir()))
+
+    def test_a_link_to_a_pdf_outside_the_files_folder_is_refused(self):
+        (self.root / "docs/wiki/policy.pdf").write_bytes(b"%PDF-1.4\n")
+        self.link_pdf("../policy.pdf")
+        self.assertEqual(["thing.md:%d: links to ../policy.pdf, which is outside the wiki's files folder and would "
+                          "be dead once published; put policy.pdf in the files folder and link it as "
+                          "../files/policy.pdf" % self.line_of("thing", "It does it slowly")],
+                         self.pdf_problems())
+
+    def test_a_link_to_a_pdf_that_does_not_exist_is_refused(self):
+        self.link_pdf("../files/gone.pdf")
+        self.assertEqual(["thing.md:%d: links to ../files/gone.pdf, which does not exist; put gone.pdf in the wiki's "
+                          "files folder, or correct the link" % self.line_of("thing", "It does it slowly")],
+                         self.pdf_problems())
+
+    def test_a_pdf_over_twenty_megabytes_is_refused(self):
+        # Exactly the limit passes; one byte over it is refused.
+        self.pdf("edge.pdf", 20 * self.MEGABYTE)
+        self.pdf("big.pdf", 20 * self.MEGABYTE + 1)
+        self.link_pdf("../files/edge.pdf", "../files/big.pdf")
+        self.assertEqual(["thing.md:%d: links to ../files/big.pdf, which is 20.1 MB, over the 20 MB a PDF may be; "
+                          "make it smaller, such as by compressing its pictures, or split it into parts"
+                          % self.line_of("thing", "It does it slowly")],
+                         self.pdf_problems())
+
+    def test_a_pdf_named_through_a_folder_is_refused_and_not_published(self):
+        # Only a file directly in the files folder is published. A link through a folder inside it, or out of it
+        # and back, would otherwise carry a file from wherever the path led.
+        self.pdf("sub/policy.pdf")
+        (self.root / "docs/wiki/secret.pdf").write_bytes(b"%PDF-1.4\n")
+        for target in ("../files/sub/policy.pdf", "../files/../secret.pdf", "../files/..%2Fsecret.pdf"):
+            with self.subTest(target=target):
+                self.link_pdf(target)
+                problems = self.pdf_problems()
+                self.assertEqual(1, len(problems), problems)
+                self.assertIn("outside the wiki's files folder", problems[0])
+                self.assertFalse((self.out / "files").exists(), "a PDF named through a folder was published")
+
+    def test_a_pdf_named_with_an_ampersand_is_published(self):
+        # The rendered page writes & as &amp; in an address, so the build has to read it back as &.
+        self.pdf("R&D.pdf")
+        self.link_pdf("../files/R&D.pdf")
+        self.assertEqual([], self.pdf_problems())
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        anchor = re.search(r'<a href="([^"]+)" class="pdf">the policy 1</a> <span class="pdfsize">', page)
+        self.assertIsNotNone(anchor, "the link to R&D.pdf is not a published PDF link")
+        self.assertTrue((self.out / "thing" / anchor.group(1).replace("%26", "&")).is_file(), "R&D.pdf leads nowhere")
+
+    # Every way markdown writes a link, so the check and the build can never judge one differently.
+    PDF_LINK_FORMS = (("a title", 'It does it slowly, as [the policy 1]({} "The policy") says.[^why]'),
+                      ("angle brackets", "It does it slowly, as [the policy 1](<{}>) says.[^why]"),
+                      ("a reference", "It does it slowly, as [the policy 1][pol] says.[^why]\n\n[pol]: {}"),
+                      ("a query", "It does it slowly, as [the policy 1]({}?x=1) says.[^why]"))
+
+    def test_every_form_of_link_to_a_pdf_outside_the_files_folder_is_refused(self):
+        (self.root / "docs/wiki/policy.pdf").write_bytes(b"%PDF-1.4\n")
+        for form, sentence in self.PDF_LINK_FORMS:
+            with self.subTest(form=form):
+                self.write("thing", PAGE.replace("It does it slowly.[^why]", sentence.format("../policy.pdf")))
+                problems = self.pdf_problems()
+                self.assertEqual(1, len(problems), problems)
+                self.assertIn("outside the wiki's files folder", problems[0])
+
+    def test_every_form_of_link_to_a_pdf_in_the_files_folder_is_published(self):
+        self.pdf("policy.pdf")
+        for form, sentence in self.PDF_LINK_FORMS:
+            with self.subTest(form=form):
+                self.write("thing", PAGE.replace("It does it slowly.[^why]", sentence.format("../files/policy.pdf")))
+                self.assertEqual([], self.pdf_problems())
+                page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+                anchor = re.search(r'<a href="([^"]+)" class="pdf"[^>]*>the policy 1</a> <span class="pdfsize">', page)
+                self.assertIsNotNone(anchor, "the link is not a published PDF link")
+                self.assertTrue((self.out / "thing" / anchor.group(1).partition("?")[0]).is_file(),
+                                f"{anchor.group(1)} leads nowhere")
+
+    def test_a_pdf_linked_to_a_file_outside_the_files_folder_is_refused(self):
+        # A symbolic link is copied as the file it points at: a PDF linked to the project's .env would publish it.
+        (self.root / ".env").write_text("TOKEN=secret", encoding="utf-8")
+        (self.root / "docs/wiki/files").mkdir(parents=True)
+        (self.root / "docs/wiki/files/policy.pdf").symlink_to(self.root / ".env")
+        self.link_pdf("../files/policy.pdf")
+        with self.assertRaises(wiki.WikiError) as caught:
+            self.build()
+        # No absolute path: a message names the wiki's own folders, the same on every machine.
+        self.assertEqual("thing.md links to policy.pdf, which links to a file outside the files folder; put the PDF "
+                         "itself in the wiki's files folder", str(caught.exception))
+        self.assertFalse((self.out / "files/policy.pdf").exists(), "the linked file was published")
+
+    def test_a_files_folder_that_is_a_symbolic_link_is_refused(self):
+        # With the folder itself a link, the file and the folder resolve to the same place elsewhere, so a
+        # containment test that resolves both would publish whatever the folder points at.
+        (self.root / "elsewhere").mkdir()
+        (self.root / "elsewhere/secret.pdf").write_bytes(b"%PDF-1.4\n")
+        (self.root / "docs/wiki/files").symlink_to(self.root / "elsewhere")
+        self.link_pdf("../files/secret.pdf")
+        with self.assertRaises(wiki.WikiError) as caught:
+            self.build()
+        self.assertEqual("the wiki's files folder is a symbolic link, so a build would publish whatever it points "
+                         "at; make files a folder of its own inside the wiki, and put the PDFs in it",
+                         str(caught.exception))
+        self.assertFalse((self.out / "files/secret.pdf").exists(), "a PDF from outside the wiki was published")
+
+    def test_a_pdf_link_shows_the_pdfs_size(self):
+        self.pdf("policy.pdf", 2516582)
+        self.pdf("note.pdf", 3000)
+        self.link_pdf("../files/policy.pdf", "../files/note.pdf")
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertIn('<a href="../files/policy.pdf" class="pdf">the policy 1</a> '
+                      '<span class="pdfsize">(PDF, 2.4 MB)</span>', page)
+        self.assertIn('<a href="../files/note.pdf" class="pdf">the policy 2</a> '
+                      '<span class="pdfsize">(PDF, 3 KB)</span>', page)
+
+    def test_a_pdf_size_reads_right_at_its_edges(self):
+        # An empty file is no kilobyte, and a byte under a megabyte rounds up to a megabyte, not to 1024 KB.
+        for size, label in ((0, "0 KB"), (1, "1 KB"), (self.MEGABYTE - 1, "1.0 MB"), (self.MEGABYTE, "1.0 MB")):
+            with self.subTest(size=size):
+                self.pdf("policy.pdf", size)
+                self.link_pdf("../files/policy.pdf")
+                self.build()
+                page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+                self.assertIn('<span class="pdfsize">(PDF, %s)</span>' % label, page)
+
+    def test_two_builds_of_a_wiki_with_a_pdf_are_identical(self):
+        self.pdf("policy.pdf", 2516582)
+        self.link_pdf("../files/policy.pdf")
+        self.build()
+        first = wiki.tree_digest(self.out)
+        self.assertIn("files/policy.pdf", first, "no PDF was built, so the comparison proves nothing about one")
+        shutil.rmtree(self.out)
+        self.build()
+        self.assertEqual(first, wiki.tree_digest(self.out))
+
+    def test_a_pdf_link_carries_what_the_viewer_needs(self):
+        self.pdf("policy.pdf")
+        self.link_pdf("../files/policy.pdf")
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        # A real link to the published file, so a new tab, a middle click or a download still opens the PDF itself.
+        anchor = re.search(r'<a href="([^"]+)" class="pdf">the policy 1</a>', page)
+        self.assertIsNotNone(anchor, "the PDF link is not marked for the viewer")
+        self.assertTrue((self.out / "thing" / anchor.group(1)).is_file(), "the PDF link leads nowhere")
+        script = (self.out / "assets/wiki.js").read_text(encoding="utf-8")
+        for needed in ('"a.pdf[href]"', "showModal", "(pointer: coarse)", "pdfViewerEnabled", '"iframe"',
+                       "Open in new tab", "Download", "Close"):
+            with self.subTest(needed=needed):
+                self.assertIn(needed, script)
+
+    def test_a_pdf_link_resolves_in_every_build_and_markdown_copy(self):
+        self.pdf("policy.pdf")
+        self.write("thing", PAGE.replace('categories = ["Things"]', 'categories = ["Things"]\naudience = "user"')
+                   .replace("It does it slowly.[^why]", "It does it slowly, as [the policy](../files/policy.pdf) says.[^why]"))
+        for audience, links in (("internal", "file"), ("internal", "clean"), ("user", "file")):
+            with self.subTest(audience=audience, links=links):
+                shutil.rmtree(self.out, ignore_errors=True)
+                wiki.build(self.root, self.out, audience, today="2026-01-02", links=links)
+                page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+                href = re.search(r'<a href="([^"]+)" class="pdf">', page).group(1)
+                self.assertTrue((self.out / "thing" / href).is_file(), f"{href} leads nowhere")
+                if audience == "internal":
+                    copy = (self.out / "thing" / wiki.AGENT_COPY).read_text(encoding="utf-8")
+                    target = re.search(r"\[the policy\]\(([^)]+)\)", copy).group(1)
+                    self.assertTrue((self.out / "thing" / target).is_file(), f"the markdown copy's {target} leads nowhere")
+
+    def test_a_reference_to_a_pdf_is_refused(self):
+        # A PDF is a document, not a citation, wherever it is kept.
+        self.pdf("policy.pdf")
+        self.write("thing", PAGE.replace("[^why]: The reason — `Source/Thing.h`.",
+                                         "[^why]: The reason — [the policy](../files/policy.pdf)."))
+        self.assertEqual(["thing.md cites ../files/policy.pdf, which is a document; a reference names the code that "
+                          "does the thing, or an outside service's own documentation"],
+                         wiki.citation_problems(self.root))
+        self.write("thing", PAGE.replace("[^why]: The reason — `Source/Thing.h`.",
+                                         "[^why]: The vendor — [the guide](https://example.com/guide.pdf)."))
+        self.assertEqual([], wiki.citation_problems(self.root), "an outside service's own PDF was refused")
+
     def test_a_citation_does_not_count_against_the_reading_budget(self):
         long_note = "[^why]: " + ("word " * 300)
         self.write("thing", PAGE.replace("[^why]: The reason — `Source/Thing.h`.", long_note))

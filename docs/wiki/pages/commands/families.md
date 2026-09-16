@@ -48,9 +48,10 @@ A child's headings are listed in order, leaving out any shown in a code sample.[
 parent's when a word of more than three letters, singular or plural, is in both.[^report] On wiki-builder's
 own wiki, where the Checks and Commands pages declare families:[^report]
 ```text
-wiki: pages.md declares no family for its 3 children
+wiki: pages.md declares no family for its 4 children
 wiki:   pages/diagrams.md: Writing, Drawing, Citations, Copies
 wiki:   pages/markdown.md: Links, Code, Tables, Citations
+wiki:   pages/pdfs.md: Links, Publishing, Viewer
 wiki:   pages/pictures.md: Text pictures, Infobox picture, Lightbox
 wiki: site.md declares no family for its 2 children
 wiki:   site/agent-markdown.md: Copies, Index, Audiences

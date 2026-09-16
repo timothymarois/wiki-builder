@@ -41,7 +41,7 @@ The kind of CI other projects include is `action.yml` at the root.
 | `config.py` | `wiki.toml` — a project's site name, reading budgets and sidebar — and the release it was written against |
 | `serve.py` | A local server rooted at the project, so a citation opens the file it names as readable text |
 | `assets/wiki.css` | The look. Lifted from an approved prototype; light and dark |
-| `assets/wiki.js` | Search over an inlined index, the theme switch, the mobile menu, the lightbox, copy |
+| `assets/wiki.js` | Search over an inlined index, the theme switch, the mobile menu, the lightbox for pictures and PDFs, copy |
 | `assets/template.html` | The page, as named holes |
 | `assets/mermaid-12.0.0.min.js` | Mermaid, pinned and bundled: draws `mermaid` blocks with no network; copied only into a site that has a diagram |
 | `assets/mermaid-12.0.0.LICENSE` | Mermaid's MIT licence, copied beside it |
@@ -78,9 +78,9 @@ inside it.
 them inside the package; a checkout leaves them where they were written, and `build.skill_dir()` finds
 them either way.
 
-## Tests (`tests/` — 274 cases)
+## Tests (`tests/` — 291 cases)
 
-`tests/test_build.py` (2843 lines). Each case builds a small wiki in a temporary directory, breaks exactly
+`tests/test_build.py` (3067 lines). Each case builds a small wiki in a temporary directory, breaks exactly
 one rule, and asserts the tool names it. Run them with:
 
 ```sh
@@ -100,6 +100,7 @@ docs/wiki/
   wiki.toml          the site's name, the reading budgets, the sidebar
   pages/**.md        a page's path is its address and its place in the sidebar
   images/            pictures, and PICTURES.toml recording what each shows
+  files/             PDFs a page links; a build copies only those
   UPDATED.toml       when each page last changed and was last audited. Written by the tool
   site/              the rendered site. Generated; never committed
 ```

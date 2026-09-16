@@ -75,7 +75,8 @@ may be named `source.md`, in any folder.[^source]
 
 A flowchart or other **diagram** is written as a `mermaid` code block and drawn on the page, as described
 on [Diagrams](pages/diagrams.md). The markdown a page is written in is described on
-[Markdown syntax](pages/markdown.md), and pictures on [Pictures](pages/pictures.md).
+[Markdown syntax](pages/markdown.md), pictures on [Pictures](pages/pictures.md), and PDFs on
+[PDFs](pages/pdfs.md).
 
 [^front]: `src/builder/build.py` — `wiki_of()` puts the wiki in `docs/wiki`, whose `pages` `write_site()`
     reads; `read_front_matter()` reads TOML between two `+++` fences, and refuses a page whose fences are
