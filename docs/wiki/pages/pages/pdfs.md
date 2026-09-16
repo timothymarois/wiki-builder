@@ -98,9 +98,10 @@ download it.[^touch]
 [^native]: `src/builder/assets/wiki.js` — the listener returns without `preventDefault()` for any button but
     the first, when Ctrl, ⌘, Shift or Alt is held, and for a link to another site.
 [^dialog]: `src/builder/assets/wiki.js` — `show()` opens one native `dialog` with `showModal()` and marks the
-    page `lightbox-open`, which `src/builder/assets/wiki.css` stops scrolling; `stop()` keeps Tab inside the
-    dialog, a click on the dialog itself closes it when its `pointerdown` landed there too, and its `close`
-    listener in `lightbox()` puts focus back on the opener.
+    page `lightbox-open`, which `src/builder/assets/wiki.css` stops scrolling, and focuses the opener before it
+    opens; `stop()` keeps Tab inside the dialog, and a click on the dialog itself closes it when its
+    `pointerdown` landed there too. `closed()` empties the dialog, releases the page and puts focus back on the
+    opener, whether `dismiss()` calls it for `Close` and the backdrop or the `close` event does for Escape.
 [^frame]: `src/builder/assets/wiki.js` — the comment above the lightbox states it, `showModal()` closes the
     dialog on Escape the page receives, and `stop()` counts the `iframe` among the controls Tab reaches and
     catches Tab leaving it; `src/builder/assets/wiki.css` — `.lightbox .bar` holds `Close` above the `iframe`.

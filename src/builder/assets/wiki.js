@@ -201,29 +201,48 @@
     var pressed = false;
     dialog.addEventListener("pointerdown", function (event) { pressed = event.target === dialog; });
     dialog.addEventListener("click", function (event) {
-      if (pressed && event.target === dialog) { dialog.close(); }
+      if (pressed && event.target === dialog) { dismiss(); }
       pressed = false;
     });
-    dialog.addEventListener("close", function () {
-      root.classList.remove("lightbox-open");
-      // Emptied, so a PDF still loading stops, and the next opening starts clean.
-      dialog.textContent = "";
-      dialog.removeAttribute("aria-label");
-      if (opener) { opener.focus(); opener = null; }
-    });
+    dialog.addEventListener("close", closed);
     return dialog;
+  }
+
+  // Every close path ends in the same state. The browser fires close a task after the dialog is closed, so
+  // closing it and leaving the rest to that event leaves the page locked and the dialog full in between -- long
+  // enough for a reader to open the next one on top of the last. Close and the backdrop therefore clean up as
+  // they close, and the close event, which is all Escape leaves behind, cleans up after them: doing it twice
+  // changes nothing.
+  function closed() {
+    root.classList.remove("lightbox-open");
+    // Emptied, so a PDF still loading stops, and the next opening starts clean.
+    dialog.textContent = "";
+    dialog.removeAttribute("aria-label");
+    var back = opener;
+    opener = null;
+    if (back) { back.focus(); }
+  }
+
+  function dismiss() {
+    if (dialog.open) { dialog.close(); }
+    closed();
   }
 
   function show(kind, from, parts, shut) {
     var box = lightbox();
     box.className = "lightbox " + kind;
+    // Emptied before it is filled, so nothing from an earlier opening can be shown twice.
+    box.textContent = "";
     box.appendChild(stop(true));
     parts.forEach(function (part) { box.appendChild(part); });
     box.appendChild(stop(false));
-    shut.addEventListener("click", function () { box.close(); });
+    shut.addEventListener("click", dismiss);
     shut.autofocus = true;
     opener = from;
     root.classList.add("lightbox-open");
+    // The browser puts focus back where it was when the dialog opened, so the opener takes it first: a picture
+    // takes focus from nothing, and a clicked link does not hold it in every browser.
+    from.focus();
     box.showModal();
     shut.focus();
   }

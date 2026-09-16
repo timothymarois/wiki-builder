@@ -79,5 +79,6 @@ opened it.[^dialog]
     page.
 [^dialog]: `src/builder/assets/wiki.js` — `show()` opens one native `dialog` with `showModal()` for a picture
     or a PDF and marks the page `lightbox-open`, which `src/builder/assets/wiki.css` stops scrolling; `stop()`
-    keeps Tab inside the dialog, and its `close` listener in `lightbox()` puts focus back on the opener; the
-    comment above the lightbox says Escape inside a PDF's frame goes to the PDF's viewer.
+    keeps Tab inside the dialog, and `closed()` empties the dialog, releases the page and puts focus back on the
+    picture, whether `dismiss()` calls it for the Close button and the backdrop or the `close` event does for
+    Escape; the comment above the lightbox says Escape inside a PDF's frame goes to the PDF's viewer.
