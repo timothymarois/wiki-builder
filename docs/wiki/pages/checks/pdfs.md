@@ -1,7 +1,7 @@
 +++
 title = "PDFs"
 subtitle = "a PDF link that would be dead once published, and a PDF over 20 MB"
-status = "draft"
+status = "approved"
 categories = ["Refusals"]
 intent = """
 The PDF check exists so that a PDF a page links is still there once the site is published. A link that

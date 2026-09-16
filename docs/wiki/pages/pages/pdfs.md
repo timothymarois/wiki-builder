@@ -1,7 +1,7 @@
 +++
 title = "PDFs"
 subtitle = "PDF files in the files folder, their links, sizes and viewer"
-status = "draft"
+status = "approved"
 intent = """
 PDFs exist so that a page can hand a reader a document the project keeps, such as a policy, from the place
 the page talks about it. A link to a PDF should work wherever the site is published, and a PDF is never a

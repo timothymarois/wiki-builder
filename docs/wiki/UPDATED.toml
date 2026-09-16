@@ -35,7 +35,7 @@ audited = "2026-09-14"
 
 ["checks/pdfs"]
 updated = "2026-09-15"
-digest = "bc7080045444e322afdac165a84647ec8006ad804125ef4308f12106b8eda423"
+digest = "2326a55c721a85b7ea775369036fa8d432ec3c58bf1d542ab41390cf09121f09"
 
 ["checks/pictures"]
 updated = "2026-09-15"
@@ -134,7 +134,7 @@ audited = "2026-09-14"
 
 ["goals"]
 updated = "2026-09-15"
-digest = "44a8db0a43f6cf9c0615d6dcb904801b510492f6003969dcfb80d57b1fb1ad5e"
+digest = "97014ea4c871296d8500ae3e65858d233efbb54032f060bd81082bf3a9a6364f"
 
 ["health"]
 updated = "2026-09-15"
@@ -174,7 +174,7 @@ audited = "2026-09-15"
 
 ["pages/pdfs"]
 updated = "2026-09-15"
-digest = "467e0ab3f161f3b09989bbab69a895a58921ec5ade16b5a3e44bb6cd08979d13"
+digest = "4593df4940a6774a17848bcde82b1deefada22a9cf109be1a097a7776959111a"
 
 ["pages/pictures"]
 updated = "2026-09-15"
