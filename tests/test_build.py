@@ -2401,6 +2401,15 @@ Every page, with its sources and dates.
                                         "--wiki", str(self.root / "docs/wiki")])
         self.assertEqual(0, status, output)
 
+    def test_the_site_s_own_script_is_served_so_a_browser_will_run_it(self):
+        """A .js under the site's assets is the site's own code. Answered as text, a browser refuses to
+        execute it and the site loses search, the theme and the lightbox, while a .js a reference points
+        at anywhere else is still shown rather than downloaded."""
+        self.assertIsNone(serving.shown_as_text("docs/wiki/site/assets/wiki.js", "docs/wiki/site"))
+        self.assertIsNone(serving.shown_as_text("docs/wiki/site/assets/mermaid.min.js", "docs/wiki/site"))
+        self.assertEqual(serving.PLAIN, serving.shown_as_text("src/thing/helper.js", "docs/wiki/site"))
+        self.assertEqual(serving.PLAIN, serving.shown_as_text("docs/wiki/site/thing/index.md", "docs/wiki/site"))
+
     def test_the_program_alone_builds_and_serves(self):
         # `wiki` with no command is `wiki serve`, and serve is the only command that declares a port.
         from unittest import mock
