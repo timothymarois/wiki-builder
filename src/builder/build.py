@@ -972,9 +972,7 @@ def render_page(title, subtitle, hatnote, body_html, infobox, categories_bar, na
         "nav": nav,
         "title": html_module.escape(title),
         "subtitle": html_module.escape(subtitle),
-        "hatnote": (('      <p class="hat draft"><b>This page is a draft.</b> What it says this part of the '
-                     'system is for has not been approved yet, so read it as a proposal rather than as '
-                     'the wiki.</p>\n' if draft else "")
+        "hatnote": (('      <p class="hat draft"><b>Draft</b> — not approved yet.</p>\n' if draft else "")
                     + ('      <p class="hat">%s</p>' % html_module.escape(hatnote) if hatnote else "")),
         "infobox": infobox,
         "contents": render_contents(entries),
@@ -1055,7 +1053,7 @@ def markdown_copy(page, directory, page_ids, pages_dir, ledger, extra=""):
     if page["subtitle"]:
         head += ["_%s_" % page["subtitle"], ""]
     if page["status"] != "approved":
-        head += ["**Status.** Draft: what this page says the thing is for has not been approved yet.", ""]
+        head += ["**Status.** Draft, not approved yet.", ""]
     head += ["**Intent.** " + " ".join(page["intent"].split()), ""]
     body = outside_code(page["body"].strip("\n"), lambda text: MARKDOWN_LINK.sub(readdress, text))
     return "\n".join(head) + "\n" + body + "\n" + extra
