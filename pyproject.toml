@@ -1,6 +1,6 @@
 [project]
 name = "wiki-builder"
-version = "0.5.0"
+version = "0.6.0"
 description = "A wiki a person can read, built from markdown, where every statement is traced to the code."
 readme = "README.md"
 requires-python = ">=3.11"
