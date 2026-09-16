@@ -29,20 +29,27 @@ PLAIN = "text/plain; charset=utf-8"
 LOCAL_NAMES = ("127.0.0.1", "localhost", "::1")
 
 
-def shown_as_text(path):
+def shown_as_text(path, site=""):
     """The type to answer with, or None to leave the decision where it was.
 
     A function rather than a method so it can be tested without standing up a request: what a reference
-    is answered with is the whole point of this file.
+    is answered with is the whole point of this file. The site's own assets keep their real type: a
+    script answered as text is refused by the browser, and the site loses everything its script does.
     """
+    parts = Path(path).as_posix()
+    assets = (Path(site) / "assets").as_posix().strip("/") if site else None
+    if assets and (parts == assets or f"/{assets}/" in f"/{parts}"):
+        return None
     return PLAIN if Path(path).suffix.lower() in AS_TEXT else None
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     """The stock handler, plus plain text for the files a reference can reach, and nothing cached."""
 
+    site = ""
+
     def guess_type(self, path):
-        return shown_as_text(path) or super().guess_type(path)
+        return shown_as_text(path, self.site) or super().guess_type(path)
 
     def send_head(self):
         # A web page can give its own domain the address 127.0.0.1 and read this server as its own site, so
@@ -98,6 +105,7 @@ def serve(root, site, port):
 
     url = f"http://127.0.0.1:{port}/{Path(site).as_posix().strip('/')}/"
     handler = functools.partial(Handler, directory=str(root))
+    Handler.site = Path(site).as_posix().strip("/")
     try:
         server = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
     except OSError as error:
