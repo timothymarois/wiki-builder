@@ -132,7 +132,11 @@
       pre.removeAttribute("data-processed");
       pre.textContent = diagramText[index];
     });
-    window.mermaid.initialize({ startOnLoad: false, theme: dark ? "dark" : "default", securityLevel: "strict" });
+    // Numbered ids, not Mermaid's default clock: it names each drawing after the millisecond it started, so two
+    // that start inside one millisecond share a name, and the second is sized against the first -- it keeps no
+    // height of its own and paints over the diagram above it. Charts draw fast enough to collide every time.
+    window.mermaid.initialize({ startOnLoad: false, theme: dark ? "dark" : "default", securityLevel: "strict",
+                                deterministicIds: true });
     window.mermaid.run({ nodes: diagrams });
   }
 

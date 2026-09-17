@@ -930,6 +930,51 @@ class WikiTests(unittest.TestCase):
         self.build()
         self.assertFalse((self.out / "assets" / wiki.MERMAID).exists(), "the script outlived the last diagram")
 
+    # Charts: the same block, drawing figures rather than boxes and arrows.
+
+    CHARTS = ('xychart-beta\n  title "Requests a month"\n  x-axis [Jan, Feb]\n  y-axis "Requests" 0 --> 400\n'
+              "  bar [120, 380]\n  line [120, 380]",
+              'pie showData\n  title Plans in use\n  "Free" : 60\n  "Team" : 40',
+              'quadrantChart\n  x-axis "Cheap" --> "Costly"\n  y-axis "Low value" --> "High value"\n'
+              '  "A check": [0.3, 0.8]',
+              "sankey-beta\nPages,Approved,30\nPages,Draft,10",
+              'radar-beta\n  axis a["Speed"], b["Size"]\n  curve x["Today"]{3, 4}\n  max 5')
+
+    def test_a_chart_block_is_drawn_like_any_other_diagram(self):
+        """Every kind of mermaid block is a drawing, not a sample, whatever it draws.
+
+        The build never reads a block's first word, and a check that did would leave every chart on a wiki
+        showing its own source to the reader instead of the figures it draws.
+        """
+        for chart in self.CHARTS:
+            kind = chart.split("\n")[0]
+            with self.subTest(kind=kind):
+                self.write("thing", PAGE.replace(
+                    "## Ground", "It counts.[^why]\n\n```mermaid\n%s\n```\n\n## Ground" % chart))
+                self.build()
+                page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+                self.assertIn('<pre class="mermaid">%s\n' % kind, page)
+                self.assertNotIn("language-mermaid", page, f"the {kind} block was left as a code sample")
+                self.assertTrue((self.out / "assets" / wiki.MERMAID).is_file())
+
+    def test_two_drawings_on_one_page_are_named_apart(self):
+        """Mermaid names a drawing after the millisecond it began, and two charts begin in the same one.
+
+        Sharing a name, the second is sized against the first: it keeps no height of its own and paints
+        over the drawing above it. Numbered ids are what stop that, and a page with two charts is where it
+        showed up -- two flowcharts are slow enough to land in different milliseconds and pass by luck.
+        """
+        self.write("thing", PAGE.replace(
+            "## Ground", self.DIAGRAM + "\nIt counts.[^why]\n\n```mermaid\n%s\n```\n\n## Ground" % self.CHARTS[0]))
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertEqual(2, page.count('<pre class="mermaid">'), "the page does not hold two drawings")
+        script = (self.out / "assets/wiki.js").read_text(encoding="utf-8")
+        settings = re.search(r"mermaid\.initialize\((.*?)\);", script, re.S)
+        self.assertIsNotNone(settings, "the page's script does not set Mermaid up")
+        self.assertIn("deterministicIds: true", settings.group(1),
+                      "Mermaid names each drawing after the clock, so two charts collide")
+
     def test_a_diagram_stays_mermaid_in_the_markdown_copy(self):
         self.write("thing", PAGE.replace("## Ground", self.DIAGRAM + "\n## Ground"))
         self.build()
