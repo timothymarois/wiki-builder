@@ -42,11 +42,11 @@ appears after `wiki build`.[^serve] What refuses a page is described on [Checks]
 Every page is a folder holding one file, `index.html`, and every link names that file.[^links] That way the
 same site works both through a server and opened straight from disk.[^links] `wiki publish` builds it with
 clean addresses instead, which work only on a host.[^publish] A link that leaves the wiki opens in a new tab,
-is marked `nofollow` and ends in an arrow, without its author writing anything but the link.[^outside]
+is marked `nofollow` and ends in an arrow, without its author writing more than the link.[^outside]
 
 The build deletes whatever it no longer makes, so a removed page leaves nothing behind.[^removed] For the
 same reason, **it refuses to write into a folder it did not make**, so it never empties a folder
-made by anything else.[^guard] Two builds from the same pages and dates write identical files.[^same]
+another program made.[^guard] Two builds from the same pages and dates write identical files.[^same]
 
 **A link to a wiki page that does not exist is drawn red instead of blue**, and `wiki check` refuses it,
 naming the page and the line.[^redlink] A link to any other file that does not exist is not refused, and

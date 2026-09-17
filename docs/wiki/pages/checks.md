@@ -68,6 +68,7 @@ flowchart LR
 | An infobox row that cites nothing[^rows] | [Citations](checks/citations.md) |
 | A heading that asks a question, rates its contents or points at the page[^headings] | [Headings](checks/headings.md) |
 | A name or sentence that points at the page, hides who acts, attributes a rule to a person or carries no fact[^wording] | [Wording](checks/wording.md) |
+| A spelling or a word the wiki's English does not use[^english] | [Plain English](checks/wording/plain-english.md) |
 | A link to a wiki page that does not exist[^deadlinks] | [Site](site.md) |
 | A page longer than its budget[^budget] | [Reading budgets](checks/budgets.md) |
 | A picture whose subject has changed[^pictures] | [Pictures](checks/pictures.md) |
@@ -92,6 +93,7 @@ sentence, and the command exits with 1.[^caught]
 [^headings]: `src/builder/build.py` — `heading_problems()`.
 [^wording]: `src/builder/build.py` — `pointing_problems()`, `vague_actor_problems()`,
     `attribution_problems()` and `empty_word_problems()`.
+[^english]: `src/builder/build.py` — `plain_english_problems()`.
 [^deadlinks]: `src/builder/build.py` — `dead_link_problems()`.
 [^budget]: `src/builder/build.py` — `budget_problems()`.
 [^pictures]: `src/builder/build.py` — `picture_problems()`.

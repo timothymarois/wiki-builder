@@ -3,7 +3,7 @@
 Read this before drawing a chart on a page. `SKILL.md` holds the rules every chart obeys — it draws figures
 the page already states and cites, and it never holds a figure on its own. This holds how to design one a
 reader learns something from: when a chart beats a table, which kind to draw, where its numbers come from,
-how it is labelled, and how it sits on the page.
+how it is labeled, and how it sits on the page.
 
 A chart is written as a `mermaid` block, like a diagram, and the first word of the block says which kind it
 is. **A diagram draws how something works; a chart draws how much.** Read
@@ -78,12 +78,12 @@ more than the prose, not less.
   at a glance.
 - **Quote every label** in the block, so a comma or a colon in one cannot break the chart.
 
-## Colour
+## Color
 
-- **Colour never carries meaning on its own.** It is lost in the other theme and to a reader who cannot see
+- **Color never carries meaning on its own.** It is lost in the other theme and to a reader who cannot see
   it, so a series is named by its label and its legend, never by "the blue one".
-- **Never set colours in the block.** A chart is drawn in the page's theme, light and dark, and drawn
-  again when the reader switches; a colour written into the block survives only one of them.
+- **Never set colors in the block.** A chart is drawn in the page's theme, light and dark, and drawn
+  again when the reader switches; a color written into the block survives only one of them.
 
 ## On the page
 
@@ -94,7 +94,7 @@ more than the prose, not less.
   the description is the whole content for a reader using a screen reader, so it carries the numbers, not
   just the subject.
 - **The block costs nothing against the page's reading budget**, which is a reason to keep the prose that
-  states its figures, not a licence to draw instead of writing.
+  states its figures, not a license to draw instead of writing.
 
 ## Worked example
 
@@ -109,7 +109,7 @@ xychart-beta
 ```
 
 - **Title:** "Data" names nothing; the reader cannot tell what is counted.
-- **Axes:** no unit on the values, and the run is labelled 1 to 4 rather than by what those points are.
+- **Axes:** no unit on the values, and the run is labeled 1 to 4 rather than by what those points are.
 - **Baseline:** the value axis starts at 100, so the last bar looks four times the first when it is three.
 - **Kind:** a line across four separate counts claims a trend between them.
 - **Nothing accessible:** no `accTitle` or `accDescr`, so a reader who cannot see it gets nothing at all.

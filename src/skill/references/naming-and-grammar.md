@@ -1,6 +1,6 @@
 # Naming and grammar
 
-Read this before naming anything on a page, before describing a name the software already has, and
+Read this before naming a page, a heading or a label, before describing a name the software already has, and
 before the final pass over any page. `SKILL.md` holds the method — ask the question, name the answer —
 and the five tests for a name. This holds the rules for each kind of name, how to write about the names
 the software owns, and the grammar every page is held to.
@@ -55,7 +55,7 @@ grammar.
 - **One subject.** A heading joined with "and" is usually two sections.
 - **No numbers or counts** ("Three limits"). The count changes; the subject does not.
 - **No demonstratives.** "This site", "Our setup" and "These options" point at the page they sit on
-  instead of naming anything, and read as nothing in a contents box or a search result: **Example**,
+  instead of naming a subject, and read as nothing in a contents box or a search result: **Example**,
   **Setup**, **Options**.
 - **A gerund is a noun and is fine** (**Spreading**). A gerund phrase is usually the question in
   disguise ("Getting started" wants to be **Setup**).
@@ -194,7 +194,7 @@ two ways. These rules settle most cases.
 
 - **Name the actor.** "`wiki check` refuses the page", not "the page is refused". The actor is usually the
   fact the reader came for. Passive voice is right only when the actor genuinely does not matter.
-- **Present tense for what exists.** No "will", "currently", "new" or "now" in a claim about behaviour.
+- **Present tense for what exists.** No "will", "currently", "new" or "now" in a claim about behavior.
   A planned change is one marked note at the end of the page. The gate refuses "currently", "at the
   moment" and "for now".
 - **Subject and verb agree**, across whatever sits between them: "the goals page collects", "a list of
@@ -213,7 +213,7 @@ two ways. These rules settle most cases.
 
 ### Numbers and units
 
-- **Figures for anything a reader compares, types or checks**: 500 words, port 8787, exit code 2.
+- **Figures for every value a reader compares, types or checks**: 500 words, port 8787, exit code 2.
 - **Words for a round, approximate quantity in a sentence**: about thirty seconds. Hold one choice for
   one quantity across the page.
 - **A space between a number and its unit**, and the unit a reader would use: 4 kB, 30 minutes.
@@ -231,7 +231,7 @@ two ways. These rules settle most cases.
 - **No terminal punctuation** on titles, headings, labels, columns or a caption that is a phrase. A
   caption that is a full sentence ends with a full stop.
 
-### Capitalisation
+### Capitalization
 
 - **Sentence case** for titles, headings, labels, categories and columns.
 - **A name keeps its own case**: a product name as its makers write it, a name the software owns
@@ -239,8 +239,12 @@ two ways. These rules settle most cases.
 
 ### Spelling
 
-One English variant for the whole wiki, held. The skill itself is written in British English; a project
-may choose otherwise, and says so once.
+**American English, and words a person says out loud.** The gate refuses a British spelling and names the
+American word to write: behaviour, colour, licence, labelled, centre, judgement, grey, towards, analyse,
+and every verb spelled -ise where American English spells it -ize. It refuses the old register and the
+register of contracts the same way: whilst, amongst, shall, ought, thus, hence, notwithstanding, albeit,
+thereof, therein, aforementioned, hereby, herein. It refuses fellen, which is not a word. A name the
+software owns is written the way the software spells it, and code is never read.
 
 ### Words that say nothing
 
@@ -258,7 +262,8 @@ Each of these survives a first draft and carries no fact.
 | Vague verbs | handle, manage, deal with, process, support | the verb that happens: refuses, writes, retries |
 | Intentions for machines | the check wants, the server tries to | what it does, and under what condition |
 | Open lists | etc., and so on, various, and/or | the whole list, or the single thing. The gate refuses them |
-| Vague references | the one, the ones | the thing itself: the tag, the section, the error. The gate refuses them |
+| Vague references | the one, the ones, anything | the thing itself: the tag, the section, the error. The gate refuses them |
+| Hidden actors | kept, is kept, are kept | who keeps it, or where it lives: the build writes it, the files folder holds it. The gate refuses kept |
 | Question clauses | what a person writes, how it works, where it lives | the thing itself: page files and their intent. The gate refuses them in headings and subtitles |
 | Pointing elsewhere | see the documentation for details | link the exact page, or state the fact |
 | Vague actors | nobody, somebody, someone, anyone, everyone, no one | name who acts: the reader, the engineering team, an agent, the build. The gate refuses them |

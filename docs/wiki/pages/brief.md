@@ -68,14 +68,14 @@ them.
   files; a published build with clean addresses; a user build with everything internal removed;
   carrying rule changes into a project; a GitHub Action for a project's CI; guides to installing and
   deploying a wiki.
-- **Refuses:** knowing anything about the project it documents, which a test over the code and the skill
+- **Refuses:** knowing one fact about the project it documents, which a test over the code and the skill
   enforces: no project name, no domain word, no assumption about its assets. Generating pages from the
   code they describe, since such a page agrees with the code whatever it does. Updating itself silently.
-  Scaffolding, and anything a second project has not yet asked for.
+  Scaffolding, and every feature a second project has not yet asked for.
 
 ## External systems
 
-- `uv` (`https://docs.astral.sh/uv/`) runs a pinned version without installing anything: one install per
+- `uv` (`https://docs.astral.sh/uv/`) runs a pinned version without installing the tool: one install per
   machine, never per project.
 - `mistune` is the markdown parser, pinned exactly so that a new version cannot turn every page red at
   once.

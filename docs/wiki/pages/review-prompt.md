@@ -213,7 +213,7 @@ fixed.
 
 To have the agent fix what it finds instead of reporting it, replace the fourth step of "Before starting"
 with: "Fix each finding, change nothing a finding does not name, keep `wiki check` passing, run
-`wiki build` and then `wiki audit` on every page reviewed that cites anything, and list every change you made, one line
+`wiki build` and then `wiki audit` on every page reviewed that cites a source, and list every change you made, one line
 each." An edit that fixes nothing still moves the page's date, and tells every reader
 the page changed when it did not.[^dates] Intents stay out of reach either way, because changing one
 changes what a page is for, which needs approval.

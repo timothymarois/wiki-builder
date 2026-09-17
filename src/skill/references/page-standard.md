@@ -1,7 +1,7 @@
 # Page standard
 
 The page below is the standard every page is written to. Read both versions
-before writing anything. **The contrast teaches more than either version alone**, and more than the rules
+before writing a page. **The contrast teaches more than either version alone**, and more than the rules
 do: rules tell you what not to do, an example tells you what good looks like.
 
 The subject here is a session in a web application, chosen because every reader has one. Your subject
@@ -45,7 +45,7 @@ will be something else. Nothing about the shape changes.
 >
 > Sessions have a timeout. The timeout is configurable per deployment and defaults to a reasonable value.
 > When a session's timeout elapses it will be invalidated and the user will be required to
-> re-authenticate. Draft persistence behaviour may vary depending on configuration.
+> re-authenticate. Draft persistence behavior may vary depending on configuration.
 >
 > ## Storage and limits
 >
@@ -64,7 +64,7 @@ replication are described — this page covers what a session is for and what it
 a reader looking here for the wrong thing, and stops this page growing into that one.
 
 **It says the consequence, never the mechanism.** "A session that expires while you are typing does not
-lose the work" is what a person needs. "Draft persistence behaviour may vary depending on configuration"
+lose the work" is what a person needs. "Draft persistence behavior may vary depending on configuration"
 describes machinery and leaves the reader arithmetic they have no numbers for.
 
 **The numbers are there, and both halves of a comparison sit together.** "Thirty minutes." "At most
@@ -178,4 +178,4 @@ happen" — it is another claim that can be wrong in the same way.
 
 **A page that never surprised its writer probably was not read carefully enough.** Writing a page from
 the code routinely turns up assumptions in the stated requirements that are not true. If yours turned up
-nothing, you summarised another document instead of reading what runs.
+nothing, you summarized another document instead of reading what runs.

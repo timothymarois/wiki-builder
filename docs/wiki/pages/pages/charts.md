@@ -113,11 +113,11 @@ radar-beta
 
 ## Drawing
 
-A chart needs no network: Mermaid ships inside wiki-builder, and a build copies it, with its licence, into
+A chart needs no network: Mermaid ships inside wiki-builder, and a build copies it, with its license, into
 a site only when some page draws something.[^script] It is drawn in the page's theme, light or dark, and
-drawn again whenever the theme changes.[^theme] **Its colours are the wiki's own**, one set of six chosen
+drawn again whenever the theme changes.[^theme] **Its colors are the wiki's own**, one set of six chosen
 to stay apart for a reader who cannot tell red from green, with the text and rules of the page around
-it.[^colours] **Two charts on one page each keep their own box**: every
+it.[^colors] **Two charts on one page each keep their own box**: every
 drawing on a page is numbered rather than named after the millisecond it began, which two charts share,
 leaving the second sized against the first and painted over it.[^named] A chart Mermaid cannot read passes
 `wiki check`, and the page shows Mermaid's error in its place.[^error]
@@ -149,10 +149,10 @@ chart as the block it was written as, which is how an agent reads it.[^copy]
     `src/builder/assets/wiki.js` — `loadMermaid()` fetches the bundled script once a drawing comes within
     600 pixels of the screen.
 [^theme]: `src/builder/assets/wiki.js` — `drawDiagrams()` sets Mermaid's theme to dark when the page's
-    theme is dark or follows a dark system, and the theme button and a change in the system's colour
+    theme is dark or follows a dark system, and the theme button and a change in the system's color
     scheme call it again.
-[^colours]: `src/builder/assets/wiki.js` — `chartColours()` gives Mermaid a palette, text and rules for
-    the page's theme, and `recolourFlows()` puts the same colours over the scheme Mermaid paints a sankey
+[^colors]: `src/builder/assets/wiki.js` — `chartColours()` gives Mermaid a palette, text and rules for
+    the page's theme, and `recolourFlows()` puts the same colors over the scheme Mermaid paints a sankey
     from; `src/builder/assets/wiki.css` — `.art pre.mermaid`, whose rules size a chart and stop a sankey's
     bands being multiplied into the page.
 [^named]: `src/builder/assets/wiki.js` — `drawDiagrams()` initializes Mermaid with `deterministicIds`, so

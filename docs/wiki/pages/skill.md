@@ -78,7 +78,7 @@ sections, gives every input its type, default and meaning, and quotes every erro
 
 ## Infobox
 
-The infobox gives a thing's names, figures and rules as labelled rows, and every row cites a
+The infobox gives a thing's names, figures and rules as labeled rows, and every row cites a
 footnote the prose also cites.[^infobox]
 
 ## Diagrams
@@ -94,7 +94,7 @@ ticket, a gap list, an apology, marketing, or an attribution to whoever asked fo
 
 ## Coverage
 
-Every behaviour a person meets, and every stated requirement, has a page or a section, found by
+Every behavior a person meets, and every stated requirement, has a page or a section, found by
 listing the code rather than the wiki.[^coverage] A requirement not built yet is written on its page and
 marked `{missing}`.[^missing]
 
@@ -140,7 +140,7 @@ requirement not built yet, a failing check, a review and organizing pages.[^task
     diagram is drawn, which kind, and its shapes, direction and labels.
 [^charts]: `src/skill/SKILL.md` — the Charts section, whose rules draw only figures the page states and
     cites and refuse one that moves faster than the page; `src/skill/references/charts.md` — when a chart
-    beats a table, which kind to draw, where its numbers come from, and how it is labelled.
+    beats a table, which kind to draw, where its numbers come from, and how it is labeled.
 [^exclusions]: `src/skill/SKILL.md` — the Exclusions table.
 [^coverage]: `src/skill/SKILL.md` — the Coverage section, whose first rule inventories from the code, never
     from the wiki.

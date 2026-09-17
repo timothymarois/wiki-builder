@@ -5,7 +5,7 @@ status = "approved"
 intent = """
 A page is how a writer who has read the code tells a reader who will not what it does. Writing one should
 need nothing but markdown and a few lines of settings, and where the file sits should decide where the
-page is found, so no list has to be kept in step with the files.
+page is found, so no writer has to hold a list in step with the files.
 """
 
 [[infobox]]
@@ -46,7 +46,7 @@ approved page's intent is collected onto the goals page in sidebar order, so the
 project can be read in one sitting.[^goals]
 
 A page about the wiki itself, such as the front page, says `goals = false` to stay off the goals
-page.[^exempt] The same setting excuses a page from citing anything, whatever it describes.[^exempt]
+page.[^exempt] The same setting excuses a page from citing its sources, whatever it describes.[^exempt]
 
 ## Approval
 

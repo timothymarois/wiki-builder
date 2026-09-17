@@ -1,7 +1,7 @@
 # Flowcharts
 
 Read this before drawing a diagram on a page. `SKILL.md` holds the rules every diagram obeys — it states
-behaviour, so the sentence introducing it is cited and every box and arrow is something the code does.
+behavior, so the sentence introducing it is cited and every box and arrow is something the code does.
 This holds how to design one a reader can follow at a glance: when to draw, which kind, its shapes, its
 direction, its labels, and how it sits on the page.
 
@@ -49,9 +49,9 @@ reader who has seen a flowchart knows them already.
 | Double-sided rectangle | a step whose own flow is drawn elsewhere | `id[["Issue the refund"]]` |
 | Cylinder | stored data the flow reads or writes | `id[("Charges")]` |
 
-- **Never use a shape, a colour or a line style for decoration.** A reader looks for the meaning in every
+- **Never use a shape, a color or a line style for decoration.** A reader looks for the meaning in every
   difference, and finds none.
-- **Colour never carries meaning on its own.** It disappears in the other theme, and for a reader who
+- **Color never carries meaning on its own.** It disappears in the other theme, and for a reader who
   cannot see it.
 
 ## Direction
@@ -64,7 +64,7 @@ reader who has seen a flowchart knows them already.
   refusals and failures branch off to one side and stay there.
 - **Lines never cross.** Reorder the boxes, or split the diagram. A crossing is the first place a reader
   loses the path.
-- **A line that runs back against the direction is a loop**, and it is labelled with why it goes back.
+- **A line that runs back against the direction is a loop**, and it is labeled with why it goes back.
 
 ## Start and end
 
@@ -83,7 +83,7 @@ difference for decisions.
 - **A decision is a short yes-or-no question**, ending in a question mark: "Charge found?". It is the only
   place a question is the right name, because the reader is choosing which way to go. Where the outcomes
   are not yes and no, label the exits with the outcomes instead: "Charge OK", "Charge declined".
-- **Every exit from a decision is labelled**, and yes and no leave in the same order in every diagram.
+- **Every exit from a decision is labeled**, and yes and no leave in the same order in every diagram.
 - **An end is the outcome, as a noun phrase**: "Refund issued".
 - **The page's words, exactly.** A box calls a thing what the page calls it, and a name the software owns
   keeps its case. No abbreviations: they are the first thing a reader has to stop and decode.
@@ -147,7 +147,7 @@ named outcomes.
 2. **Read it against the code, arrow by arrow.** Every box is a step the code takes, every diamond a
    condition it tests, in the order it runs. A drawing of how the thing was meant to work is wrong.
 3. **Read only the labels.** Steps are verbs with objects, decisions are questions, ends are outcomes, and
-   every decision exit is labelled.
+   every decision exit is labeled.
 4. **Count.** About ten steps at most, no crossing lines, one start, every path at an end.
 5. **Cover the diagram and read the page.** Everything it showed is still there in the text.
 
@@ -161,7 +161,7 @@ named outcomes.
 - Wikipedia — [Flowchart](https://en.wikipedia.org/wiki/Flowchart): the common symbols and their meanings.
 - Bruce Silver — [BPMN Method and Style rules](https://www.trisotech.com/bpmn-style-rules/) and
   [Gateways and end states](https://www.methodandstyle.com/blog/gateways-end-states-example-bpmn-style/):
-  activities labelled verb-object, decisions labelled by end state or as a question with Yes and No, end
+  activities labeled verb-object, decisions labeled by end state or as a question with Yes and No, end
   states named for the outcome, about ten activities to a level.
 - Google — [Diagrams, figures, and other images](https://developers.google.com/style/images): introduce an
   image with a complete sentence, and describe a complex one in the text.

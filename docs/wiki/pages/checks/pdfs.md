@@ -21,7 +21,7 @@ rows = [
 +++
 
 `wiki check` refuses a link to a PDF that would lead nowhere once the site is published, and a PDF over the
-size limit.[^check] Where PDFs are kept and how a page links one is described on
+size limit.[^check] Which folder holds a PDF and how a page links one is described on
 [PDFs](../pages/pdfs.md).
 
 ## Refusals

@@ -41,7 +41,7 @@ described on [Site](site.md).
 **The server shows the whole project, not only the site.**[^root] A page can link to any file in the
 project, and a browser cannot follow a link above the folder it is served from.[^paths]
 
-That means anything that can reach the server can read every file in the project.[^root] For that reason, it
+That means every program that can reach the server can read every file in the project.[^root] For that reason, it
 answers only on this machine.[^loopback] **A hidden file is never served**: an address with any part
 starting with a full stop, such as `.env` or `.git/config`, is answered with page not found, and so is a
 file that a link in the project leads into a hidden folder.[^hidden] It answers only a
@@ -51,7 +51,7 @@ read the project through it.[^host]
 ## Sources
 
 Code, settings and markdown files open **as text in the browser** instead of downloading, across 38 common
-file types.[^text] Anything else, such as the site's own pages and pictures, is served as it normally
+file types.[^text] A file of another type, such as the site's own pages and pictures, is served as it normally
 would be.[^text] Every answer tells the browser not to guess another type, so a text file is never read as
 a page.[^sniff]
 

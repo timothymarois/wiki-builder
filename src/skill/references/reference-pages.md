@@ -14,7 +14,7 @@ The reader is about to call the thing. They arrive knowing what they want done a
 **The bar: the reader can use the surface correctly from the page alone**, without reading the code or
 asking the people who built it — and when a call fails, can tell from the page why, and what to do.
 
-- **Dense and factual.** A table for anything parallel; prose for behaviour a table cannot hold.
+- **Dense and factual.** A table for parallel facts; prose for behavior a table cannot hold.
 - **The names the software owns are the content.** Write them exactly, as code.
 - **Only the published surface.** The function or class that implements it belongs in the references,
   never in the page.
@@ -62,8 +62,8 @@ Sections in this order. Leave out a section that does not apply; never write an 
 
 ### Settings file
 
-Only for a file the project defines and a person edits. A setting of anything else is a sentence on the
-page whose behaviour it changes.
+Only for a file the project defines and a person edits. A setting of another kind is a sentence on the
+page whose behavior it changes.
 
 | Section | Holds |
 |---|---|
@@ -159,5 +159,5 @@ the contract, with every row that nothing implements marked `{missing}`.
 3. Every error is quoted exactly, with its condition.
 4. Every example was run, and shows what the run produced.
 5. Every name matches its source, character for character.
-6. A reader who has never seen the code could make a correct call, recognise a failed one, and know why it
+6. A reader who has never seen the code could make a correct call, recognize a failed one, and know why it
    failed.

@@ -275,7 +275,7 @@ which invoice matters.
 
 ## Shared qualities
 
-**A reader could make the call from the page alone** — and recognise a failure, and know its cause.
+**A reader could make the call from the page alone** — and recognize a failure, and know its cause.
 
 **Every infobox row cites.** Each names the footnote the prose cites for the same fact, and each footnote
 names the code that does the thing.

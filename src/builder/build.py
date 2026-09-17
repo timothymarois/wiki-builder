@@ -1974,7 +1974,119 @@ EMPTY_WORDS = (
      "which points at a thing instead of naming it", "name the thing"),
     (re.compile(r"\b(a number of|reasonable)\b", re.I),
      "which gives no figure", "give the number, or the condition"),
+    # "anything" is "the ones" without even the article: the sentence was written to say which thing, and
+    # this is the word that leaves it out.
+    (re.compile(r"\b(anything)\b", re.I),
+     "which stands in for the thing instead of naming it", "name the thing"),
+    # A passive past participle with no actor: "where PDFs are kept" never says who keeps them, or where.
+    (re.compile(r"\b(kept)\b", re.I),
+     "which hides who keeps it", "name who keeps it, or say where it lives"),
 )
+# One English for every wiki: American, and the word a person would say out loud. Each entry gives the
+# word refused and the word to write, because "not American English" tells a writer to look it up and
+# "write 'behavior'" tells them what to type.
+#
+# Every word is written out. A rule on the ending would be a tenth of the size and would take "raise",
+# "precise", "promise", "otherwise", "surprise", "advise", "revise" and "exercise" with it -- all correct,
+# all already in these pages -- so the list is the point, not an accident of how it was written.
+BRITISH = {
+    "behaviour": "behavior", "behaviours": "behaviors", "behavioural": "behavioral",
+    "colour": "color", "colours": "colors", "coloured": "colored", "colouring": "coloring",
+    "favour": "favor", "favours": "favors", "favoured": "favored", "favourite": "favorite",
+    "flavour": "flavor", "flavours": "flavors", "honour": "honor", "honours": "honors",
+    "humour": "humor", "labour": "labor", "labours": "labors",
+    "neighbour": "neighbor", "neighbours": "neighbors", "neighbouring": "neighboring",
+    "rumour": "rumor", "rumours": "rumors", "endeavour": "endeavor", "endeavours": "endeavors",
+    "labelled": "labeled", "labelling": "labeling", "cancelled": "canceled", "cancelling": "canceling",
+    "travelled": "traveled", "travelling": "traveling", "traveller": "traveler",
+    "modelled": "modeled", "modelling": "modeling", "signalled": "signaled", "signalling": "signaling",
+    "fuelled": "fueled", "fuelling": "fueling", "marvellous": "marvelous",
+    "skilful": "skillful", "wilful": "willful", "enrol": "enroll", "enrolment": "enrollment",
+    "instalment": "installment", "fulfil": "fulfill", "fulfils": "fulfills", "fulfilment": "fulfillment",
+    "licence": "license", "licences": "licenses", "defence": "defense", "defences": "defenses",
+    "offence": "offense", "offences": "offenses", "pretence": "pretense", "practise": "practice",
+    "practised": "practiced", "practising": "practicing",
+    "centre": "center", "centres": "centers", "centred": "centered", "metre": "meter", "metres": "meters",
+    "litre": "liter", "litres": "liters", "fibre": "fiber", "fibres": "fibers", "theatre": "theater",
+    "judgement": "judgment", "judgements": "judgments", "ageing": "aging",
+    "catalogue": "catalog", "catalogues": "catalogs", "programme": "program", "programmes": "programs",
+    "grey": "gray", "greyed": "grayed", "storey": "story", "storeys": "stories", "tyre": "tire",
+    "cheque": "check", "cheques": "checks", "plough": "plow", "aluminium": "aluminum",
+    "aeroplane": "airplane", "manoeuvre": "maneuver", "moustache": "mustache", "draught": "draft",
+    "learnt": "learned", "spelt": "spelled", "burnt": "burned", "dreamt": "dreamed", "leapt": "leaped",
+    "towards": "toward", "afterwards": "afterward", "forwards": "forward", "backwards": "backward",
+    "upwards": "upward", "downwards": "downward", "amidst": "amid",
+    "analyse": "analyze", "analyses": "analyzes", "analysed": "analyzed", "analysing": "analyzing",
+    "paralyse": "paralyze", "paralysed": "paralyzed", "catalyse": "catalyze",
+}
+# The -ise verbs. Their endings are spelled out here rather than matched, for the reason above: the stem is
+# what differs, and it differs by one letter.
+for _stem in ("organis", "recognis", "summaris", "capitalis", "minimis", "maximis", "normalis",
+              "serialis", "initialis", "customis", "optimis", "prioritis", "standardis", "emphasis",
+              "realis", "utilis", "apologis", "categoris", "specialis", "visualis", "authoris",
+              "itemis", "familiaris", "generalis", "memoris", "synchronis", "criticis", "summaris"):
+    for _ending in ("e", "es", "ed", "ing", "ation", "ations", "er", "ers"):
+        BRITISH[_stem + _ending] = _stem[:-1] + "z" + _ending
+
+# Words a person would not say out loud: old English, and the legal register that reads as ceremony. Each
+# gives the plain word that replaces it.
+#
+# A word with a plain meaning in some field stays out, however archaic it sounds elsewhere: "manifold" is a
+# part of an engine and a surface in mathematics, and no list here can know which a project documents.
+OLD_ENGLISH = {
+    "whilst": "write 'while'", "amongst": "write 'among'", "betwixt": "write 'between'",
+    "whence": "write 'where from'", "thence": "write 'from there'", "hitherto": "write 'until now'",
+    "heretofore": "write 'until now'", "henceforth": "write 'from now on'", "forthwith": "write 'now'",
+    "hereby": "delete the word", "herein": "delete the word", "hereto": "delete the word",
+    "thereof": "name what it belongs to", "thereto": "name what it belongs to",
+    "thereby": "name what does it", "therein": "name what it is in",
+    "whereof": "name what it belongs to", "wherein": "name what it is in",
+    "whereupon": "write 'and then'", "wherewith": "name what it is done with",
+    "aforementioned": "name the thing", "aforesaid": "name the thing",
+    "insofar": "write 'as far as'", "notwithstanding": "write 'even so'", "lest": "write 'in case'",
+    "unto": "write 'to'", "ere": "write 'before'", "oft": "write 'often'", "nigh": "write 'near'",
+    "albeit": "write 'though'", "sundry": "write 'several'",
+    "hath": "write 'has'", "doth": "write 'does'", "thee": "write 'you'", "thou": "write 'you'",
+    "thy": "write 'your'", "thine": "write 'yours'", "shall": "write 'will' or 'must'",
+    "ought": "write 'should'", "thus": "write 'so'", "hence": "write 'so'", "ergo": "write 'so'",
+}
+# Not a spelling of anything. It is written all the same, so it is refused by name rather than left to a
+# reader to puzzle over.
+NOT_A_WORD = {"fellen": "write 'fell' or 'fallen'"}
+PLAIN_ENGLISH = re.compile(r"\b(%s)\b" % "|".join(
+    sorted(list(BRITISH) + list(OLD_ENGLISH) + list(NOT_A_WORD), key=len, reverse=True)), re.I)
+
+
+def plain_english_problems(root, wiki=None):
+    """Words that are not American English, that no person says out loud, or that are not words at all.
+
+    A wiki read by people who did not write it reads in one English, and each of these is refused with the
+    word to write in its place. Code is left alone, because a name is written the way the software spells
+    it.
+    """
+    pages_dir = wiki_of(root, wiki) / "pages"
+    problems = []
+    for path in sorted(pages_dir.rglob("*.md")):
+        for place, text in wording_places(path, pages_dir):
+            # Every word, not the first: with this many words listed, one refusal a run would have a writer
+            # fixing a sentence and running the check again for the next word in it.
+            seen = []
+            for found in PLAIN_ENGLISH.finditer(text):
+                word = found.group(0).lower()
+                if word in seen:
+                    continue
+                seen.append(word)
+                if word in BRITISH:
+                    problems.append(f"{place} says {word!r}, which is not American English; "
+                                    f"write {BRITISH[word]!r}")
+                elif word in OLD_ENGLISH:
+                    problems.append(f"{place} says {word!r}, which no person says out loud; "
+                                    f"{OLD_ENGLISH[word]}")
+                else:
+                    problems.append(f"{place} says {word!r}, which is not a word; {NOT_A_WORD[word]}")
+    return problems
+
+
 # An infobox value that is nothing but one of these gives a reader nothing to check.
 EMPTY_VALUE = re.compile(r"yes|configurable|varies|depends", re.I)
 
@@ -2392,6 +2504,7 @@ def check(root, wiki=None, version=None):
         problems += attribution_problems(root, wiki)
         problems += vague_actor_problems(root, wiki)
         problems += empty_word_problems(root, wiki)
+        problems += plain_english_problems(root, wiki)
         problems += uncited_problems(root, wiki)
         problems += infobox_problems(root, wiki)
         problems += family_problems(root, wiki)

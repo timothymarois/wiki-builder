@@ -5,22 +5,22 @@
 # build that changed nothing writes nothing. An audit keeps its day through later edits.
 
 ["brief"]
-updated = "2026-09-15"
-digest = "5b5ceb9bb423176211478611f0ae22a120fcc5c066b5cd8940b36bcc8e00bcfd"
+updated = "2026-09-17"
+digest = "fe6f4fcaa7361544d74652524d6bf453b932f1ec19d69ff811af2faae927cfc5"
 
 ["checks"]
-updated = "2026-09-15"
-digest = "4c85ab510c4f444c3829df68a9240fe15393f7f7ca63ec4e8e82e2c39ec96099"
+updated = "2026-09-17"
+digest = "c46c594f02b5e3d71e961fc259f8bb8783661534d1b6544ad5d12fbf3332bf25"
 audited = "2026-09-14"
 
 ["checks/budgets"]
-updated = "2026-09-15"
-digest = "7bdd4f4d31c36a9354d7657aa9799b25263147133a4aca3a462a2cb31452d2d7"
+updated = "2026-09-17"
+digest = "bb7297c295e23d41a94334169a3b9b37a514e6f1bf8582a4f97667d86be7901a"
 audited = "2026-09-14"
 
 ["checks/citations"]
-updated = "2026-09-15"
-digest = "cd8e85d6d926653a682cef6e06c57294423faa04fed4ede3f0f78d333ca6b462"
+updated = "2026-09-17"
+digest = "19fe001674bc501f2ea69f6428194798bc02e0fdc7466613919def90435e53af"
 audited = "2026-09-14"
 
 ["checks/families"]
@@ -29,13 +29,13 @@ digest = "d4e95b706484ab2bc34348cc06dc39cbc6df4e52b5dc9c6b1ebfc171ea35c247"
 audited = "2026-09-15"
 
 ["checks/headings"]
-updated = "2026-09-15"
-digest = "96f581d8d0c1d9357b117477338cf0528226dc2e811dae060b9ac8893384f364"
+updated = "2026-09-17"
+digest = "a450f3423d7423c9c7fb1a6128544b2dc627d40a4a7917a20cc60bc66d1a848b"
 audited = "2026-09-14"
 
 ["checks/pdfs"]
-updated = "2026-09-15"
-digest = "2326a55c721a85b7ea775369036fa8d432ec3c58bf1d542ab41390cf09121f09"
+updated = "2026-09-17"
+digest = "bcab4f8508722d58e1f5a59709302a7caa295a0ff1bd0fdecc8c34949dffbb22"
 
 ["checks/pictures"]
 updated = "2026-09-15"
@@ -43,9 +43,13 @@ digest = "bf7be5aa76dbb391da83a092db252d1b5e98c16fd3b5a87def206231043cf9de"
 audited = "2026-09-14"
 
 ["checks/wording"]
-updated = "2026-09-15"
-digest = "f3db56dcb013b4b8a29714dbbd90b7d981a086f5f5821c8a47e17d764b241b74"
+updated = "2026-09-17"
+digest = "11d748ae39e1cb8da141204767b8506208d87ddb1ed9e04f8ae65c62df6d760d"
 audited = "2026-09-14"
+
+["checks/wording/plain-english"]
+updated = "2026-09-17"
+digest = "9cff0a11decf560c6239a6c6733ed4c5816de910e68285aac1b3c6541d834fba"
 
 ["commands"]
 updated = "2026-09-15"
@@ -78,8 +82,8 @@ digest = "0b8eedd326388afb551a520d374b79e15f6b6c5f4d7b95442731c1c151dc35c9"
 audited = "2026-09-15"
 
 ["commands/families"]
-updated = "2026-09-15"
-digest = "1320e36f62d490f14e1c6ff49ba92556734988fdd71b5f7302025d59b1c88d20"
+updated = "2026-09-17"
+digest = "39abecb0999287ce5c39c22b394485595e45a3ba283f6c6c86a0256c1e855070"
 audited = "2026-09-15"
 
 ["commands/publish"]
@@ -128,13 +132,13 @@ digest = "0377333ecefed4eba0888578b1b68af466f02cbfd7098219228c3f688d991c89"
 audited = "2026-09-14"
 
 ["front-matter/infobox"]
-updated = "2026-09-14"
-digest = "6d2fc369995b7f34f8e78d81051f11074d2c64b8d5845c3c8716fe5d3a7b103c"
+updated = "2026-09-17"
+digest = "b8bfbec6cc0e9c02c8f120fc0d920a02c1c8c5d94d4ef95158d45c689f82eca5"
 audited = "2026-09-14"
 
 ["goals"]
 updated = "2026-09-17"
-digest = "076afbb80ad853cf40e5578f3228d2187cd2a02a482d27ba2b3ebc3ca6df42b9"
+digest = "791ff9851b4583b397ff655d704395c39be0c06b6e3cbfe8e1930eab65fc4614"
 
 ["health"]
 updated = "2026-09-15"
@@ -158,17 +162,17 @@ updated = "2026-09-15"
 digest = "a8581f33f7f82cbc457c141d8954e4e37faa2f29a27bf4dfac8fee5e3accfc20"
 
 ["pages"]
-updated = "2026-09-15"
-digest = "0b4e778af4cbdbd413f1c8b68bba402e77af984a81935faa25e840e75998277f"
+updated = "2026-09-17"
+digest = "7fb4f7c91769919141a4b0741de24d2edf7987de354bf9bb049cc4078df2304b"
 audited = "2026-09-14"
 
 ["pages/charts"]
-updated = "2026-09-16"
-digest = "6ac022f02f590178316c71f3c8242eb02cc5b103750b51de9d5895e77f8076db"
+updated = "2026-09-17"
+digest = "0aa2c4c7821ade18ea3c2e8046d25079e79b01d11c88dc53e5b5286c37aae676"
 
 ["pages/diagrams"]
-updated = "2026-09-16"
-digest = "acd66f030f9b04fb1db7a9cb67d5574d1d95fb9db6894c79c8db6f84704948c0"
+updated = "2026-09-17"
+digest = "8995898380c67bbd14940ef64fca7c7a188395e6f7bae00340d21d0dd804d14b"
 audited = "2026-09-14"
 
 ["pages/markdown"]
@@ -186,22 +190,22 @@ digest = "2bcf47f3f7c3cade99c48336ab460913be9b45cbfddc621a88bfd676ff8fff2b"
 audited = "2026-09-15"
 
 ["pictures-toml"]
-updated = "2026-09-15"
-digest = "f42b3520f0a31fd437e57e4c276ec578e37c585dfe5b4de4f759220b2ea40e41"
+updated = "2026-09-17"
+digest = "6e8f0898c8a06d14743da810993f4abe1c22c80cb9d6d9820403f1b264c5bd9e"
 audited = "2026-09-14"
 
 ["review-prompt"]
-updated = "2026-09-15"
-digest = "df3229eaf5c11e99147d26690e905d379d6581aa74309ce90363dccf2eec3bac"
+updated = "2026-09-17"
+digest = "6d77ce93d8328bd45f72553a5b84c7d843c452590ed81432af234ea208b4865d"
 
 ["serving"]
-updated = "2026-09-14"
-digest = "bdae27b452daa99993bdd47159d5303dde0db9b1d5670ed06555059afd648abe"
+updated = "2026-09-17"
+digest = "3c2865db5acad0e1a755c0f13839563500368c3e3591b3ca4c34207e5865bd4c"
 audited = "2026-09-14"
 
 ["site"]
-updated = "2026-09-15"
-digest = "8ef312617562f1dec1f5c76eebafb672158492c0674f81bc5a72694729c196ec"
+updated = "2026-09-17"
+digest = "1b64570471211f2ff12c1e9f39a6893754572c521f2d248c65e69998823d2d36"
 audited = "2026-09-14"
 
 ["site/agent-markdown"]
@@ -219,8 +223,8 @@ updated = "2026-09-17"
 digest = "5f0cc0b210b12e8d3f2d19df69e10b2147498c8b0c64c9ee1b2f36fa0651edab"
 
 ["skill"]
-updated = "2026-09-16"
-digest = "ee7d629c829c4cc2b2e3e43c89da9c79079756a800ce4cf2995028041ff643e6"
+updated = "2026-09-17"
+digest = "e6cb30d21415e950cd46e401a2233a0486aaa0137b333ecf211b9ac3d368d5a7"
 audited = "2026-09-14"
 
 ["skill/delivery"]

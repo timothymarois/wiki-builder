@@ -41,7 +41,7 @@ on dates" is refused, but "Release notes" passes.**[^verdict]
 ### Pointers
 
 A heading that opens with *this*, *that*, *these*, *those*, *our* or *here* is refused.[^pointer] It
-points at the page it sits on instead of naming anything, so "Our setup" should be **Setup**.[^pointer] A
+points at the page it sits on instead of naming its subject, so "Our setup" should be **Setup**.[^pointer] A
 title or an infobox label that opens the same way is refused as well, as described on
 [Wording](wording.md).
 

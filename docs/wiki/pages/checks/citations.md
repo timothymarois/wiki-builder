@@ -51,7 +51,7 @@ flowchart LR
   other -- "No" --> refused(["Refused with page and line"])
 ```
 
-A citation after the full stop belongs to its sentence, and **a sentence never borrows its neighbour's
+A citation after the full stop belongs to its sentence, and **a sentence never borrows its neighbor's
 citation**.[^uncited]
 
 **Every table row carries a citation, or the red mark, in at least one of its cells**; a table whose rows cite

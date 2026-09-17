@@ -49,7 +49,7 @@ instead.[^goals]
 ## Enforcement
 
 A page over its limit is listed by the check.[^over] **An intent over its limit stops the build** before
-anything else is checked.[^intent] Every build and every check prints each page's word count.[^report]
+the other checks run.[^intent] Every build and every check prints each page's word count.[^report]
 
 ### Calibration
 

@@ -1,6 +1,6 @@
 +++
 title = "Wording"
-subtitle = "pointing words, vague actors, attribution and empty words"
+subtitle = "pointing words, vague actors, attribution, empty words and one English"
 status = "approved"
 categories = ["Refusals"]
 intent = """
@@ -12,15 +12,16 @@ rule plainly rather than quoting who asked for it.
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Refusals", value = "pointing words, vague actors, attribution, empty words", cite = "checks" },
+  { label = "Refusals", value = "pointing words, vague actors, attribution, empty words, one English", cite = "checks" },
   { label = "Scope", value = "every page, including one excused from citations", cite = "pages" },
   { label = "Exceptions", value = "words inside code", cite = "code" },
 ]
 +++
 
 The wording checks refuse a name or a sentence that points at the page, hides who acts, attributes a rule to a
-person instead of stating it, or uses a word that carries no fact.[^checks] Each names the field it found, or
-the page and line of the sentence.[^checks]
+person instead of stating it, uses a word that carries no fact, or writes in an English the wiki does not
+use.[^checks] Each names the field it found, or the page and line of the sentence.[^checks] The spellings and
+old words are on [Plain English](wording/plain-english.md).
 
 ## Refusals
 
@@ -56,13 +57,14 @@ instead.[^empty]
 | Kind | Words refused |
 |---|---|
 | Marketing | `powerful`, `seamless`, `robust`, `cutting-edge`, `best-in-class`[^empty] |
-| Minimisers | `simply`, `easily`, `obviously`, `of course`, `clearly`[^empty] |
+| Minimizers | `simply`, `easily`, `obviously`, `of course`, `clearly`[^empty] |
 | Hedges | `appears to`, `seems to`, `typically`, `usually`, `generally`, `probably`, `likely`, `in some cases`, `tends to`[^empty] |
 | Preamble | `note that` opening a clause or after `please` or `to`[^note], `it is worth noting`, `please be aware`, `in order to` |
 | Open lists | `etc.`, `and so on`, `and/or`, `various`[^empty] |
 | Time words | `currently`, `at the moment`, `for now`[^empty] |
 | Empty amounts | `a number of`, `reasonable`[^empty] |
-| Vague references | `the one`, `the ones`[^empty] |
+| Vague references | `the one`, `the ones`, `anything`[^empty] |
+| Hidden actors | `kept`[^empty] |
 | Infobox values | a value that is only `yes`, `configurable`, `varies` or `depends`[^values] |
 
 ## Scope
@@ -77,9 +79,10 @@ intent and every sentence, but no title, heading or infobox row.[^attribution]
 Words inside code are left alone, because a sample shows text as written, and capital letters make no
 difference.[^code] `may`, `just`, `some` and `new` have plain uses too, so the writer judges them.[^empty]
 
-[^checks]: `src/builder/build.py` — `pointing_problems()`, `vague_actor_problems()`, `attribution_problems()`
-    and `empty_word_problems()`, each called from `check()`, and each naming the field, or the page and line.
-[^pages]: `src/builder/build.py` — none of the four skips a page whose front matter says `goals = false`.
+[^checks]: `src/builder/build.py` — `pointing_problems()`, `vague_actor_problems()`, `attribution_problems()`,
+    `empty_word_problems()` and `plain_english_problems()`, each called from `check()`, and each naming the
+    field, or the page and line.
+[^pages]: `src/builder/build.py` — none of the five skips a page whose front matter says `goals = false`.
 [^code]: `src/builder/build.py` — `wording_places()` removes `INLINE_CODE` before a sentence or field is
     matched, `page_statements()` has already blanked fenced code, and every pattern ignores case.
 [^empty]: `src/builder/build.py` — `empty_word_problems()` matches each pattern in `EMPTY_WORDS` against the

@@ -3,7 +3,7 @@ title = "Infobox fields"
 subtitle = "the settings for a page's infobox"
 status = "approved"
 intent = """
-Infobox fields exist so that a page's reference card is written beside the page it summarises, with every
+Infobox fields exist so that a page's reference card is written beside the page it summarizes, with every
 row naming the footnote that proves it. A row that cites nothing should never reach a reader unmarked.
 """
 

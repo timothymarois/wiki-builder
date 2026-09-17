@@ -4,7 +4,7 @@ Read this before writing or changing an infobox. `SKILL.md` holds the summary; t
 the label and value a row pairs, the keys a row takes, and an example.
 
 The infobox is the page's reference card: a reader glances at it for the thing's name, the values that
-govern it and the rules it keeps. It summarises the page, and **never says anything the page does not.**
+govern it and the rules it keeps. It summarizes the page, and **never states a fact the page does not.**
 
 ## Contents
 
@@ -17,12 +17,12 @@ Rows come in three groups, in this order:
 | **Rules** | Its core logic, each in a phrase: what it refuses, what always happens, what never does | Overflow · refused, never truncated; Signing out · this device only |
 
 - **A named thing opens with its name.** A page about a command, a skill, a setting or a service starts
-  with a **Name** row giving the name exactly, so a reader who knows it recognises the page.
+  with a **Name** row giving the name exactly, so a reader who knows it recognizes the page.
 - **Identity holds the names a person uses**: what they type, search for, open or configure. Never a
   function, class or internal id; those belong in the references.
 - **A group is named for what it holds**: Identity, Values and Rules, or something more precise when every
   row shares it — **Limits**, **Defaults**, **Exit codes**, **Contents**. Never "Info", which names nothing.
-- **Leave out** what a reader never looks up: every setting there is, a value that needs a sentence, anything the
+- **Leave out** what a reader never looks up: every setting there is, a value that needs a sentence, a fact the
   thing does not do.
 - **Every row cites.** A row carries `cite = "<footnote>"`, naming a footnote the page's prose cites for
   the same fact, and renders with that citation's number. A row with nothing to cite carries

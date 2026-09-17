@@ -64,9 +64,9 @@ flowchart LR
 ```
 
 **A diagram needs no network**: Mermaid ships inside wiki-builder, and a build copies it, with its
-licence, into a site only when some page has a diagram.[^script] A diagram is drawn in the page's theme,
+license, into a site only when some page has a diagram.[^script] A diagram is drawn in the page's theme,
 light or dark, and is drawn again whenever the theme changes, whether the reader switches it or the system
-does.[^theme] It sits centred without a frame, and shrinks to fit when it is wider than the
+does.[^theme] It sits centered without a frame, and shrinks to fit when it is wider than the
 page.[^style][^width] A diagram Mermaid cannot read passes `wiki check`, and the page shows Mermaid's error
 in its place.[^cite][^error]
 
@@ -95,7 +95,7 @@ diagrams are on [Checks](../checks.md), [Citations](../checks/citations.md) and
     the fetch fails.
 [^theme]: `src/builder/assets/wiki.js` — `drawDiagrams()` keeps each diagram's text, sets Mermaid's theme
     to dark when the page's theme is dark or follows a dark system, and draws every `pre.mermaid`; the
-    theme button and a change in the system's colour scheme call it again.
+    theme button and a change in the system's color scheme call it again.
 [^style]: `src/builder/assets/wiki.css` — `.art pre.mermaid`.
 [^width]: Mermaid — [Mermaid Config Schema](https://mermaid.js.org/config/schema-docs/config.html):
     `useMaxWidth`, true by default, sets a diagram's width to 100% and scales it with the available space;

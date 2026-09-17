@@ -676,6 +676,117 @@ class WikiTests(unittest.TestCase):
         problems, *_ = wiki.check(self.root)
         self.assertTrue(any("says 'simply'" in problem for problem in problems), problems)
 
+    def test_a_word_standing_in_for_a_thing_is_refused(self):
+        # "anything" and "kept" both leave out the fact the sentence was for: which thing, and who keeps it.
+        for word, fix in (("anything", "name the thing"), ("kept", "name who keeps it")):
+            with self.subTest(word=word):
+                self.write("thing", PAGE.replace("It does it slowly.[^why]",
+                                                 "It does %s slowly.[^why]" % word))
+                problems = wiki.empty_word_problems(self.root)
+                self.assertEqual(1, len(problems), problems)
+                self.assertTrue(problems[0].startswith("thing.md:%d: " % self.line_of("thing", "It does")),
+                                problems)
+                self.assertIn("says %r" % word, problems[0])
+                self.assertIn(fix, problems[0])
+
+    def test_a_spelling_that_is_not_american_is_refused(self):
+        # One English for every wiki, and the message names the word to write, not merely the word to drop.
+        for word, american in (("behaviour", "behavior"), ("colour", "color"), ("labelled", "labeled"),
+                               ("licence", "license"), ("organisation", "organization"),
+                               ("summarises", "summarizes"), ("judgement", "judgment"),
+                               ("towards", "toward"), ("grey", "gray"), ("analysed", "analyzed")):
+            with self.subTest(word=word):
+                self.write("thing", PAGE.replace("It does it slowly.[^why]",
+                                                 "It does the %s slowly.[^why]" % word))
+                problems = wiki.plain_english_problems(self.root)
+                self.assertEqual(1, len(problems), problems)
+                self.assertTrue(problems[0].startswith("thing.md:%d: " % self.line_of("thing", "It does")),
+                                problems)
+                self.assertIn("says %r" % word, problems[0])
+                self.assertIn("write %r" % american, problems[0])
+
+    def test_a_word_people_do_not_say_is_refused(self):
+        # Old and legal English reads as ceremony, and a reader who would not say the word aloud reads it
+        # twice. Each is refused with the plain word that replaces it.
+        for word, plain in (("whilst", "while"), ("amongst", "among"), ("hereby", "delete"),
+                            ("notwithstanding", "even so"), ("shall", "will"), ("thus", "so"),
+                            ("aforementioned", "name")):
+            with self.subTest(word=word):
+                self.write("thing", PAGE.replace("It does it slowly.[^why]",
+                                                 "It does %s it slowly.[^why]" % word))
+                problems = wiki.plain_english_problems(self.root)
+                self.assertEqual(1, len(problems), problems)
+                self.assertIn("says %r" % word, problems[0])
+                self.assertIn(plain, problems[0])
+
+    def test_a_word_that_is_not_a_word_is_refused(self):
+        # Not a spelling of anything: agents write it, and no dictionary has it.
+        self.write("thing", PAGE.replace("It does it slowly.[^why]", "It has fellen slowly.[^why]"))
+        problems = wiki.plain_english_problems(self.root)
+        self.assertEqual(1, len(problems), problems)
+        self.assertIn("is not a word", problems[0])
+        self.assertIn("fallen", problems[0])
+
+    def test_every_word_in_one_sentence_is_named_at_once(self):
+        # With this many words listed, one refusal a run would have a writer fix a sentence, run the check
+        # again, and meet the next word in the same sentence.
+        self.write("thing", PAGE.replace(
+            "It does it slowly.[^why]",
+            "The colour is whilst it has fellen, centred amongst the licence.[^why]"))
+        problems = wiki.plain_english_problems(self.root)
+        self.assertEqual(6, len(problems), problems)
+        for word in ("colour", "whilst", "fellen", "centred", "amongst", "licence"):
+            with self.subTest(word=word):
+                self.assertTrue(any("says %r" % word in problem for problem in problems), problems)
+
+    def test_one_word_twice_in_a_sentence_is_named_once(self):
+        self.write("thing", PAGE.replace("It does it slowly.[^why]",
+                                         "The colour is the colour it was.[^why]"))
+        self.assertEqual(1, len(wiki.plain_english_problems(self.root)))
+
+    def test_a_word_a_suffix_rule_would_catch_passes(self):
+        """The refused spellings are listed one by one, never matched by their ending.
+
+        A rule on -ise takes raise, precise, promise, otherwise, surprise, advise, revise and exercise with
+        it, and every one of those is correct and already on these pages. This is the case that fails the
+        moment the list becomes a pattern.
+        """
+        for word in ("raise", "raises", "raised", "precise", "concise", "promise", "promises", "otherwise",
+                     "surprise", "surprises", "advise", "revise", "revised", "exercise", "wise", "rise",
+                     "rises", "disguise", "franchise", "supervise", "improvise", "merchandise", "demise",
+                     "compromise", "arise", "paradise", "expertise", "premise", "likewise", "noise",
+                     "practice", "license plate", "defense", "center", "color", "behavior", "gray",
+                     "toward", "analyze", "organize", "judgment", "labeled"):
+            with self.subTest(word=word):
+                self.write("thing", PAGE.replace("It does it slowly.[^why]",
+                                                 "It does the %s slowly.[^why]" % word))
+                self.assertEqual([], wiki.plain_english_problems(self.root),
+                                 "%r is correct English and was refused" % word)
+
+    def test_a_spelling_inside_code_passes(self):
+        # A name the software owns is written the way the software spells it, however a page spells prose.
+        self.write("thing", PAGE.replace("It does it slowly.[^why]",
+                                         "It calls `chartColours()` slowly.[^why]"))
+        self.assertEqual([], wiki.plain_english_problems(self.root))
+
+    def test_a_word_people_do_not_say_in_the_front_matter_is_refused(self):
+        for old, new, place in (
+                ('subtitle = "the thing, its speed and its ground"', 'subtitle = "the thing and its colour"',
+                 "the subtitle"),
+                ("It should be plain", "It shall be plain", "the intent"),
+                ('value = "a promise"', 'value = "grey"', "the infobox value")):
+            with self.subTest(place=place):
+                self.write("thing", PAGE.replace(old, new))
+                problems = wiki.plain_english_problems(self.root)
+                self.assertTrue(any(problem.startswith("thing.md: %s says" % place) for problem in problems),
+                                problems)
+
+    def test_the_check_refuses_a_word_that_is_not_plain_english(self):
+        self.write("thing", PAGE.replace("It does it slowly.[^why]",
+                                         "It behaves whilst it does it slowly.[^why]"))
+        problems, *_ = wiki.check(self.root)
+        self.assertTrue(any("says 'whilst'" in problem for problem in problems), problems)
+
     def test_the_check_refuses_a_name_that_points_at_the_page(self):
         self.write("thing", PAGE.replace('label = "Today"', 'label = "This site"'))
         problems, *_ = wiki.check(self.root)

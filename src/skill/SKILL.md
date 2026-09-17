@@ -1,6 +1,6 @@
 ---
 name: writing-wiki-pages
-description: Use when writing, updating, reviewing or fixing the pages of a wiki that the `wiki` command builds and checks — a folder holding `wiki.toml` and `pages/` — including a new page, a page the code has moved on from, a stated requirement not built yet, a failing `wiki check`, pages to organize or restructure, or the name or wording of anything a reader sees there. It supplies the page contract, citations, naming, voice, and the steps for each of those tasks. Do not use for documentation written for builders, such as a README, codemap or contributing guide.
+description: Use when writing, updating, reviewing or fixing the pages of a wiki that the `wiki` command builds and checks — a folder holding `wiki.toml` and `pages/` — including a new page, a page the code has moved on from, a stated requirement not built yet, a failing `wiki check`, pages to organize or restructure, or the name or wording of a page, a heading or a label a reader sees there. It supplies the page contract, citations, naming, voice, and the steps for each of those tasks. Do not use for documentation written for builders, such as a README, codemap or contributing guide.
 ---
 
 # Writing wiki pages
@@ -45,7 +45,7 @@ needs [Naming and grammar](references/naming-and-grammar.md) rather than the pag
    the change touched that a person uses, such as a command, option or setting.
 2. Read each sentence that cites the changed code against the code as it is now, and correct both what the
    sentence says and what its reference names.
-3. Give anything new a person can use, configure or notice its page or a section, in the same change.
+3. Give each new thing a person can use, configure or notice its page or a section, in the same change.
 4. Replace each `{missing}` the change implements with a citation to the code that does it.
 5. Run `wiki check`.
 
@@ -145,7 +145,7 @@ reads it**, and the page serves all four without being written four times.
 |---|---|---|---|
 | Stakeholder | the intent, the lead and the goals page | whether the system does what it was meant to | states what the system is for and what it does, in words the stakeholder uses, never function or field names |
 | Product owner | the lead, the headings, the infobox and the prose | the system's rules, limits and consequences | states each rule, limit and consequence plainly, with figures a person would notice |
-| Engineering team | the prose, the references and the reference pages | the behaviour to keep, and where it happens | cites every statement to its file and function, and gives each name the software owns exactly |
+| Engineering team | the prose, the references and the reference pages | the behavior to keep, and where it happens | cites every statement to its file and function, and gives each name the software owns exactly |
 | Customer | a page marked `audience = "user"`, built without references | how to use the system, and what to expect from it | describes what the customer does, sees and is refused, and names no product owner, team, agent, branch, function or field |
 
 - **Plain words carry the sentence, and the exact name follows.** Say what happens in ordinary words, then
@@ -192,7 +192,7 @@ function a verb; in an encyclopedia a title is a noun phrase, never a verb or a 
 actions, so **every name on a page is a noun phrase** for a thing a reader wants. The failure is always the
 same: the writer names their question instead of its answer.
 
-**Read [Naming and grammar](references/naming-and-grammar.md) before naming anything, before describing a
+**Read [Naming and grammar](references/naming-and-grammar.md) before naming a page, a heading or a label, before describing a
 name the software owns — a field, an option, a setting — and before the last pass over any page.**
 
 ### Method
@@ -221,7 +221,7 @@ From the encyclopedia's title policy, for titles, headings and categories alike.
 
 - **Recognisable** — a reader who knows the subject, without being expert in it, knows what this is.
 - **Natural** — what they would say aloud, and what another page would link to it as.
-- **Precise** — this subject, not a neighbour. "Limits" is a size on a page about uploads and a rate on
+- **Precise** — this subject, not a neighbor. "Limits" is a size on a page about uploads and a rate on
   one about the API; the page supplies the subject. **A nested page's title names only what sets it apart
   within its parent**: under **Checks**, a page is **Citations**, not "Citation checks", because the
   sidebar, the trail above the title and search all show the parent.
@@ -284,7 +284,7 @@ place elsewhere.
   and each keeps the shape its subject needs. Reference pages take their layouts from
   [Reference pages](references/reference-pages.md).
 - **The parent declares the layout** as `[family]` in its front matter, with `headings` in order and the
-  infobox `labels` a member may use. `wiki check` then refuses a member that uses anything else, and a member
+  infobox `labels` a member may use. `wiki check` then refuses a member that uses another heading or label, and a member
   the parent does not link; `wiki families` lists the parents whose children declare no layout.
 - **The build writes the member table** when the parent names the labels to compare as `table` and puts
   `{family-table}` on its own line where the table goes: one row per member, from each member's infobox, with
@@ -299,18 +299,22 @@ family done well and badly.
 - **The consequence, not the mechanism.** "An expired session does not lose your draft" — not that one
   setting outlives another.
 - **Short sentences, ordinary words.** A sentence that needs reading twice is the sentence's fault.
+- **One English: American, and words a person says out loud.** The gate refuses a British spelling and
+  names the American word, refuses the old and legal registers -- whilst, amongst, shall, thus, thereof,
+  hereby -- and refuses fellen, which is not a word. See
+  [Naming and grammar](references/naming-and-grammar.md).
 - **Name who acts.** "Nobody has approved it", "someone must bless it" and "anyone can run it" hide the
   fact a reader needs. Say the reader, the engineering team, an agent, or the part of the system that
   acts. The gate refuses nobody, somebody, someone, anyone, everyone and no one.
 - **Say what a thing is and does.** Framing such as "the half of the tool that is not code" or "at its
-  heart" names no purpose and no behaviour: state what the thing is for and what it does instead.
+  heart" names no purpose and no behavior: state what the thing is for and what it does instead.
 - **No sentence without a statement.** A run-up, a transition, a summary or a restatement states nothing
   a reader can check, so it has nothing to cite — and a sentence with nothing to cite has nothing to
   say. Cut it.
 - **Bold what matters**, once or twice a section. If everything is bold, nothing is.
 - **A number only where a person would notice it wrong.** "About thirty seconds" beats a precise figure
   a reader cannot perceive.
-- **Units a reader can feel** — seconds, metres, kilograms, days, plain counts. Convert from whatever the
+- **Units a reader can feel** — seconds, meters, kilograms, days, plain counts. Convert from whatever the
   code uses; never leave that to the reader.
 - **A surprising decision gets one clause of reason.** "Expiry is meant to make a stolen session useless,
   not to punish a user who went to lunch." A reader who knows why does not report it as a bug. The
@@ -347,8 +351,8 @@ These are not style preferences. A page carrying any of them has failed its read
 
 | Never | Instead |
 |---|---|
-| A name only the code knows: a field, constant, function or class | The behaviour it produces. A name a person uses — a command, a setting, a file they edit — is given where the page introduces the thing, and in the infobox |
-| Ticks, centimetres, internal ids, requirement numbers | Seconds, metres, kilograms, plain counts |
+| A name only the code knows: a field, constant, function or class | The behavior it produces. A name a person uses — a command, a setting, a file they edit — is given where the page introduces the thing, and in the infobox |
+| Ticks, centimetres, internal ids, requirement numbers | Seconds, meters, kilograms, plain counts |
 | A task, phase, branch or ticket | Nothing; the reader cannot act on it |
 | A gap list, a to-do, "not built yet" as prose | `{missing}` on the claim itself |
 | An apology for what is missing | Nothing |
@@ -394,10 +398,10 @@ A session ends thirty minutes after its last request.[^expiry]
 
 ## Citation coverage
 
-**Every sentence is a statement, and carries its own reference.** A sentence states a fact, a behaviour,
+**Every sentence is a statement, and carries its own reference.** A sentence states a fact, a behavior,
 a rule or a consequence; one that states none of those adds nothing to the page, and is cut. So every
 sentence ends with a citation or `{missing}` — every one, not the surprising ones, and never on the
-strength of its neighbour's.
+strength of its neighbor's.
 
 **The gate refuses a sentence that cites nothing.** A citation after the full stop belongs to its
 sentence. A sentence that links to another page is excused, because that page carries the citations.
@@ -405,7 +409,7 @@ sentence. A sentence that links to another page is excused, because that page ca
 one cited row never covers the rows beside it. A list item that is a bare link — the host's own guides, under **External
 links** at the end of a page — states nothing and is excused too. Write an outside link as a plain link; the build
 opens it in a new tab, marks it `nofollow` and adds the arrow. Only a page about the wiki itself is exempt, because it describes no
-behaviour.
+behavior.
 
 A reader uses the wiki **instead of** the source, so a sentence they cannot trace must be taken on faith —
 and it looks exactly like one that was checked. **"No source" is a fine answer; silence is not.**
@@ -428,13 +432,13 @@ the thing exists.
 
 **A requirement stated before it is built is written now, and marked.** The wiki can lead the code: a
 stated requirement may describe a feature, a change or a whole idea, so its documentation takes shape
-before anything is built. Each statement of it goes on the page it belongs to, carrying `{missing}` because
+before the code is built. Each statement of it goes on the page it belongs to, carrying `{missing}` because
 nothing implements it yet. A page written that way, or a whole wiki, can be mostly red marks, and that is
 correct: it is the idea, stated plainly, waiting for its code.
 
 - **Only the stated requirements.** A requirement never stated is invented, however likely it seems; it is not
   written, marked or not.
-- **Write it as the behaviour it asks for**, in the present tense and with the same rules as any other
+- **Write it as the behavior it asks for**, in the present tense and with the same rules as any other
   sentence, so the page reads the same once it is built and only its marks change.
 - **The mark comes off with a citation** to the code that does the thing, in the change that builds it.
 - **A change to something already built** is one short, marked note at the end of its page, never mixed
@@ -445,7 +449,7 @@ correct: it is the idea, stated plainly, waiting for its code.
 ## Infobox
 
 The infobox is the page's reference card: the thing's names, the values that govern it and the rules it
-keeps. It summarises the page, and **never says anything the page does not.**
+keeps. It summarizes the page, and **never states a fact the page does not.**
 
 - **Groups, in order**: Identity, the names a person types or searches for; Values, the figures that
   govern it, in units a reader can feel; Rules, what it refuses, always does or never does.
@@ -466,7 +470,7 @@ GitHub draws one. The site draws it with no network, and the page's markdown kee
 **Read [Flowcharts](references/flowcharts.md) before drawing one.** It holds when a diagram earns its
 place, which kind to draw, its shapes, direction and labels, and a draft beside the finished drawing.
 
-- **A diagram states behaviour**, so the sentence introducing it carries the citation, and every box and
+- **A diagram states behavior**, so the sentence introducing it carries the citation, and every box and
   arrow is something the cited code does. Never draw a step the code does not have.
 - **Name its parts as the page does**: the same words for the same things.
 - **One question per diagram**, answered in about ten steps at most.
@@ -478,7 +482,7 @@ diagram: bars and lines over an ordered run, a pie of the parts of one whole, a 
 quadrant or a radar. A diagram draws how something works; a chart draws how much.
 
 **Read [Charts](references/charts.md) before drawing one.** It holds when a chart beats a table, which
-kind to draw, where its numbers come from, how it is labelled, and a chart done well and badly.
+kind to draw, where its numbers come from, how it is labeled, and a chart done well and badly.
 
 - **A chart draws figures the page already states and cites.** It is never the only place a number
   appears: a drawing cannot be searched, read aloud or copied, and the sentence introducing it carries the
@@ -523,7 +527,7 @@ requirements**, or **an outside service's own documentation** for how that servi
 source — not what is typical, what similar tools do, what seems likely, what would make the page
 complete, or what you would have built.
 
-- **No invented behaviour**: no feature, option, default, limit, error, step or edge case the code does
+- **No invented behavior**: no feature, option, default, limit, error, step or edge case the code does
   not have.
 - **No invented reasons**: a why comes from the stated requirements, or from a comment or commit in the
   code, never from a plausible guess about what the code's author intended.
@@ -536,35 +540,35 @@ complete, or what you would have built.
 
 1. **Read the code for every claim** — not the configuration, another document, or what a task said would
    be built.
-2. **Say what is uncertain.** Where behaviour is emergent, untested or could not be determined, say so
+2. **Say what is uncertain.** Where behavior is emergent, untested or could not be determined, say so
    plainly. **A confident sentence covering a gap is the worst thing a page can hold**, because the reader
    is using it *instead of* the code and cannot catch it.
-3. **Never guess a number.** Without one, describe the behaviour.
+3. **Never guess a number.** Without one, describe the behavior.
 4. **When the page and the thing disagree, the page is wrong.** Fix it. A page is never grounds for calling
    the implementation wrong; only an approved requirement says what it ought to do.
 
 ## Coverage
 
-**Behaviour no page mentions is as wrong as a page the code contradicts.** A reader using the wiki instead
-of the source never learns it exists, and nothing on any page warns them. **Coverage means behaviour and
+**Behavior no page mentions is as wrong as a page the code contradicts.** A reader using the wiki instead
+of the source never learns it exists, and nothing on any page warns them. **Coverage means behavior and
 requirements**: what a person meets when they use the system, and what the stated requirements say it
 must do. A task covers the part of the code it touches; an inventory of the whole code is a review, run
 when a task asks for one.
 
 - **Inventory from the code, never from the wiki**, so the wiki cannot hide its own gaps. List the
-  behaviour a person meets: commands and options; endpoints, public functions, events; data a person sees
+  behavior a person meets: commands and options; endpoints, public functions, events; data a person sees
   or changes; refusals, error messages, exit and status codes, limits; jobs, workflows, builds,
   deployments; outside services; roles and permissions. Then add every stated requirement.
-- **A setting is a sentence, not a page.** It goes on the page whose behaviour it changes, and only when it
+- **A setting is a sentence, not a page.** It goes on the page whose behavior it changes, and only when it
   changes something a person or an outside service notices. Plumbing a reader never meets, such as a
   connection pool or a log format, is left out. A settings file gets its own page only when the project
   defines it and a person edits it.
 - **Every item has a home**: a page, or a section of one. An item only mentioned in passing, without its
-  behaviour, is not covered.
-- **Walk it the other way too.** A source file whose behaviour a person meets, and that no reference cites,
+  behavior, is not covered.
+- **Walk it the other way too.** A source file whose behavior a person meets, and that no reference cites,
   is usually an undocumented feature. `wiki coverage` lists every such file, and every citation of a file
   that no longer exists, once `wiki.toml` has a `[coverage]` table naming the source files.
-- **A new behaviour gets its page in the same change as its code.** Leave out internals a reader never
+- **A new behavior gets its page in the same change as its code.** Leave out internals a reader never
   meets, such as private helpers and test code.
 
 ## Reading budget
@@ -591,7 +595,7 @@ serving nothing is still wrong, and a page over it is saying its intent has grow
 2. Every sentence serves the intent.
 3. The prose holds no name only the code knows, no unit a reader cannot feel, and no task or gap list.
 4. Every sentence states something read from the code and carries its own citation, or `{missing}`;
-   anything uncertain says so.
+   every uncertain claim says so.
 5. Mechanism links out instead of being retold, a subject of its own is a child page, and a page in a
    family follows the family's layout.
 6. The infobox gives the thing's names, values and rules under noun labels, and every row cites a
@@ -600,6 +604,6 @@ serving nothing is still wrong, and a page over it is saying its intent has grow
 8. A reader who has never read the source can follow the whole page, and each reader in
    [Readers](#readers) finds, in the parts of the page that table names for them, the facts it says they
    come for.
-9. The behaviour the change touched, and every requirement stated for it, has a page or a section.
+9. The behavior the change touched, and every requirement stated for it, has a page or a section.
 10. Nothing on the page was invented: every statement traces to the code, the stated requirements, or an
     outside service's own documentation.

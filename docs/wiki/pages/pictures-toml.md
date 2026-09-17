@@ -41,7 +41,7 @@ is refused.[^read]
 | `depicts` | list of paths | none | the files or folders the picture shows, relative to the project; with none, the picture is never checked[^keys] |
 | `digest` | string | none | the fingerprint of those files, written by `wiki bless`; with none, the picture is never checked[^bless][^keys] |
 | `blessed` | string | none | the reason last given to `wiki bless`[^bless] |
-| `made` | string | none | kept when `wiki bless` rewrites the file, and read by nothing else[^write] |
+| `made` | string | none | left as written when `wiki bless` rewrites the file, and read by nothing else[^write] |
 
 `wiki bless` rewrites the whole file, keeping only these four keys and replacing every comment with its
 own header.[^write]
