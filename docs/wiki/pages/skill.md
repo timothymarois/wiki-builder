@@ -20,7 +20,7 @@ group = "Contents"
 rows = [
   { label = "Instructions", value = "SKILL.md", cite = "contents" },
   { label = "Worked examples", value = "page-standard.md, page-families.md, reference-standard.md", cite = "contents" },
-  { label = "Rule files", value = "naming-and-grammar.md, infobox.md, reference-pages.md, flowcharts.md", cite = "contents" },
+  { label = "Rule files", value = "naming-and-grammar.md, infobox.md, reference-pages.md, flowcharts.md, charts.md", cite = "contents" },
 ]
 
 [[infobox]]
@@ -84,7 +84,8 @@ footnote the prose also cites.[^infobox]
 ## Diagrams
 
 A flow, a sequence or a set of states is drawn as a Mermaid diagram of about ten steps, and every
-step is something the cited code does.[^diagrams]
+step is something the cited code does.[^diagrams] A chart draws figures the page states and
+cites.[^charts]
 
 ## Exclusions
 
@@ -105,7 +106,7 @@ requirement not built yet, a failing check, a review and organizing pages.[^task
 [^files]: `src/builder/cli.py` — `SKILL_NAME` names the skill; `sync()` copies every markdown file under
     `SKILL`, which `src/builder/build.py` finds with `skill_dir()`.
 [^contents]: `src/skill/` — `SKILL.md`, and in `references/` the rule files `naming-and-grammar.md`,
-    `infobox.md`, `reference-pages.md` and `flowcharts.md` and the worked examples `page-standard.md`, one
+    `infobox.md`, `reference-pages.md`, `flowcharts.md` and `charts.md` and the worked examples `page-standard.md`, one
     ordinary page, `page-families.md`, a family of notification channels, and `reference-standard.md`, a
     command and an endpoint.
 [^sync]: `src/builder/cli.py` — `sync()`.
@@ -137,6 +138,9 @@ requirement not built yet, a failing check, a review and organizing pages.[^task
     Identity, Values and Rules, the keys a row takes, and an example.
 [^diagrams]: `src/skill/SKILL.md` — the Diagrams section; `src/skill/references/flowcharts.md` — when a
     diagram is drawn, which kind, and its shapes, direction and labels.
+[^charts]: `src/skill/SKILL.md` — the Charts section, whose rules draw only figures the page states and
+    cites and refuse one that moves faster than the page; `src/skill/references/charts.md` — when a chart
+    beats a table, which kind to draw, where its numbers come from, and how it is labelled.
 [^exclusions]: `src/skill/SKILL.md` — the Exclusions table.
 [^coverage]: `src/skill/SKILL.md` — the Coverage section, whose first rule inventories from the code, never
     from the wiki.

@@ -471,6 +471,23 @@ place, which kind to draw, its shapes, direction and labels, and a draft beside 
 - **Name its parts as the page does**: the same words for the same things.
 - **One question per diagram**, answered in about ten steps at most.
 
+## Charts
+
+Figures are drawn in the same `mermaid` block, whose first word names a kind of chart instead of a
+diagram: bars and lines over an ordered run, a pie of the parts of one whole, a flow of quantities, a
+quadrant or a radar. A diagram draws how something works; a chart draws how much.
+
+**Read [Charts](references/charts.md) before drawing one.** It holds when a chart beats a table, which
+kind to draw, where its numbers come from, how it is labelled, and a chart done well and badly.
+
+- **A chart draws figures the page already states and cites.** It is never the only place a number
+  appears: a drawing cannot be searched, read aloud or copied, and the sentence introducing it carries the
+  citation.
+- **A table until the shape is the point.** Four numbers a reader compares one by one are a table; a rise
+  across twelve months is a chart.
+- **Never draw a figure that moves faster than the page.** A count that is different next week is stale
+  the day after it is drawn, and nothing on the page says so.
+
 ## Pictures
 
 A page shows the thing it describes. Put pictures in `docs/wiki/images/`, reference them by a relative

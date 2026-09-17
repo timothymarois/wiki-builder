@@ -73,6 +73,7 @@ inside it.
 | `references/infobox.md` | The infobox: its groups, labels and values, the keys a row takes, and an example |
 | `references/reference-pages.md` | How a page documents a command, endpoint, function, settings file or event |
 | `references/flowcharts.md` | How to design a diagram: when to draw, its kind, shapes, direction, labels, and its sources |
+| `references/charts.md` | How to design a chart: when one beats a table, its kind, where its numbers come from, and its labels |
 
 `wiki sync` writes every one of them into the consuming project, where its agents read them. A built wheel carries
 them inside the package; a checkout leaves them where they were written, and `build.skill_dir()` finds

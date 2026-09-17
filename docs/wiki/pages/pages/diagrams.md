@@ -25,7 +25,8 @@ rows = [
 +++
 
 A **diagram** is a code block whose language is `mermaid`, and the site draws it as a picture instead of
-showing its text.[^block] Mermaid is the diagram language GitHub draws from the same block, so one page
+showing its text.[^block] A block that draws figures rather than steps is a chart, described on
+[Charts](charts.md). Mermaid is the diagram language GitHub draws from the same block, so one page
 reads as a diagram on GitHub and on the wiki.[^github] How a page is written in general is described on
 [Pages](../pages.md).
 
