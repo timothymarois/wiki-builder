@@ -80,6 +80,18 @@ def read_config(wiki_dir):
                         "such as https://github.com/example/project")
     if not loaded.get("section"):
         raise WikiError(f"{CONFIG} lists no sections, so nothing would be reachable")
+    # A section's title is what the sidebar draws and what a browser remembers it shut by, so an untitled
+    # one draws a blank header, and two that share a title shut and open together.
+    titles = []
+    for section in loaded["section"]:
+        title = str(section.get("title", "")).strip()
+        if not title:
+            raise WikiError(f"{CONFIG} has a section with no title, so the sidebar cannot name it or "
+                            "remember it; give every [[section]] a title")
+        if title in titles:
+            raise WikiError(f"{CONFIG} has two sections both titled {title!r}; the title is what the "
+                            "sidebar remembers a section shut by, so give each section its own title")
+        titles.append(title)
 
     budget = dict(DEFAULT_BUDGET, **loaded.get("budget", {}))
     for name in ("page", "intent", "goals"):

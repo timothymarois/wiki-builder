@@ -1403,6 +1403,72 @@ class WikiTests(unittest.TestCase):
         self.assertNotIn('class="up"', nav)
         self.assertNotIn('class="here"', nav)
 
+    def test_a_section_is_a_control_that_opens_and_shuts_it(self):
+        """A section header is one button, so a long sidebar can be folded down to the parts in use.
+
+        The key is the section's title slugged, not its position: a section added above another would
+        otherwise take over what the reader had shut.
+        """
+        self.build()
+        front = (self.out / "index.html").read_text(encoding="utf-8")
+        nav = front[front.index('<div id="nav">'):front.index("</div></nav>")]
+        self.assertIn('<h5 data-sec="things"><button type="button"', nav,
+                      "a section header is not a control")
+        self.assertIn("</button></h5><div class=\"fold\"><ul>", nav,
+                      "a section's pages sit in nothing the slide can size")
+        # The tree inside a section is untouched: a child still nests under its parent.
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        self.build()
+        front = (self.out / "index.html").read_text(encoding="utf-8")
+        nav = front[front.index('<div id="nav">'):front.index("</div></nav>")]
+        self.assertIn('<a class="" href="thing/index.html">A thing</a><ul>', nav)
+
+    def test_two_sections_with_one_title_are_refused(self):
+        # The title is the key the browser remembers a section by, so two of them would shut together.
+        self.nav(CONFIGURATION.replace('title = "Things"', 'title = "Navigation"'))
+        self.refused("has two sections both titled")
+
+    def test_a_section_with_no_title_is_refused(self):
+        # An untitled section draws a line and a blank header, and has no key to be remembered by.
+        self.nav(CONFIGURATION.replace('title = "Things"\n', ""))
+        self.refused("has a section with no title")
+
+    def test_the_page_carries_what_the_sidebar_remembers(self):
+        """The shut sections are applied in the head, before the sidebar is parsed, so none of it flashes.
+
+        The key carries the site's name because localStorage is shared by every wiki on one address, and
+        by every page opened off disk, where two sections named alike would otherwise toggle together.
+        """
+        self.build()
+        page = (self.out / "index.html").read_text(encoding="utf-8")
+        head = page[:page.index("</head>")]
+        self.assertIn("wiki-nav-shut:a-wiki", head, "the sidebar's state is not kept per wiki")
+        self.assertIn("grid-template-rows:0fr", head, "the head does not shut a stored section")
+        # Reloading is not arriving: a section the reader just shut would otherwise come back every time
+        # they refreshed the page they shut it on.
+        self.assertIn('"reload"', head, "a reload counts as arriving, so a shut section reopens")
+        self.assertLess(page.index("wiki-nav-shut"), page.index('<div id="nav">'),
+                        "the sidebar is drawn before its stored state is applied, so it flashes")
+
+    def test_the_sidebar_keeps_its_state_and_its_place(self):
+        # What the reader chose outlives a page change: which sections are shut, and where the list is
+        # scrolled. pagehide covers a normal move and the back/forward cache; visibilitychange covers a
+        # phone being put away, where pagehide may never fire.
+        self.build()
+        script = (self.out / "assets/wiki.js").read_text(encoding="utf-8")
+        for needed in ("data-navkey", '"wiki-nav-scroll"', '"wiki-seen"', '"pagehide"',
+                       '"visibilitychange"', "persisted"):
+            with self.subTest(needed=needed):
+                self.assertIn(needed, script)
+
+    def test_a_shut_section_leaves_the_keyboard(self):
+        # Clipped to no height, a shut section's links stay focusable and announced, and Tab walks into a
+        # box the reader cannot see. The slide is CSS, so it costs no measured height in script.
+        self.build()
+        style = (self.out / "assets/wiki.css").read_text(encoding="utf-8")
+        self.assertIn("grid-template-rows:0fr", style, "a section is not shut by the stylesheet")
+        self.assertIn("visibility:hidden", style, "a shut section keeps its links focusable")
+
     def test_a_child_page_shows_the_pages_above_it_as_a_trail(self):
         # A reader on a child page, on a narrow screen especially, sees where it sits and can climb back up.
         # A top page has nothing above it, so it shows no trail.

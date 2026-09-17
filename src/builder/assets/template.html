@@ -8,7 +8,19 @@
 {{llm_links}}
 <script>
 (function(){var r=document.documentElement;r.className+=" js";
-try{var t=localStorage.getItem("wiki-theme");if(t==="dark"){r.setAttribute("data-theme","dark");}else if(t==="auto"){r.removeAttribute("data-theme");}}catch(e){}})();
+try{var t=localStorage.getItem("wiki-theme");if(t==="dark"){r.setAttribute("data-theme","dark");}else if(t==="auto"){r.removeAttribute("data-theme");}}catch(e){}
+// The sections a reader shut, applied as a rule before the sidebar is parsed rather than as a class
+// afterwards: a fold born shut cannot flash open and cannot animate itself closed on the way in. Its own
+// try, so a stored value that will not parse costs the theme nothing.
+r.setAttribute("data-navkey","{{nav_key}}");
+try{var s=JSON.parse(localStorage.getItem("{{nav_key}}")||"[]");
+var here=sessionStorage.getItem("wiki-seen")?null:"{{nav_here}}";
+var n=performance.getEntriesByType&&performance.getEntriesByType("navigation")[0];
+if(n&&n.type==="reload"){here=null;}
+r.setAttribute("data-navhere",here||"");
+var c=s.filter(function(k){return /^[a-z0-9-]+$/.test(k)&&k!==here;}).map(function(k){
+return'#nav h5[data-sec="'+k+'"]+.fold{grid-template-rows:0fr}#nav h5[data-sec="'+k+'"] .chev{transform:rotate(-90deg)}';}).join("");
+if(c){var e=document.createElement("style");e.id="nav-shut";e.textContent=c;document.head.appendChild(e);}}catch(e){}})();
 </script>
 </head>
 <body>
@@ -16,6 +28,7 @@ try{var t=localStorage.getItem("wiki-theme");if(t==="dark"){r.setAttribute("data
   <nav class="rail"><div class="rail-in">
     <div class="logo"><div class="brand"><a href="{{home}}"><b>{{site_name}}</b></a>{{tagline_line}}</div>{{github}}</div>
     <div class="sbox"><input id="q" type="search" placeholder="Search" aria-label="Search" autocomplete="off">
+      <button class="foldall" type="button" aria-label="Shut every section" title="Shut every section"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4.5 6 8.5 10 4.5M2 .5 6 4.5 10 .5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <div class="res" id="res" hidden></div></div>
     <button class="navtoggle" type="button" aria-expanded="false">Menu</button>
     <div id="nav">{{nav}}</div>

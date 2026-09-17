@@ -3,9 +3,12 @@
   <!-- the rail -->
   <rect x="16" y="16" width="170" height="408" rx="6" fill="#ffffff" stroke="#c8ccd1"/>
   <text x="30" y="44" font-weight="700" fill="#202122">Site name</text>
-  <rect x="30" y="58" width="142" height="24" rx="4" fill="#f8f9fa" stroke="#a2a9b1"/>
+  <rect x="30" y="58" width="112" height="24" rx="4" fill="#f8f9fa" stroke="#a2a9b1"/>
   <text x="40" y="75" fill="#72777d">Search</text>
+  <rect x="148" y="58" width="24" height="24" rx="4" fill="#f8f9fa" stroke="#a2a9b1"/>
+  <path d="M154 72.5 160 78.5 166 72.5M154 64 160 70 166 64" fill="none" stroke="#54595d" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
   <text x="30" y="108" font-size="11" fill="#54595d" letter-spacing="1">SECTION</text>
+  <path d="M160 100 165 105 170 100" fill="none" stroke="#72777d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
   <text x="30" y="130" fill="#3366cc">A page</text>
   <text x="46" y="150" fill="#3366cc">Its child</text>
   <text x="30" y="170" fill="#3366cc">Another page</text>

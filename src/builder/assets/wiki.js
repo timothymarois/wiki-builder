@@ -83,17 +83,138 @@
     });
   }
 
+  // --- shutting a section --------------------------------------------------------------------------
+  // A sidebar with several sections is longer than a reader wants to walk past, so each one folds. What is
+  // shut is what is stored, not what is open: a section added to a wiki later then arrives open, the way
+  // a reader who has never seen it would expect.
+  //
+  // The page head has already shut the stored sections with a rule of its own, because the sidebar does not
+  // exist yet when it runs and a fold born shut can neither flash open nor animate itself closed. Here that
+  // rule is traded for the class that says the same thing, in one go, so nothing moves in between, and from
+  // then on the class alone decides.
+  var nav = document.getElementById("nav");
+  var NAV_SHUT = root.getAttribute("data-navkey");
+  var NAV_SCROLL = NAV_SHUT && NAV_SHUT.replace("wiki-nav-shut", "wiki-nav-scroll");
+  var sections = nav ? Array.prototype.slice.call(nav.querySelectorAll("h5[data-sec]")) : [];
+
+  function shutSections() {
+    try { return JSON.parse(localStorage.getItem(NAV_SHUT) || "[]"); } catch (e) { return []; }
+  }
+
+  function rememberShut() {
+    // Only the sections this wiki has: a key left behind by a wiki that once shared this address would
+    // otherwise sit in the store for good.
+    var shut = sections.filter(function (head) { return head.classList.contains("shut"); })
+                       .map(function (head) { return head.getAttribute("data-sec"); });
+    try { localStorage.setItem(NAV_SHUT, JSON.stringify(shut)); } catch (e) { /* a private window */ }
+  }
+
+  var foldAll = document.querySelector(".foldall");
+
+  function showFoldAll() {
+    // The button says what it will do, not what the sidebar is: with every section shut, the only useful
+    // press opens them.
+    if (!foldAll) { return; }
+    var open = sections.every(function (head) { return head.classList.contains("shut"); });
+    var label = open ? "Open every section" : "Shut every section";
+    foldAll.classList.toggle("open", open);
+    foldAll.setAttribute("aria-label", label);
+    foldAll.setAttribute("title", label);
+  }
+
+  if (sections.length) {
+    // The section holding the page being read is left open however it was stored, so a reader who followed
+    // a link straight here sees where they landed. Which section that is, and whether this arrival counts,
+    // was settled in the page head; it is read back rather than worked out again, because the two run at
+    // different moments and would not always agree. Nothing is written back, so one shared link cannot
+    // undo what the reader chose.
+    var here = root.getAttribute("data-navhere");
+    var stored = shutSections();
+    sections.forEach(function (head) {
+      var key = head.getAttribute("data-sec");
+      var shut = stored.indexOf(key) !== -1 && key !== here;
+      head.classList.toggle("shut", shut);
+      head.firstChild.setAttribute("aria-expanded", shut ? "false" : "true");
+    });
+    var written = document.getElementById("nav-shut");
+    if (written) { written.remove(); }
+    showFoldAll();
+
+    nav.addEventListener("click", function (event) {
+      var button = event.target.closest("h5[data-sec] > button");
+      if (!button) { return; }
+      var head = button.parentNode;
+      var shut = head.classList.toggle("shut");
+      button.setAttribute("aria-expanded", shut ? "false" : "true");
+      rememberShut();
+      showFoldAll();
+    });
+  }
+
+  if (foldAll && sections.length) {
+    foldAll.addEventListener("click", function () {
+      var open = sections.every(function (head) { return head.classList.contains("shut"); });
+      sections.forEach(function (head) {
+        head.classList.toggle("shut", !open);
+        head.firstChild.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+      rememberShut();
+      showFoldAll();
+      // The button stands inside the search box, which is what tells a stray click from a click on the
+      // search box, so the results would otherwise hang over the sidebar they were just cleared from.
+      if (results) { results.hidden = true; }
+    });
+  }
+
+  // --- where the page list was left ------------------------------------------------------------------
+  // Every page is a fresh document, so the list would open at the top each time and lose the part of the
+  // wiki the reader was working through. The offset is kept for the tab, not the device: it belongs to one
+  // walk through the wiki, not to the reader for ever.
+  //
+  // Whether the reader arrived here from inside the wiki is worth knowing on its own, and this is what
+  // records it: a tab that has not seen a page yet was opened on this one.
+  var arrived = true;
+  try { arrived = !sessionStorage.getItem("wiki-seen"); sessionStorage.setItem("wiki-seen", "1"); } catch (e) {}
+
+  function scrolls() {
+    // Below 900px the list is not a scrolling box at all, and is hidden until Menu opens it, where every
+    // measurement is zero and setting an offset does nothing.
+    return nav && nav.clientHeight && nav.scrollHeight > nav.clientHeight;
+  }
+
+  function keepPlace() {
+    if (!scrolls()) { return; }
+    try { sessionStorage.setItem(NAV_SCROLL, String(nav.scrollTop)); } catch (e) {}
+  }
+
+  // pagehide covers an ordinary move and going into the back/forward cache; visibilitychange covers a phone
+  // put away, where pagehide can be the event that never comes. Never unload, which turns that cache off.
+  window.addEventListener("pagehide", keepPlace);
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") { keepPlace(); }
+  });
+
   // --- the current page in a long page list -----------------------------------------------------------
   // The list scrolls on its own, so a page far down it would open with its own link out of sight. Only
-  // the list moves: the article stays where the reader put it.
-  var nav = document.getElementById("nav");
-  var current = nav && nav.querySelector("a.on");
-  if (current && nav.scrollHeight > nav.clientHeight) {
+  // the list moves: the article stays where the reader put it. Reading a measurement first is what makes
+  // the offset stick: set before the browser has laid the list out, it is quietly clamped to the top.
+  function placeList() {
+    if (!scrolls()) { return; }
+    var kept = null;
+    try { kept = sessionStorage.getItem(NAV_SCROLL); } catch (e) {}
+    if (kept !== null && !arrived) { nav.scrollTop = Number(kept); }
+    var current = nav.querySelector("a.on");
+    if (!current) { return; }
     var top = current.getBoundingClientRect().top - nav.getBoundingClientRect().top;
     if (top < 0 || top > nav.clientHeight - current.offsetHeight) {
       nav.scrollTop += top - nav.clientHeight / 3;
     }
   }
+  placeList();
+
+  // Coming back through the back/forward cache, the browser has already put the whole page back, this list
+  // included. Putting it back a second time is what makes it jump.
+  window.addEventListener("pageshow", function (event) { if (!event.persisted) { placeList(); } });
 
   // --- diagrams ------------------------------------------------------------------------------------------
   // Mermaid is several megabytes, so it is fetched only on a page that has a diagram, and only once a diagram

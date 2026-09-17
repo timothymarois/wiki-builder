@@ -725,6 +725,13 @@ def children_of(page_id, page_ids):
                   if other != page_id and other.rsplit("/", 1)[0] == page_id)
 
 
+# The mark at the right of a section's header, turned by the stylesheet when the section is shut. It is
+# drawn rather than written so it takes the header's own colour in either theme.
+CHEVRON = ('<svg class="chev" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">'
+           '<path d="M1 3.5 5 7.5 9 3.5" fill="none" stroke="currentColor" stroke-width="1.6" '
+           'stroke-linecap="round" stroke-linejoin="round"/></svg>')
+
+
 def render_nav(sections, pages, categories, current, directory, audience):
     """The sidebar. Its shape comes from the pages, not from labels written beside them.
 
@@ -770,9 +777,31 @@ def render_nav(sections, pages, categories, current, directory, audience):
         items = [item for item in items if item]
         if not items:
             continue
-        markup.append("<h5>%s</h5><ul>%s</ul>"
-                      % (html_module.escape(section.get("title", "")), "".join(items)))
+        title = section.get("title", "")
+        # The header is a button across the whole rail, and the pages under it sit in one box the
+        # stylesheet can slide shut. The key is the title slugged, never the section's position: a
+        # section added above another would otherwise inherit what a reader had shut.
+        markup.append('<h5 data-sec="%s"><button type="button"><span>%s</span>%s</button></h5>'
+                      '<div class="fold"><ul>%s</ul></div>'
+                      % (slugify(title), html_module.escape(title), CHEVRON, "".join(items)))
     return "".join(markup)
+
+
+def current_section(sections, current):
+    """The key of the section the page being drawn sits in, so the sidebar can show it open.
+
+    A reader who follows a link straight to a page should see where it sits, whatever they shut on an
+    earlier visit -- so this is the one section the stored state does not close, and reaching it never
+    changes what is stored.
+    """
+    for section in sections:
+        for page_id in section.get("pages", []):
+            if current == page_id or (current or "").startswith(page_id + "/"):
+                return slugify(section.get("title", ""))
+        for name in section.get("categories", []):
+            if current == slugify(name):
+                return slugify(section.get("title", ""))
+    return ""
 
 
 def ancestors_of(page_id, pages, audience):
@@ -1033,7 +1062,8 @@ GITHUB_LINK = ('<a class="github" href="%s" target="_blank" rel="noopener norefe
 
 def render_page(title, subtitle, hatnote, body_html, infobox, categories_bar, nav, index, site,
                 directory, template, tabs=ARTICLE_ONLY, updated="", stamp_css="", stamp_js="",
-                draft=False, llm_links="", diagram_script="", stats=(), audited=None, crumbs=""):
+                draft=False, llm_links="", diagram_script="", stats=(), audited=None, crumbs="",
+                nav_here=""):
     body_html, entries = number_headings(body_html)
     filled = {
         "tabs": tabs,
@@ -1043,9 +1073,13 @@ def render_page(title, subtitle, hatnote, body_html, infobox, categories_bar, na
         "js": relative_file(directory, "assets/wiki.js") + stamp_js,
         "home": relative_directory(directory, ""),
         "site_name": html_module.escape(site["name"]),
+        # localStorage belongs to an address, not to a wiki: two wikis published under one domain, and
+        # every page opened off disk, would otherwise share one set of shut sections.
+        "nav_key": "wiki-nav-shut:" + slugify(site["name"]),
         "tagline_line": ("<span>%s</span>" % html_module.escape(site["tagline"])) if site.get("tagline") else "",
         "github": (GITHUB_LINK % html_module.escape(site["github"], quote=True)) if site.get("github") else "",
         "nav": nav,
+        "nav_here": nav_here,
         "title": html_module.escape(title),
         "subtitle": html_module.escape(subtitle),
         "hatnote": (('      <p class="hat draft"><b>Draft</b> — not approved yet.</p>\n' if draft else "")
@@ -1408,7 +1442,8 @@ def write_site(root, out, audience, link_root, today, record, wiki, sitemap=Fals
             # excused from citations has none, so neither carries an audit.
             audited=(dates[page_id].get("audited", "") if with_source and page["meta"].get("goals", True)
                      else None),
-            crumbs=render_crumbs(page_id, pages, directory, audience)))
+            crumbs=render_crumbs(page_id, pages, directory, audience),
+            nav_here=current_section(sections, page_id)))
         if with_source:
             source_directory = directory + "source/"
             emit(source_directory, render_page(
@@ -1416,7 +1451,8 @@ def write_site(root, out, audience, link_root, today, record, wiki, sitemap=Fals
                 render_source(page["raw"], "../" + AGENT_COPY), "", "",
                 render_nav(sections, pages, categories, page_id, source_directory, audience),
                 index_for(source_directory), site, source_directory, template, on_source(),
-                dates[page_id]["updated"], stamps["wiki.css"], stamps["wiki.js"]))
+                dates[page_id]["updated"], stamps["wiki.css"], stamps["wiki.js"],
+                nav_here=current_section(sections, page_id)))
         counts[page_id] = page["words"]
 
     for slug in sorted(categories):
@@ -1434,7 +1470,7 @@ def write_site(root, out, audience, link_root, today, record, wiki, sitemap=Fals
             "Category: " + listed["name"], "a category page", "", body, "", "",
             render_nav(sections, pages, categories, slug, directory, audience),
             index_for(directory), site, directory, template, ARTICLE_ONLY, "",
-            stamps["wiki.css"], stamps["wiki.js"]))
+            stamps["wiki.css"], stamps["wiki.js"], nav_here=current_section(sections, slug)))
 
     if audience != "user":
         order = agent_order(sections, pages, emitted)

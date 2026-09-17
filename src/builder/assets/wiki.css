@@ -72,14 +72,22 @@ code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;backgroun
 .logo .github:hover{opacity:1}
 .logo b{display:block;font:400 17px/1.2 'Linux Libertine',Georgia,'Times New Roman',serif}
 .logo span{display:block;font-size:10.5px;color:var(--faint);margin-top:3px;font-style:italic}
-.sbox{position:relative;padding:11px 0 14px}
+.sbox{position:relative;padding:11px 0 14px;display:flex;align-items:center;gap:6px}
 /* A line across the whole rail below the logo and below the search box, so neither floats. They are spaced
    as the sections are: 11px from a line down to what follows it, and 14px from a block down to its line. */
 .logo::after,.sbox::after{content:"";position:absolute;left:calc(-1 * var(--pad-l));right:calc(-1 * var(--pad-r));
   bottom:0;border-bottom:1px solid var(--border-soft)}
-.sbox input{width:100%;padding:5px 7px;border:1px solid var(--border-soft);border-radius:2px;
+.sbox input{flex:1;min-width:0;padding:5px 7px;border:1px solid var(--border-soft);border-radius:2px;
   background:var(--page);color:var(--text);font:13px/1.4 inherit}
-.res{position:absolute;z-index:20;inset:41px 0 auto 0;background:var(--page);border:1px solid var(--border-soft);
+/* Shuts every section, or opens every one, from beside the search box. Its arrows point the way they
+   will move, and it is quiet until pointed at, so it never competes with the search box. */
+.foldall{flex:none;display:flex;align-items:center;justify-content:center;width:26px;height:26px;padding:0;
+  border:1px solid var(--border-soft);border-radius:2px;background:var(--surface);color:var(--soft);cursor:pointer}
+.foldall:hover{background:var(--sunk);color:var(--text)}
+.foldall.open svg{transform:rotate(180deg)}
+/* Under the row rather than 41px down it: the old figure was the padding and the input's height added up
+   by hand, and any control of another height in the row moved the box away from the input. */
+.res{position:absolute;z-index:20;top:calc(100% - 14px);left:0;right:0;background:var(--page);border:1px solid var(--border-soft);
   max-height:250px;overflow:auto;box-shadow:0 2px 5px rgba(0,0,0,.12)}
 .res button{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--hair);
   background:none;cursor:pointer;padding:6px 8px;font:13px/1.3 inherit;color:var(--link)}
@@ -89,10 +97,31 @@ code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;backgroun
 .res .pp{color:var(--faint)}
 /* A section is set apart from the pages in it: a line above it across the whole rail, and its name in
    small capitals in the text colour. */
-.rail h5{margin:0 calc(-1 * var(--pad-r)) 5px calc(-1 * var(--pad-l));padding:11px var(--pad-r) 0 var(--pad-l);
+.rail h5{margin:0 calc(-1 * var(--pad-r)) 5px calc(-1 * var(--pad-l));padding:0;
   border-top:1px solid var(--border-soft);
   font:700 10.5px/1.3 inherit;letter-spacing:.07em;text-transform:uppercase;color:var(--text)}
 .rail #nav > h5:first-child{border-top:0}
+/* The whole header is the control, edge to edge. The padding and the bleed sit on the button rather than
+   on the h5: inside the header's padding box the full-bleed strips would look like part of the row and
+   take no press, so the row would read as one target and behave as another. A button inherits neither the
+   header's type nor its colour, so both are said again. */
+.rail h5 button{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;
+  padding:11px var(--pad-r) 5px var(--pad-l);border:0;background:none;color:inherit;font:inherit;
+  letter-spacing:inherit;text-transform:inherit;text-align:left;cursor:pointer}
+.rail h5 button:hover{background:var(--shade)}
+/* Inside the edge rather than outside it: #nav scrolls, so an outline drawn past a full-bleed button
+   pushes a sideways scroll bar into the rail for as long as the header holds focus. */
+.rail h5 button:focus-visible{outline-offset:-2px}
+.rail h5 .chev{flex:none;color:var(--faint);transition:transform .2s ease}
+h5.shut .chev{transform:rotate(-90deg)}
+/* The pages of a section slide rather than vanish: the box goes from one row to none, which the browser
+   can animate without any height being measured in script. A section shut this way is only clipped, so
+   its links would still take Tab and still be read out -- hiding them is what takes it out of the page,
+   and it waits until the slide has finished so the reader sees it close. */
+.fold{display:grid;grid-template-rows:1fr;transition:grid-template-rows .2s ease}
+.fold > ul{min-height:0;overflow:hidden}
+h5.shut + .fold{grid-template-rows:0fr}
+h5.shut + .fold > ul{visibility:hidden;transition:visibility 0s linear .2s}
 .rail ul{list-style:none;margin:0 0 14px;padding:0}
 .rail li{margin:0 0 1px}
 .rail li a{display:block;padding:1px 0;font-size:12.8px}
@@ -356,6 +385,13 @@ pre.src{overflow-x:auto;margin:0;padding:12px 14px;background:var(--surface);
   /* Tap targets: a 12.8px link on one line is about 20px tall, under any reasonable minimum. */
   .rail li a{padding:8px 0;font-size:14px}
   .rail h5{margin-top:4px}
+  /* The fold ends the list's old adjacency to the next header, so the 14px under a section and the 4px
+     above the next one stopped collapsing into one gap and started adding up. */
+  .fold + h5{margin-top:0}
+  /* The page list is hidden here until Menu opens it, so shutting every section would change nothing a
+     reader can see. */
+  .js .foldall{display:none}
+  .js .rail.open .foldall{display:flex}
   /* Collapsed only where script can open it again; with scripting off the lists stay where they are. */
   .js .navtoggle{display:block}
   .js .rail #nav{display:none}

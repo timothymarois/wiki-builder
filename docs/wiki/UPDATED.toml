@@ -133,8 +133,8 @@ digest = "6d2fc369995b7f34f8e78d81051f11074d2c64b8d5845c3c8716fe5d3a7b103c"
 audited = "2026-09-14"
 
 ["goals"]
-updated = "2026-09-16"
-digest = "fdd4a9c3ab23261d3f77183864d8ea234b66c58a99b8d9c743cbf590b7c73045"
+updated = "2026-09-17"
+digest = "076afbb80ad853cf40e5578f3228d2187cd2a02a482d27ba2b3ebc3ca6df42b9"
 
 ["health"]
 updated = "2026-09-15"
@@ -210,9 +210,13 @@ digest = "56a0a505720363060a6b12bb9c22bfc4c69bea4907dce014a95fed5577f78dc5"
 audited = "2026-09-14"
 
 ["site/layout"]
-updated = "2026-09-15"
-digest = "66371371259fc601c3b5f4dac1effe4ea98dbb7f805e9a8babd2de8846049b94"
+updated = "2026-09-17"
+digest = "e6dcfa6deadd093fc2bcb33b1cb27c502aba66cf2dc8d991d1964fc07b6d4ee6"
 audited = "2026-09-14"
+
+["site/layout/sidebar"]
+updated = "2026-09-17"
+digest = "5f0cc0b210b12e8d3f2d19df69e10b2147498c8b0c64c9ee1b2f36fa0651edab"
 
 ["skill"]
 updated = "2026-09-16"

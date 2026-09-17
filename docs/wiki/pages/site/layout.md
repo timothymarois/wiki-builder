@@ -1,6 +1,6 @@
 +++
 title = "Layout"
-subtitle = "the sidebar, article, footer and narrow-screen layout"
+subtitle = "the article, its code blocks and tables, the footer and a narrow screen"
 status = "approved"
 intent = """
 The layout exists so that a reader can always see where they are and get somewhere else, whatever they
@@ -11,27 +11,15 @@ should be as easy to copy as it is to read.
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Sidebar", value = "scrolls on its own", note = "logo and search stay put", cite = "rail" },
   { label = "Code block", value = "copy button", cite = "copy" },
   { label = "Outside link", value = "new tab, nofollow, arrow", cite = "outside" },
   { label = "Narrow screen", value = "sidebar above the page", cite = "narrow" },
 ]
 +++
 
-A page has the sidebar on the left and the article beside it, and the two scroll separately.[^rail] How
-a page's parts are named is described on [Pages](../pages.md).
-
-## Sidebar
-
-**The sidebar is exactly the window's height and never scrolls as a whole**: the logo and the search box
-stay at its top, and only the list of pages beneath them scrolls.[^rail] Scrolling that list never moves
-the article, and scrolling the article never moves the sidebar.[^rail] A page far down a long list opens
-with its own link scrolled into view.[^current]
-
-Pages beneath another hang from it as a tree.[^nest] **The sidebar marks where the reader is**: pages
-above the current one are bold, and its tree lines take the link colour.[^branch] Lines across the
-sidebar set off the logo, the search box and each section, whose name is in capitals, and the scroll bar
-sits at the edge.[^section]
+A page has the sidebar on the left and the article beside it, and the two scroll separately.[^rail] The
+sidebar's own tree, sections and storage are described on [Sidebar](layout/sidebar.md), and how a page's
+parts are named on [Pages](../pages.md).
 
 ## Article
 
@@ -68,23 +56,8 @@ button.[^narrow]
 [^rail]: `src/builder/assets/wiki.css` — `.rail-in` is sticky and the window's height; `.rail #nav` takes
     the space left under the logo and search, scrolls with `overflow-y: auto`, and keeps the scroll with
     `overscroll-behavior: contain`.
-[^current]: `src/builder/assets/wiki.js` — scrolls `#nav` so its `a.on` link is in view, without moving
-    the article.
 [^crumbs]: `src/builder/build.py` — `render_crumbs()` links each page above the current one that the build
     has, in order, and `render_page()` fills it into `src/builder/assets/template.html` before the title.
-[^nest]: `src/builder/assets/wiki.css` — `.rail li li::before` draws the line beside a nested page and
-    stops it at the leg on `:last-child`, `.rail li li::after` draws the leg, and `.rail li li a` sets
-    the link smaller.
-[^branch]: `src/builder/build.py` — `render_nav()` gives the link of every page above the current one the
-    class `up`, and the list beneath the current page or a page above it the class `here`;
-    `src/builder/assets/wiki.css` makes `a.up` bold and draws the line and legs of `ul.here` in the link
-    colour.
-[^section]: `src/builder/assets/wiki.css` — `.logo::after` and `.sbox::after` draw the lines below the
-    logo and the search box, and
-    `.rail h5` draws each section's name in capitals under a
-    line that reaches both edges of the rail, `.rail #nav > h5:first-child` leaves the line off the first,
-    and `.rail #nav` reaches the rail's edges and carries its padding inside, so its scroll bar is on the
-    edge.
 [^copy]: `src/builder/build.py` — `write_site()` wraps every code block in `srcbox` with a Copy button;
     `src/builder/assets/wiki.js` copies the block when it is pressed.
 [^beside]: `src/builder/assets/wiki.css` — `.srcbox` sets `display: flow-root`.

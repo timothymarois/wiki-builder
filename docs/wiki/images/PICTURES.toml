@@ -1,11 +1,11 @@
 # What each picture shows, and what its subject hashed to when the picture was made.
 #
 # The gate fails when a depicted asset has moved and its picture has not been re-made, because a
-# wiki the owner reads instead of the source cannot afford a picture of something that no longer
+# wiki read instead of the source cannot afford a picture of something that no longer
 # exists. Clear it by re-rendering, or by `wiki bless <picture> "<reason>"`
 # when the change did not alter what the picture shows.
 
 ["page-anatomy.svg"]
-digest = "sha256:fda745f6d63c36a5b4a197288d8f2f0c70aa30c621120680c753607b543e1471"
+digest = "sha256:feffca0aa79b0f4fee3f0280d2e1e3e8f9f7668b7f8c36e19b443d7202ef407d"
 depicts = ["src/builder/assets/template.html"]
-blessed = "the logo row gained a GitHub link that appears only when site.github is set; the picture shows a page without one, and nothing else a reader sees moved"
+blessed = "the search row gained the button that shuts every section and a section header gained its chevron; the picture was redrawn to show both"
