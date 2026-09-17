@@ -53,4 +53,4 @@ exclude = ["src/builder/assets/mermaid-*"]
 # Written by `wiki sync`. Which release of the tool these pages
 # were written against; `wiki check` says so when they differ.
 [tool]
-version = "0.7.0"
+version = "0.8.0"

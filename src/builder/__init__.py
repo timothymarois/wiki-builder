@@ -6,4 +6,4 @@ states something and cites nothing, a heading that asks a question instead of na
 longer than anyone will read, a picture whose subject has changed since the picture was made.
 """
 
-__version__ = "0.7.0"
+__version__ = "0.8.0"
