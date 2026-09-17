@@ -123,6 +123,57 @@
     document.head.appendChild(script);
   }
 
+  // A chart's colours are the wiki's, not Mermaid's: left to its own dark theme, a pie's first slice is very
+  // nearly the page's own black and an xy chart sits in a grey panel of its own. Series colours are the
+  // Okabe-Ito set, which stays apart for a reader who cannot tell red from green. Text and rules follow the
+  // page's own colours, so a chart carries the theme the reader chose.
+  var CHART_INK = { light: "#202122", dark: "#eaecf0" };
+  var CHART_SOFT = { light: "#54595d", dark: "#a2a9b1" };
+  var CHART_RULE = { light: "#a2a9b1", dark: "#54595d" };
+  var CHART_PAGE = { light: "#ffffff", dark: "#101418" };
+  var CHART_SHADE = { light: "#f1f3f5", dark: "#1b1e21" };
+  // The darkest of the set leads on a light page and the lightest on a dark one, so no series disappears
+  // into the background it is drawn on.
+  var CHART_SERIES = {
+    light: ["#0072b2", "#e69f00", "#009e73", "#cc79a7", "#d55e00", "#56b4e9"],
+    dark: ["#56b4e9", "#e69f00", "#009e73", "#cc79a7", "#f0e442", "#0072b2"]
+  };
+  // A pie's slices are the only fills a label is written on top of, so they are dark enough for white text
+  // in either theme rather than pale tints of the series colours.
+  var CHART_SLICES = ["#0072b2", "#c1440e", "#007a5e", "#9b4b87", "#8c6d1f", "#2a6f97", "#7b5aa6", "#47632a"];
+  // What a chart is drawn at before the page scales it down: the wide kinds share one width and the square
+  // ones another, so a page of charts keeps one rhythm instead of each kind arriving at its own size.
+  var CHART_WIDE = { width: 700, height: 400 };
+  var CHART_SQUARE = 560;
+
+  function chartColours(dark) {
+    var theme = dark ? "dark" : "light";
+    var ink = CHART_INK[theme], soft = CHART_SOFT[theme], rule = CHART_RULE[theme], page = CHART_PAGE[theme];
+    var series = CHART_SERIES[theme];
+    var colours = {
+      // An xy chart with no panel of its own sits on the page, in either theme.
+      xyChart: { backgroundColor: "transparent", titleColor: ink, plotColorPalette: series.join(","),
+                 xAxisTitleColor: soft, xAxisLabelColor: soft, xAxisTickColor: rule, xAxisLineColor: rule,
+                 yAxisTitleColor: soft, yAxisLabelColor: soft, yAxisTickColor: rule, yAxisLineColor: rule },
+      // A slice carries its own percentage, so the text on it is white and the slice is dark enough to hold it.
+      pieTitleTextColor: ink, pieLegendTextColor: ink, pieSectionTextColor: "#ffffff",
+      pieStrokeColor: page, pieOuterStrokeColor: rule, pieOpacity: "1",
+      quadrantTitleFill: ink, quadrantPointTextFill: ink, quadrantXAxisTextFill: soft,
+      quadrantYAxisTextFill: soft, quadrantPointFill: series[0],
+      quadrantInternalBorderStrokeFill: rule, quadrantExternalBorderStrokeFill: rule,
+      radar: { axisColor: rule, graticuleColor: rule, curveOpacity: 0.4 }
+    };
+    CHART_SLICES.forEach(function (slice, index) { colours["pie" + (index + 1)] = slice; });
+    // The quarters alternate between the page and the shade beside it, so the four are visible as four
+    // without any of them claiming a meaning of its own.
+    for (var quarter = 1; quarter <= 4; quarter += 1) {
+      colours["quadrant" + quarter + "Fill"] = quarter % 2 ? page : CHART_SHADE[theme];
+    }
+    // A radar curve takes its colour from the same set the other charts use.
+    series.slice(0, 3).forEach(function (colour, index) { colours["cScale" + index] = colour; });
+    return colours;
+  }
+
   function drawDiagrams() {
     if (!diagrams.length || mermaidState !== "ready") { return; }
     var chosen = root.getAttribute("data-theme");
@@ -136,8 +187,36 @@
     // that start inside one millisecond share a name, and the second is sized against the first -- it keeps no
     // height of its own and paints over the diagram above it. Charts draw fast enough to collide every time.
     window.mermaid.initialize({ startOnLoad: false, theme: dark ? "dark" : "default", securityLevel: "strict",
-                                deterministicIds: true });
-    window.mermaid.run({ nodes: diagrams });
+                                deterministicIds: true, themeVariables: chartColours(dark),
+                                xyChart: CHART_WIDE, sankey: CHART_WIDE,
+                                quadrantChart: { chartWidth: CHART_SQUARE, chartHeight: CHART_SQUARE,
+                                                 pointRadius: 7, pointLabelFontSize: 14 },
+                                radar: { width: CHART_SQUARE, height: CHART_SQUARE } });
+    // A drawing Mermaid cannot read rejects the run; the ones that did come out are still recoloured.
+    window.mermaid.run({ nodes: diagrams }).catch(function () {}).then(function () { recolourFlows(dark); });
+  }
+
+  // The scheme Mermaid paints a sankey from, in its own code, where no setting reaches it. A block takes the
+  // colour at its place in this list and a band is a gradient from the block it leaves to the block it
+  // reaches, so swapping each of these colours for the page's own keeps every band a gradient and puts the
+  // wiki's palette on the blocks and the bars between them.
+  var FLOW_SCHEME = ["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f",
+                     "#edc949", "#af7aa1", "#ff9da7", "#9c755f", "#bab0ab"];
+
+  function recolourFlows(dark) {
+    var series = CHART_SERIES[dark ? "dark" : "light"];
+    diagrams.forEach(function (pre) {
+      var flow = pre.querySelector('svg[aria-roledescription="sankey"]');
+      if (!flow) { return; }
+      flow.querySelectorAll("rect").forEach(function (block) {
+        var place = FLOW_SCHEME.indexOf((block.getAttribute("fill") || "").toLowerCase());
+        if (place !== -1) { block.setAttribute("fill", series[place % series.length]); }
+      });
+      flow.querySelectorAll("stop").forEach(function (end) {
+        var place = FLOW_SCHEME.indexOf((end.getAttribute("stop-color") || "").toLowerCase());
+        if (place !== -1) { end.setAttribute("stop-color", series[place % series.length]); }
+      });
+    });
   }
 
   if (diagrams.length) {

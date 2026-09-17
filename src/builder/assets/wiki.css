@@ -307,6 +307,15 @@ html.lightbox-open{overflow:hidden}
    it is wider than the page. */
 .art pre.mermaid{background:none;border:0;padding:0;margin:14px 0;text-align:center;white-space:pre;
   overflow-x:auto;font:inherit;color:var(--text)}
+/* A chart takes the width it is given and keeps its own proportions, so a page of charts reads as one set
+   rather than as drawings that each arrived at their own size. */
+.art pre.mermaid svg{max-width:100%;height:auto}
+/* A sankey's bands are drawn behind its own blocks, and Mermaid multiplies each one into the page: a way
+   of shading them on white that turns every band black on a dark page. They are painted plainly instead.
+   The override is marked important because Mermaid writes its rule into the drawing under the drawing's own
+   id, which outranks any selector here. Their colours are the page's, put there when the drawing is done. */
+.art pre.mermaid g.links g.link{mix-blend-mode:normal !important}
+.art pre.mermaid g.node-labels text{fill:var(--text)}
 
 /* ===== the source view ===== */
 /* The markdown a page is written in, shown as it is written. Not from the prototype, which had no such

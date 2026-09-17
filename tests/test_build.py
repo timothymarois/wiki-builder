@@ -975,6 +975,29 @@ class WikiTests(unittest.TestCase):
         self.assertIn("deterministicIds: true", settings.group(1),
                       "Mermaid names each drawing after the clock, so two charts collide")
 
+    def test_a_chart_takes_the_pages_own_colours(self):
+        """A chart is drawn in the wiki's colours, not Mermaid's, in either theme.
+
+        Left to itself Mermaid draws a pie's first slice in very nearly the page's own black and puts an xy
+        chart in a grey panel; a sankey's colours are fixed inside Mermaid where no setting reaches them, so
+        the stylesheet paints over those instead.
+        """
+        self.write("thing", PAGE.replace(
+            "## Ground", "It counts.[^why]\n\n```mermaid\n%s\n```\n\n## Ground" % self.CHARTS[0]))
+        self.build()
+        script = (self.out / "assets/wiki.js").read_text(encoding="utf-8")
+        self.assertIn("themeVariables: chartColours(dark)", script,
+                      "the drawing is left to Mermaid's own colours")
+        for named in ("plotColorPalette", "pieSectionTextColor", "quadrantPointFill", "cScale"):
+            with self.subTest(named=named):
+                self.assertIn(named, script)
+        # A sankey is painted from a scheme inside Mermaid, so the page swaps those colours for its own once
+        # the drawing is done, which keeps each band the gradient Mermaid drew it as.
+        self.assertIn("recolourFlows", script, "a sankey keeps Mermaid's own colours")
+        style = (self.out / "assets/wiki.css").read_text(encoding="utf-8")
+        self.assertIn("mix-blend-mode:normal !important", style,
+                      "a sankey's bands are multiplied into the page, which blacks them out on a dark one")
+
     def test_a_diagram_stays_mermaid_in_the_markdown_copy(self):
         self.write("thing", PAGE.replace("## Ground", self.DIAGRAM + "\n## Ground"))
         self.build()
