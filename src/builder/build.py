@@ -1661,8 +1661,11 @@ def picture_problems(root, wiki=None):
     return problems
 
 
-# A link to a document, inside a footnote's reference.
-DOCUMENT_LINK = re.compile(r"\]\(([^)]*\.md[^)]*)\)")
+# A link to a document, inside a footnote's reference. The address has to end in `.md` -- at its end, or
+# where a fragment or a query starts -- and not merely hold those characters somewhere: matched loosely,
+# the rule refused `https://www.mdpi.com/...` for the `.md` inside its host, so a wiki citing a paper
+# published there had no way to link it. The PDF rule below has always anchored this way.
+DOCUMENT_LINK = re.compile(r"\]\(([^)\s]*\.md(?=[#?)]|$)[^)]*)\)")
 # A link to a PDF the wiki keeps, inside a footnote's reference: a document too, however it is published. An
 # outside service's own PDF, linked by its full address, is that service's documentation.
 PDF_DOCUMENT_LINK = re.compile(r"\]\((?![a-z][a-z0-9+.-]*:|//)([^)\s]*\.pdf(?:#[^)\s]*)?)\)", re.I)
