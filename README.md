@@ -10,17 +10,38 @@ unreachable page fails the check. The full documentation is the wiki itself, bui
 
 ## Install
 
-Nothing to install per project. [uv](https://docs.astral.sh/uv/) runs a pinned release, from one wrapper
-the project commits:
+Nothing to install per project. The release is one file the project commits, and every script reads it:
+
+```text
+# scripts/wiki-version
+v0.8.0
+```
+
+[uv](https://docs.astral.sh/uv/) runs that release locally, from one wrapper:
 
 ```sh
 #!/bin/sh
 # scripts/dev-wiki.sh
 set -eu
-WIKI_VERSION=v0.8.0        # the pin. Bump this to update.
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+WIKI_VERSION="$(cat "$ROOT/scripts/wiki-version")"
 exec uvx --from "git+https://github.com/timothymarois/wiki-builder@$WIKI_VERSION" \
      wiki "$@" --root "$ROOT"
+```
+
+A web host that builds the wiki from the repository runs the deploy script instead, which reads the same
+pin — so no release tag is ever typed into a dashboard:
+
+```sh
+#!/bin/sh
+# scripts/deploy-wiki.sh -- check the wiki and publish it, for a host that builds from the repository.
+set -eu
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+OUT="${1:-_site}"
+WIKI_VERSION="$(cat "$ROOT/scripts/wiki-version")"
+pip install --quiet "git+https://github.com/timothymarois/wiki-builder@$WIKI_VERSION"
+wiki check --root "$ROOT"
+wiki publish "$OUT" --root "$ROOT"
 ```
 
 Pages live in `docs/wiki/pages`, and `docs/wiki/wiki.toml` names the site and its sidebar.
@@ -43,13 +64,14 @@ wiki audit     record that pages were checked against the code today
 
 ## Updating
 
-1. Bump `WIKI_VERSION` in the wrapper.
+1. Bump the tag in `scripts/wiki-version`.
 2. Run `./scripts/dev-wiki.sh sync` to update the skill and record the release.
 3. Run `./scripts/dev-wiki.sh check`. A release that adds a check names every page the new rule finds.
 
 ## Continuous integration
 
-One step checks the wiki on every push and pull request:
+One step checks the wiki on every push and pull request. A workflow cannot read `scripts/wiki-version`,
+because GitHub resolves `uses:` before any step runs, so this tag is a second place to bump:
 
 ```yaml
 # .github/workflows/wiki.yml

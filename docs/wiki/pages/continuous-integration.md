@@ -60,6 +60,11 @@ The action installs the tool from its own copy, at the release named in `uses:`,
 the check that release ships.[^install] A wiki synced against a different release fails, and the check says
 to run `wiki sync`.[^version]
 
+**A workflow cannot read a project's release pin.**{missing} GitHub resolves `uses:` before any step runs, so the
+tag here is a second place to bump, beside the `scripts/wiki-version` file the scripts on
+[Installation](installation.md) share.{missing} The check that refuses a wiki synced against another
+release is what catches the two drifting apart.[^version]
+
 ## Repository workflows
 
 Every push to `main` and every pull request runs two workflows in the wiki-builder repository, and a push
