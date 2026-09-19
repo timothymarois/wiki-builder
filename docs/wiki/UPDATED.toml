@@ -80,8 +80,8 @@ digest = "7dc4f10571d2064aa5c9d4320ecba33caa973508eb77b7b2c6cde18dbb951e54"
 audited = "2026-09-14"
 
 ["commands/check"]
-updated = "2026-09-15"
-digest = "bf6c90fcfdcbab4960a8e4f3d256735ee351f49650b91bb8a7a7aeb7f4c36783"
+updated = "2026-09-19"
+digest = "06df730357edc73f1e6fb6025867e40f64e03298b82df8419637e00836eb42a0"
 audited = "2026-09-14"
 
 ["commands/coverage"]

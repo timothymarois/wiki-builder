@@ -12,6 +12,7 @@ fail a build.
 group = "Identity"
 rows = [
   { label = "Command", value = "wiki check", cite = "usage" },
+  { label = "Options", value = "--json, --summary", note = "one or the other", cite = "shape" },
 ]
 
 [[infobox]]
@@ -35,10 +36,60 @@ every push on [Continuous integration](../continuous-integration.md).
 
 ## Usage
 
-It takes only the options every command shares.[^usage]
+Beside the options every command shares, it takes one shape for its report.[^usage]
 ```sh
-wiki check [-h] [--root ROOT] [--wiki WIKI]
+wiki check [-h] [--root ROOT] [--wiki WIKI] [--json | --summary]
 wiki check
+```
+
+## Options
+
+| Option | Meaning |
+|---|---|
+| `--json` | write the problems as one JSON document on standard output, for another tool to read[^shape] |
+| `--summary` | count the problems by the check that found them, instead of listing them[^shape] |
+
+**Neither may be given with the other**, and giving both exits with 2.[^shape]
+
+### --json
+
+The document holds the page count, a record for each problem, and the claims marked as having no source
+in a list of their own.[^json] Each record names the file, the line where the problem has one, the check
+that refused it and the whole sentence.[^record] **A record carries its sentence unchanged**, so a problem
+whose shape the fields do not fit still reads as a sentence rather than arriving cut short.[^record] A claim marked as having no
+source is never among the problems, because it fails nothing.[^json] Nothing else is written, on either
+stream, and two runs of one wiki write the same bytes.[^json]
+
+```json
+{
+  "marks": [],
+  "pages": 3,
+  "problems": [
+    {
+      "file": "thing.md",
+      "line": 22,
+      "message": "thing.md:22: “It says nothing.” states something and cites nothing; give it a reference, or {missing} if there is none",
+      "rule": "uncited"
+    }
+  ]
+}
+```
+
+The check that refused each problem is named by one of `budget`, `picture`, `date`, `citation`,
+`heading`, `pointing`, `dead-link`, `pdf`, `attribution`, `vague-actor`, `empty-word`, `plain-english`,
+`table`, `uncited`, `infobox`, `family` or `version`; a marked claim is named `missing`.[^rules]
+
+### --summary
+
+A count for each check with something to say, most first and by name where two tie, and then the line
+counting pages and problems.[^summary] **A wiki of a few hundred pages prints more lines than a build log
+holds**, and a log that drops its oldest lines drops the problems first.[^summary]
+
+```text
+wiki:    292  family
+wiki:    207  pointing
+wiki:    186  uncited
+wiki: 346 pages, 685 problems
 ```
 
 ## Output
@@ -71,7 +122,19 @@ wiki: 3 pages, 1 problem
 | `2` | an option it does not know[^exit] | `wiki: error: unrecognized arguments: --unknown` |
 
 [^check]: `src/builder/build.py` — `check()` builds into a temporary directory with `record=False`.
-[^usage]: `src/builder/cli.py` — `main()` gives `check` only the shared options.
+[^usage]: `src/builder/cli.py` — `main()` gives `check` the shared options and one mutually exclusive
+    group.
+[^shape]: `src/builder/cli.py` — `main()` puts `--json` and `--summary` in a mutually exclusive group,
+    which argparse refuses both of, exiting 2.
+[^json]: `src/builder/cli.py` — `run()` writes one `json.dumps()` with `sort_keys=True` on standard
+    output and returns before the sentences, the counts and the marks are printed, putting
+    `missing_marks()` under `marks` instead.
+[^record]: `src/builder/build.py` — `problem_record()` reads the file and line from `PROBLEM_PLACE` at the
+    head of the sentence, keeps the sentence whole as `message`, and leaves `file` and `line` empty where
+    it finds none.
+[^rules]: `src/builder/build.py` — `check()` names each producer as it adds it.
+[^summary]: `src/builder/cli.py` — `run()` counts the records by `rule` and prints them sorted by falling
+    count then by name, then the page and problem count.
 [^output]: `src/builder/cli.py` — `run()` prints each problem to standard error, then calls `report()` with
     `citation_counts()`, which prints the budget warning, and prints the count; `src/builder/build.py` —
     `uncited_problems()` and `pointing_problems()` name a sentence's page and line.
