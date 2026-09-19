@@ -1,7 +1,7 @@
 +++
 title = "Report shapes"
 subtitle = "the JSON document and the count per check that wiki check writes for another tool"
-status = "draft"
+status = "approved"
 intent = """
 These shapes exist so that a tool reading a check does not begin by parsing sentences written for a
 person, and so that a build log too short to hold every problem still shows what is wrong. Each should be

@@ -1,7 +1,7 @@
 +++
 title = "References"
 subtitle = "a reference that cites a document rather than the code or an outside service"
-status = "draft"
+status = "approved"
 categories = ["Refusals"]
 intent = """
 This check exists so that a reference leads to something that can settle the claim above it. A citation to
