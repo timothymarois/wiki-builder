@@ -219,8 +219,8 @@ digest = "e6dcfa6deadd093fc2bcb33b1cb27c502aba66cf2dc8d991d1964fc07b6d4ee6"
 audited = "2026-09-14"
 
 ["site/layout/sidebar"]
-updated = "2026-09-17"
-digest = "5f0cc0b210b12e8d3f2d19df69e10b2147498c8b0c64c9ee1b2f36fa0651edab"
+updated = "2026-09-19"
+digest = "dc333c7df889312cffff1e74fe1148c28f79719041387a8e7a0a929acf206506"
 
 ["skill"]
 updated = "2026-09-17"

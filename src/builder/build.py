@@ -34,6 +34,7 @@ from pathlib import Path
 import mistune
 from mistune.util import unikey
 
+from . import __version__
 from .config import WikiError, read_config, read_coverage, CONFIG
 
 # Front matter is TOML between these fences, so it is read by the standard library and costs no parser.
@@ -1048,6 +1049,13 @@ def page_stats(words, cited=None, missing=None):
     return stats
 
 
+# Which release built the site, at the foot of the sidebar and outside the part that scrolls, so a reader
+# looking at a page can tell what made it without finding the repository first. The address is the tool's
+# own, not the project's: the version beside it is the tool's version, and a link to the project's
+# repository is the mark beside the site's name.
+RAIL_FOOT = '<div class="railfoot"><a href="%s">Wiki v%s</a></div>'
+WIKI_REPOSITORY = "https://github.com/timothymarois/wiki-builder"
+
 # The GitHub mark beside the site's name, drawn inline so the site needs no network and no picture file for it.
 GITHUB_LINK = ('<a class="github" href="%s" target="_blank" rel="noopener noreferrer" aria-label="GitHub" '
                'title="GitHub"><svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true">'
@@ -1080,6 +1088,7 @@ def render_page(title, subtitle, hatnote, body_html, infobox, categories_bar, na
         "github": (GITHUB_LINK % html_module.escape(site["github"], quote=True)) if site.get("github") else "",
         "nav": nav,
         "nav_here": nav_here,
+        "rail_foot": RAIL_FOOT % (WIKI_REPOSITORY, __version__),
         "title": html_module.escape(title),
         "subtitle": html_module.escape(subtitle),
         "hatnote": (('      <p class="hat draft"><b>Draft</b> — not approved yet.</p>\n' if draft else "")

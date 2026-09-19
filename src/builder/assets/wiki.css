@@ -65,6 +65,14 @@ code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;backgroun
    scroll bar sits on the rail's edge rather than inside the padding. */
 .rail #nav{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;
   margin:0 calc(-1 * var(--pad-r)) 0 calc(-1 * var(--pad-l));padding:0 var(--pad-r) 24px var(--pad-l)}
+/* Which release built the site, held at the foot of the rail rather than carried down the page list: the
+   list scrolls and this does not, so it is in view on every page and at every scroll position. The line
+   above it reaches both edges, as the lines under the logo and the search box do. */
+.rail-in > .railfoot{flex:none;position:relative;padding:7px 0 8px;font-size:10.5px;color:var(--faint)}
+.railfoot::before{content:"";position:absolute;left:calc(-1 * var(--pad-l));right:calc(-1 * var(--pad-r));
+  top:0;border-top:1px solid var(--border-soft)}
+.railfoot a{color:inherit}
+.railfoot a:hover{color:var(--link)}
 .logo{position:relative;padding:0 0 14px;display:flex;align-items:center;gap:8px}
 .logo .brand{flex:1;min-width:0}
 /* The GitHub mark sits at the right of the site's name, centred on it, quieter than the name until pointed at. */
@@ -97,16 +105,17 @@ code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92em;backgroun
 .res .pp{color:var(--faint)}
 /* A section is set apart from the pages in it: a line above it across the whole rail, and its name in
    small capitals in the text colour. */
-.rail h5{margin:0 calc(-1 * var(--pad-r)) 5px calc(-1 * var(--pad-l));padding:0;
+.rail h5{margin:0 calc(-1 * var(--pad-r)) 0 calc(-1 * var(--pad-l));padding:0;
   border-top:1px solid var(--border-soft);
   font:700 10.5px/1.3 inherit;letter-spacing:.07em;text-transform:uppercase;color:var(--text)}
 .rail #nav > h5:first-child{border-top:0}
 /* The whole header is the control, edge to edge. The padding and the bleed sit on the button rather than
    on the h5: inside the header's padding box the full-bleed strips would look like part of the row and
    take no press, so the row would read as one target and behave as another. A button inherits neither the
-   header's type nor its colour, so both are said again. */
+   header's type nor its colour, so both are said again. The padding is the same above and below: a shut
+   section is a row on its own, and 11px over 5px left its name sitting high in it. */
 .rail h5 button{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;
-  padding:11px var(--pad-r) 5px var(--pad-l);border:0;background:none;color:inherit;font:inherit;
+  padding:8px var(--pad-r);border:0;background:none;color:inherit;font:inherit;
   letter-spacing:inherit;text-transform:inherit;text-align:left;cursor:pointer}
 .rail h5 button:hover{background:var(--shade)}
 /* Inside the edge rather than outside it: #nav scrolls, so an outline drawn past a full-bleed button
@@ -122,7 +131,13 @@ h5.shut .chev{transform:rotate(-90deg)}
 .fold > ul{min-height:0;overflow:hidden}
 h5.shut + .fold{grid-template-rows:0fr}
 h5.shut + .fold > ul{visibility:hidden;transition:visibility 0s linear .2s}
-.rail ul{list-style:none;margin:0 0 14px;padding:0}
+/* The space under a section's pages sits on the last page, inside the box that is clipped, rather than
+   under the list. A grid item's own margin sizes its track, so a margin under the list survived
+   `grid-template-rows: 0fr` and left 14px below every shut section; padding did the same, because it
+   gives the border box a height the track cannot go under. On the last page it collapses with the
+   section and slides with it. */
+.rail ul{list-style:none;margin:0;padding:0}
+.fold > ul > li:last-child{margin-bottom:14px}
 .rail li{margin:0 0 1px}
 .rail li a{display:block;padding:1px 0;font-size:12.8px}
 .rail li a.on{font-weight:700;color:var(--text)}
@@ -384,14 +399,13 @@ pre.src{overflow-x:auto;margin:0;padding:12px 14px;background:var(--surface);
   h1{font-size:23px}
   /* Tap targets: a 12.8px link on one line is about 20px tall, under any reasonable minimum. */
   .rail li a{padding:8px 0;font-size:14px}
-  .rail h5{margin-top:4px}
-  /* The fold ends the list's old adjacency to the next header, so the 14px under a section and the 4px
-     above the next one stopped collapsing into one gap and started adding up. */
-  .fold + h5{margin-top:0}
   /* The page list is hidden here until Menu opens it, so shutting every section would change nothing a
-     reader can see. */
+     reader can see, and the release that built the site belongs with the list rather than above the
+     article. */
   .js .foldall{display:none}
   .js .rail.open .foldall{display:flex}
+  .js .rail-in > .railfoot{display:none}
+  .js .rail.open .rail-in > .railfoot{display:block}
   /* Collapsed only where script can open it again; with scripting off the lists stay where they are. */
   .js .navtoggle{display:block}
   .js .rail #nav{display:none}

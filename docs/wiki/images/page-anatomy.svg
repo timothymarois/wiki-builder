@@ -12,7 +12,9 @@
   <text x="30" y="130" fill="#3366cc">A page</text>
   <text x="46" y="150" fill="#3366cc">Its child</text>
   <text x="30" y="170" fill="#3366cc">Another page</text>
-  <text x="30" y="404" font-size="12" fill="#54595d">Sidebar: nested from paths</text>
+  <text x="30" y="370" font-size="12" fill="#54595d">Sidebar: nested from paths</text>
+  <line x1="16" y1="386" x2="186" y2="386" stroke="#c8ccd1"/>
+  <text x="30" y="406" font-size="11" fill="#72777d">Wiki vX.Y.Z</text>
   <!-- the tabs -->
   <rect x="200" y="16" width="504" height="32" rx="6" fill="#ffffff" stroke="#c8ccd1"/>
   <text x="214" y="37" font-weight="700" fill="#202122">Article</text>
