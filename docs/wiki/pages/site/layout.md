@@ -29,7 +29,9 @@ Every code block has a Copy button in its top right corner.[^copy] A code block 
 narrowed to fit beside it, so its button is never hidden underneath.[^beside] A table in a page is drawn
 as a wiki table, and scrolls inside its own frame when it is wider than the screen.[^table] A list is
 indented and spaced like the references at the foot of the page.[^lists] A link that leaves the wiki
-opens in a new tab and ends in an arrow.[^outside] A flowchart or other diagram written in a `mermaid` code block is drawn as a
+opens in a new tab and ends in an arrow.[^outside] **Every address a page shows is a link**, in its prose
+and its references alike, whether the writer wrote it as a link or left it bare; one inside a code sample
+is left as written.[^addresses] The page's own markdown keeps what the writer typed.[^addresses] A flowchart or other diagram written in a `mermaid` code block is drawn as a
 diagram, the way GitHub draws one, and the page's markdown keeps the block as written.[^diagram] The drawing needs no network,
 and a page loads it only as a diagram nears the screen.[^diagram] How to write one is described on
 [Diagrams](../pages/diagrams.md).
@@ -82,6 +84,9 @@ button.[^narrow]
     before the page is drawn.
 [^pace]: `src/builder/build.py` — `reading_minutes()` divides by `READING_PACE`, 250, and rounds up to a
     whole minute, never fewer than one.
+[^addresses]: `src/builder/build.py` — `autolink_addresses()` wraps each `BARE_ADDRESS` in the page's
+    HTML, skipping anything `ALREADY_MARKED` holds, and `write_site()` calls it on the rendered body
+    before the markdown copy is written from `page["raw"]`.
 [^outside]: `src/builder/build.py` — `rewrite_references()` adds `OUTSIDE` to a link matching
     `OUTSIDE_LINK`; `src/builder/assets/wiki.css` draws the arrow on `a.ext`.
 [^narrow]: `src/builder/assets/wiki.css` — the rules under `max-width: 900px`; `src/builder/assets/wiki.js`
