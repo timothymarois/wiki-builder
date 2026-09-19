@@ -1,6 +1,6 @@
 +++
 title = "Sidebar"
-subtitle = "the page tree, the sections a reader shuts, and what the browser remembers"
+subtitle = "the page tree, the sections a reader shuts, the release at its foot, and what the browser remembers"
 status = "approved"
 intent = """
 The sidebar exists so that a reader can see where they are in the wiki and reach any other page from
@@ -15,13 +15,15 @@ rows = [
   { label = "Stored", value = "the sections a reader shut", cite = "stored" },
   { label = "Direct arrival", value = "opens the page's own section", cite = "arrival" },
   { label = "Page list", value = "scrolls on its own", note = "logo and search stay put", cite = "rail" },
+  { label = "Foot", value = "the release that built the site", note = "outside the part that scrolls", cite = "foot" },
 ]
 +++
 
 The sidebar holds the whole wiki, with the site's name and the search box above the page list.[^rail] **The
 sidebar is exactly the window's height and never scrolls as a whole**: only the list beneath the search box
-scrolls, and scrolling it never moves the article.[^rail] The rest of the layout is described on
-[Layout](../layout.md).
+scrolls, and scrolling it never moves the article.[^rail] Below that list, outside what scrolls, is the
+release of wiki-builder that drew the page, linking the tool's own repository.[^foot] The rest of the
+layout is described on [Layout](../layout.md).
 
 ## Page tree
 
@@ -33,8 +35,10 @@ section, whose name is in capitals, and the scroll bar sits at the edge.[^sectio
 ## Sections
 
 **A section's name is a button across the full width of the sidebar**, with a mark at its right that turns
-as the section shuts.[^control] Pressing it slides that section's pages up or down.[^slide] A shut section
-is out of reach of the keyboard as well as out of sight, so tabbing through the sidebar walks past
+as the section shuts.[^control] Pressing it slides that section's pages up or down.[^slide] **A shut
+section takes up no more than its own name**, because the space under a section's pages sits on the last
+page rather than under the list, where it sized the box the slide shuts and stayed behind.[^space] A shut
+section is out of reach of the keyboard as well as out of sight, so tabbing through the sidebar walks past
 it.[^slide] The button beside the search box shuts every section at once, and opens every section once all
 of them are shut.[^all] No section may go without a name, and no two may share one, because the name is
 what a section is remembered by.[^named]
@@ -77,6 +81,13 @@ arriving: a section just shut stays shut.[^arrival]
 [^all]: `src/builder/assets/template.html` — the `foldall` button stands beside the search box;
     `src/builder/assets/wiki.js` — its click shuts every section, or opens every one when all are shut,
     and `showFoldAll()` names which it will do next.
+[^space]: `src/builder/assets/wiki.css` — `.fold > ul > li:last-child` carries the space under a section,
+    and `.rail ul` carries none, because a grid item's own margin sizes the track `grid-template-rows: 0fr`
+    shuts; `.rail h5 button` pads the header equally above and below.
+[^foot]: `src/builder/build.py` — `render_page()` fills `rail_foot` with `RAIL_FOOT` and
+    `WIKI_REPOSITORY`, naming `__version__`; `src/builder/assets/template.html` — the hole sits after
+    `<div id="nav">` and inside `.rail-in`; `src/builder/assets/wiki.css` — `.rail-in > .railfoot` is
+    `flex: none`, so the list scrolls and it does not.
 [^named]: `src/builder/config.py` — `read_config()` refuses a section with no title, and two sections that
     share one.
 [^stored]: `src/builder/build.py` — `render_page()` fills `nav_key` with `wiki-nav-shut:` and the site's

@@ -1580,6 +1580,53 @@ class WikiTests(unittest.TestCase):
         self.assertIn("grid-template-rows:0fr", style, "a section is not shut by the stylesheet")
         self.assertIn("visibility:hidden", style, "a shut section keeps its links focusable")
 
+    def test_the_sidebar_names_the_release_that_built_the_site(self):
+        """The foot of the sidebar says which release drew the page, and links the tool it came from.
+
+        It sits outside the part that scrolls, so a reader deep in a long page list still has it, and a
+        page built by an older release can be told from one built by a newer without reading wiki.toml.
+        A reader outside the team sees it too: it carries no reference and names nothing internal.
+        """
+        self.write("thing", PAGE.replace('categories = ["Things"]',
+                                         'categories = ["Things"]\naudience = "user"'))
+        footer = ('<div class="railfoot"><a href="https://github.com/timothymarois/wiki-builder">'
+                  "Wiki v%s</a></div>" % wiki.__version__)
+        # A user build writes only the pages marked for users, so each audience is read where it lands.
+        for audience, name in (("internal", "index.html"), ("user", "thing/index.html")):
+            with self.subTest(audience=audience):
+                self.build(audience)
+                page = (self.out / name).read_text(encoding="utf-8")
+                self.assertIn(footer, page,
+                              "the sidebar does not name the release that built the site")
+                # Outside #nav and inside the rail: in #nav it would scroll away with the pages.
+                rail = page[page.index('<div class="rail-in">'):page.index("</div></nav>")]
+                self.assertLess(rail.index('<div id="nav">'), rail.index('class="railfoot"'),
+                                "the release sits inside the page list, so it scrolls away")
+
+    def test_a_shut_section_takes_up_no_more_than_its_header(self):
+        """The space under a section's pages collapses with the section, so a shut one is a row.
+
+        A margin under the list, or padding inside it, sizes the grid track that the slide shuts, and
+        left 14px below every shut section -- a sidebar of nine shut sections carried 126px of nothing.
+        The space belongs to the last page instead, inside the box the slide clips.
+        """
+        self.build()
+        style = (self.out / "assets/wiki.css").read_text(encoding="utf-8")
+        self.assertIn(".fold > ul > li:last-child{margin-bottom:14px}", style,
+                      "the space under a section is not on the last page in it")
+        self.assertNotRegex(style, r"\.rail ul\{[^}]*margin:0 0 14px",
+                            "the space under a section is back on the list, where the slide cannot shut it")
+        self.assertNotRegex(style, r"\.fold > ul\{[^}]*padding-bottom",
+                            "padding inside the list gives the shut section a height it cannot go under")
+
+    def test_a_section_header_is_padded_evenly(self):
+        # A shut section is a row on its own, and uneven padding left its name sitting high in it.
+        self.build()
+        style = (self.out / "assets/wiki.css").read_text(encoding="utf-8")
+        self.assertIn("padding:8px var(--pad-r);", style, "a section header is not padded evenly")
+        self.assertRegex(style, r"\.rail h5\{margin:0 calc\(-1 \* var\(--pad-r\)\) 0 ",
+                         "the header keeps a bottom margin, which a shut section cannot shed")
+
     def test_a_child_page_shows_the_pages_above_it_as_a_trail(self):
         # A reader on a child page, on a narrow screen especially, sees where it sits and can climb back up.
         # A top page has nothing above it, so it shows no trail.

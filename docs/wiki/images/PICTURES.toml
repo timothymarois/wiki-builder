@@ -6,6 +6,6 @@
 # when the change did not alter what the picture shows.
 
 ["page-anatomy.svg"]
-digest = "sha256:feffca0aa79b0f4fee3f0280d2e1e3e8f9f7668b7f8c36e19b443d7202ef407d"
+digest = "sha256:efa902749a4002092b0a83d41487aba67ac60bff9f92cecc261fefd1a8dc44a8"
 depicts = ["src/builder/assets/template.html"]
-blessed = "the search row gained the button that shuts every section and a section header gained its chevron; the picture was redrawn to show both"
+blessed = "the sidebar gained a foot naming the release that built the site, outside the part that scrolls; the picture was redrawn to show it"
