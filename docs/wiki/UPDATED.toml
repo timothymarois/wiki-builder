@@ -207,7 +207,7 @@ updated = "2026-09-17"
 digest = "6d77ce93d8328bd45f72553a5b84c7d843c452590ed81432af234ea208b4865d"
 
 ["serving"]
-updated = "2026-09-17"
+updated = "2026-09-19"
 digest = "3c2865db5acad0e1a755c0f13839563500368c3e3591b3ca4c34207e5865bd4c"
 audited = "2026-09-14"
 
@@ -222,8 +222,8 @@ digest = "56a0a505720363060a6b12bb9c22bfc4c69bea4907dce014a95fed5577f78dc5"
 audited = "2026-09-14"
 
 ["site/layout"]
-updated = "2026-09-17"
-digest = "e6dcfa6deadd093fc2bcb33b1cb27c502aba66cf2dc8d991d1964fc07b6d4ee6"
+updated = "2026-09-19"
+digest = "f54500d2049989fe476fa0351708250cea253ff10d07b810b8248f5f2b214e51"
 audited = "2026-09-14"
 
 ["site/layout/sidebar"]

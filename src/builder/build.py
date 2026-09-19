@@ -404,6 +404,36 @@ def footnote_reference(renderer, key, index):
     return CITATION % (index, index)
 
 
+# An address written bare, rather than as `[title](address)` or between angle brackets, which are the two
+# forms markdown links on its own. A bare one renders as text a reader cannot follow -- one wiki published
+# 2,009 of them, 82% of its references. Only a scheme starts one: linking `docs.example.com` on sight
+# would mark up prose that was never an address. `&amp;` is a character of the address rather than the end
+# of it, because a query string carries ampersands and the page's HTML has already escaped them.
+BARE_ADDRESS = re.compile(r"""https?://(?:&amp;|[^\s<>()\[\]"'&])+""")
+# What an address must not be wrapped inside: a link it already has, and code, which shows text as written.
+ALREADY_MARKED = re.compile(r"<a\b[^>]*>.*?</a>|<(code|pre)\b[^>]*>.*?</\1>", re.S)
+
+
+def autolink_addresses(markup):
+    """Make every bare address on a page clickable, leaving one already linked or shown as code alone.
+
+    Done to the page's HTML rather than to its markdown, so what the writer typed is what the source view
+    and the markdown copy still show. Trailing punctuation is handed back: an address ending a sentence
+    keeps its full stop outside the link.
+    """
+    def wrap(found):
+        address = found.group(0)
+        trimmed = address.rstrip(".,;:!?")
+        return '<a href="%s">%s</a>%s' % (trimmed, trimmed, address[len(trimmed):])
+
+    parts, last = [], 0
+    for marked in ALREADY_MARKED.finditer(markup):
+        parts += [BARE_ADDRESS.sub(wrap, markup[last:marked.start()]), marked.group(0)]
+        last = marked.end()
+    parts.append(BARE_ADDRESS.sub(wrap, markup[last:]))
+    return "".join(parts)
+
+
 def footnote_item(renderer, text, key, index):
     return '<li id="cite-%d">%s</li>\n' % (index, text.rstrip())
 
@@ -1387,6 +1417,10 @@ def write_site(root, out, audience, link_root, today, record, wiki, sitemap=Fals
             page["raw"] += ("\n<!-- Every intent below this page's own text is collected from the other\n"
                             "     pages when the wiki is built, and is not written here. -->\n")
         body = LONE_FIGURE.sub(r"\1", body)
+        # Every address the page shows, in its prose and in its references alike, is a link a reader can
+        # follow. Before the rewrites below, so a diagram's source and a code sample are still inside the
+        # <pre> that keeps them out of it.
+        body = autolink_addresses(body)
         # A mermaid block is a diagram, not a sample: Mermaid draws what it finds in a pre.mermaid, and only
         # a page carrying one loads the script.
         body, diagrams = MERMAID_BLOCK.subn(r'<pre class="mermaid">\1</pre>', body)

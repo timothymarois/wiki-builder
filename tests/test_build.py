@@ -1205,6 +1205,74 @@ class WikiTests(unittest.TestCase):
         self.assertIn("</table></div>", page)
         self.assertNotIn("<table>", page)
 
+    # --- addresses a reader can follow ------------------------------------------------------------
+
+    # A body, and the addresses the built page must make clickable.
+    ADDRESSES = (
+        ("a bare address in prose", "It is at https://example.com/guide there.[^why]",
+         ["https://example.com/guide"]),
+        ("an address ending a sentence", "It is at https://example.com/guide.[^why]",
+         ["https://example.com/guide"]),
+        ("a query string", "It is at https://example.com/g?a=1&b=2 there.[^why]",
+         ["https://example.com/g?a=1&amp;b=2"]),
+        ("an address already linked", "It is [there](https://example.com/guide).[^why]",
+         ["https://example.com/guide"]),
+        ("an address in angle brackets", "It is at <https://example.com/guide>.[^why]",
+         ["https://example.com/guide"]),
+        ("an address shown as code", "The setting is `https://example.com/guide`.[^why]", []),
+        ("two addresses on one line",
+         "It is at https://a.example/x and https://b.example/y.[^why]",
+         ["https://a.example/x", "https://b.example/y"]),
+    )
+
+    def test_every_address_a_page_shows_is_a_link(self):
+        """A bare address published as text a reader could see and not follow.
+
+        Markdown links `[title](address)` and the angle-bracket form and leaves a bare one alone, so a
+        wiki whose notes were written with the address bare published 2,009 of them unclickable -- 82% of
+        its references. Nothing refused them, because a reference that links nothing is not a reference
+        that links the wrong thing.
+        """
+        for case, prose, expected in self.ADDRESSES:
+            with self.subTest(case):
+                self.write("thing", PAGE.replace("It does it slowly.[^why]", prose))
+                self.build()
+                page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+                found = [address for address in re.findall(r'<a [^>]*href="([^"]*)"', page)
+                         if "example" in address]
+                self.assertEqual(expected, found, page[page.index("<article"):][:400])
+
+    def test_an_address_in_a_reference_is_a_link(self):
+        # Where it cost the most: a reference naming a publisher, a title and a bare address.
+        self.write("thing", PAGE.replace("[^why]: The reason — `Source/Thing.h`.",
+                                         "[^why]: Publisher — Title — https://example.com/guide"))
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        cites = page[page.index('class="cites"'):]
+        self.assertIn('href="https://example.com/guide"', cites,
+                      "the address in the reference is not a link")
+        # And it is treated as any other outside link: a new tab, and nofollow.
+        self.assertRegex(cites, r'<a href="https://example\.com/guide"[^>]*target="_blank"')
+
+    def test_an_address_in_a_code_sample_is_left_as_written(self):
+        # A sample is the thing itself. Linking an address inside one changes what it shows.
+        self.write("thing", PAGE.replace("It does it slowly.[^why]",
+                                         "Type it.[^why]\n\n```sh\ncurl https://example.com/guide\n```"))
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertIn("curl https://example.com/guide", page)
+        self.assertNotIn('href="https://example.com/guide"', page)
+
+    def test_a_page_keeps_the_address_as_it_was_written(self):
+        # The link is made in the page's HTML, so the source view and the markdown copy still show what
+        # the writer typed.
+        self.write("thing", PAGE.replace("It does it slowly.[^why]",
+                                         "It is at https://example.com/guide there.[^why]"))
+        self.build()
+        copy = (self.out / "thing/index.md").read_text(encoding="utf-8")
+        self.assertIn("It is at https://example.com/guide there.", copy)
+        self.assertNotIn("<a href", copy)
+
     # --- tables the renderer will not draw ------------------------------------------------------
 
     SOUND_TABLE = "| a | b |\n|---|---|\n| c[^why] | d |"
