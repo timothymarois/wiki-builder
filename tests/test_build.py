@@ -2938,8 +2938,8 @@ Every page, with its sources and dates.
 
     # --- the command line ---------------------------------------------------------------------------
 
-    def run_main(self, argv):
-        """The entry point a project's wrapper actually calls, and the status it acts on.
+    def run_streams(self, argv):
+        """The entry point a project's wrapper calls, with what it wrote to each stream kept apart.
 
         Nothing `main` should catch is caught here: a problem that escaped it would reach a person as a
         traceback, and a helper that tidied it away would hide exactly that.
@@ -2953,7 +2953,102 @@ Every page, with its sources and dates.
             except SystemExit as refused:
                 # argparse refuses a command line by exiting, which is how a person meets it too.
                 status = refused.code
-        return status, out.getvalue() + err.getvalue()
+        return status, out.getvalue(), err.getvalue()
+
+    def run_main(self, argv):
+        """The same, as one piece of output, for a case that does not care which stream carried it."""
+        status, out, err = self.run_streams(argv)
+        return status, out + err
+
+    # --- what another tool reads ----------------------------------------------------------------
+
+    def broken(self, prose="It says nothing."):
+        """A wiki breaking two different rules, so a shape that only parses cannot pass for one that tags.
+
+        Built first, so the dates are recorded and the only problems are the two written in on purpose.
+        """
+        self.write("thing", PAGE.replace("It does it slowly.[^why]", prose)
+                   .replace("## Ground", "## How it works"))
+        self.build()
+        return self.line_of("thing", prose)
+
+    def test_check_json_names_the_file_line_and_rule_of_each_problem(self):
+        """Everything is prose today, so triaging a large wiki starts with a regex over sentences.
+
+        The fields are an addition to the sentence, not a replacement: the message stays whole, so a
+        producer whose shape the parse does not know still yields something a person can read.
+        """
+        line = self.broken()
+        import json
+        status, out, err = self.run_streams(["--root", str(self.root), "check", "--json"])
+        self.assertEqual(1, status, out + err)
+        document = json.loads(out)
+        rules = {record["rule"] for record in document["problems"]}
+        self.assertEqual({"uncited", "heading"}, rules, document["problems"])
+        uncited = [record for record in document["problems"] if record["rule"] == "uncited"]
+        self.assertEqual(1, len(uncited), uncited)
+        self.assertEqual("thing.md", uncited[0]["file"])
+        self.assertEqual(line, uncited[0]["line"])
+        self.assertIn("cites nothing", uncited[0]["message"])
+        self.assertEqual(3, document["pages"])
+
+    def test_check_json_writes_one_document_and_nothing_else(self):
+        # Half a document is worse than none: a consumer parses the whole of stdout or fails loudly.
+        import json
+        self.broken()
+        status, out, err = self.run_streams(["--root", str(self.root), "check", "--json"])
+        json.loads(out)
+        self.assertEqual("", err, "a --json run wrote to standard error as well")
+        self.assertNotIn("wiki:", out, "the sentences for a person are in the document too")
+        self.assertNotIn(str(self.root), out, "a record carries an absolute path")
+
+    def test_check_json_keeps_the_marks_apart_from_the_problems(self):
+        # A mark is an answer, not a problem. Merged in, every {missing} would fail a gate keyed on them.
+        import json
+        self.write("thing", PAGE.replace("It does it slowly.[^why]", "It is not known. {missing}"))
+        self.build()
+        status, out, _ = self.run_streams(["--root", str(self.root), "check", "--json"])
+        self.assertEqual(0, status, out)
+        document = json.loads(out)
+        self.assertEqual([], document["problems"])
+        self.assertTrue(document["marks"], "the marked claim is in neither list")
+        self.assertEqual("missing", document["marks"][0]["rule"])
+        self.assertEqual("thing.md", document["marks"][0]["file"])
+
+    def test_check_json_is_the_same_twice(self):
+        self.broken()
+        first = self.run_streams(["--root", str(self.root), "check", "--json"])[1]
+        second = self.run_streams(["--root", str(self.root), "check", "--json"])[1]
+        self.assertEqual(first, second)
+        self.assertTrue(first.strip(), "an empty document cannot prove it was written twice")
+
+    def test_check_summary_counts_the_problems_by_the_check_that_found_them(self):
+        """A wiki of a few hundred pages prints more lines than a build log keeps.
+
+        A 346-page wiki printed 19,824 lines into a build log that kept 521, so the line saying what
+        broke was never seen. The count is as many lines as there are checks with something to say.
+        """
+        self.broken()
+        status, out, err = self.run_streams(["--root", str(self.root), "check", "--summary"])
+        self.assertEqual(1, status, out + err)
+        counted = [line.split() for line in err.strip().splitlines()]
+        self.assertEqual([["wiki:", "1", "heading"], ["wiki:", "1", "uncited"]], counted, err)
+        self.assertIn("3 pages, 2 problems", out)
+        # The sentences themselves are what it replaces.
+        self.assertNotIn("cites nothing", err)
+
+    def test_check_summary_puts_the_commonest_first(self):
+        # The shape of the work is the point: what to fix first has to be the first line.
+        self.broken("It says nothing. It says less.")
+        _, _, err = self.run_streams(["--root", str(self.root), "check", "--summary"])
+        self.assertEqual(["wiki: 2 uncited", "wiki: 1 heading"],
+                         [" ".join(line.split()) for line in err.strip().splitlines()], err)
+
+    def test_check_takes_one_shape_or_the_other(self):
+        # Both at once has no meaning, and picking one silently would hide which was obeyed.
+        status, out, err = self.run_streams(["--root", str(self.root), "check", "--json", "--summary"])
+        self.assertEqual(2, status)
+        self.assertIn("not allowed with argument --json", err)
 
     def test_a_build_that_stopped_partway_does_not_block_the_next(self):
         # A build that stops on one page has already written the pages before it. The next build must know

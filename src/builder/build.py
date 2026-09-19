@@ -2610,7 +2610,27 @@ def families_report(root, wiki=None):
     return lines
 
 
-def check(root, wiki=None, version=None):
+# What every producer already writes at the head of its sentence: the file the problem is on, then the
+# line when it has one. Nothing here is invented -- a sentence that names no file carries none in its
+# record, rather than having one guessed for it.
+PROBLEM_PLACE = re.compile(r"^(?P<file>\S+\.\w+)(?::(?P<line>\d+))?:?\s")
+
+
+def problem_record(rule, problem):
+    """One problem as another tool reads it: where it is, which check refused it, and the sentence.
+
+    The sentence is kept whole, head included, rather than cut into the fields beside it. The fields are
+    an addition, so a producer whose shape this does not recognise still yields a record a person can read
+    instead of a mangled one.
+    """
+    found = PROBLEM_PLACE.match(problem)
+    return {"file": found.group("file") if found else None,
+            "line": int(found.group("line")) if found and found.group("line") else None,
+            "rule": rule,
+            "message": problem}
+
+
+def check(root, wiki=None, version=None, records=None):
     """Every reason the wiki is not fit to read, as sentences rather than a diff.
 
     The rendered site is not committed -- it is built before it is served, so it cannot be stale and
@@ -2626,27 +2646,37 @@ def check(root, wiki=None, version=None):
         pdf_links = []
         counts, goals_words, budget, _ = build(root, Path(work) / "site", "internal",
                                                wiki / "site", record=False, wiki_dir=wiki, pdf_links=pdf_links)
-        problems += budget_problems(counts, goals_words, budget)
-        problems += picture_problems(root, wiki)
-        problems += date_problems(root, wiki)
-        problems += citation_problems(root, wiki)
-        problems += heading_problems(root, wiki)
-        problems += pointing_problems(root, wiki)
-        problems += dead_link_problems(root, wiki)
-        problems += pdf_problems(root, wiki, pdf_links)
-        problems += attribution_problems(root, wiki)
-        problems += vague_actor_problems(root, wiki)
-        problems += empty_word_problems(root, wiki)
-        problems += plain_english_problems(root, wiki)
+        def add(rule, found):
+            """Keep one check's problems, and a record of each naming the check that refused it.
+
+            The rule comes from here rather than from the sentence, because the aggregator is the only
+            place that knows which check produced which problems without every producer being rewritten.
+            """
+            problems.extend(found)
+            if records is not None:
+                records.extend(problem_record(rule, problem) for problem in found)
+
+        add("budget", budget_problems(counts, goals_words, budget))
+        add("picture", picture_problems(root, wiki))
+        add("date", date_problems(root, wiki))
+        add("citation", citation_problems(root, wiki))
+        add("heading", heading_problems(root, wiki))
+        add("pointing", pointing_problems(root, wiki))
+        add("dead-link", dead_link_problems(root, wiki))
+        add("pdf", pdf_problems(root, wiki, pdf_links))
+        add("attribution", attribution_problems(root, wiki))
+        add("vague-actor", vague_actor_problems(root, wiki))
+        add("empty-word", empty_word_problems(root, wiki))
+        add("plain-english", plain_english_problems(root, wiki))
         # Before the citation checks: a table the renderer threw away still cites correctly as markdown,
         # so their silence about it is the thing that needs explaining first.
-        problems += table_problems(root, wiki)
-        problems += uncited_problems(root, wiki)
-        problems += infobox_problems(root, wiki)
-        problems += family_problems(root, wiki)
+        add("table", table_problems(root, wiki))
+        add("uncited", uncited_problems(root, wiki))
+        add("infobox", infobox_problems(root, wiki))
+        add("family", family_problems(root, wiki))
         if version:
             site, _, _ = read_config(wiki)
-            problems += version_problems(site, version)
+            add("version", version_problems(site, version))
     return problems, counts, goals_words, budget
 
 

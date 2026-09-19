@@ -6,13 +6,14 @@ first silently won.
 """
 
 import argparse
+import json
 import shutil
 import sys
 from pathlib import Path
 
 from . import __version__
 from .build import (ASSETS, SITEMAP, SKILL, audit, bless, build, check, citation_counts, coverage,
-                    families_report, missing_marks, report, wiki_of)
+                    families_report, missing_marks, problem_record, report, wiki_of)
 from .config import CONFIG, WikiError, read_config, record_version
 from .serve import serve
 
@@ -103,7 +104,15 @@ def main(argv=None):
     commands = parser.add_subparsers(dest="command")
 
     commands.add_parser("build", parents=[place], help="render the pages into the site")
-    commands.add_parser("check", parents=[place], help="every reason the wiki is not fit to read")
+    checked = commands.add_parser("check", parents=[place],
+                                  help="every reason the wiki is not fit to read")
+    # A wiki of a few dozen pages prints more lines than a build log keeps, and the line saying what
+    # broke is the one that scrolls away. Both of these are the same list, said shorter.
+    shape = checked.add_mutually_exclusive_group()
+    shape.add_argument("--json", action="store_true",
+                       help="write the problems as one JSON document on stdout, for another tool to read")
+    shape.add_argument("--summary", action="store_true",
+                       help="count the problems by the check that found them, instead of listing them")
     commands.add_parser("coverage", parents=[place], help="list the source files no page cites")
     commands.add_parser("families", parents=[place],
                         help="list the child pages that share no declared layout")
@@ -188,15 +197,38 @@ def run(args, root, wiki):
         return 0
 
     if command == "check":
-        problems, counts, goals_words, budget = check(root, wiki, __version__)
+        # Both shapes are the same list said differently, and both need to know which check refused
+        # what, which only the aggregator can say.
+        records = [] if args.json or args.summary else None
+        problems, counts, goals_words, budget = check(root, wiki, __version__, records)
+        pages = "wiki: %d page%s, %d problem%s" % (len(counts), "" if len(counts) == 1 else "s",
+                                                   len(problems), "" if len(problems) == 1 else "s")
+        if args.json:
+            # One document on stdout and nothing else: half a document is worse than none, and the word
+            # counts and the budget warning are written for a person reading a terminal. The marks are
+            # kept apart from the problems, because a mark is an answer and fails nothing.
+            marks = [problem_record("missing", mark) for mark in missing_marks(root, wiki)]
+            print(json.dumps({"pages": len(counts), "problems": records, "marks": marks},
+                             indent=2, sort_keys=True))
+            return 1 if problems else 0
+        if args.summary:
+            # Counted by the check that refused them, most first and by name where two tie. A wiki of a
+            # few hundred pages prints more lines than a build log keeps, and the line that says what
+            # broke is the one it drops; this says the same thing in as many lines as there are checks.
+            counted = {}
+            for record in records:
+                counted[record["rule"]] = counted.get(record["rule"], 0) + 1
+            for rule, count in sorted(counted.items(), key=lambda pair: (-pair[1], pair[0])):
+                print("wiki: %6d  %s" % (count, rule), file=sys.stderr)
+            print(pages)
+            return 1 if problems else 0
         for problem in problems:
             print("wiki: " + problem, file=sys.stderr)
         # Not problems: each is an answer, and together they are the work that remains.
         for mark in missing_marks(root, wiki):
             print("wiki: " + mark)
         report(counts, goals_words, budget, citations=citation_counts(root, wiki))
-        print("wiki: %d page%s, %d problem%s" % (len(counts), "" if len(counts) == 1 else "s",
-                                                len(problems), "" if len(problems) == 1 else "s"))
+        print(pages)
         return 1 if problems else 0
 
     out = {"publish": lambda: args.out.resolve(),
