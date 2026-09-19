@@ -65,6 +65,7 @@ flowchart LR
 | Refused | Described on |
 |---|---|
 | A sentence that cites nothing, or a reference to a document[^cited] | [Citations](checks/citations.md) |
+| A table the renderer will not draw as a table[^tables] | [Tables](checks/tables.md) |
 | An infobox row that cites nothing[^rows] | [Citations](checks/citations.md) |
 | A heading that asks a question, rates its contents or points at the page[^headings] | [Headings](checks/headings.md) |
 | A name or sentence that points at the page, hides who acts, attributes a rule to a person or carries no fact[^wording] | [Wording](checks/wording.md) |
@@ -90,6 +91,7 @@ sentence, and the command exits with 1.[^caught]
     returns 2 when there is no wiki.
 [^cited]: `src/builder/build.py` — `uncited_problems()` and `citation_problems()`.
 [^rows]: `src/builder/build.py` — `infobox_problems()`.
+[^tables]: `src/builder/build.py` — `table_problems()`.
 [^headings]: `src/builder/build.py` — `heading_problems()`.
 [^wording]: `src/builder/build.py` — `pointing_problems()`, `vague_actor_problems()`,
     `attribution_problems()` and `empty_word_problems()`.

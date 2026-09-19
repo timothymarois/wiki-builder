@@ -1173,6 +1173,94 @@ class WikiTests(unittest.TestCase):
         self.assertIn("</table></div>", page)
         self.assertNotIn("<table>", page)
 
+    # --- tables the renderer will not draw ------------------------------------------------------
+
+    SOUND_TABLE = "| a | b |\n|---|---|\n| c[^why] | d |"
+
+    def table(self, rows):
+        """A page whose one table is the rows given, in place of the page's second sentence."""
+        self.write("thing", PAGE.replace("It does it slowly.[^why]", "| a | b |\n|---|---|\n" + rows))
+        return wiki.table_problems(self.root)
+
+    def test_a_row_carrying_text_after_its_last_pipe_is_refused(self):
+        """The mark landed past the closing pipe, the row fell out of the table, and the check stayed green.
+
+        Every other check reads the markdown, where the row is still a row that cites its source, so a
+        page could render as a paragraph of raw pipes and pass the gate that exists to stop exactly that.
+        """
+        problems = self.table("| c[^why] | d | {missing}")
+        self.assertEqual(1, len(problems), problems)
+        self.assertTrue(problems[0].startswith(
+            "thing.md:%d: " % self.line_of("thing", "| c[^why] | d | {missing}")), problems[0])
+        self.assertIn("carries text after its last |", problems[0])
+        # The renderer really does drop it: the table is drawn with no body row at all.
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertIn("<tbody></tbody>", page.replace("\n", "").replace(" ", ""),
+                      "the row did not fall out, so this is no longer the failure being caught")
+
+    def test_a_row_with_the_wrong_number_of_cells_is_refused(self):
+        # A ragged row does not lose only itself: the renderer throws the whole table away.
+        for rows, says in (("| e[^why] |", "has 1 cell where its header has 2"),
+                           ("| c[^why] | d | e |", "has 3 cells where its header has 2")):
+            with self.subTest(rows=rows):
+                problems = self.table(rows)
+                self.assertEqual(1, len(problems), problems)
+                self.assertIn(says, problems[0])
+                self.assertIn("give the row 2 cells", problems[0])
+
+    def test_a_sound_table_is_left_alone(self):
+        # In one case with a broken one, so an empty result cannot pass for a check that ran.
+        self.assertEqual([], self.table("| c[^why] | d |"))
+        self.assertNotEqual([], self.table("| c[^why] | d | e |"),
+                            "the check found nothing wrong with a table the renderer refuses")
+
+    def test_a_table_in_a_code_sample_is_not_checked(self):
+        # A sample showing a broken table is the thing itself, not a claim, and the renderer never sees it.
+        broken = "```md\n| a | b |\n|---|---|\n| e |\n```"
+        self.write("thing", PAGE.replace("It does it slowly.[^why]", broken))
+        self.assertEqual([], wiki.table_problems(self.root))
+        self.write("thing", PAGE.replace("It does it slowly.[^why]", broken.replace("```md\n", "").replace("\n```", "")))
+        self.assertNotEqual([], wiki.table_problems(self.root), "the same table outside a fence passed")
+
+    def test_a_broken_table_is_found_on_a_wiki_that_also_has_written_ones(self):
+        """The health table and a family's member table are written after the page is rendered.
+
+        The check renders each page's own markdown, so neither is in what it counts. What this proves is
+        that a wiki carrying both still has a page's own broken table named, and that the written tables
+        raise nothing of their own.
+        """
+        # [family] goes after the last top-level key: put in the middle, it swallows the keys below it
+        # into its own table, and the page silently stops having an intent or a family at all.
+        family = ('"""\n\n[family]\nheadings = ["Speed", "Ground"]\nlabels = ["Held to", "Today"]\n'
+                  'table = ["Held to"]')
+        self.write("health", INDEX.replace("Front", "Health").replace("the front", "every page"))
+        self.nav(CONFIGURATION.replace('pages = ["index", "goals"]', 'pages = ["index", "goals", "health"]')
+                 .replace('pages = ["thing"]', 'pages = ["thing"]'))
+        self.write("thing", PAGE.replace("It does it slowly.[^why]", "{family-table}")
+                   .replace('"""\n\n[[infobox]]', family + "\n\n[[infobox]]", 1))
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        self.build()
+        # Both tables are really on the built pages, or this proves nothing about leaving them out.
+        self.assertIn('class="w family"', (self.out / "thing/index.html").read_text(encoding="utf-8"),
+                      "the family table was not drawn, so the case does not cover it")
+        self.assertIn('class="w health"', (self.out / "health/index.html").read_text(encoding="utf-8"),
+                      "the health table was not drawn, so the case does not cover it")
+        self.assertEqual([], wiki.table_problems(self.root))
+        # And a page's own broken table is still found on the same wiki.
+        self.write("thing/part", PAGE.replace("A thing", "A part")
+                   .replace("It does it slowly.[^why]", "| a | b |\n|---|---|\n| e |"))
+        problems = wiki.table_problems(self.root)
+        self.assertEqual(1, len(problems), problems)
+        self.assertTrue(problems[0].startswith("thing/part.md:"), problems[0])
+
+    def test_check_names_a_table_the_renderer_will_not_draw(self):
+        # Through the command, because the gate is what a project runs.
+        self.table("| c[^why] | d | {missing}")
+        status, output = self.run_main(["--root", str(self.root), "check"])
+        self.assertEqual(1, status, output)
+        self.assertIn("carries text after its last |", output)
+
     def test_a_count_of_one_is_singular(self):
         # "1 pages written" and "1 problems" were printed by every one-page build and one-problem check.
         self.write("thing", PAGE.replace('categories = ["Things"]', 'categories = ["Things"]\naudience = "user"'))

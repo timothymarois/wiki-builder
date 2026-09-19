@@ -9,8 +9,8 @@ updated = "2026-09-17"
 digest = "fe6f4fcaa7361544d74652524d6bf453b932f1ec19d69ff811af2faae927cfc5"
 
 ["checks"]
-updated = "2026-09-17"
-digest = "c46c594f02b5e3d71e961fc259f8bb8783661534d1b6544ad5d12fbf3332bf25"
+updated = "2026-09-19"
+digest = "aada0cd05e014e0ee732e3fc7cfc1484988c18aabba89ddf1c9e31c94437f55b"
 audited = "2026-09-14"
 
 ["checks/budgets"]
@@ -41,6 +41,10 @@ digest = "bcab4f8508722d58e1f5a59709302a7caa295a0ff1bd0fdecc8c34949dffbb22"
 updated = "2026-09-15"
 digest = "bf7be5aa76dbb391da83a092db252d1b5e98c16fd3b5a87def206231043cf9de"
 audited = "2026-09-14"
+
+["checks/tables"]
+updated = "2026-09-19"
+digest = "d877db219d527d8aa1e1fdf381fb320f3a43ecbab7557d11a54146d29734b58e"
 
 ["checks/wording"]
 updated = "2026-09-17"
