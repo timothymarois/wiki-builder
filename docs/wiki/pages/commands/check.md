@@ -53,11 +53,10 @@ wiki check
 
 ### --json
 
-The document holds the page count, a record for each problem, and the claims marked as having no source
-in a list of their own.[^json] Each record names the file, the line where the problem has one, the check
-that refused it and the whole sentence.[^record] **A record carries its sentence unchanged**, so a problem
-whose shape the fields do not fit still reads as a sentence rather than arriving cut short.[^record] A claim marked as having no
-source is never among the problems, because it fails nothing.[^json] Nothing else is written, on either
+The document holds the page count, a record for each problem, and the marked claims in a list of their
+own.[^json] Each record names the file, the line where there is one, the check that refused it and the
+sentence, **carried unchanged** so that a problem the fields do not fit still reads.[^record] A marked
+claim is never among the problems, because it fails nothing.[^json] Nothing else is written, on either
 stream, and two runs of one wiki write the same bytes.[^json]
 
 ```json
@@ -81,8 +80,8 @@ The check that refused each problem is named by one of `budget`, `picture`, `dat
 
 ### --summary
 
-A count for each check with something to say, most first and by name where two tie, and then the line
-counting pages and problems.[^summary] **A wiki of a few hundred pages prints more lines than a build log
+A count for each check with something to say, most first and by name where two tie, then the line counting
+pages and problems.[^summary] **A wiki of a few hundred pages prints more lines than a build log
 holds**, and a log that drops its oldest lines drops the problems first.[^summary]
 
 ```text
@@ -113,11 +112,16 @@ wiki: 3 pages, 1 problem
 
 ## Exit codes
 
+**A wiki that cannot be read at all exits with 1, not 2**, because a missing `wiki.toml` is a wrong wiki
+rather than a mistyped command.[^broken] A gate that lets 1 past and stops on 2 lets a broken wiki
+through.[^broken]
+
 | Code | Condition | Message |
 |---|---|---|
 | `0` | no problem is found[^exit] | a last line ending `0 problems` |
 | `1` | at least one problem is found[^exit] | each problem, then a last line such as `wiki: 3 pages, 1 problem` |
 | `1` | a problem stops the build | that problem alone[^stop] |
+| `1` | the wiki cannot be read at all[^broken] | `wiki: there is no wiki.toml in docs/wiki` |
 | `2` | there is no wiki where it was pointed[^exit] | `wiki: no wiki at nowhere` |
 | `2` | an option it does not know[^exit] | `wiki: error: unrecognized arguments: --unknown` |
 
@@ -142,3 +146,6 @@ wiki: 3 pages, 1 problem
 [^exit]: `src/builder/cli.py` — `run()` returns 1 when there are problems and 0 when there are none;
     `main()` returns 2 with no wiki; argparse exits 2 on an option it does not know.
 [^stop]: `src/builder/cli.py` — `main()` catches `WikiError`, prints it, and returns 1.
+[^broken]: `src/builder/cli.py` — `main()` returns 2 only when the wiki folder is not there, and 1 for
+    every `WikiError`, which is what `read_config()` in `src/builder/config.py` raises for a missing
+    `wiki.toml`.
