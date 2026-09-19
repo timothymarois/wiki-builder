@@ -3064,6 +3064,44 @@ Every page, with its sources and dates.
         status, output = self.run_main(["--root", str(self.root), "build"])
         self.assertEqual(0, status, output)
 
+    def test_a_publish_that_stopped_partway_leaves_no_folder(self):
+        """A folder handed to a host is written whole or not at all.
+
+        `wiki build` writes inside the wiki, where a stopped build is one somebody is watching; `publish`
+        and `user` are given a folder a person opens or a host serves, and one holding the pages written
+        before the failure looks exactly like a finished site.
+        """
+        # Marked for users as well, or the user build has no page to fail on and writes nothing at all.
+        broken = (PAGE.replace("It does it slowly.[^why]", "It is drawn ![here](../images/nope.png).[^why]")
+                  .replace('categories = ["Things"]', 'categories = ["Things"]\naudience = "user"'))
+        for command in ("publish", "user"):
+            with self.subTest(command=command):
+                out = self.root / ("out-" + command)
+                self.write("thing", broken)
+                status, output = self.run_main(["--root", str(self.root), command, str(out)])
+                self.assertEqual(1, status, output)
+                self.assertFalse(out.exists(), "a folder was left where the site would have been")
+                # And nothing beside it either.
+                self.assertEqual([], sorted(child.name for child in self.root.iterdir()
+                                            if child.name.startswith("." + out.name)),
+                                 "the folder it built into was left behind")
+
+    def test_a_publish_that_stopped_partway_leaves_the_last_one_alone(self):
+        # A host serving the folder keeps serving what passed, rather than losing it to a failed run.
+        out = self.root / "out"
+        self.write("thing", PAGE.replace('categories = ["Things"]', 'categories = ["Things"]\naudience = "user"'))
+        self.build()
+        status, output = self.run_main(["--root", str(self.root), "publish", str(out)])
+        self.assertEqual(0, status, output)
+        before = sorted(path.relative_to(out).as_posix() for path in out.rglob("*"))
+        self.assertTrue(before, "nothing was published, so there is nothing to protect")
+        self.write("thing", PAGE.replace("It does it slowly.[^why]",
+                                         "It is drawn ![here](../images/nope.png).[^why]"))
+        status, output = self.run_main(["--root", str(self.root), "publish", str(out)])
+        self.assertEqual(1, status, output)
+        self.assertEqual(before, sorted(path.relative_to(out).as_posix() for path in out.rglob("*")),
+                         "the failed publish changed the site that was already there")
+
     def test_the_audit_command_names_each_page_it_recorded(self):
         self.write("thing/part", PAGE.replace("A thing", "A part"))
         self.build()

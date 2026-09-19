@@ -9,6 +9,7 @@ import argparse
 import json
 import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 from . import __version__
@@ -235,11 +236,31 @@ def run(args, root, wiki):
            "user": lambda: args.out.resolve()}.get(command, lambda: wiki / "site")()
     if not guard_output(out):
         return 2
-    out.mkdir(parents=True, exist_ok=True)
-    counts, goals_words, budget, drafts = build(
-        root, out, "user" if command == "user" else "internal",
-        links="clean" if command == "publish" else "file", wiki_dir=wiki,
-        sitemap=command in ("publish", "user"))
+    # A build that stops partway has already written the pages before it, and the folder it leaves looks
+    # like a site somebody can open. The folder a host or a person is given is written whole or not at
+    # all: the build goes to a folder beside it, which replaces it once the build has returned. Beside
+    # it, so the move is a rename on one filesystem rather than a copy of the whole site. `build` and
+    # `serve` write inside the wiki, where the folder is the tool's own and a stopped build is a stopped
+    # build somebody is watching.
+    staged = out
+    if command in ("publish", "user"):
+        out.parent.mkdir(parents=True, exist_ok=True)
+        staged = Path(tempfile.mkdtemp(prefix="." + out.name + "-", dir=out.parent))
+    else:
+        staged.mkdir(parents=True, exist_ok=True)
+    try:
+        counts, goals_words, budget, drafts = build(
+            root, staged, "user" if command == "user" else "internal",
+            links="clean" if command == "publish" else "file", wiki_dir=wiki,
+            sitemap=command in ("publish", "user"))
+    except BaseException:
+        if staged != out:
+            shutil.rmtree(staged, ignore_errors=True)
+        raise
+    if staged != out:
+        if out.exists():
+            shutil.rmtree(out)
+        staged.rename(out)
     report(counts, goals_words, budget, drafts, citation_counts(root, wiki))
     print("wiki: %d page%s written to %s" % (len(counts), "" if len(counts) == 1 else "s", out))
     if command in ("publish", "user"):

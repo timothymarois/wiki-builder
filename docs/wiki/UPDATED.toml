@@ -95,8 +95,8 @@ digest = "39abecb0999287ce5c39c22b394485595e45a3ba283f6c6c86a0256c1e855070"
 audited = "2026-09-15"
 
 ["commands/publish"]
-updated = "2026-09-15"
-digest = "95bde3fbde5d7fa62027ecaaeea68203e5c1095c876c4e999ed9e9a8c306cabb"
+updated = "2026-09-19"
+digest = "df885eab467995e98b6fa99c6389970edb1a12a6abf9ee39976061adf8e90ef9"
 audited = "2026-09-14"
 
 ["commands/serve"]
@@ -110,8 +110,8 @@ digest = "6eebc107ab54c3d4c0e3a673e2ab503c67788141d83dd1a3a2ca655d5ac04dc9"
 audited = "2026-09-14"
 
 ["commands/user"]
-updated = "2026-09-15"
-digest = "e9f053e91c62be98fdb94a4adca6f4dba71c493a6f7a8e2b651f6b00ca61e7ea"
+updated = "2026-09-19"
+digest = "28dcb6c423e225fd2463dadff07bc5fc990ece5a635167da7368b7198903dd85"
 audited = "2026-09-15"
 
 ["continuous-integration"]

@@ -37,8 +37,9 @@ rows = [
 
 `wiki user` builds only the pages marked for users into the folder it is given, with every
 reference, red mark and Source tab removed.[^user] A draft marked for users is built too, under its draft
-banner.[^draft] How a page is marked for users is described on
-[Front matter](../front-matter.md).
+banner.[^draft] Like [wiki publish](publish.md), **the folder is written whole or not at all**: a build
+that stops partway leaves no half-written site and the last one built is still there.[^whole] How a page
+is marked for users is described on [Front matter](../front-matter.md).
 
 ## Usage
 
@@ -84,6 +85,8 @@ wiki: set site.url in wiki.toml to write sitemap.xml
 | `2` | `OUT` is missing[^exit] | `wiki user: error: the following arguments are required: OUT` |
 | `2` | an option it does not know[^exit] | `wiki: error: unrecognized arguments: --unknown` |
 
+[^whole]: `src/builder/cli.py` — `run()` builds `publish` and `user` into a `tempfile.mkdtemp()` beside
+    `OUT`, removes it if the build raises, and renames it over `OUT` once the build has returned.
 [^user]: `src/builder/cli.py` — `run()` builds with audience `"user"`; `src/builder/build.py` —
     `visible_to()`, `for_user()` and `with_source` in `write_site()`.
 [^draft]: `src/builder/build.py` — `write_site()` writes every page `visible_to()` the audience, whatever
