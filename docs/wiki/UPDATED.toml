@@ -81,8 +81,12 @@ audited = "2026-09-14"
 
 ["commands/check"]
 updated = "2026-09-19"
-digest = "939d714a456744ab3c88ccada20e60a0f1d489999d5442aa3929cf5df26d290c"
+digest = "a8b34ba80f0bbdc257aded09f3ec9968a323090c08e4d84eb4008e30042052ed"
 audited = "2026-09-14"
+
+["commands/check/reports"]
+updated = "2026-09-19"
+digest = "730cbed4e424784b0e3dd324b6adef9b1c940fe68e06f59b897ce21b34448adb"
 
 ["commands/coverage"]
 updated = "2026-09-15"

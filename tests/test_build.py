@@ -3112,6 +3112,71 @@ Every page, with its sources and dates.
         self.assertEqual(["wiki: 2 uncited", "wiki: 1 heading"],
                          [" ".join(line.split()) for line in err.strip().splitlines()], err)
 
+    def scoped(self):
+        """A wiki whose problems sit on two different branches, so narrowing has something to narrow."""
+        self.write("thing/part", PAGE.replace("A thing", "A part").replace("It does it slowly.[^why]",
+                                                                           "It says nothing."))
+        self.write("other", PAGE.replace("A thing", "Other").replace("It does it slowly.[^why]",
+                                                                     "It says nothing either."))
+        self.nav(CONFIGURATION.replace('pages = ["thing"]', 'pages = ["thing", "other"]'))
+        self.build()
+
+    def test_check_reports_only_the_pages_it_was_given(self):
+        """Fixing two pages of 315 meant running the whole corpus on every iteration.
+
+        Every check still runs over the whole wiki, because each reads one page against the others -- a
+        family against its parent, a link against the page it names. Only the reporting narrows, and the
+        run says how many problems it is not showing rather than implying there are none.
+        """
+        self.scoped()
+        status, out, err = self.run_streams(["--root", str(self.root), "check", "thing"])
+        self.assertEqual(1, status, out + err)
+        self.assertIn("thing/part.md", err)
+        self.assertNotIn("other.md", err)
+        self.assertIn("1 problem on thing", out)
+        self.assertIn("1 elsewhere", out)
+
+    def test_a_scoped_check_says_it_is_not_the_whole_check(self):
+        # Nobody should be able to read its output as a gate having passed.
+        self.scoped()
+        _, out, _ = self.run_streams(["--root", str(self.root), "check", "thing"])
+        self.assertIn("budget and pdf did not run", out)
+        self.assertIn("not the whole check", out)
+        # The word counts belong to a build that did not happen, so they are not printed either.
+        self.assertNotIn("words", out)
+
+    def test_a_scoped_check_takes_a_page_a_folder_or_several(self):
+        self.scoped()
+        for names, expected in ((["thing/part"], 1), (["thing/part.md"], 1), (["pages/thing"], 1),
+                                (["thing", "other"], 2), (["other"], 1)):
+            with self.subTest(names=names):
+                _, out, err = self.run_streams(["--root", str(self.root), "check"] + names)
+                self.assertIn("%d problem" % expected, out)
+
+    def test_a_scoped_check_refuses_a_page_that_is_not_there(self):
+        # Reporting nothing wrong with a page that does not exist is what a clean page looks like.
+        self.scoped()
+        status, out, err = self.run_streams(["--root", str(self.root), "check", "nowhere"])
+        self.assertEqual(1, status)
+        self.assertIn("there is no page or folder nowhere to check", err)
+
+    def test_a_scoped_check_skips_the_build(self):
+        """The build is nine tenths of a check, and it is what a scoped run is for.
+
+        A page whose picture has no entry stops the build, so a whole check cannot get past it; a scoped
+        run never builds, so it still reports on the page it was asked about.
+        """
+        self.scoped()
+        self.write("thing", PAGE.replace("It does it slowly.[^why]",
+                                         "It is drawn ![here](../images/nope.png).[^why]"))
+        status, out, err = self.run_streams(["--root", str(self.root), "check"])
+        self.assertEqual(1, status)
+        self.assertIn("has no entry", err, "the build no longer stops on a picture with no record")
+        status, out, err = self.run_streams(["--root", str(self.root), "check", "other"])
+        self.assertEqual(1, status, out + err)
+        self.assertIn("other.md", err)
+        self.assertNotIn("has no entry", err)
+
     def test_check_takes_one_shape_or_the_other(self):
         # Both at once has no meaning, and picking one silently would hide which was obeyed.
         status, out, err = self.run_streams(["--root", str(self.root), "check", "--json", "--summary"])
