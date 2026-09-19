@@ -19,9 +19,13 @@ digest = "bb7297c295e23d41a94334169a3b9b37a514e6f1bf8582a4f97667d86be7901a"
 audited = "2026-09-14"
 
 ["checks/citations"]
-updated = "2026-09-17"
-digest = "19fe001674bc501f2ea69f6428194798bc02e0fdc7466613919def90435e53af"
+updated = "2026-09-19"
+digest = "6db15fb23caafeb605ae0b048329262c493d251054668dd8a7d2e526f9e9e6ad"
 audited = "2026-09-14"
+
+["checks/citations/references"]
+updated = "2026-09-19"
+digest = "9edc7c1792f6fa243ead0bfc94508fb423e346ba2c96832ae009b958417702aa"
 
 ["checks/families"]
 updated = "2026-09-15"

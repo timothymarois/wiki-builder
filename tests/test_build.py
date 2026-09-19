@@ -369,6 +369,22 @@ class WikiTests(unittest.TestCase):
         ("code inside a cited sentence", "It prints `done. Next` at the end.[^why]", []),
         ("the mark in the middle", "It waits {missing} and then stops.", []),
         ("a cited sentence beside an uncited one", "It is cited.[^why] It is not.", ["It is not."]),
+        # A bold label names what follows instead of stating it, and BOUNDARY cuts it off the sentence it
+        # introduces -- so it could never carry a citation, and reported itself for ever.
+        ("a bold label opening a cited sentence", "- **Inference.** It was learned.[^why]", []),
+        ("a bold label opening an uncited sentence", "- **Inference.** It was learned.",
+         ["It was learned."]),
+        ("a bold label on its own", "**Missing citation.**", []),
+        ("a claim set in bold", "**It is fast.**", ["**It is fast.**"]),
+        ("a long bold sentence", "**The build refuses a ragged row.**",
+         ["**The build refuses a ragged row.**"]),
+        ("a bold label opening prose on one line", "**Speed** matters here.", ["**Speed** matters here."]),
+        # A line of links names somewhere to read, whichever way the links are written.
+        ("a line of reference-style links", "- [Guide][guide]; [Domains][domains]", []),
+        ("several inline links on one line", "- [A](https://a.example), [B](https://b.example)", []),
+        ("a word between two links", "- [A][a] and [B][b] were wrong.", ["- [A][a] and [B][b] were wrong."]),
+        ("a sentence around a reference-style link", "- [Guide][guide] serves every folder.",
+         ["- [Guide][guide] serves every folder."]),
     )
 
     def test_each_sentence_is_held_to_its_own_citation(self):
@@ -380,6 +396,22 @@ class WikiTests(unittest.TestCase):
                 self.assertEqual(len(expected), len(problems), problems)
                 for start, name in zip(expected, named):
                     self.assertTrue(name.startswith(start), f"expected {start!r}, got {name!r}")
+
+    def test_a_reference_style_link_definition_is_not_a_statement(self):
+        """Where a link's address is defined names an address, not a fact, so nothing can cite it.
+
+        Exempting `[Name][ref]` where it is used and not where it is defined would leave the page with a
+        problem no writer can clear, which is the loop this pair of exemptions exists to end.
+        """
+        prose = "- [Guide][guide]\n\n[guide]: https://example.com/guide"
+        self.write("thing", PAGE.replace("It does it slowly.[^why]", prose))
+        self.assertEqual([], wiki.uncited_problems(self.root))
+        # Blanked, not removed: a later sentence is still reported on the line it is really on.
+        self.write("thing", PAGE.replace("It does it slowly.[^why]", prose + "\n\nIt states something."))
+        problems = wiki.uncited_problems(self.root)
+        self.assertEqual(1, len(problems), problems)
+        self.assertTrue(problems[0].startswith("thing.md:%d: " % self.line_of("thing", "It states something.")),
+                        problems[0])
 
     def line_of(self, page_id, fragment):
         """The line of a page's file a fragment starts on, counted independently of the tool."""
