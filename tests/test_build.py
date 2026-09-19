@@ -562,6 +562,27 @@ class WikiTests(unittest.TestCase):
         self.assertEqual(["thing.md cites ../design.md, which is a document; a reference names the code that "
                           "does the thing, or an outside service's own documentation"], problems)
 
+    def test_an_address_merely_holding_md_is_not_a_document(self):
+        """The rule matched `.md` anywhere in the address, so a host holding those letters was refused.
+
+        `https://www.mdpi.com/...` is a journal, and a wiki citing a paper published there had no way to
+        link it. The address has to end in `.md`, where a fragment or a query may follow it.
+        """
+        passes = ("https://www.mdpi.com/1999-4907/4/4/1055", "https://example.com/a.mdx",
+                  "https://mdn.example.com/page")
+        for address in passes:
+            with self.subTest(address=address):
+                self.write("thing", PAGE.replace("[^why]: The reason — `Source/Thing.h`.",
+                                                 "[^why]: Publisher — [A paper](%s)." % address))
+                self.assertEqual([], wiki.citation_problems(self.root))
+        # The real ones are still refused, in the same case, so an empty result cannot pass for a check.
+        for address in ("https://example.com/docs/guide.md", "https://example.com/docs/guide.md#top",
+                        "../design.md"):
+            with self.subTest(address=address):
+                self.write("thing", PAGE.replace("[^why]: The reason — `Source/Thing.h`.",
+                                                 "[^why]: Publisher — [A doc](%s)." % address))
+                self.assertNotEqual([], wiki.citation_problems(self.root))
+
     def test_a_reference_to_an_outside_services_documentation_passes(self):
         # A reference may cite an outside service's own documentation for how that service behaves.
         self.write("thing", PAGE.replace(
