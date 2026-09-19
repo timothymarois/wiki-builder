@@ -2664,7 +2664,74 @@ def problem_record(rule, problem):
             "message": problem}
 
 
-def check(root, wiki=None, version=None, records=None):
+def scoped_page(name, problem_file):
+    """Whether a problem's file is a page a scoped run named, or a page beneath it."""
+    if problem_file is None:
+        return False
+    named = name[:-3] if name.endswith(".md") else name
+    named = named[len("pages/"):] if named.startswith("pages/") else named
+    return problem_file == named + ".md" or problem_file.startswith(named + "/")
+
+
+# What the build is needed for, and so what a scoped run cannot say. Everything else reads the pages'
+# markdown, and the build is nine tenths of a check's time on a wiki of a few hundred pages.
+BUILT_CHECKS = ("budget", "pdf")
+
+
+def page_checks(root, wiki):
+    """Every check that reads the pages' markdown, in the order they are reported, named as it goes.
+
+    The table check comes before the citation checks: a table the renderer threw away still cites
+    correctly as markdown, so their silence about it is the thing that needs explaining first.
+    """
+    return (("picture", picture_problems(root, wiki)),
+            ("date", date_problems(root, wiki)),
+            ("citation", citation_problems(root, wiki)),
+            ("heading", heading_problems(root, wiki)),
+            ("pointing", pointing_problems(root, wiki)),
+            ("dead-link", dead_link_problems(root, wiki)),
+            ("attribution", attribution_problems(root, wiki)),
+            ("vague-actor", vague_actor_problems(root, wiki)),
+            ("empty-word", empty_word_problems(root, wiki)),
+            ("plain-english", plain_english_problems(root, wiki)),
+            ("table", table_problems(root, wiki)),
+            ("uncited", uncited_problems(root, wiki)),
+            ("infobox", infobox_problems(root, wiki)),
+            ("family", family_problems(root, wiki)))
+
+
+def check_pages(root, wiki, version, records, only):
+    """The checks that read the markdown, reported for the pages a scoped run named.
+
+    Every one of them runs over the whole wiki, because a check reads one page against the others -- a
+    family against its parent, a link against the page it names. Only the reporting narrows, so a scoped
+    run can say how many problems it is not showing rather than pretending there are none.
+    """
+    # A name matching no page would otherwise report nothing wrong with it, which is what a clean page
+    # looks like. A typed path is the likeliest way to reach this, and the likeliest to be believed.
+    known = sorted(path.relative_to(wiki / "pages").with_suffix("").as_posix()
+                   for path in (wiki / "pages").rglob("*.md"))
+    for name in only:
+        if not any(scoped_page(name, page + ".md") for page in known):
+            raise WikiError(f"there is no page or folder {name} to check; name one by its path under "
+                            "pages, such as checks/budgets or checks")
+    problems, elsewhere = [], 0
+    named = list(page_checks(root, wiki))
+    if version:
+        named.append(("version", version_problems(read_config(wiki)[0], version)))
+    for rule, found in named:
+        for problem in found:
+            record = problem_record(rule, problem)
+            if not any(scoped_page(name, record["file"]) for name in only):
+                elsewhere += 1
+                continue
+            problems.append(problem)
+            if records is not None:
+                records.append(record)
+    return problems, elsewhere
+
+
+def check(root, wiki=None, version=None, records=None, only=None, skipped=None):
     """Every reason the wiki is not fit to read, as sentences rather than a diff.
 
     The rendered site is not committed -- it is built before it is served, so it cannot be stale and
@@ -2674,6 +2741,16 @@ def check(root, wiki=None, version=None, records=None):
     """
     wiki = wiki_of(root, wiki)
     problems = []
+    if only:
+        # The build writes every page to learn two things: each page's word count, and the PDFs the
+        # pages link. Both are the whole wiki's business, and neither is worth nine tenths of the time
+        # to someone fixing one page. What did not run is reported rather than left for them to assume.
+        if skipped is not None:
+            skipped.extend(BUILT_CHECKS)
+        found, elsewhere = check_pages(root, wiki, version, records, only)
+        if skipped is not None:
+            skipped.append(elsewhere)
+        return found, {}, 0, read_config(wiki)[1]
     with tempfile.TemporaryDirectory() as work:
         # Checked as it will be read: from the place the site is actually served from.
         # The PDF links are the ones this build writes, so the check can never read a link the build does not.
@@ -2690,24 +2767,11 @@ def check(root, wiki=None, version=None, records=None):
             if records is not None:
                 records.extend(problem_record(rule, problem) for problem in found)
 
+        # The two the build is for, together, and then everything that reads the markdown.
         add("budget", budget_problems(counts, goals_words, budget))
-        add("picture", picture_problems(root, wiki))
-        add("date", date_problems(root, wiki))
-        add("citation", citation_problems(root, wiki))
-        add("heading", heading_problems(root, wiki))
-        add("pointing", pointing_problems(root, wiki))
-        add("dead-link", dead_link_problems(root, wiki))
         add("pdf", pdf_problems(root, wiki, pdf_links))
-        add("attribution", attribution_problems(root, wiki))
-        add("vague-actor", vague_actor_problems(root, wiki))
-        add("empty-word", empty_word_problems(root, wiki))
-        add("plain-english", plain_english_problems(root, wiki))
-        # Before the citation checks: a table the renderer threw away still cites correctly as markdown,
-        # so their silence about it is the thing that needs explaining first.
-        add("table", table_problems(root, wiki))
-        add("uncited", uncited_problems(root, wiki))
-        add("infobox", infobox_problems(root, wiki))
-        add("family", family_problems(root, wiki))
+        for rule, found in page_checks(root, wiki):
+            add(rule, found)
         if version:
             site, _, _ = read_config(wiki)
             add("version", version_problems(site, version))

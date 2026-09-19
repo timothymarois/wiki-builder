@@ -13,6 +13,7 @@ group = "Identity"
 rows = [
   { label = "Command", value = "wiki check", cite = "usage" },
   { label = "Options", value = "--json, --summary", note = "one or the other", cite = "shape" },
+  { label = "Arguments", value = "PAGE", note = "a page or folder; the whole wiki when none is named", cite = "scope" },
 ]
 
 [[infobox]]
@@ -36,10 +37,12 @@ every push on [Continuous integration](../continuous-integration.md).
 
 ## Usage
 
-Beside the options every command shares, it takes one shape for its report.[^usage]
+Beside the options every command shares, it takes one shape for its report, and the pages to report
+on.[^usage]
 ```sh
-wiki check [-h] [--root ROOT] [--wiki WIKI] [--json | --summary]
+wiki check [-h] [--root ROOT] [--wiki WIKI] [--json | --summary] [PAGE ...]
 wiki check
+wiki check checks/budgets
 ```
 
 ## Options
@@ -51,44 +54,23 @@ wiki check
 
 **Neither may be given with the other**, and giving both exits with 2.[^shape]
 
-### --json
+Both are written for another tool rather than for a person, and what each holds is described on
+[Report shapes](check/reports.md).
 
-The document holds the page count, a record for each problem, and the marked claims in a list of their
-own.[^json] Each record names the file, the line where there is one, the check that refused it and the
-sentence, **carried unchanged** so that a problem the fields do not fit still reads.[^record] A marked
-claim is never among the problems, because it fails nothing.[^json] Nothing else is written, on either
-stream, and two runs of one wiki write the same bytes.[^json]
+## Arguments
 
-```json
-{
-  "marks": [],
-  "pages": 3,
-  "problems": [
-    {
-      "file": "thing.md",
-      "line": 22,
-      "message": "thing.md:22: “It says nothing.” states something and cites nothing; give it a reference, or {missing} if there is none",
-      "rule": "uncited"
-    }
-  ]
-}
-```
+| Argument | Meaning |
+|---|---|
+| `PAGE` | a page or a folder under `pages`, with or without `.md`; the whole wiki when none is named[^scope] |
 
-The check that refused each problem is named by one of `budget`, `picture`, `date`, `citation`,
-`heading`, `pointing`, `dead-link`, `pdf`, `attribution`, `vague-actor`, `empty-word`, `plain-english`,
-`table`, `uncited`, `infobox`, `family` or `version`; a marked claim is named `missing`.[^rules]
-
-### --summary
-
-A count for each check with something to say, most first and by name where two tie, then the line counting
-pages and problems.[^summary] **A wiki of a few hundred pages prints more lines than a build log
-holds**, and a log that drops its oldest lines drops the problems first.[^summary]
+**Naming a page is for writing, not for merging.**[^scope] Every check still runs over the whole wiki,
+because each reads one page against the others; only the report narrows, and it says what it is not
+showing and what did not run.[^scope][^scoped] It skips the build, which most of a check's time goes on
+and which only the page budget and the PDF links need.[^built] A name matching no page is
+refused.[^scope]
 
 ```text
-wiki:    292  family
-wiki:    207  pointing
-wiki:    186  uncited
-wiki: 346 pages, 685 problems
+wiki: 1 problem on checks/budgets; 4 elsewhere, and budget and pdf did not run, so this is not the whole check -- run `wiki check` with no page before merging
 ```
 
 ## Output
@@ -130,15 +112,13 @@ through.[^broken]
     group.
 [^shape]: `src/builder/cli.py` — `main()` puts `--json` and `--summary` in a mutually exclusive group,
     which argparse refuses both of, exiting 2.
-[^json]: `src/builder/cli.py` — `run()` writes one `json.dumps()` with `sort_keys=True` on standard
-    output and returns before the sentences, the counts and the marks are printed, putting
-    `missing_marks()` under `marks` instead.
-[^record]: `src/builder/build.py` — `problem_record()` reads the file and line from `PROBLEM_PLACE` at the
-    head of the sentence, keeps the sentence whole as `message`, and leaves `file` and `line` empty where
-    it finds none.
-[^rules]: `src/builder/build.py` — `check()` names each producer as it adds it.
-[^summary]: `src/builder/cli.py` — `run()` counts the records by `rule` and prints them sorted by falling
-    count then by name, then the page and problem count.
+[^scope]: `src/builder/cli.py` — `main()` gives `check` the positional `pages`; `src/builder/build.py` —
+    `check_pages()` runs every check in `page_checks()` over the whole wiki and keeps the problems whose
+    file `scoped_page()` matches, raising `WikiError` for a name that matches none.
+[^scoped]: `src/builder/cli.py` — `run()` prints what `check()` put in `skipped`, the problems counted
+    elsewhere, and the line saying this is not the whole check.
+[^built]: `src/builder/build.py` — `check()` returns from `check_pages()` before the
+    `tempfile.TemporaryDirectory()` build, and `BUILT_CHECKS` names the two the build is for.
 [^output]: `src/builder/cli.py` — `run()` prints each problem to standard error, then calls `report()` with
     `citation_counts()`, which prints the budget warning, and prints the count; `src/builder/build.py` —
     `uncited_problems()` and `pointing_problems()` name a sentence's page and line.

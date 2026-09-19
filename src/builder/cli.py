@@ -13,8 +13,8 @@ import tempfile
 from pathlib import Path
 
 from . import __version__
-from .build import (ASSETS, SITEMAP, SKILL, audit, bless, build, check, citation_counts, coverage,
-                    families_report, missing_marks, problem_record, report, wiki_of)
+from .build import (ASSETS, BUILT_CHECKS, SITEMAP, SKILL, audit, bless, build, check, citation_counts,
+                    coverage, families_report, missing_marks, problem_record, report, wiki_of)
 from .config import CONFIG, WikiError, read_config, record_version
 from .serve import serve
 
@@ -114,6 +114,9 @@ def main(argv=None):
                        help="write the problems as one JSON document on stdout, for another tool to read")
     shape.add_argument("--summary", action="store_true",
                        help="count the problems by the check that found them, instead of listing them")
+    checked.add_argument("pages", nargs="*", metavar="PAGE",
+                         help="a page or folder under pages to report on, with or without .md; the whole "
+                              "wiki when none is named")
     commands.add_parser("coverage", parents=[place], help="list the source files no page cites")
     commands.add_parser("families", parents=[place],
                         help="list the child pages that share no declared layout")
@@ -201,9 +204,20 @@ def run(args, root, wiki):
         # Both shapes are the same list said differently, and both need to know which check refused
         # what, which only the aggregator can say.
         records = [] if args.json or args.summary else None
-        problems, counts, goals_words, budget = check(root, wiki, __version__, records)
-        pages = "wiki: %d page%s, %d problem%s" % (len(counts), "" if len(counts) == 1 else "s",
-                                                   len(problems), "" if len(problems) == 1 else "s")
+        skipped = [] if args.pages else None
+        problems, counts, goals_words, budget = check(root, wiki, __version__, records, args.pages,
+                                                      skipped)
+        if skipped is None:
+            pages = "wiki: %d page%s, %d problem%s" % (len(counts), "" if len(counts) == 1 else "s",
+                                                       len(problems), "" if len(problems) == 1 else "s")
+        else:
+            # A scoped run is not the gate, and says so plainly: what it did not run, and how many
+            # problems it found and is not showing. A count of nothing is still worth printing.
+            elsewhere = skipped.pop()
+            pages = ("wiki: %d problem%s on %s; %d elsewhere, and %s did not run, so this is not the "
+                     "whole check -- run `wiki check` with no page before merging"
+                     % (len(problems), "" if len(problems) == 1 else "s", ", ".join(args.pages),
+                        elsewhere, " and ".join(skipped)))
         if args.json:
             # One document on stdout and nothing else: half a document is worse than none, and the word
             # counts and the budget warning are written for a person reading a terminal. The marks are
@@ -228,7 +242,8 @@ def run(args, root, wiki):
         # Not problems: each is an answer, and together they are the work that remains.
         for mark in missing_marks(root, wiki):
             print("wiki: " + mark)
-        report(counts, goals_words, budget, citations=citation_counts(root, wiki))
+        if skipped is None:
+            report(counts, goals_words, budget, citations=citation_counts(root, wiki))
         print(pages)
         return 1 if problems else 0
 
