@@ -25,7 +25,7 @@ audited = "2026-09-14"
 
 ["checks/citations/references"]
 updated = "2026-09-19"
-digest = "9edc7c1792f6fa243ead0bfc94508fb423e346ba2c96832ae009b958417702aa"
+digest = "a425fc1d361273c10c453a26c51fe9bf8c60ba4f7e58b0b50f815ab6e32a5e39"
 
 ["checks/families"]
 updated = "2026-09-15"
@@ -48,7 +48,7 @@ audited = "2026-09-14"
 
 ["checks/tables"]
 updated = "2026-09-19"
-digest = "d877db219d527d8aa1e1fdf381fb320f3a43ecbab7557d11a54146d29734b58e"
+digest = "121fd26ef023682d20e7ff73d6bf4734a7e80566c66a0f0dd4180714cd06e661"
 
 ["checks/wording"]
 updated = "2026-09-17"
@@ -86,7 +86,7 @@ audited = "2026-09-14"
 
 ["commands/check/reports"]
 updated = "2026-09-19"
-digest = "730cbed4e424784b0e3dd324b6adef9b1c940fe68e06f59b897ce21b34448adb"
+digest = "f61c844e4ebd48557460d04a2948e359e8a283197b46a0d960f6b60ed88e9b7b"
 
 ["commands/coverage"]
 updated = "2026-09-15"
@@ -149,8 +149,8 @@ digest = "b8bfbec6cc0e9c02c8f120fc0d920a02c1c8c5d94d4ef95158d45c689f82eca5"
 audited = "2026-09-14"
 
 ["goals"]
-updated = "2026-09-17"
-digest = "791ff9851b4583b397ff655d704395c39be0c06b6e3cbfe8e1930eab65fc4614"
+updated = "2026-09-19"
+digest = "d89f2b4b8ed90a3aa55dbb260d4f45963e6207c9ae8e6427038839126cca2353"
 
 ["health"]
 updated = "2026-09-15"

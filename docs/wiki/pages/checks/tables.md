@@ -1,7 +1,7 @@
 +++
 title = "Tables"
 subtitle = "a table the renderer will not draw, served to a reader as a paragraph of pipes"
-status = "draft"
+status = "approved"
 categories = ["Refusals"]
 intent = """
 The tables check exists so that a page cannot pass its gate while rendering as raw pipes. A reader should
