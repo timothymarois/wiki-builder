@@ -1690,6 +1690,12 @@ PAGE_LINK = re.compile(r"\]\([^)\s]*\.md(?:#[^)\s]*)?\)")
 # A list item that is a link and nothing else, as under External links: it names somewhere to read, and
 # states nothing that could be cited.
 LINK_ONLY = re.compile(r"^\s*(?:(?:[-*+]|\d+\.)\s+)?\[[^\]]+\]\([^)\s]+\)\s*$")
+# The pipes that divide one row into cells: every one the writer did not escape. Backticks are not
+# honoured, because the renderer does not honour them either -- a cell holding `a|b` is two cells to it,
+# and a check that read it as one would pass a table the renderer throws away.
+CELL_EDGE = re.compile(r"(?<!\\)\|")
+# The body rows of a rendered table, which is what a row in the markdown was meant to become.
+RENDERED_BODY = re.compile(r"<tbody>(.*?)</tbody>", re.S)
 
 
 def statements(block):
@@ -1750,6 +1756,94 @@ def quoted(statement, limit=80):
     if len(text) <= limit:
         return "“%s”" % text
     return "“%s…”" % (text[:limit].rsplit(" ", 1)[0] if " " in text[:limit] else text[:limit])
+
+
+def table_cells(row):
+    """The cells of one markdown table row, counted the way the renderer counts them."""
+    parts = CELL_EDGE.split(row.strip())
+    # A row written with the outer pipes has an empty field at each end, which is a border and not a cell.
+    if parts and not parts[0].strip():
+        parts = parts[1:]
+    if parts and not parts[-1].strip():
+        parts = parts[:-1]
+    return parts
+
+
+def source_tables(path):
+    """Each table in a page's markdown: the line its header is on, its header, and its body rows.
+
+    Read from the markdown rather than the built page, because what this is for is the difference between
+    the two. Fenced code and footnote definitions are blanked rather than removed, so every line keeps
+    its number.
+    """
+    text = path.read_text(encoding="utf-8")
+    _, body = read_front_matter(path)
+    first = text[:len(text) - len(body)].count("\n") + 1
+
+    def blank(match):
+        return "\n" * match.group(0).count("\n")
+
+    lines = FENCED.sub(blank, FOOTNOTE.sub(blank, body)).split("\n")
+    found, index = [], 0
+    while index < len(lines) - 1:
+        header, after = lines[index], lines[index + 1]
+        if "|" in header and header.strip() and TABLE_SEPARATOR.match(after):
+            rows, cursor = [], index + 2
+            while cursor < len(lines) and lines[cursor].strip() and "|" in lines[cursor]:
+                rows.append((first + cursor, lines[cursor]))
+                cursor += 1
+            found.append((first + index, header, rows))
+            index = cursor
+            continue
+        index += 1
+    return found
+
+
+def table_problems(root, wiki=None):
+    """Tables the renderer will not draw as tables, which the other checks cannot see.
+
+    A row that does not divide into the same cells as its header stops the whole block being a table, and
+    a row carrying anything after its last pipe falls out of one -- in both cases the markdown is served
+    as a paragraph of raw pipes. Nothing else notices: every check that reads a table reads the markdown,
+    where the rows are still rows, so a mangled table cites its sources correctly and passes. A reader
+    gets the pipes.
+    """
+    pages_dir = wiki_of(root, wiki) / "pages"
+    markdown = make_markdown()
+    problems = []
+    for path in sorted(pages_dir.rglob("*.md")):
+        name = path.relative_to(pages_dir)
+        _, body = read_front_matter(path)
+        tables = source_tables(path)
+        named = len(problems)
+        for line, header, rows in tables:
+            width = len(table_cells(header))
+            for row_line, row in rows:
+                if row.strip().startswith("|") and not row.strip().endswith("|"):
+                    problems.append(
+                        "%s:%d: the table row %s carries text after its last |, so the renderer drops it "
+                        "out of the table and serves the table as a paragraph of pipes; move what follows "
+                        "the last | into a cell" % (name, row_line, quoted(row)))
+                elif len(table_cells(row)) != width:
+                    cells = len(table_cells(row))
+                    problems.append(
+                        "%s:%d: the table row %s has %d cell%s where its header has %d, so the renderer "
+                        "refuses the whole table and serves it as a paragraph of pipes; give the row %d "
+                        "cell%s, one for each column"
+                        % (name, row_line, quoted(row), cells, "" if cells == 1 else "s", width,
+                           width, "" if width == 1 else "s"))
+        # The backstop: a table that did not render for a reason no row above names. The page's own
+        # markdown is rendered here, so the tables the build writes itself are not in what is counted.
+        if tables and len(problems) == named:
+            drawn = markdown(FOOTNOTE.sub("", body))
+            rows_drawn = sum(part.count("<tr>") for part in RENDERED_BODY.findall(drawn))
+            rows_written = sum(len(rows) for _, _, rows in tables)
+            if rows_drawn < rows_written:
+                problems.append(
+                    "%s:%d: the table starting here is served as a paragraph of pipes rather than a "
+                    "table; give it a header row, a |---| line with one column for each cell, and one "
+                    "row for each line" % (name, tables[0][0]))
+    return problems
 
 
 def uncited_problems(root, wiki=None):
@@ -2514,6 +2608,9 @@ def check(root, wiki=None, version=None):
         problems += vague_actor_problems(root, wiki)
         problems += empty_word_problems(root, wiki)
         problems += plain_english_problems(root, wiki)
+        # Before the citation checks: a table the renderer threw away still cites correctly as markdown,
+        # so their silence about it is the thing that needs explaining first.
+        problems += table_problems(root, wiki)
         problems += uncited_problems(root, wiki)
         problems += infobox_problems(root, wiki)
         problems += family_problems(root, wiki)
