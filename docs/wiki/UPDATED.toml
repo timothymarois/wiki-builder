@@ -10,7 +10,7 @@ digest = "fe6f4fcaa7361544d74652524d6bf453b932f1ec19d69ff811af2faae927cfc5"
 
 ["checks"]
 updated = "2026-09-19"
-digest = "aada0cd05e014e0ee732e3fc7cfc1484988c18aabba89ddf1c9e31c94437f55b"
+digest = "89a38ef388b5d1ff1e098003520ea68ed26fec0390b460e5ab21edf7278a8075"
 audited = "2026-09-14"
 
 ["checks/budgets"]
@@ -139,8 +139,8 @@ digest = "b0d97e8f0d35cd38c79f9f52724a8e79aefa35c4afa196614b5bc9130c221f54"
 audited = "2026-09-15"
 
 ["front-matter"]
-updated = "2026-09-15"
-digest = "0377333ecefed4eba0888578b1b68af466f02cbfd7098219228c3f688d991c89"
+updated = "2026-09-19"
+digest = "0bb72fa8c8ae95ac8d2228cfa7b0c44a05e770a61b24270e2bef929a5ecac2eb"
 audited = "2026-09-14"
 
 ["front-matter/infobox"]
@@ -186,6 +186,10 @@ digest = "0aa2c4c7821ade18ea3c2e8046d25079e79b01d11c88dc53e5b5286c37aae676"
 updated = "2026-09-17"
 digest = "8995898380c67bbd14940ef64fca7c7a188395e6f7bae00340d21d0dd804d14b"
 audited = "2026-09-14"
+
+["pages/index-tables"]
+updated = "2026-09-19"
+digest = "a656002b77847f84eae96079624c6f3c301e1bb947df1fb13ddd62e3952d0a21"
 
 ["pages/markdown"]
 updated = "2026-09-14"

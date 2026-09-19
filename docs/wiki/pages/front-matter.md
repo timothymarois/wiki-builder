@@ -42,6 +42,7 @@ page is for and how it is laid out is described on [Pages](pages.md), and the fi
 | `image` | string | none | a picture recorded in `PICTURES.toml`, shown at the top of the infobox[^image] |
 | `image_caption` | string | empty | the caption under that picture[^image] |
 | `infobox` | list of tables, written `[[infobox]]` | none | the infobox's groups, in the order written[^infobox] |
+| `index` | table, written `[index]` | none | a table of other pages the build writes where `{index-table}` stands: `pages` naming them and `columns` what each row shows, as [Index tables](pages/index-tables.md) describes[^index] |
 | `family` | table, written `[family]` | none | on a parent page, the layout its child pages follow: `headings` in order, the infobox `labels` they may use, and the `table` of labels its member table compares, as [Families](checks/families.md) describes[^family] |
 
 Any other field is ignored, except `kicker`, which is refused.[^fields]
@@ -108,5 +109,7 @@ Refunds exist so that a customer who was charged wrongly gets their money back w
     none when it is absent.
 [^refusals]: `src/builder/build.py` — `read_pages()` raises the messages for a missing or empty `title` or
     `intent`, an intent over its budget, `kicker`, and an `audience` outside `AUDIENCES`.
+[^index]: `src/builder/build.py` — `index_table_rows()` reads `pages` and `columns` from a page's
+    `index` table, and `index_problems()` refuses one the build cannot write.
 [^family]: `src/builder/build.py` — `family_problems()` reads `headings` and `labels` from a parent's `family`
     table and checks each child page against them.

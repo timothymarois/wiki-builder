@@ -235,6 +235,9 @@ table.w th,table.w td{border:1px solid var(--border-soft);padding:5px 9px;text-a
 table.w th{background:var(--sunk);font-weight:700;white-space:nowrap}
 table.w td.n{font-variant-numeric:tabular-nums;white-space:nowrap}
 table.w tbody tr:hover{background:var(--shade)}
+/* The row an index table totals its counted columns in. Set apart from the pages above it, because it
+   states the wiki's own arithmetic rather than anything a page says. */
+table.w tr.total td{background:var(--sunk);font-weight:700}
 sup.ref{font-size:10.5px;line-height:1}
 sup.ref a{padding:0 1px}
 /* A claim with nothing to cite reads exactly like a citation, in red: it sits where the reader already

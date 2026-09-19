@@ -1226,6 +1226,157 @@ class WikiTests(unittest.TestCase):
         self.assertIn("</table></div>", page)
         self.assertNotIn("<table>", page)
 
+    # --- a table over a named set of pages ---------------------------------------------------------
+
+    INDEX = ('[index]\npages = "thing/*"\ntotal = true\ncolumns = [\n'
+             '  { heading = "Subject", field = "subtitle" },\n'
+             '  { heading = "Pages", count = true },\n]')
+
+    def indexed(self, index=None, marker="{index-table}"):
+        """A wiki whose front page indexes the pages under `thing`, which are not its children."""
+        self.write("thing/one", PAGE.replace("A thing", "One").replace(
+            "the thing, its speed and its ground", "what one covers"))
+        self.write("thing/two", PAGE.replace("A thing", "Two").replace(
+            "the thing, its speed and its ground", "what two covers"))
+        self.write("thing/two/deep", PAGE.replace("A thing", "Deep"))
+        # [index] after the last top-level key: in the middle it swallows the keys below it into itself.
+        self.write("indexer", PAGE.replace("A thing", "Indexer")
+                   .replace('"""\n\n[[infobox]]', '"""\n\n' + (self.INDEX if index is None else index)
+                            + "\n\n[[infobox]]", 1)
+                   .replace("It does it slowly.[^why]", marker))
+        self.nav(CONFIGURATION.replace('pages = ["thing"]', 'pages = ["thing", "indexer"]'))
+
+    def test_an_index_table_lists_pages_that_are_not_its_own_children(self):
+        """A family's member table is a page and its children; this is a table over a named set.
+
+        Listing a page in a section pulls its whole subtree into that one fold, so a wiki wanting a
+        foldable section for each part keeps those parts out of the page that indexes them -- and then
+        has an index no family can write.
+        """
+        self.indexed()
+        self.build()
+        page = (self.out / "indexer/index.html").read_text(encoding="utf-8")
+        table = page[page.index('<table class="w index">'):page.index("</table>")]
+        self.assertIn(">One</a>", table)
+        self.assertIn(">Two</a>", table)
+        # Its own children would be nobody: the pages it lists live under another page entirely.
+        self.assertNotIn(">Indexer</a>", table)
+
+    def test_an_index_column_shows_a_pages_own_front_matter(self):
+        # 23 of 25 cells in a hand-kept index were the listed page's subtitle, character for character.
+        self.indexed()
+        self.build()
+        table = (self.out / "indexer/index.html").read_text(encoding="utf-8")
+        self.assertIn("<td>what one covers</td>", table)
+        self.assertIn("<td>what two covers</td>", table)
+
+    def test_an_index_column_counts_the_pages_beneath_each_one(self):
+        """The value a hand-kept index gets wrong first, because anything added anywhere changes it.
+
+        It is a property of the tree, so no page states it and no infobox could carry it.
+        """
+        self.indexed()
+        self.build()
+        page = (self.out / "indexer/index.html").read_text(encoding="utf-8")
+        table = page[page.index('<table class="w index">'):page.index("</table>")]
+        self.assertRegex(table, r">One</a></td><td>what one covers</td><td>0</td>")
+        self.assertRegex(table, r">Two</a></td><td>what two covers</td><td>1</td>")
+        # A page added beneath one changes its count, with nothing on the indexing page edited.
+        self.write("thing/two/deep/deeper", PAGE.replace("A thing", "Deeper"))
+        self.build()
+        page = (self.out / "indexer/index.html").read_text(encoding="utf-8")
+        self.assertRegex(page, r">Two</a></td><td>what two covers</td><td>2</td>")
+
+    def test_an_index_table_totals_its_counted_columns(self):
+        # Ours sums the count column and we maintain it by hand: the total is generated with the counts.
+        self.indexed()
+        self.build()
+        page = (self.out / "indexer/index.html").read_text(encoding="utf-8")
+        self.assertIn('<tr class="total"><td>Total</td><td></td><td>1</td></tr>', page)
+
+    def test_an_index_table_reaches_the_markdown_copy(self):
+        # The copy is what an agent reads, so a table written only into the HTML would be invisible to it.
+        self.indexed()
+        self.build()
+        copy = (self.out / "indexer/index.md").read_text(encoding="utf-8")
+        self.assertIn("| [One](../thing/one/index.md) | what one covers | 0 |", copy)
+        self.assertIn("| Total |  | 1 |", copy)
+        self.assertNotIn("{index-table}", copy)
+
+    # A declaration, and what the check must say about it.
+    INDEX_REFUSED = (
+        ("a pattern matching no page", 'pages = "thing/*"', 'pages = "nowhere/*"',
+         "matches no page"),
+        ("columns that are not a list", "columns = [\n", "columns = \"subtitle\"\nwas = [\n",
+         "index.columns must list what each row shows"),
+        ("a column naming two sources", '{ heading = "Pages", count = true }',
+         '{ heading = "Pages", count = true, field = "subtitle" }',
+         "names 2 of field, label and count"),
+        ("a column naming no source", '{ heading = "Pages", count = true }', '{ heading = "Pages" }',
+         "names 0 of field, label and count"),
+        ("a column with no heading", '{ heading = "Pages", count = true }', "{ count = true }",
+         "states no heading"),
+        ("front matter a column may not show", '{ heading = "Subject", field = "subtitle" }',
+         '{ heading = "Subject", field = "intent" }', "which a column may not show"),
+        ("a total with nothing counted", '{ heading = "Pages", count = true }',
+         '{ heading = "Pages", label = "Held to" }', "no column counts anything"),
+    )
+
+    def test_an_index_the_build_cannot_write_is_refused(self):
+        for case, old, new, says in self.INDEX_REFUSED:
+            with self.subTest(case):
+                self.indexed(index=self.INDEX.replace(old, new, 1))
+                problems = [problem for problem in wiki.index_problems(self.root)
+                            if problem.startswith("indexer.md")]
+                self.assertTrue(problems, "nothing was refused")
+                self.assertTrue(any(says in problem for problem in problems), problems)
+
+    def test_an_index_marker_and_its_declaration_need_each_other(self):
+        for case, index, marker, says in (
+                ("a marker with no declaration", "[other]\nx = 1", "{index-table}", "declares no [index]"),
+                ("a declaration with no marker", None, "It states something.[^why]", "has no {index-table}"),
+                ("a marker the build cannot replace", None, "- {index-table}", "where the build cannot write"),
+                ("a marker written twice", None, "{index-table}\n\n{index-table}", "2 times")):
+            with self.subTest(case):
+                self.indexed(index=index, marker=marker)
+                problems = [problem for problem in wiki.index_problems(self.root)
+                            if problem.startswith("indexer.md")]
+                self.assertTrue(problems, "nothing was refused")
+                self.assertIn(says, problems[0])
+
+    def test_a_sound_index_is_left_alone(self):
+        # In one case with a broken one, so an empty result cannot pass for a check that ran.
+        self.indexed()
+        self.assertEqual([], [p for p in wiki.index_problems(self.root) if p.startswith("indexer.md")])
+        self.indexed(index=self.INDEX.replace('pages = "thing/*"', 'pages = "nowhere/*"', 1))
+        self.assertNotEqual([], [p for p in wiki.index_problems(self.root) if p.startswith("indexer.md")])
+
+    def test_check_names_an_index_the_build_cannot_write(self):
+        # Through the command, because the gate is what a project runs, and a check nothing calls is none.
+        self.indexed(index=self.INDEX.replace('pages = "thing/*"', 'pages = "nowhere/*"', 1))
+        status, output = self.run_main(["--root", str(self.root), "check"])
+        self.assertEqual(1, status, output)
+        self.assertIn("matches no page", output)
+
+    def test_a_star_in_a_pattern_stops_at_a_slash(self):
+        """`thing/*` is the pages directly under thing, and `thing/**` is everything beneath it.
+
+        Taken from fnmatch, whose star crosses a slash, a table meant to list the parts of an area would
+        have listed every page in it however deep.
+        """
+        def listed():
+            # The table only: every page is in the sidebar, whatever the pattern matched.
+            page = (self.out / "indexer/index.html").read_text(encoding="utf-8")
+            return page[page.index('<table class="w index">'):page.index("</table>")]
+
+        self.indexed()
+        self.build()
+        self.assertIn(">One</a>", listed())
+        self.assertNotIn(">Deep</a>", listed())
+        self.indexed(index=self.INDEX.replace('pages = "thing/*"', 'pages = "thing/**"', 1))
+        self.build()
+        self.assertIn(">Deep</a>", listed())
+
     # --- addresses a reader can follow ------------------------------------------------------------
 
     # A body, and the addresses the built page must make clickable.
