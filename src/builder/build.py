@@ -911,6 +911,110 @@ FAMILY_TABLE = "{family-table}"
 FAMILY_TABLE_LINE = re.compile(r"^[ \t]*\{family-table\}[ \t]*$", re.M)
 
 
+# A table over a named set of pages, which a family's member table cannot serve: a family is a page and
+# its children, and a wiki whose index differs from its tree has pages to list that are nobody's children.
+# Listing a page in a section pulls its whole subtree into that one fold, so a project wanting a foldable
+# section for each part has to keep those parts out of the page that indexes them.
+INDEX_TABLE = "{index-table}"
+INDEX_TABLE_LINE = re.compile(r"^[ \t]*\{index-table\}[ \t]*$", re.M)
+# The front matter a column may show. A page's title is already the link in the first cell.
+COLUMN_FIELDS = ("subtitle", "status")
+
+
+def glob_pattern(pattern):
+    """One page pattern as an expression that matches an address.
+
+    Written out rather than taken from `fnmatch`, whose `*` crosses a `/` -- with it, `area/*` would match
+    every page at any depth beneath area, and a table meant to list the parts of an area would list the
+    whole of it. `pathlib`'s own matching would do, but it arrived after the Python this package supports.
+    """
+    out, at = [], 0
+    while at < len(pattern):
+        if pattern.startswith("**", at):
+            out.append(".*")
+            at += 2
+        elif pattern[at] == "*":
+            out.append("[^/]*")
+            at += 1
+        elif pattern[at] == "?":
+            out.append("[^/]")
+            at += 1
+        else:
+            out.append(re.escape(pattern[at]))
+            at += 1
+    return re.compile("".join(out) + r"\Z")
+
+
+def index_pages(patterns, page_ids):
+    """The pages an index table lists: every page matching any of its patterns, in address order.
+
+    A pattern names addresses under `pages`, which is what a writer sees: `area/*` is the pages directly
+    under area, and `area/**` is everything beneath it however deep.
+    """
+    found = set()
+    for pattern in patterns:
+        cleaned = pattern[len("pages/"):] if pattern.startswith("pages/") else pattern
+        cleaned = cleaned[:-len(".md")] if cleaned.endswith(".md") else cleaned
+        matches = glob_pattern(cleaned)
+        found |= {page_id for page_id in page_ids if matches.match(page_id)}
+    return sorted(found)
+
+
+def pages_beneath(page_id, page_ids):
+    """How many pages sit under this one, however deep. The number a hand-kept index gets wrong first."""
+    return sum(1 for other in page_ids if other.startswith(page_id + "/"))
+
+
+def index_columns(index):
+    """The columns a page's index table declares, or None when it declares none this file can write."""
+    columns = index.get("columns")
+    if not isinstance(columns, list) or not columns:
+        return None
+    return [column for column in columns if isinstance(column, dict)] or None
+
+
+def index_table_rows(page_id, pages, emitted, audience):
+    """A page's index table: its headings, a row for each page it lists, and the totals row if asked for.
+
+    Every value is read rather than written, so a page added anywhere beneath a listed page changes the
+    count without anyone editing the table. None when the page declares no index this file can write,
+    which `wiki check` reports.
+    """
+    index = pages[page_id]["meta"].get("index")
+    if not isinstance(index, dict):
+        return None
+    patterns = index.get("pages")
+    patterns = [patterns] if isinstance(patterns, str) else patterns
+    columns = index_columns(index)
+    if not isinstance(patterns, list) or not patterns or columns is None:
+        return None
+    written = [other for other in emitted if other != page_id]
+    headings = [str(column.get("heading", "")) for column in columns]
+    rows = []
+    for listed in index_pages([str(pattern) for pattern in patterns], written):
+        stated = {}
+        for group in pages[listed]["meta"].get("infobox", []):
+            if visible_to(audience, group.get("audience", pages[listed]["audience"])):
+                for row in group.get("rows", []):
+                    stated.setdefault(str(row.get("label", "")), str(row.get("value", "")))
+        cells = []
+        for column in columns:
+            if column.get("count"):
+                cells.append(str(pages_beneath(listed, written)))
+            elif column.get("field"):
+                cells.append(str(pages[listed]["meta"].get(str(column["field"]), "")).strip())
+            else:
+                cells.append(stated.get(str(column.get("label", "")), ""))
+        rows.append((listed, cells))
+    totals = None
+    if index.get("total"):
+        # Only a counted column has a total: summing anything a page happened to write in a cell would
+        # be inventing a number nobody stated.
+        totals = [str(sum(int(cells[at]) for _, cells in rows)) if column.get("count") else ""
+                  for at, column in enumerate(columns)]
+    return headings, rows, totals
+
+
 def markdown_cell(text):
     """Text that sits in one markdown table cell without ending the cell, the row, or opening a code span."""
     return " ".join(str(text).splitlines()).replace("|", "\\|").replace("`", "\\`")
@@ -1018,6 +1122,35 @@ def family_table_markdown(pages, table, directory):
     lines += ["| [%s](%s) | %s |" % (markdown_cell(pages[child]["title"]), copy_address(directory, child),
                                      " | ".join(markdown_cell(value) for value in values))
               for child, values in rows]
+    return "\n".join(lines)
+
+
+def index_table_html(pages, table, directory):
+    """A page's index table as it shows it: each listed page linked, then its values, then the totals."""
+    headings, rows, totals = table
+    head = "<th></th>" + "".join("<th>%s</th>" % html_module.escape(heading) for heading in headings)
+    body = "".join('<tr><td><a href="%s">%s</a></td>%s</tr>'
+                   % (relative_directory(directory, page_directory(listed)),
+                      html_module.escape(pages[listed]["title"]),
+                      "".join("<td>%s</td>" % html_module.escape(value) for value in values))
+                   for listed, values in rows)
+    if totals:
+        body += ("<tr class=\"total\"><td>Total</td>%s</tr>"
+                 % "".join("<td>%s</td>" % html_module.escape(value) for value in totals))
+    return ('<div class="wt"><table class="w index"><thead><tr>%s</tr></thead><tbody>%s</tbody></table></div>'
+            % (head, body))
+
+
+def index_table_markdown(pages, table, directory):
+    """A page's index table as its markdown copy carries it."""
+    headings, rows, totals = table
+    lines = ["|  | %s |" % " | ".join(markdown_cell(heading) for heading in headings),
+             "|%s" % ("---|" * (len(headings) + 1))]
+    lines += ["| [%s](%s) | %s |" % (markdown_cell(pages[listed]["title"]), copy_address(directory, listed),
+                                     " | ".join(markdown_cell(value) for value in values))
+              for listed, values in rows]
+    if totals:
+        lines.append("| Total | %s |" % " | ".join(markdown_cell(value) for value in totals))
     return "\n".join(lines)
 
 
@@ -1408,6 +1541,8 @@ def write_site(root, out, audience, link_root, today, record, wiki, sitemap=Fals
         # health table on the health page, which a user build leaves out.
         family_table = (family_table_rows(page_id, pages, emitted, audience)
                         if FAMILY_TABLE in page["body"] else None)
+        index_table = (index_table_rows(page_id, pages, emitted, audience)
+                       if INDEX_TABLE in page["body"] else None)
         health = (health_rows(pages, emitted, dates, citations)
                   if page_id == HEALTH_ID and audience != "user" else None)
         markdown.renderer.cited = {}
@@ -1455,6 +1590,8 @@ def write_site(root, out, audience, link_root, today, record, wiki, sitemap=Fals
         # Written in after the references are pointed, because their links already resolve from this page.
         if family_table:
             body = body.replace("<p>%s</p>" % FAMILY_TABLE, family_table_html(pages, family_table, directory))
+        if index_table:
+            body = body.replace("<p>%s</p>" % INDEX_TABLE, index_table_html(pages, index_table, directory))
         if health is not None:
             body += health_html(pages, health, directory)
         # The source view names paths and internal identifiers by its nature, so it is internal only.
@@ -1469,6 +1606,9 @@ def write_site(root, out, audience, link_root, today, record, wiki, sitemap=Fals
             if family_table:
                 copy = outside_code(copy, lambda text: FAMILY_TABLE_LINE.sub(
                     lambda _: family_table_markdown(pages, family_table, directory), text))
+            if index_table:
+                copy = outside_code(copy, lambda text: INDEX_TABLE_LINE.sub(
+                    lambda _: index_table_markdown(pages, index_table, directory), text))
             emit(directory, copy, AGENT_COPY)
             llm_links = ('<link rel="alternate" type="text/markdown" href="%s">\n<link rel="describedby" '
                          'href="%s">' % (AGENT_COPY, posixpath.relpath("/" + AGENT_INDEX,
@@ -1800,8 +1940,8 @@ def page_statements(path):
         return "\n" * match.group(0).count("\n")
 
     # The family table marker is where the build writes a table, not a sentence.
-    body = FAMILY_TABLE_LINE.sub("", HEADING_ANY.sub("", LINK_DEFINITION.sub(
-        "", FENCED.sub(blank, FOOTNOTE.sub(blank, body)))))
+    body = INDEX_TABLE_LINE.sub("", FAMILY_TABLE_LINE.sub("", HEADING_ANY.sub("", LINK_DEFINITION.sub(
+        "", FENCED.sub(blank, FOOTNOTE.sub(blank, body))))))
     for block in BLOCK.finditer(body):
         start = first + body[:block.start()].count("\n")
         chunk = block.group(0)
@@ -2521,6 +2661,77 @@ def section_headings(body):
             for match in SECTION_HEADING.finditer(FENCED.sub("", body))]
 
 
+def index_problems(root, wiki=None):
+    """Index tables a page declares that the build cannot write, and pages it says to list but cannot find.
+
+    An index is a table over a named set of pages rather than over a page's children, so nothing about
+    the tree tells the build whether the writer meant what they typed. A pattern matching no page is the
+    way one goes wrong silently -- a table that empties itself after a page moves looks exactly like a
+    table over a set that is empty -- so it is refused rather than left to publish blank.
+    """
+    pages_dir, pages = pages_by_id(root, wiki)
+    problems = []
+    for page_id in sorted(pages):
+        _, meta, body = pages[page_id]
+        # Judged as the build writes the page: the table replaces the marker only where the marker is a
+        # paragraph of its own, so one inside a list, a quote or an indented block would stay as written.
+        written = INDEX_TABLE in INLINE_CODE.sub("", FENCED.sub("", body))
+        placed = make_markdown()(body).count("<p>%s</p>" % INDEX_TABLE) if written else 0
+        index = meta.get("index")
+        if written and not placed:
+            problems.append(f"{page_id}.md has {INDEX_TABLE} where the build cannot write the table, such as "
+                            "in a list, a quote or an indented block; put it on a line of its own, with a "
+                            "blank line before and after")
+        elif placed > 1:
+            problems.append(f"{page_id}.md has {INDEX_TABLE} {placed} times; keep one, where the table goes")
+        if index is None:
+            if placed:
+                problems.append(f"{page_id}.md has {INDEX_TABLE} but declares no [index]; declare it, with "
+                                "pages naming the pages to list and columns naming what each row shows")
+            continue
+        if not isinstance(index, dict):
+            problems.append(f"{page_id}.md: index must be a table, written [index] with pages and columns "
+                            "under it")
+            continue
+        if not placed:
+            problems.append(f"{page_id}.md declares [index] but has no {INDEX_TABLE}; put {INDEX_TABLE} on a "
+                            "line of its own where the table goes")
+        patterns = index.get("pages")
+        patterns = [patterns] if isinstance(patterns, str) else patterns
+        if (not isinstance(patterns, list) or not patterns
+                or not all(isinstance(pattern, str) and pattern for pattern in patterns)):
+            problems.append(f"{page_id}.md: index.pages must name the pages to list, as one address or a "
+                            'list of them, such as pages = "area/*"')
+            continue
+        listed = index_pages(patterns, [other for other in pages if other != page_id])
+        for pattern in patterns:
+            if not index_pages([pattern], [other for other in pages if other != page_id]):
+                problems.append(f"{page_id}.md: index.pages names {pattern!r}, which matches no page; name "
+                                "pages by their address under pages, where * stops at a / and ** does not")
+        columns = index.get("columns")
+        if not isinstance(columns, list) or not columns or not all(isinstance(c, dict) for c in columns):
+            problems.append(f"{page_id}.md: index.columns must list what each row shows, each one a table, "
+                            'such as columns = [{ heading = "Pages", count = true }]')
+            continue
+        for column in columns:
+            named = [key for key in ("field", "label", "count") if column.get(key)]
+            heading = str(column.get("heading", ""))
+            if not heading:
+                problems.append(f"{page_id}.md: an index column states no heading; give every column a "
+                                'heading, such as { heading = "Pages", count = true }')
+            if len(named) != 1:
+                problems.append(f"{page_id}.md: the index column {heading!r} names {len(named)} of field, "
+                                "label and count; give each column exactly one of them")
+            elif named == ["field"] and str(column["field"]) not in COLUMN_FIELDS:
+                problems.append(f"{page_id}.md: the index column {heading!r} shows the front matter "
+                                f"{column['field']!r}, which a column may not show; show one of "
+                                f"{', '.join(COLUMN_FIELDS)}, or an infobox label with label = ")
+        if index.get("total") and not any(column.get("count") for column in columns):
+            problems.append(f"{page_id}.md declares index.total but no column counts anything; add a column "
+                            "with count = true, or take total out")
+    return problems
+
+
 def family_problems(root, wiki=None):
     """Members of a declared family that stray from its layout, and members their parent does not link.
 
@@ -2700,7 +2911,8 @@ def page_checks(root, wiki):
             ("table", table_problems(root, wiki)),
             ("uncited", uncited_problems(root, wiki)),
             ("infobox", infobox_problems(root, wiki)),
-            ("family", family_problems(root, wiki)))
+            ("family", family_problems(root, wiki)),
+            ("index", index_problems(root, wiki)))
 
 
 def check_pages(root, wiki, version, records, only):

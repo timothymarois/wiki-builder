@@ -75,6 +75,7 @@ flowchart LR
 | A picture whose subject has changed[^pictures] | [Pictures](checks/pictures.md) |
 | A link to a PDF outside the files folder or missing from it, or a PDF over 20 MB[^pdfs] | [PDFs](checks/pdfs.md) |
 | A family member's heading or infobox label its parent's layout does not list, or a member its parent does not link[^families] | [Families](checks/families.md) |
+| An index table the build cannot write, or a pattern matching no page[^index] | [Index tables](pages/index-tables.md) |
 | A page edited since its date was recorded[^dates] | [Site](site.md) |
 | A wiki written against a different release of the tool[^version] | [Delivery](skill/delivery.md) |
 
@@ -101,6 +102,7 @@ sentence, and the command exits with 1.[^caught]
 [^pictures]: `src/builder/build.py` — `picture_problems()`.
 [^pdfs]: `src/builder/build.py` — `pdf_problems()`.
 [^families]: `src/builder/build.py` — `family_problems()`.
+[^index]: `src/builder/build.py` — `index_problems()`.
 [^dates]: `src/builder/build.py` — `date_problems()`.
 [^version]: `src/builder/build.py` — `version_problems()`.
 [^stop]: `src/builder/config.py` — `read_config()`; `src/builder/build.py` — `read_pages()`,
