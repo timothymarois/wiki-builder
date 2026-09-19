@@ -106,6 +106,11 @@ ATTRIBUTE = re.compile(r'(href|src)="([^"]*)"')
 LONE_FIGURE = re.compile(r"<p>(<figure.*?</figure>)</p>", re.S)
 # A footnote's definition: its first line and every indented or blank line after it, the reference in group 1.
 FOOTNOTE = re.compile(r"^\[\^[^\]]+\]:(.*(?:\n(?:[ \t]+.*|))*)", re.M)
+# Where a reference-style link's address is defined. It names an address, not a fact, so it is blanked
+# before a page is read as statements -- as a footnote definition is, and for the same reason. Without
+# this, exempting "[Name][ref]" where it is used would still leave its definition asking for a citation
+# no writer can give it.
+LINK_DEFINITION = re.compile(r"^[ \t]*\[[^\]^][^\]]*\]:[ \t]*\S+.*$", re.M)
 
 # Everything the user build must not carry. Each is emitted by this file, in this exact shape, so
 # stripping them is removing what we put there rather than parsing arbitrary HTML.
@@ -1687,9 +1692,29 @@ INLINE_CODE = re.compile(r"`[^`\n]*`")
 BLOCK = re.compile(r"^(?![ \t]*$).+(?:\n(?![ \t]*$).*)*", re.M)
 # A link to another page. The page it points at carries the citations.
 PAGE_LINK = re.compile(r"\]\([^)\s]*\.md(?:#[^)\s]*)?\)")
-# A list item that is a link and nothing else, as under External links: it names somewhere to read, and
-# states nothing that could be cited.
-LINK_ONLY = re.compile(r"^\s*(?:(?:[-*+]|\d+\.)\s+)?\[[^\]]+\]\([^)\s]+\)\s*$")
+# A statement that is nothing but links, as under External links: it names somewhere to read and states
+# nothing that could be cited. A reference-style link counts, because "[Name][ref]" points where
+# "[Name](url)" points, and several may sit on one line. Only punctuation may stand between them: a word
+# between two links, "and" included, makes the line prose, and prose is a claim.
+LINK = r"\[[^\]]+\](?:\([^)\s]+\)|\[[^\]]*\])"
+LINK_ONLY = re.compile(r"^\s*(?:(?:[-*+]|\d+\.)\s+)?%s(?:\s*[;,·/|]\s*%s)*\s*[.;]?\s*$" % (LINK, LINK))
+# A statement that is only a bold label -- "**Inference.**", "- **Note.**" -- which names what follows
+# instead of stating it, so there is nothing to cite. BOUNDARY ends a sentence at the full stop inside the
+# bold, cutting the label off the sentence it introduces; that sentence still answers for its own
+# citation. Held to four words and no verb, because a claim set in bold is still a claim.
+BOLD_LABEL = re.compile(r"^\s*(?:(?:[-*+]|\d+\.)\s+)?(\*\*|__)\s*(?P<label>[^*_]+?)\s*\1\s*$")
+LABEL_VERB = re.compile(r"\b(is|are|was|were|be|has|have|had|can|could|will|would|must|may|might|shall"
+                        r"|does|do|did|says|say|holds|hold|needs|need|takes|take|gets|get|makes|make"
+                        r"|goes|go|runs|run|comes|come|gives|give|keeps|keep|leaves|leave)\b", re.I)
+
+
+def bold_label(statement):
+    """Whether a statement is a bold label rather than a claim set in bold."""
+    found = BOLD_LABEL.match(statement)
+    if not found:
+        return False
+    label = found.group("label").rstrip(".:;,")
+    return bool(label) and len(label.split()) <= 4 and not LABEL_VERB.search(label)
 # The pipes that divide one row into cells: every one the writer did not escape. Backticks are not
 # honoured, because the renderer does not honour them either -- a cell holding `a|b` is two cells to it,
 # and a check that read it as one would pass a table the renderer throws away.
@@ -1738,7 +1763,8 @@ def page_statements(path):
         return "\n" * match.group(0).count("\n")
 
     # The family table marker is where the build writes a table, not a sentence.
-    body = FAMILY_TABLE_LINE.sub("", HEADING_ANY.sub("", FENCED.sub(blank, FOOTNOTE.sub(blank, body))))
+    body = FAMILY_TABLE_LINE.sub("", HEADING_ANY.sub("", LINK_DEFINITION.sub(
+        "", FENCED.sub(blank, FOOTNOTE.sub(blank, body)))))
     for block in BLOCK.finditer(body):
         start = first + body[:block.start()].count("\n")
         chunk = block.group(0)
@@ -1871,7 +1897,7 @@ def uncited_problems(root, wiki=None):
             if not re.search(r"[A-Za-z]", statement):
                 continue
             if (CLAIM.search(INLINE_CODE.sub("", statement)) or PAGE_LINK.search(statement)
-                    or LINK_ONLY.match(statement)):
+                    or LINK_ONLY.match(statement) or bold_label(statement)):
                 continue
             if statement.startswith("|"):
                 problems.append("%s:%d: the table row %s cites nothing; give one of its cells a reference, "
