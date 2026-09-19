@@ -45,6 +45,9 @@ Install wiki-builder in this project and start its wiki.
    https://github.com/timothymarois/wiki-builder/blob/main/docs/wiki/pages/installation.md
    Wherever it says TAG, use the newest release tag:
    git ls-remote --tags https://github.com/timothymarois/wiki-builder
+   Write all three files it describes: scripts/wiki-version holding that tag on its own, and the
+   two scripts that read it. Never put a release tag in a web host's build command or in any
+   other file; a GitHub workflow's `uses:` is the one exception, because it cannot read the file.
 3. Once `wiki sync` has run, load the writing-wiki-pages skill it installed and read it in full,
    references included. Write the first pages by it: a brief, then a page or a section for the behaviour
    a person meets and every requirement I have stated. Never invent: every statement comes from the

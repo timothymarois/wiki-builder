@@ -107,13 +107,13 @@ digest = "e9f053e91c62be98fdb94a4adca6f4dba71c493a6f7a8e2b651f6b00ca61e7ea"
 audited = "2026-09-15"
 
 ["continuous-integration"]
-updated = "2026-09-14"
-digest = "3c7b81c9bc25fdab14b1c3d1693255a54ab7b4c16ccc8078bf3968b05235f268"
+updated = "2026-09-19"
+digest = "33f257cdc68aa5c255f28999913d9da1c84d6f1ab9e3358bf56659259ee17f1e"
 audited = "2026-09-14"
 
 ["deployment-cloudflare"]
-updated = "2026-09-15"
-digest = "5de07ec1c8b6943c5302b74c9d01e406580cb138246a8136ab6e85314182f231"
+updated = "2026-09-19"
+digest = "6b529c2cd30ddb9ac5c3ecf6715017da164e3e305647d8716320ab93b46c48c2"
 audited = "2026-09-15"
 
 ["deployment-cloudflare/authentication"]
@@ -149,13 +149,13 @@ updated = "2026-09-15"
 digest = "7b1b3fbb69331e745f1d28260f178cf5b6792259e61ab6bb45be3aa31412d92e"
 
 ["installation"]
-updated = "2026-09-15"
-digest = "03ff87d4e1a6dedbfd9ea7f5feb0666625d42e9240c752bfc9b5abf5737227b9"
+updated = "2026-09-19"
+digest = "2b94988f96e99efe59ac6f9ba5cbcb2d9e3b465bad98a42ea97d6d1c46cea7f1"
 audited = "2026-09-14"
 
 ["installation-prompt"]
-updated = "2026-09-15"
-digest = "5e433f944d394388091c4961321709145c9aa7b650318175037ac3a5cad43543"
+updated = "2026-09-19"
+digest = "f1e73960340670310f67cfe88093ec264d01e0a49fe37c6ce3e1996501d072f9"
 
 ["organization-prompt"]
 updated = "2026-09-15"

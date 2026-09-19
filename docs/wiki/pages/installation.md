@@ -1,6 +1,6 @@
 +++
 title = "Installation"
-subtitle = "requirements, the wrapper script, a first wiki and updates"
+subtitle = "requirements, the release pin, the wrapper script, a first wiki and updates"
 status = "approved"
 intent = """
 Installation exists so that any project, on any stack, can start a wiki with one pinned release of the
@@ -40,23 +40,39 @@ It needs Python 3.11 or newer, and one dependency pinned exactly, the markdown p
 The wrapper script below also needs `uv`, whose `uvx` runs a release straight from its git address; a
 project without `uv` installs a release with `pip` and runs `wiki` directly.[^uv]
 
+## Pin
+
+**The release a project runs is one file it commits**, so that bumping it is a line in a diff a reviewer
+reads rather than a value typed into a settings panel.{missing} Both scripts below read it.{missing}
+
+```text
+# scripts/wiki-version
+TAG
+```
+
+`TAG` names a published wiki-builder release.{missing} `wiki sync` records that release in `wiki.toml`, and
+`wiki check` fails while the two differ.[^version] A GitHub workflow cannot read this file, as
+[Continuous integration](continuous-integration.md) describes.
+
 ## Wrapper
 
-A project commits one script that runs a pinned release, and passes `--root` so the tool finds the project
-wherever the script is called from.[^root]
+A project commits one script that runs the pinned release, and passes `--root` so the tool finds the
+project wherever the script is called from.[^root]
 
 ```sh
 #!/bin/sh
 # scripts/dev-wiki.sh
 set -eu
-WIKI_VERSION=TAG
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+WIKI_VERSION="$(cat "$ROOT/scripts/wiki-version")"
 exec uvx --from "git+https://github.com/timothymarois/wiki-builder@$WIKI_VERSION" \
      wiki "$@" --root "$ROOT"
 ```
 
 The tool accepts `--root` after the command, which is what lets the script add it to whatever it is
-handed.[^root] `TAG` names a published wiki-builder release.{missing}
+handed.[^root] A wiki at the root of the repository adds `--wiki .` the same way.[^wikipath] A web host
+builds the wiki with a second script that reads the same pin, described on
+[Cloudflare](deployment-cloudflare.md).
 
 ## First wiki
 
@@ -108,7 +124,8 @@ every push and pull request and cannot drift unnoticed between local runs, as de
 
 ## Updates
 
-An update is a new tag in the script, then `wiki sync` to rewrite the skill and record the release.[^sync]
+An update is a new tag in `scripts/wiki-version`, then `wiki sync` to rewrite the skill and record the
+release.[^sync]
 `wiki check` fails until that release is recorded, and names every page a new rule breaks.[^version]
 
 [^package]: `pyproject.toml` — `[project.scripts]` names the `wiki` command, `requires-python` asks for
@@ -117,6 +134,8 @@ An update is a new tag in the script, then `wiki sync` to rewrite the skill and 
     and `--from` installs a tool from another source, such as a git repository; `action.yml` — installs
     wiki-builder with `pip`, without `uv`.
 [^root]: `src/builder/cli.py` — `main()` accepts `--root` and `--wiki` before the command or after it.
+[^wikipath]: `src/builder/build.py` — `wiki_of()` uses a given `--wiki` as it stands, and joins
+    `docs/wiki` to the project only when none is given.
 [^where]: `src/builder/build.py` — `wiki_of()` defaults the wiki to `docs/wiki`.
 [^config]: `src/builder/config.py` — `read_config()` refuses a `wiki.toml` with no `site.name` or no
     `[[section]]`.
