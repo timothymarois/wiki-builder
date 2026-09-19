@@ -115,6 +115,24 @@ export async function onRequest(context) {
 }
 ```
 
+## On a Worker
+
+On a **Worker with static assets**, **Cloudflare serves a matching asset before the Worker script
+runs**, so a sign-in in front of the pages needs `assets.run_worker_first` in the Worker's
+configuration.[^first] A `functions/` folder is not read there; `wrangler pages functions build` compiles
+one into a single Worker script.[^compile]
+
+```jsonc
+{
+  "name": "a-wiki",
+  "main": "./worker/index.js",
+  "assets": { "directory": "./_site/", "binding": "ASSETS", "run_worker_first": true }
+}
+```
+
+Cloudflare marks neither as replacing the other, so a project already on Pages has nothing to
+change.[^neither]
+
 ## External links
 
 - [One-time PIN login](https://developers.cloudflare.com/cloudflare-one/identity/one-time-pin/)
@@ -122,6 +140,8 @@ export async function onRequest(context) {
 - [Known issues](https://developers.cloudflare.com/pages/platform/known-issues/)
 - [Middleware](https://developers.cloudflare.com/pages/functions/middleware/)
 - [HTTP Basic Authentication](https://developers.cloudflare.com/workers/examples/basic-auth/)
+- [Worker script routing](https://developers.cloudflare.com/workers/static-assets/routing/worker-script/)
+- [Migrating from Pages to Workers](https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/)
 
 [^pin]: Cloudflare Docs — [One-time PIN login](https://developers.cloudflare.com/cloudflare-one/identity/one-time-pin/):
     a reader enters an email address and, when an Access policy allows it, receives a PIN that expires
@@ -154,6 +174,17 @@ export async function onRequest(context) {
     Basic Authentication sends credentials unencrypted and needs HTTPS, Cloudflare Access is recommended
     for production, credentials are compared with `crypto.subtle.timingSafeEqual`, and a `401` carrying
     `WWW-Authenticate` prompts the browser for credentials.
+[^first]: Cloudflare Docs — [Worker script routing](https://developers.cloudflare.com/workers/static-assets/routing/worker-script/):
+    "If you have both static assets and a Worker script configured, Cloudflare will first attempt to serve
+    static assets if one matches the incoming request", and `assets.run_worker_first` runs the Worker
+    before each request instead.
+[^compile]: Cloudflare Docs — [Migrating from Pages to Workers](https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/):
+    "Workers, on the other hand, will default to serving static assets ahead of your Worker script, unless
+    you have configured `assets.run_worker_first`", and a `functions/` folder "must first compile these
+    functions into a single Worker script with the `wrangler pages functions build` command".
+[^neither]: Cloudflare Docs — [Middleware](https://developers.cloudflare.com/pages/functions/middleware/)
+    and [Migrating from Pages to Workers](https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/):
+    neither marks Pages as deprecated or in maintenance, and neither tells a new project to use Workers.
 [^copies]: `src/builder/build.py` — `write_site()` writes each page's `index.md` with `markdown_copy()` and
     `llms.txt` with `agent_index()` in every build but a user build; `src/builder/cli.py` — `run()` builds
     `wiki publish` for the internal audience.

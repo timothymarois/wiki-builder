@@ -125,8 +125,8 @@ digest = "6b529c2cd30ddb9ac5c3ecf6715017da164e3e305647d8716320ab93b46c48c2"
 audited = "2026-09-15"
 
 ["deployment-cloudflare/authentication"]
-updated = "2026-09-14"
-digest = "4bcf0633c2f7af2175c3bdd0102c82fd971f45004efebdba19cd5ea9d604cf8b"
+updated = "2026-09-19"
+digest = "6976516b95bf63ce67071fc4c223d352dae0d57e8fd39ff3d39ddc17e5844ae2"
 audited = "2026-09-15"
 
 ["deployment-github"]
