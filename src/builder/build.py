@@ -2013,11 +2013,13 @@ WORDED_FIELDS = ("title", "subtitle", "intent", "infobox group", "infobox label"
                  "infobox note")
 
 
-def wording_places(path, pages_dir, fields=WORDED_FIELDS):
+def wording_places(path, pages_dir, front_matter_fields=WORDED_FIELDS):
     """Each field and sentence of a page, named the way a problem names it, with its code removed.
 
     Every check that refuses a word reads a page through this, so each names a place the same way, and none
-    reads a code sample, which shows text as written.
+    reads a code sample, which shows text as written. `front_matter_fields` narrows the front matter only:
+    **the body is always read**, because a word refused in a subtitle is refused in a sentence too, and a
+    caller that passed a short list to mean "just these" read every sentence anyway.
     """
     meta, _ = read_front_matter(path)
     name = path.relative_to(pages_dir)
@@ -2029,7 +2031,7 @@ def wording_places(path, pages_dir, fields=WORDED_FIELDS):
             found += [("infobox label", row.get("label", "")), ("infobox value", row.get("value", "")),
                       ("infobox note", row.get("note", ""))]
     places = [(f"{name}: the {field}", INLINE_CODE.sub("", str(text)))
-              for field, text in found if field in fields]
+              for field, text in found if field in front_matter_fields]
     places += [(f"{name}:{line}: {quoted(statement)}", INLINE_CODE.sub("", statement))
                for line, statement in page_statements(path)]
     return places
@@ -2050,6 +2052,8 @@ def attribution_problems(root, wiki=None):
     pages_dir = wiki_of(root, wiki) / "pages"
     problems = []
     for path in sorted(pages_dir.rglob("*.md")):
+        # The title and the infobox are left out of the front matter read here; every sentence of the
+        # body is read whatever is named, which is what the check wants.
         for place, text in wording_places(path, pages_dir, ("subtitle", "intent")):
             if ATTRIBUTION.search(text):
                 problems.append(f"{place} attributes a rule to a person; state the rule itself")
