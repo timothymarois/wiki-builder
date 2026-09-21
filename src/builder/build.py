@@ -965,6 +965,32 @@ def pages_beneath(page_id, page_ids):
     return sum(1 for other in page_ids if other.startswith(page_id + "/"))
 
 
+# What a column may count: the pages beneath the listed page, the pages the listed page's own index lists,
+# or the pages beneath those. A section's front page lists parts whose pages are not their children, so
+# only a count through each part's own index reaches them.
+COUNTS = (True, "index", "index-beneath")
+
+
+def indexed_by(page_id, pages, written):
+    """The pages a page's own index lists, or None when it declares no index to count through."""
+    index = pages[page_id]["meta"].get("index")
+    patterns = index.get("pages") if isinstance(index, dict) else None
+    patterns = [patterns] if isinstance(patterns, str) else patterns
+    if not isinstance(patterns, list) or not patterns:
+        return None
+    return index_pages([str(pattern) for pattern in patterns], [other for other in written if other != page_id])
+
+
+def column_count(column, listed, pages, written):
+    """The number a counted column shows for one listed page."""
+    if column.get("count") is True:
+        return pages_beneath(listed, written)
+    through = indexed_by(listed, pages, written) or []
+    if column.get("count") == "index":
+        return len(through)
+    return sum(pages_beneath(page_id, written) for page_id in through)
+
+
 def index_columns(index):
     """The columns a page's index table declares, or None when it declares none this file can write."""
     columns = index.get("columns")
@@ -1000,7 +1026,7 @@ def index_table_rows(page_id, pages, emitted, audience):
         cells = []
         for column in columns:
             if column.get("count"):
-                cells.append(str(pages_beneath(listed, written)))
+                cells.append(str(column_count(column, listed, pages, written)))
             elif column.get("field"):
                 cells.append(str(pages[listed]["meta"].get(str(column["field"]), "")).strip())
             else:
@@ -2722,6 +2748,17 @@ def index_problems(root, wiki=None):
             if len(named) != 1:
                 problems.append(f"{page_id}.md: the index column {heading!r} names {len(named)} of field, "
                                 "label and count; give each column exactly one of them")
+            elif named == ["count"] and column["count"] not in COUNTS:
+                problems.append(f"{page_id}.md: the index column {heading!r} counts {column['count']!r}; "
+                                'count true for the pages beneath each listed page, "index" for the pages '
+                                'its own index lists, or "index-beneath" for the pages beneath those')
+            elif named == ["count"] and column["count"] is not True:
+                for other in listed:
+                    meta = pages[other][1]
+                    if not isinstance(meta.get("index"), dict) or not meta["index"].get("pages"):
+                        problems.append(f"{page_id}.md: the index column {heading!r} counts through "
+                                        f"{other}.md, which declares no [index] to count through; list pages "
+                                        "that declare one, or count true")
             elif named == ["field"] and str(column["field"]) not in COLUMN_FIELDS:
                 problems.append(f"{page_id}.md: the index column {heading!r} shows the front matter "
                                 f"{column['field']!r}, which a column may not show; show one of "

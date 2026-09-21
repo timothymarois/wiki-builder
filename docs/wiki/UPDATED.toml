@@ -188,8 +188,8 @@ digest = "8995898380c67bbd14940ef64fca7c7a188395e6f7bae00340d21d0dd804d14b"
 audited = "2026-09-14"
 
 ["pages/index-tables"]
-updated = "2026-09-19"
-digest = "a656002b77847f84eae96079624c6f3c301e1bb947df1fb13ddd62e3952d0a21"
+updated = "2026-09-21"
+digest = "079de93cbd522dadb0ce98de2dc3fc3e09f88b45d7c61abaaee7f61b35185684"
 
 ["pages/markdown"]
 updated = "2026-09-14"

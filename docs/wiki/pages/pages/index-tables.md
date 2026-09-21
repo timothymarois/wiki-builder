@@ -24,7 +24,7 @@ rows = [
 [[infobox]]
 group = "Rules"
 rows = [
-  { label = "Refusals", value = "a pattern matching no page, a column naming none or two sources, a total with nothing counted", cite = "refused" },
+  { label = "Refusals", value = "a pattern matching no page, a column naming none or two sources, a total with nothing counted, a count through a page with no index", cite = "refused" },
   { label = "Written", value = "into the page and its markdown copy", cite = "written" },
 ]
 +++
@@ -64,7 +64,9 @@ Each column states a `heading` and **exactly one** of three sources.[^columns]
 |---|---|
 | `field` | the listed page's own front matter: `subtitle` or `status`[^columns] |
 | `label` | the value of that infobox label on the listed page, empty where it states none[^columns] |
-| `count` | how many pages sit beneath the listed page, however deep[^columns] |
+| `count = true` | how many pages sit beneath the listed page, however deep[^columns] |
+| `count = "index"` | how many pages the listed page's own index lists[^through] |
+| `count = "index-beneath"` | how many pages sit beneath the pages the listed page's own index lists[^through] |
 
 The first cell of every row is the listed page's title, linked, so no column needs to
 name it.[^written] `total = true` adds a totals row summing each counted column, and leaves the other
@@ -74,6 +76,12 @@ states.[^total]
 **A count is a property of the tree**, which no page states and no infobox could carry, and it is the
 value a writer keeping an index by hand gets wrong first: a page added beneath a listed page changes
 it.[^columns]
+
+**A count can go through the listed page's own index.**[^through] A front page that lists the parts of
+a wiki, each of which indexes pages that are not its children, counts nothing beneath each part; counting
+through each part's index gives how many pages that part lists and how many sit beneath them.[^through]
+A column counting through a listed page that declares no index is refused, and so is a count the build
+does not know.[^refused]
 
 ## Writing
 
@@ -90,6 +98,8 @@ no marker.[^refused]
 [^columns]: `src/builder/build.py` — `index_table_rows()` takes a column's `count` from
     `pages_beneath()`, its `field` from the listed page's front matter, and its `label` from the listed
     page's infobox; `COLUMN_FIELDS` names the front matter a column may show.
+[^through]: `src/builder/build.py` — `column_count()` counts through `indexed_by()`, which lists the
+    pages a listed page's own index names; `COUNTS` names the three counts a column may take.
 [^total]: `src/builder/build.py` — `index_table_rows()` sums each counted column when `index.total` is
     set, leaving every other cell of that row empty.
 [^written]: `src/builder/build.py` — `index_table_html()` and `index_table_markdown()` write the table

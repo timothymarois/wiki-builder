@@ -1303,6 +1303,48 @@ class WikiTests(unittest.TestCase):
         self.assertIn("| Total |  | 1 |", copy)
         self.assertNotIn("{index-table}", copy)
 
+    THROUGH = ('[index]\npages = "indexer"\ntotal = true\ncolumns = [\n'
+               '  { heading = "Parts", count = "index" },\n'
+               '  { heading = "Pages", count = "index-beneath" },\n]')
+
+    def through(self, index=None):
+        """A front page indexing the indexer, whose own index lists the pages under `thing`.
+
+        A section's front page lists parts whose pages are not their children, so counting beneath each
+        part counts nothing; the count has to go through what each part's own index lists.
+        """
+        self.indexed()
+        self.write("front", PAGE.replace("A thing", "Front")
+                   .replace('"""\n\n[[infobox]]', '"""\n\n' + (self.THROUGH if index is None else index)
+                            + "\n\n[[infobox]]", 1)
+                   .replace("It does it slowly.[^why]", "{index-table}"))
+        self.nav(CONFIGURATION.replace('pages = ["thing"]', 'pages = ["thing", "indexer", "front"]'))
+
+    def test_an_index_column_counts_through_the_listed_pages_own_index(self):
+        # The front page of a wiki drifted to 15 parts and 315 pages against 28 and 392, typed by hand.
+        self.through()
+        self.build()
+        page = (self.out / "front/index.html").read_text(encoding="utf-8")
+        self.assertRegex(page, r">Indexer</a></td><td>2</td><td>1</td>")
+        self.assertIn('<tr class="total"><td>Total</td><td>2</td><td>1</td></tr>', page)
+        # A page added beneath a part the indexer lists changes the front page, with neither page edited.
+        self.write("thing/one/new", PAGE.replace("A thing", "New"))
+        self.build()
+        page = (self.out / "front/index.html").read_text(encoding="utf-8")
+        self.assertRegex(page, r">Indexer</a></td><td>2</td><td>2</td>")
+
+    def test_a_count_through_an_index_the_page_lacks_is_refused(self):
+        for case, old, new, says in (
+                ("a count no build knows", 'count = "index"', 'count = "everything"',
+                 "counts 'everything'"),
+                ("a count through a page with no index", 'pages = "indexer"', 'pages = "thing/one"',
+                 "declares no [index] to count through")):
+            with self.subTest(case):
+                self.through(index=self.THROUGH.replace(old, new, 1))
+                problems = [problem for problem in wiki.index_problems(self.root)
+                            if problem.startswith("front.md")]
+                self.assertTrue(any(says in problem for problem in problems), problems)
+
     # A declaration, and what the check must say about it.
     INDEX_REFUSED = (
         ("a pattern matching no page", 'pages = "thing/*"', 'pages = "nowhere/*"',
