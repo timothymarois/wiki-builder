@@ -1,0 +1,25 @@
+# Visit https://soloterm.com to learn more
+name: wiki-builder
+icon: null
+processes:
+  wiki:serve:
+    command: uv run wiki serve
+    working_dir: null
+    auto_start: false
+    auto_restart: false
+    restart_when_changed: []
+    env: {}
+  tests:
+    command: uv run --with mistune==3.3.4 python -m unittest discover -s tests -t tests
+    working_dir: null
+    auto_start: false
+    auto_restart: false
+    restart_when_changed: []
+    env: {}
+  wiki:check:
+    command: uv run wiki check
+    working_dir: null
+    auto_start: false
+    auto_restart: false
+    restart_when_changed: []
+    env: {}
