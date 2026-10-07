@@ -608,11 +608,14 @@ def render_nav(sections, pages, categories, current, directory, audience):
         below = "".join(branch(child) for child in children_of(page_id, set(pages)))
         if page_id not in visible:
             return below
+        # The branch the reader is in is marked, so a child page shows which page it sits under.
+        above = (current or "").startswith(page_id + "/")
         link = ('<li><a class="%s" href="%s">%s</a>'
-                % ("on" if page_id == current else "",
+                % ("on" if page_id == current else "up" if above else "",
                    relative_directory(directory, page_directory(page_id)),
                    html_module.escape(pages[page_id]["title"])))
-        return link + ("<ul>%s</ul>" % below if below else "") + "</li>"
+        holds = ' class="here"' if page_id == current or above else ""
+        return link + ("<ul%s>%s</ul>" % (holds, below) if below else "") + "</li>"
 
     markup = []
     for section in sections:
