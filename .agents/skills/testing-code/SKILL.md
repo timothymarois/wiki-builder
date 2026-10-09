@@ -1,6 +1,6 @@
 ---
 name: testing-code
-description: Use when designing, adding, repairing, assessing, or speeding up automated tests and their local or CI feedback loop, including choosing a boundary, finding untested behavior, turning a known defect into regression proof, or correcting a test already shown to be flaky, brittle, slow, or falsely green. It supplies a runner-neutral workflow for trustworthy assertions and auditable evidence. For an unexplained failure, find the cause before writing the test that proves it fixed.
+description: Use when designing, adding, repairing, assessing, or speeding up automated tests and their local or CI feedback loop, including choosing a boundary, finding untested behavior, reproducing a defect, or diagnosing flaky, brittle, slow, or falsely green results. It supplies a runner-neutral workflow for deterministic cases, trustworthy assertions, measured performance changes, and auditable evidence. Do not use it for a framework's test syntax alone, to review a completed change, or to diagnose a failure whose cause is unknown.
 ---
 
 # Test code
@@ -24,10 +24,12 @@ expensive boundary.
 
 ## Load the stack's own mechanics
 
-This skill supplies the method — the boundary, assertion, and proof. Load `using-python` for the language
-mechanics, and read its `references/testing.md` for `unittest` discovery, assertions, cleanup, subtests
-and isolation. Deciding which behaviour and risk deserve a test is this skill's job; how to express one
-is that one's.
+This skill supplies the method — the boundary, the assertion, and the proof. A runner's fixtures,
+doubles, isolation, cleanup, and the idioms a reviewer of that stack expects belong to the package
+
+Read the package for every language, framework, and data store the code under test uses, as soon as
+you know what they are. A framework and the database under it are two packages, not one. None of them
+needs to be installed for the method here to work.
 
 ## Choose the boundary that contains the risk
 

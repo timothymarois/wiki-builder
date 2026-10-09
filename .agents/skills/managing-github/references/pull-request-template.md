@@ -7,19 +7,19 @@ head. Add a conditional section only when it materially helps review.
 ````md
 ## Problem
 
-<!-- One or two sentences: what is wrong now, and what it costs. -->
+<!-- State the current behavior or limitation, who or what it affects, and the consequence. -->
 
-## Solution
+## Proposed solution
 
-<!-- 3-6 bullets, one line each. One decision per bullet, non-obvious rationale only. -->
-
--
+<!-- Describe the implemented outcome, important decisions and rationale, its boundary, and preserved behavior. -->
 
 ## Evidence
 
-<!-- 2-4 items the diff cannot show: numbers, output, before/after. -->
+<!-- Give concise before-and-after observations, source locations, measurements, or contract links. Distinguish evidence from validation. -->
 
--
+## Acceptance criteria
+
+- [ ] <!-- Independently checkable outcome proven by this exact head. -->
 
 ## Validation
 
@@ -27,6 +27,12 @@ head. Add a conditional section only when it materially helps review.
 - [ ] Required GitHub checks pass for the exact head commit.
 
 <!-- Use one standalone `Closes #<number>.` line per completed issue. Use `Refs` for partial work. -->
+
+## Agent
+
+<!-- Replace the placeholder with the filing agent's display name. Omit provider and generated-by branding. -->
+
+🤖 by <Agent>
 ````
 
 Add **Scope and compatibility** when a public contract, migration, dependency, permission, or

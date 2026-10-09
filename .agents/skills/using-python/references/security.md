@@ -32,7 +32,6 @@ or dispatch, use a dict of callables.
 
 **SQL built by string formatting is injection** (`S608`). Parameterize — every driver supports it —
 and never interpolate identifiers from user input; validate them against an allowlist instead. This is
-the same rule `using-sqlite` and `using-postgres` state for their engines.
 
 ## Deserializing things
 
