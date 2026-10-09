@@ -7,7 +7,7 @@ produces a wrong answer. This page is *design* — code that runs correctly and 
 harder. Report them differently: a trap is a defect, an anti-pattern is a judgement, and saying which
 is which is what makes a review credible.
 
-Flag an anti-pattern only when you can name the concrete cost. `reviewing-code` puts it well: flag
+Flag an anti-pattern only when you can name the concrete cost.
 complexity "only when it creates a concrete cost or defect risk."
 
 ## Structure and abstraction

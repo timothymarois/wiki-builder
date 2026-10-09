@@ -1,6 +1,6 @@
 ---
 name: managing-github
-description: "Use before opening, updating or merging a pull request, pushing a branch for review, getting finished work up for review, filing or closing an issue, submitting a review, cutting a release, or moving a tag — load it before the `gh` command, not after. Also for inspecting hosted state read-only: whether a pull request is in good shape, whether its checks passed, what an issue says. Applies once development is finished and delivery is the next step, and when work uncovers a repository defect that may warrant an issue; loading it authorizes nothing. Not for reviewing code with no pull request in play, local Git or branch work, GitHub Actions authoring, or repository settings."
+description: "Use when work reaches a GitHub-hosted issue, pull request or review, release, tag, or live deployment-branch boundary, including indirectly after investigation, completed development, or repository policy requires delivery. Also trigger when work discovers a repository defect that may need duplicate search or an issue even without a filing request; selection does not authorize creation. Covers templates, submission, updates, reviews, and stored-result proof. Never trigger for repository or organization administration such as branch protection, rulesets, settings, permissions, secrets, or webhooks; local implementation or Git; GitHub Actions authoring; or technical code review with no hosted PR operation."
 ---
 
 # Manage GitHub
@@ -85,9 +85,7 @@ silently.
   duplicates; route security reports.
 - [Pull requests](references/pull-requests.md): inspect the review range, prepare or open a pull
   request, select explicit base and head, apply its template, inspect hosted review state, submit an
-  authorized comment, approval, or change request, link issues, verify stored content and checks,
-  **merge an authorized pull request, and clean up after it** — the branch-role, ref and worktree
-  review that `gh pr merge --delete-branch` skips.
+  authorized comment, approval, or change request, link issues, and verify stored content and checks.
 - [Releases](references/releases.md): discover the repository release contract, choose a compatible
   version and exact tag, prepare or publish a release, verify its target and assets, recover from a
   failed attempt, or reconcile a live deployment branch.
