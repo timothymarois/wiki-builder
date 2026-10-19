@@ -42,8 +42,9 @@ page is for and how it is laid out is described on [Pages](pages.md), and the fi
 | `image` | string | none | a picture recorded in `PICTURES.toml`, shown at the top of the infobox[^image] |
 | `image_caption` | string | empty | the caption under that picture[^image] |
 | `infobox` | list of tables, written `[[infobox]]` | none | the infobox's groups, in the order written[^infobox] |
-| `index` | table, written `[index]` | none | a table of other pages the build writes where `{index-table}` stands: `pages` naming them and `columns` what each row shows, as [Index tables](pages/index-tables.md) describes[^index] |
-| `family` | table, written `[family]` | none | on a parent page, the layout its child pages follow: `headings` in order, the infobox `labels` they may use, and the `table` of labels its member table compares, as [Families](checks/families.md) describes[^family] |
+| `index` | table, written `[index]` | none | a table of other pages the build writes where `{index-table}` stands, as [Index tables](pages/index-tables.md) describes[^index] |
+| `sort` | string | `"asc"` | a parent's child pages, by address; `"desc"` reverses them[^sort] |
+| `family` | table, written `[family]` | none | on a parent page, the layout its child pages follow, as [Families](checks/families.md) describes[^family] |
 
 Any other field is ignored, except `kicker`, which is refused.[^fields]
 
@@ -60,6 +61,7 @@ Every problem below stops the build, and names the page's file.[^validation]
 | the intent is over its budget | `wiki: refunds.md's intent runs to 130 words, over the 120 an intent may use; say what the system is for, not how it works`[^refusals] |
 | the page gives `kicker` | `wiki: refunds.md gives its subtitle as kicker, which is now called subtitle; rename kicker to subtitle`[^refusals] |
 | `audience` is not `"internal"` or `"user"` | `wiki: refunds.md gives its audience as 'reader'; an audience is "internal" or "user"`[^refusals] |
+| `sort` is not `"asc"` or `"desc"` | `wiki: changelog.md gives its sort as 'newest'; a sort is "asc" or "desc"`[^refusals] |
 | `image` names a picture with no record | `wiki: refunds.md shows flow.svg, which has no entry in PICTURES.toml`[^image] |
 | `image` is not one name | `wiki: refunds.md gives its image as ['a.svg', 'b.svg']; name one picture recorded in PICTURES.toml, such as image = "page-anatomy.svg"`[^image] |
 
@@ -108,8 +110,11 @@ Refunds exist so that a customer who was charged wrongly gets their money back w
 [^infobox]: `src/builder/build.py` — `render_infobox()` shows the `infobox` groups in the order written, and
     none when it is absent.
 [^refusals]: `src/builder/build.py` — `read_pages()` raises the messages for a missing or empty `title` or
-    `intent`, an intent over its budget, `kicker`, and an `audience` outside `AUDIENCES`.
+    `intent`, an intent over its budget, `kicker`, an `audience` outside `AUDIENCES`, and a `sort` outside `SORTS`.
 [^index]: `src/builder/build.py` — `index_table_rows()` reads `pages` and `columns` from a page's
     `index` table, and `index_problems()` refuses one the build cannot write.
+[^sort]: `src/builder/build.py` — `children_of()` orders a page's children by address, reversed when the page's
+    `sort` is `"desc"`; `render_nav()`, `descendants_of()`, `family_table_rows()`, `family_problems()` and
+    `families_report()` take the children in that order.
 [^family]: `src/builder/build.py` — `family_problems()` reads `headings` and `labels` from a parent's `family`
     table and checks each child page against them.

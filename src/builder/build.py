@@ -42,6 +42,8 @@ FENCE = "+++"
 
 # Who a build is for: everyone working on the project, or the users of whatever it documents.
 AUDIENCES = ("internal", "user")
+# The order a page lists the pages beneath it: by address, ascending unless it says otherwise.
+SORTS = ("asc", "desc")
 
 # Where the tool's own files live, so it runs from anywhere rather than only inside a repository laid
 # out the way the first one was.
@@ -187,6 +189,8 @@ def read_pages(pages_dir, intent_budget):
         if meta.get("audience", "internal") not in AUDIENCES:
             raise WikiError(f"{path.name} gives its audience as {meta['audience']!r}; an audience is "
                             "\"internal\" or \"user\"")
+        if meta.get("sort", "asc") not in SORTS:
+            raise WikiError(f"{path.name} gives its sort as {meta['sort']!r}; a sort is \"asc\" or \"desc\"")
         if not isinstance(meta.get("image", ""), str):
             raise WikiError(f"{path.name} gives its image as {meta['image']!r}; name one picture recorded in "
                             f"{LEDGER}, such as image = \"page-anatomy.svg\"")
@@ -748,17 +752,20 @@ def visible_to(audience, marked):
     return audience != "user" or marked == "user"
 
 
-def descendants_of(page_id, page_ids):
-    """A page and everything beneath it, depth first."""
+def descendants_of(page_id, pages):
+    """A page and everything beneath it, depth first, each page's children in the order it sorts them."""
     yield page_id
-    for child in children_of(page_id, page_ids):
-        yield from descendants_of(child, page_ids)
+    for child in children_of(page_id, set(pages), pages[page_id]["meta"] if page_id in pages else None):
+        yield from descendants_of(child, pages)
 
 
-def children_of(page_id, page_ids):
-    """The pages that live directly beneath this one. A page's place in the tree is its own address."""
-    return sorted(other for other in page_ids
-                  if other != page_id and other.rsplit("/", 1)[0] == page_id)
+def children_of(page_id, page_ids, meta=None):
+    """The pages that live directly beneath this one, by address. A page's place in the tree is its own
+    address, and its front matter's sort says whether they run ascending or descending.
+    """
+    return sorted((other for other in page_ids
+                   if other != page_id and other.rsplit("/", 1)[0] == page_id),
+                  reverse=(meta or {}).get("sort") == "desc")
 
 
 # The mark at the right of a section's header, turned by the stylesheet when the section is shut. It is
@@ -783,7 +790,7 @@ def render_nav(sections, pages, categories, current, directory, audience):
     def branch(page_id):
         # Children are gathered from every page, not only the visible ones: a page hidden from this
         # audience must not take its visible children down with it. They rise to where it stood.
-        below = "".join(branch(child) for child in children_of(page_id, set(pages)))
+        below = "".join(branch(child) for child in children_of(page_id, set(pages), pages[page_id]["meta"]))
         if page_id not in visible:
             return below
         # The branch the reader is in is marked, so a child page shows which page it sits under.
@@ -1115,7 +1122,7 @@ def family_table_rows(page_id, pages, emitted, audience):
         return None
     written = set(emitted)
     rows = []
-    for child in children_of(page_id, set(pages)):
+    for child in children_of(page_id, set(pages), pages[page_id]["meta"]):
         if child not in written:
             continue
         values = {}
@@ -1187,7 +1194,7 @@ def goals_order(pages, sections, audience):
     seen = set()
     for section in sections:
         for top in section.get("pages", []):
-            for page_id in descendants_of(top, set(pages)):
+            for page_id in descendants_of(top, pages):
                 if page_id not in pages or page_id in seen or page_id == GOALS_ID:
                     continue
                 if not visible_to(audience, pages[page_id]["audience"]):
@@ -1412,7 +1419,7 @@ def agent_order(sections, pages, emitted):
     for section in sections:
         ids = []
         for top in section.get("pages", []):
-            for page_id in descendants_of(top, set(pages)):
+            for page_id in descendants_of(top, pages):
                 if page_id in shown and page_id not in seen:
                     seen.add(page_id)
                     ids.append(page_id)
@@ -1488,7 +1495,7 @@ def write_site(root, out, audience, link_root, today, record, wiki, sitemap=Fals
     listed = {page_id for section in sections for page_id in section.get("pages", [])}
     in_nav = {reachable
               for top in listed
-              for reachable in descendants_of(top, set(pages))}
+              for reachable in descendants_of(top, pages)}
     for page_id in sorted(pages):
         if page_id not in in_nav:
             raise WikiError(f"{page_id}.md is in no navigation section and beneath no page that is, "
@@ -2835,7 +2842,7 @@ def family_problems(root, wiki=None):
         # The member table the build writes links every member, so the parent needs no link of its own to each.
         if marked and table is not None:
             linked = set(children_of(parent_id, set(pages)))
-        for child_id in children_of(parent_id, set(pages)):
+        for child_id in children_of(parent_id, set(pages), meta):
             _, child_meta, child_body = pages[child_id]
             if child_id not in linked:
                 problems.append(f"{parent_id}.md does not link {child_id}.md, a member of its family; link every "
@@ -2873,7 +2880,7 @@ def families_report(root, wiki=None):
     lines, declared, undeclared = [], 0, 0
     for parent_id in sorted(pages):
         meta = pages[parent_id][1]
-        children = children_of(parent_id, set(pages))
+        children = children_of(parent_id, set(pages), meta)
         if "family" in meta:
             declared += 1
         elif len(children) >= 2:
