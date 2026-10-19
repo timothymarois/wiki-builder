@@ -2932,6 +2932,40 @@ class WikiTests(unittest.TestCase):
         self.assertIn('<a href="part/index.html">A part</a>', page)
         self.assertNotIn("{family-table}", page)
 
+    def weeks(self, sort=None):
+        """The thing page over two children named by date, sorting them as `sort` says; returns its built page."""
+        self.write("thing/2026-01-05", PAGE.replace("A thing", "Week one"))
+        self.write("thing/2026-01-12", PAGE.replace("A thing", "Week two"))
+        parent = PAGE if sort is None else PAGE.replace('status = "approved"', 'status = "approved"\nsort = "%s"' % sort)
+        self.family(parent=parent, labels=["Held to", "Today"], table=["Today"], linked=False, marker=True)
+        self.build()
+        return (self.out / "thing/index.html").read_text(encoding="utf-8")
+
+    def test_a_parent_that_sets_no_sort_lists_its_children_ascending(self):
+        page = self.weeks()
+        nav = page[page.index('<div id="nav">'):page.index("</div></nav>")]
+        self.assertLess(nav.index("Week one"), nav.index("Week two"))
+        self.assertEqual(["Week one", "Week two"], [row[0] for row in self.table_cells(page, "family")[1:]])
+
+    def test_a_parent_sorting_descending_lists_its_children_newest_first_everywhere(self):
+        page = self.weeks("desc")
+        nav = page[page.index('<div id="nav">'):page.index("</div></nav>")]
+        self.assertLess(nav.index("Week two"), nav.index("Week one"), "the sidebar kept ascending order")
+        self.assertEqual(["Week two", "Week one"], [row[0] for row in self.table_cells(page, "family")[1:]],
+                         "the member table kept ascending order")
+        copy = (self.out / "thing/index.md").read_text(encoding="utf-8")
+        self.assertLess(copy.index("Week two"), copy.index("Week one"), "the markdown copy kept ascending order")
+        goals = (self.out / "goals/index.html").read_text(encoding="utf-8")
+        goals = goals[goals.index("</nav>"):]
+        self.assertLess(goals.index("Week two"), goals.index("Week one"), "the goals page kept ascending order")
+        self.write("thing", (self.pages / "thing.md").read_text(encoding="utf-8").replace("[family]", "[unused]"))
+        listed = [line.strip().split(".md")[0] for line in wiki.families_report(self.root) if line.startswith("  ")]
+        self.assertEqual(["thing/2026-01-12", "thing/2026-01-05"], listed, "wiki families kept ascending order")
+
+    def test_a_sort_the_build_does_not_know_is_refused(self):
+        self.write("thing", PAGE.replace('status = "approved"', 'status = "approved"\nsort = "newest"'))
+        self.refused('thing.md gives its sort as \'newest\'; a sort is "asc" or "desc"')
+
     def test_a_family_table_in_a_user_build_lists_only_members_marked_for_users(self):
         user = 'categories = ["Things"]\naudience = "user"'
         self.write("thing/part", PAGE.replace("A thing", "A part").replace('categories = ["Things"]', user))
