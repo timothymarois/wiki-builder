@@ -1112,8 +1112,8 @@ def health_markdown(pages, rows, directory):
 
 
 def family_table_rows(page_id, pages, emitted, audience):
-    """A declared family's member table: the labels it compares, and each member this build writes with its
-    value for each label, empty where the member states none. A value in an infobox group the build leaves
+    """A declared family's member table: the heading of its member column, the labels it compares, and each
+    member this build writes with its value for each label, empty where the member states none. A value in an infobox group the build leaves
     out is not shown. None when the family declares no table, which `wiki check` reports.
     """
     family = pages[page_id]["meta"].get("family")
@@ -1131,13 +1131,14 @@ def family_table_rows(page_id, pages, emitted, audience):
                 for row in group.get("rows", []):
                     values.setdefault(str(row.get("label", "")), str(row.get("value", "")))
         rows.append((child, [values.get(str(label), "") for label in labels]))
-    return [str(label) for label in labels], rows
+    name = family.get("name", "")
+    return name if isinstance(name, str) else "", [str(label) for label in labels], rows
 
 
 def family_table_html(pages, table, directory):
     """A family's member table as the parent page shows it: each member linked, then its values."""
-    labels, rows = table
-    head = "<th></th>" + "".join("<th>%s</th>" % html_module.escape(label) for label in labels)
+    name, labels, rows = table
+    head = "<th>%s</th>" % html_module.escape(name) + "".join("<th>%s</th>" % html_module.escape(label) for label in labels)
     body = "".join('<tr><td><a href="%s">%s</a></td>%s</tr>'
                    % (relative_directory(directory, page_directory(child)),
                       html_module.escape(pages[child]["title"]),
@@ -1149,8 +1150,8 @@ def family_table_html(pages, table, directory):
 
 def family_table_markdown(pages, table, directory):
     """A family's member table as the parent's markdown copy carries it."""
-    labels, rows = table
-    lines = ["|  | %s |" % " | ".join(markdown_cell(label) for label in labels),
+    name, labels, rows = table
+    lines = ["| %s | %s |" % (markdown_cell(name), " | ".join(markdown_cell(label) for label in labels)),
              "|%s" % ("---|" * (len(labels) + 1))]
     lines += ["| [%s](%s) | %s |" % (markdown_cell(pages[child]["title"]), copy_address(directory, child),
                                      " | ".join(markdown_cell(value) for value in values))
@@ -2823,6 +2824,9 @@ def family_problems(root, wiki=None):
             }[key]
             problems.append(f"{parent_id}.md: family.{key} must list the {meaning}, such as {key} = {example}, or "
                             f"leave family.{key} out{tail}")
+        if not isinstance(meta["family"].get("name", ""), str):
+            problems.append(f"{parent_id}.md: family.name must be the heading of the member table's first column, "
+                            'such as name = "Week", or leave family.name out to leave it blank')
         if wrong:
             continue
         prose = INLINE_CODE.sub("", FENCED.sub("", body))

@@ -39,7 +39,8 @@ table = ["Arguments", "Options", "Files written"]
 
 When the family names `table`, the build writes the parent's member table where `{family-table}` stands on
 its own line: one row per member, linked, with the member's infobox value for each label, and an empty cell
-where the member states none.[^table]
+where the member states none.[^table] The family's `name`, such as `name = "Command"`, heads the column of
+members, which is blank when the family names none, and a `name` that is not text is refused.[^name]
 
 ## Refusals
 
@@ -130,6 +131,9 @@ from the parent's text, such as from a table of the members.[^links]
 [^table]: `src/builder/build.py` — `family_table_rows()` takes each written member's infobox value for every
     label in `table`, empty where the member states none; `write_site()` puts `family_table_html()` where the
     parent's `{family-table}` paragraph stands, and `family_table_markdown()` into its markdown copy.
+[^name]: `src/builder/build.py` — `family_table_rows()` reads `name` from the parent's `family` table, empty
+    when absent, and `family_table_html()` and `family_table_markdown()` head the first column with it;
+    `family_problems()` refuses a `name` that is not a string.
 [^tablecheck]: `src/builder/build.py` — `family_problems()` refuses a `table` label outside `labels`, a
     `table` with no marker, and a marker with no `table` or no `family`; it renders the parent with
     `make_markdown()` and refuses a marker that is not a paragraph of its own, or is one more than once.

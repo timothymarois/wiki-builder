@@ -2895,11 +2895,11 @@ class WikiTests(unittest.TestCase):
 
     # --- page families -------------------------------------------------------------------------------
 
-    def family(self, headings=None, labels=None, parent=PAGE, linked=True, table=None, marker=False):
+    def family(self, headings=None, labels=None, parent=PAGE, linked=True, table=None, marker=False, name=None):
         """The thing page declaring a family, with a link to its part when `linked` and the table marker when
         `marker`; returns the family problems."""
         declaration = "[family]\n"
-        for key, value in (("headings", headings), ("labels", labels), ("table", table)):
+        for key, value in (("headings", headings), ("labels", labels), ("table", table), ("name", name)):
             if value is not None:
                 declaration += "%s = %s\n" % (key, json.dumps(value))
         text = parent.replace("\n[[infobox]]", "\n" + declaration + "\n[[infobox]]", 1)
@@ -2965,6 +2965,22 @@ class WikiTests(unittest.TestCase):
     def test_a_sort_the_build_does_not_know_is_refused(self):
         self.write("thing", PAGE.replace('status = "approved"', 'status = "approved"\nsort = "newest"'))
         self.refused('thing.md gives its sort as \'newest\'; a sort is "asc" or "desc"')
+
+    def test_a_family_table_heads_its_member_column_with_the_family_name(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        problems = self.family(labels=["Held to", "Today"], table=["Today"], linked=False, marker=True, name="Week")
+        self.assertEqual([], problems, "a family with a name was refused")
+        self.build()
+        page = (self.out / "thing/index.html").read_text(encoding="utf-8")
+        self.assertEqual(["Week", "Today"], self.table_cells(page, "family")[0])
+        copy = (self.out / "thing/index.md").read_text(encoding="utf-8")
+        self.assertIn("| Week | Today |", copy)
+
+    def test_a_family_name_that_is_not_text_is_refused(self):
+        self.write("thing/part", PAGE.replace("A thing", "A part"))
+        problems = self.family(labels=["Held to", "Today"], table=["Today"], linked=False, marker=True, name=["Week"])
+        self.assertIn('thing.md: family.name must be the heading of the member table\'s first column, such as '
+                      'name = "Week", or leave family.name out to leave it blank', problems[0])
 
     def test_a_family_table_in_a_user_build_lists_only_members_marked_for_users(self):
         user = 'categories = ["Things"]\naudience = "user"'

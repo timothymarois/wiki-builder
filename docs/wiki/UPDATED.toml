@@ -28,8 +28,8 @@ updated = "2026-09-19"
 digest = "a425fc1d361273c10c453a26c51fe9bf8c60ba4f7e58b0b50f815ab6e32a5e39"
 
 ["checks/families"]
-updated = "2026-09-15"
-digest = "d4e95b706484ab2bc34348cc06dc39cbc6df4e52b5dc9c6b1ebfc171ea35c247"
+updated = "2026-10-19"
+digest = "d3cdfa85060f808f220fccd278fc8c2c46f172aa974dd0effa1ad41ece397d6a"
 audited = "2026-09-15"
 
 ["checks/headings"]
