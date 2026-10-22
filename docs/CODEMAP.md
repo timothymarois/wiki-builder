@@ -48,8 +48,8 @@ The kind of CI other projects include is `action.yml` at the root.
 
 ## Skills (`.agents/skills/` — 5, linked from `.claude/skills/`)
 
-What an agent working here must load. The repository owns each one, and none of them references a skill
-it does not own.
+What an agent working here must load. `writing-wiki-pages` is the repository's own; Rundesk adds the
+others from the `rundesk-ai/skills` package and keeps them out of git.
 
 | Skill | For |
 |---|---|
