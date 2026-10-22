@@ -7,24 +7,20 @@ produces a wrong answer. This page is *design* — code that runs correctly and 
 harder. Report them differently: a trap is a defect, an anti-pattern is a judgement, and saying which
 is which is what makes a review credible.
 
-Flag an anti-pattern only when you can name the concrete cost.
-complexity "only when it creates a concrete cost or defect risk."
+Flag an anti-pattern only when you can name the concrete cost or the defect risk it creates.
 
 ## Structure and abstraction
 
 | Don't | Do | Because |
 |---|---|---|
-| A class with an `__init__` and one other method | A function | Jack Diederich's *Stop Writing Classes* case: the class is a closure with ceremony. If it has no state between calls, it is not an object |
+| A class with an `__init__` and one other method | A function | The class is a closure with ceremony. If it has no state between calls, it is not an object |
 | Build the abstraction for the second caller you imagine | Wait for the second caller you have | Every speculative parameter is a branch nobody exercises and nobody can delete later |
 | A module named `utils`, `helpers`, `common`, `misc` | Name it for the capability | Generic buckets have no owner, so everything lands there and nothing can be moved out |
-| Deep inheritance to share code | Composition, or a module-level function | Hynek Schlawack: with inheritance a reader of `self.x` "won't know where `x` comes from." Composition "forces discipline on you, even if it results in clunkiness" |
+| Deep inheritance to share code | Composition, or a module-level function | A reader of `self.x` has to search the hierarchy to find where `x` comes from; composition keeps each dependency explicit, at the price of some verbosity |
 | A `Repository`/`Manager` wrapping a library that is already the abstraction | Call the library | The wrapper re-exposes the same surface through a hand-written interface, and the swap it enables never happens |
 | A metaclass, descriptor, or `__getattr__` to save repetition | Write it out | Each one makes the class unreadable to everyone who did not write it, and undebuggable in a stack trace |
 | Build names dynamically — `globals()[f"handler_{x}"]` | A dict of callables | Nothing can grep for the definition, so nothing can safely rename or delete it |
 | A package facade re-exporting everything | An explicit `__all__` | Everything imported becomes public API you cannot change |
-
-The test for an abstraction, from the skill's own rule: add one when it "gives one name and one owner
-to behavior already repeated or independently meaningful" — not to shorten a file.
 
 ## Interfaces and contracts
 
@@ -32,7 +28,7 @@ to behavior already repeated or independently meaningful" — not to shorten a f
 |---|---|---|
 | Return `Result` or `None` or `False` from one function | One return type; raise on failure | Every caller writes a different guard, and one of them checks the wrong falsy value |
 | `def render(data, True, False)` | Keyword-only flags, or separate functions | A boolean parameter at a call site says nothing; two of them say less |
-| Take and mutate a caller's list | Return a new one, or document the mutation loudly | The caller's variable changes under them — the "mutable presto-chango" as an API design |
+| Take and mutate a caller's list | Return a new one, or document the mutation loudly | The caller's variable changes under them, through a second name for the same object |
 | Pass a dict of options through three layers | A dataclass, or explicit parameters | Nothing can tell you what keys exist, and a typo is a silent default |
 | `str` for an id, a path, a currency, a state | `NewType`, `Path`, `Decimal`, `Enum` | Primitive obsession: the type system cannot stop you passing a user id where an order id goes |
 | Accept `list[X]` when you only iterate | Accept `Iterable[X]` / `Sequence[X]` | Rejects a tuple or generator for no reason — see [typing.md](typing.md) |

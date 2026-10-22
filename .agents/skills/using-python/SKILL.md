@@ -49,7 +49,7 @@ taste. Report what the tools already flag before adding judgement of your own.
 - Read [references/advanced-patterns.md](references/advanced-patterns.md) only for concurrency,
   cancellation, shared state, memory, or measured performance work.
 - Read [references/sources.md](references/sources.md) when reviewing, updating, or challenging a
-  technical claim in this package.
+  technical claim in this skill.
 
 ## Review in risk order
 

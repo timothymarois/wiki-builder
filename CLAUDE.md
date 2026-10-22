@@ -26,6 +26,8 @@ being true. Every rule below follows from that one fact.
    | Any Python | `using-python` |
    | Any change in behaviour | `testing-code` |
    | The pages this tool renders, or the skill it ships | `writing-wiki-pages` |
+   | The skill it ships, as a skill: its description, structure and references | `writing-skills` |
+   | Planning or finishing a feature, fix or refactor | `managing-development-work` |
 
    **This repository owns every skill its rules name**, and those skills reference no others. A skill
    here that told you to load one this repository does not have would be an instruction you could not

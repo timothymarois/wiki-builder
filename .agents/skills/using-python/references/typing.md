@@ -71,8 +71,8 @@ Two documented limits on `@runtime_checkable`:
 
 - "`@runtime_checkable` will check only the presence of the required methods or attributes, not their
   type signatures or types" — so it is a shallower check than it looks.
-- An `isinstance()` check against a runtime-checkable protocol "can be surprisingly slow"; prefer
-  `hasattr()` in a hot path.
+- An `isinstance()` check against a runtime-checkable protocol "can be surprisingly slow"; in a hot
+  path, check the one attribute you need directly.
 
 Use an ABC instead when you want shared implementation or a nominal relationship enforced.
 

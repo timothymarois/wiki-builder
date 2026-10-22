@@ -12,8 +12,8 @@ Python traps, and **flake8-bandit** (`S`) is the security equivalent — see
 
 **Assignment never copies.** `y = x` binds a second name to the same object. CPython's FAQ: "doing
 `y = x` doesn't create a copy of the list – it creates a new variable `y` that refers to the same
-object." Ned Batchelder calls the consequence the *mutable presto-chango*: "changes in a value are
-visible through all of its names." Three conditions are needed — a mutable value, more than one name,
+object." A change made through one name is therefore visible through every other. Three conditions
+are needed — a mutable value, more than one name,
 and a mutation through one of them.
 
 ```python
@@ -109,21 +109,18 @@ use a per-instance cache such as `functools.cached_property`.
 **An ABC with no `@abstractmethod`** (`B024`), or an empty method in an ABC that is missing the
 decorator (`B027`) — the subclass that forgets to implement it instantiates fine and fails later.
 
-**`hasattr()` runs the attribute lookup and discards the result.** Hynek Schlawack's argument: it is
-"a dangerous misnomer" because a property that raises is reported as a missing attribute. Prefer
-`getattr(x, "y", None)` or a narrow `try/except AttributeError`. For callables, `callable(x)` rather
-than `hasattr(x, "__call__")` (`B004`).
+**`hasattr()` runs the attribute lookup and discards the result.** It reports `False` whenever the
+lookup raises `AttributeError` — including an `AttributeError` raised by a bug *inside* a property —
+so a broken property looks like a missing attribute. `getattr(x, "y", None)` has the same blind spot.
+When the difference matters, look the attribute up once and let unexpected errors propagate. For
+callables, `callable(x)` rather than `hasattr(x, "__call__")` (`B004`).
 
-**Most decorators break the signature.** `functools.wraps` copies the name and docstring but the
-wrapper's signature replaces the real one, so introspection, debuggers, autocomplete, and frameworks
-that dispatch on argument count all see the wrong thing. Keep decorators few and simple, accept
-`*args, **kwargs` honestly, and reach for a signature-preserving helper when the wrapped callable's
-signature actually matters.
-
-**Prefer composition to subclassing.** Schlawack's case: with inheritance a reader of `self.x` "won't
-know where `x` comes from and it takes research and mental energy to find out." Composition "forces
-discipline on you, even if it results in clunkiness." This is why `attrs` and `dataclasses` are
-decorators rather than base classes.
+**A decorator without `functools.wraps` hides the wrapped function.** The wrapper's name, docstring,
+and `(*args, **kwargs)` signature replace the real ones. `functools.wraps` copies the metadata and sets
+`__wrapped__`, which `inspect.signature()` follows, so introspection recovers the real signature; the
+wrapper itself still accepts any arguments, so a wrong call fails inside the wrapped function rather
+than at the call site, and type checkers need `ParamSpec` to see the real parameters. Always use
+`functools.wraps`, and type a reusable decorator with `ParamSpec`.
 
 **`getattr`/`setattr`/`delattr` with a literal name** (`B009`, `B010`, `B043`) — write `x.attr`.
 
@@ -159,8 +156,8 @@ The `DTZ` family exists because naive datetimes are a durable source of producti
 | Trap | Rule | Fix |
 |---|---|---|
 | `datetime.now()` with no tz | `DTZ005` | `datetime.now(tz=UTC)` |
-| `datetime.utcnow()` | `DTZ003` | `datetime.now(tz=UTC)` — **deprecated, removed in 3.15** |
-| `datetime.utcfromtimestamp()` | `DTZ004` | `datetime.fromtimestamp(t, tz=UTC)` — same removal |
+| `datetime.utcnow()` | `DTZ003` | `datetime.now(tz=UTC)` — deprecated since 3.12 |
+| `datetime.utcfromtimestamp()` | `DTZ004` | `datetime.fromtimestamp(t, tz=UTC)` — deprecated since 3.12 |
 | `datetime.today()` | `DTZ002` | `datetime.now(tz=UTC)` |
 | `datetime.fromtimestamp()` with no tz | `DTZ006` | pass `tz=` |
 | `strptime()` without `%z` | `DTZ007` | parse the offset, or attach one explicitly |
@@ -252,7 +249,7 @@ Check the runtime floor before modernizing, and check these before assuming exis
 
 | Removed / removing | Version | Replacement |
 |---|---|---|
-| `datetime.utcnow()`, `utcfromtimestamp()` | 3.15 | `datetime.now(tz=UTC)`, `fromtimestamp(t, tz=UTC)` |
+| `datetime.utcnow()`, `utcfromtimestamp()` | deprecated, no removal version set | `datetime.now(tz=UTC)`, `fromtimestamp(t, tz=UTC)` |
 | `asyncio` event-loop policy API | 3.16 | `asyncio.run(main(), loop_factory=...)` |
 | `asyncio.iscoroutinefunction()` | 3.16 | `inspect.iscoroutinefunction()` |
 | `typing.ByteString`, `collections.abc.ByteString` | 3.17 | `bytes \| bytearray \| memoryview` |
@@ -261,8 +258,9 @@ Check the runtime floor before modernizing, and check these before assuming exis
 | `logging.warn()` | pending | `logging.warning()` |
 | `typing.List`, `Dict`, `Tuple`, … | soft-deprecated since 3.9 | builtin generics |
 
-Python 3.9 reached end of life on **31 October 2025**, and 3.10 reaches it on **31 October 2026**. A
-repository still pinned to either is worth flagging — but do not raise its floor without being asked.
+A repository whose floor is a Python version past end of life (check
+<https://devguide.python.org/versions/>) is worth flagging — but do not raise its floor without being
+asked.
 
 ## Review order for these
 

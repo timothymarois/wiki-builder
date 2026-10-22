@@ -31,7 +31,7 @@ For data, `ast.literal_eval()` parses literals only. If you are reaching for `ex
 or dispatch, use a dict of callables.
 
 **SQL built by string formatting is injection** (`S608`). Parameterize — every driver supports it —
-and never interpolate identifiers from user input; validate them against an allowlist instead. This is
+and never interpolate identifiers from user input; validate them against an allowlist instead.
 
 ## Deserializing things
 
