@@ -1,7 +1,7 @@
 +++
 title = "Index tables"
 subtitle = "a generated table over a named set of pages, with their subtitles and the pages beneath each"
-status = "draft"
+status = "approved"
 intent = """
 An index table exists so that no writer maintains a list of pages by hand. Where a wiki's index does not
 follow its tree, a writer should still be able to say which pages to list and what to show for each, and

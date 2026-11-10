@@ -149,8 +149,8 @@ digest = "b8bfbec6cc0e9c02c8f120fc0d920a02c1c8c5d94d4ef95158d45c689f82eca5"
 audited = "2026-09-14"
 
 ["goals"]
-updated = "2026-09-19"
-digest = "d89f2b4b8ed90a3aa55dbb260d4f45963e6207c9ae8e6427038839126cca2353"
+updated = "2026-11-10"
+digest = "47604f83b3d636e690518e0d35d1e5a951c18abfaf92338adde21958a8c834d2"
 
 ["health"]
 updated = "2026-09-15"
@@ -188,8 +188,8 @@ digest = "8995898380c67bbd14940ef64fca7c7a188395e6f7bae00340d21d0dd804d14b"
 audited = "2026-09-14"
 
 ["pages/index-tables"]
-updated = "2026-09-21"
-digest = "079de93cbd522dadb0ce98de2dc3fc3e09f88b45d7c61abaaee7f61b35185684"
+updated = "2026-11-10"
+digest = "d52bc458bafaedea9df9ce1d5c73e0ae91c617a765a35af6f19c0b9adca2ee32"
 
 ["pages/markdown"]
 updated = "2026-09-14"
@@ -245,7 +245,7 @@ audited = "2026-09-14"
 
 ["skill/delivery"]
 updated = "2026-11-10"
-digest = "ae0b35176c9f04b748f6f4a2bc4456f95c12d86d099edec2c50419cc63c88703"
+digest = "cdacc8ea7f6dd27e4a488f3f1682b06aff924138b4cf4d01b14da110f8c08c78"
 audited = "2026-09-15"
 
 ["wiki-toml"]
