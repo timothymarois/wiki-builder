@@ -70,7 +70,7 @@ wiki audit     record that pages were checked against the code today
 
 ## Skill package
 
-`manifest.json` lists the `writing-wiki-pages` skill, so a skill-package installer such as Rundesk can
+`manifest.json` lists the `writing-wiki-pages` skill, so a skill-package installer such as [Rundesk](https://rundesk.app) can
 add `https://github.com/timothymarois/wiki-builder` and pick up each release's skill from its tag.
 
 ## Continuous integration
