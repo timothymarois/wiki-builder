@@ -244,8 +244,8 @@ digest = "e6cb30d21415e950cd46e401a2233a0486aaa0137b333ecf211b9ac3d368d5a7"
 audited = "2026-09-14"
 
 ["skill/delivery"]
-updated = "2026-09-15"
-digest = "fea70b8a8c36d5645445ea71669e8dc8b6e48e3beac221dffda11e92f7859676"
+updated = "2026-11-10"
+digest = "ae0b35176c9f04b748f6f4a2bc4456f95c12d86d099edec2c50419cc63c88703"
 audited = "2026-09-15"
 
 ["wiki-toml"]

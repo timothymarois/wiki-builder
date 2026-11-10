@@ -68,6 +68,11 @@ wiki audit     record that pages were checked against the code today
 2. Run `./scripts/dev-wiki.sh sync` to update the skill and record the release.
 3. Run `./scripts/dev-wiki.sh check`. A release that adds a check names every page the new rule finds.
 
+## Skill package
+
+`manifest.json` lists the `writing-wiki-pages` skill, so a skill-package installer such as Rundesk can
+add `https://github.com/timothymarois/wiki-builder` and pick up each release's skill from its tag.
+
 ## Continuous integration
 
 One step checks the wiki on every push and pull request. A workflow cannot read `scripts/wiki-version`,

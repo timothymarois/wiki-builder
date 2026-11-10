@@ -47,7 +47,7 @@ pages = ["installation-prompt", "review-prompt", "organization-prompt"]
 # The tool's own source, which `wiki coverage` counts. The bundled Mermaid files are another project's.
 [coverage]
 include = ["src/**/*.py", "src/builder/assets/*", "src/skill/**/*.md", "action.yml", ".github/workflows/*.yml",
-           "pyproject.toml"]
+           "pyproject.toml", "manifest.json"]
 exclude = ["src/builder/assets/mermaid-*"]
 
 # Written by `wiki sync`. Which release of the tool these pages

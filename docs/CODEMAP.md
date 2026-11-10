@@ -5,12 +5,14 @@
 
 Counts are of lines, and are meant to show shape and growth at a glance.
 
-## Project (root — 6 tracked files)
+## Project (root — 7 tracked files)
 
 - `pyproject.toml` — the package: distribution `wiki-builder`, command `wiki`, `mistune` pinned exactly,
   Python 3.11 or newer for `tomllib`.
 - `action.yml` — the GitHub Action a project uses to check its wiki in CI: installs wiki-builder from the
   action's own copy, then runs `wiki check`.
+- `manifest.json` — the skill package: lists `writing-wiki-pages` at `src/skill` for an installer that
+  reads it from each release tag. Its version changes with the release.
 - `README.md` — what it is, the release pin and the two scripts a project commits, and how it updates.
 - `AGENTS.md` / `CLAUDE.md` — the rules. Byte-identical, changed in the same commit.
 - `.gitignore` — generated output, environments, caches.
