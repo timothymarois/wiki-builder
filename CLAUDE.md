@@ -29,10 +29,11 @@ being true. Every rule below follows from that one fact.
    | The skill it ships, as a skill: its description, structure and references | `writing-skills` |
    | Planning or finishing a feature, fix or refactor | `managing-development-work` |
 
-   **This repository owns every skill its rules name**, and those skills reference no others. A skill
-   here that told you to load one this repository does not have would be an instruction you could not
-   follow. `writing-wiki-pages` is a link to `src/skill/`, which is the copy that ships — there is one of
-   it, and editing it changes what every project receives on its next `wiki sync`.
+   **`writing-wiki-pages` is the only skill this repository owns.** It is a link to `src/skill/`, which
+   is the copy that ships — there is one of it, and editing it changes what every project receives on
+   its next `wiki sync`, and what Rundesk installs from the next release tag. Rundesk adds the others
+   from its `rundesk-ai/skills` package and keeps them out of git; never edit or commit them, because
+   Rundesk rewrites them on every release of that package.
 
 2. Read this file, `docs/wiki/pages/brief.md`, and the task you were handed in full.
 3. State the outcome and the observable proof. Check `git status` before editing.
@@ -106,7 +107,12 @@ Every branch and commit follows these conventions.
 
 ## Releases
 
-- `pyproject.toml` and `src/builder/__init__.py` carry the version; they change together.
+- `pyproject.toml`, `src/builder/__init__.py` and `manifest.json` carry the version; they change
+  together, and `PackageTests` fails when the manifest differs. The same release commit bumps the
+  README's pins and runs `wiki sync`, which records the version in `docs/wiki/wiki.toml`.
+- A release is the tag `vX.Y.Z`: projects pin it, and Rundesk installs the skill from the newest one.
+  Its notes are GitHub's generated notes (`gh release create --generate-notes`), never hand-written;
+  the pull request carries the detail.
 - Tag only when the owner says. **Never push without the owner's yes.**
 
 ## Approval gates
