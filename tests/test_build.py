@@ -3807,6 +3807,31 @@ class PackageTests(unittest.TestCase):
         self.assertIsNotNone(declared, "the skill declares no name")
         self.assertEqual(cli.SKILL_NAME, declared.group(1))
 
+    def test_the_skill_package_manifest_lists_the_skill_this_release_ships(self):
+        """`manifest.json` at the repository's root lists the skill for a skill-package installer.
+
+        The installer reads it from a release tag and refuses a listed name that disagrees with the
+        skill's own front matter, so a manifest left on an old version or an old name installs nothing.
+        """
+        manifest = json.loads((Path(__file__).resolve().parents[1] / "manifest.json").read_text(encoding="utf-8"))
+        self.assertEqual(1, manifest["schema"])
+        self.assertEqual(wiki_version(), manifest["version"],
+                         "manifest.json names another release; bump it with pyproject.toml")
+        self.assertTrue(manifest["description"].strip())
+        self.assertEqual(1, len(manifest["skills"]), "the manifest lists no skill, or more than ships")
+        listed = manifest["skills"][0]
+        self.assertEqual(cli.SKILL_NAME, listed["name"])
+        home = Path(__file__).resolve().parents[1] / listed["path"]
+        self.assertTrue((home / "SKILL.md").is_file(), f"{listed['path']} holds no SKILL.md")
+        listed_files = {p.relative_to(home).as_posix(): p.read_bytes()
+                        for p in sorted(home.rglob("*.md"))}
+        shipped_files = {p.relative_to(wiki.SKILL).as_posix(): p.read_bytes()
+                         for p in sorted(wiki.SKILL.rglob("*.md"))}
+        self.assertTrue(shipped_files, "the installed package ships no skill files")
+        self.assertEqual(sorted(shipped_files), sorted(listed_files),
+                         "the manifest lists a folder holding other files than the skill that ships")
+        self.assertEqual(shipped_files, listed_files, "the manifest lists a copy that differs from the shipped one")
+
     def test_sync_writes_the_skill_where_agents_look_for_it(self):
         with tempfile.TemporaryDirectory() as work:
             root = Path(work)

@@ -5,12 +5,14 @@
 
 Counts are of lines, and are meant to show shape and growth at a glance.
 
-## Project (root — 6 tracked files)
+## Project (root — 7 tracked files)
 
 - `pyproject.toml` — the package: distribution `wiki-builder`, command `wiki`, `mistune` pinned exactly,
   Python 3.11 or newer for `tomllib`.
 - `action.yml` — the GitHub Action a project uses to check its wiki in CI: installs wiki-builder from the
   action's own copy, then runs `wiki check`.
+- `manifest.json` — the skill package: lists `writing-wiki-pages` at `src/skill` for an installer that
+  reads it from each release tag. Its version changes with the release.
 - `README.md` — what it is, the release pin and the two scripts a project commits, and how it updates.
 - `AGENTS.md` / `CLAUDE.md` — the rules. Byte-identical, changed in the same commit.
 - `.gitignore` — generated output, environments, caches.
@@ -46,17 +48,18 @@ The kind of CI other projects include is `action.yml` at the root.
 | `assets/mermaid-12.0.0.min.js` | Mermaid, pinned and bundled: draws `mermaid` blocks with no network; copied only into a site that has a diagram |
 | `assets/mermaid-12.0.0.LICENSE` | Mermaid's MIT licence, copied beside it |
 
-## Skills (`.agents/skills/` — 4, linked from `.claude/skills/`)
+## Skills (`.agents/skills/` — 5, linked from `.claude/skills/`)
 
-What an agent working here must load. The repository owns each one, and none of them references a skill
-it does not own.
+What an agent working here must load. `writing-wiki-pages` is the repository's own; Rundesk adds the
+others from the `rundesk-ai/skills` package and keeps them out of git.
 
 | Skill | For |
 |---|---|
 | `using-python` | Any Python: boundaries, naming, errors, resources, testing mechanics, traps |
 | `testing-code` | Any change in behaviour: which boundary holds the risk, and proving a test has teeth |
 | `writing-wiki-pages` | A link to `src/skill/` — the copy that ships, so there is only one of it |
-| `managing-github` | Issues, pull requests, reviews, releases and tags on GitHub, and reading their stored state back |
+| `writing-skills` | The shipped skill as a skill: its description, structure and references |
+| `managing-development-work` | Planning or finishing a feature, fix or refactor |
 
 ## The skill (`src/skill/` — not a builder feature)
 

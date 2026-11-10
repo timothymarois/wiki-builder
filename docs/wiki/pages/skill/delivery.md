@@ -12,6 +12,7 @@ group = "Identity"
 rows = [
   { label = "Command", value = "wiki sync", cite = "sync" },
   { label = "Options", value = "--skill-dir, --no-skill", cite = ["skilldir", "noskill"] },
+  { label = "Package manifest", value = "manifest.json", cite = "manifest" },
 ]
 
 [[infobox]]
@@ -49,6 +50,16 @@ changes no other setting, no line ending and no comment beside the version.[^rec
 `wiki sync`.[^version] A newer release can add a check, and a new check finds old pages; the record makes
 that failure expected rather than surprising.[^version]
 
+## Skill package
+
+The repository also publishes the skill as a **skill package**: `manifest.json`, at the repository's
+root, names the package `wiki-builder` and lists `writing-wiki-pages` at the folder `wiki sync` copies
+from.[^manifest] The package is compatible with [Rundesk](https://rundesk.app), which keeps skills in one
+library and shares them across projects, so the agents it runs can use them.[^rundesk] A Rundesk agent gets
+the skill by adding the repository as a skill package, and receives each change to it with the next
+release tag, without running `wiki sync`.{missing} The manifest
+carries the same version as the release, and the tool's tests fail while the two differ.[^manifest]
+
 [^sync]: `src/builder/cli.py` — `sync()` copies every markdown file under `SKILL` into `skill_home()`, then
     calls `record_version()` in `src/builder/config.py`.
 [^home]: `src/builder/cli.py` — `skill_home()` tries `.agents/skills`, then `.claude/skills`, and falls
@@ -64,3 +75,9 @@ that failure expected rather than surprising.[^version]
     file's own line endings back, and refuses to write a file that would read differently anywhere outside
     `[tool]`; `src/builder/cli.py` — `sync()` prints the recorded release.
 [^version]: `src/builder/build.py` — `version_problems()`, called from `check()`.
+[^manifest]: `manifest.json` — `schema` 1, `name`, `version` and `skills`, whose one entry names
+    `writing-wiki-pages` at `src/skill`; `tests/test_build.py` —
+    `test_the_skill_package_manifest_lists_the_skill_this_release_ships()` holds its version to
+    `src/builder/__init__.py`.
+[^rundesk]: Rundesk — [Rundesk — The control room for coding agents](https://rundesk.app): "Manage your
+    skills in one library and share them across projects."
