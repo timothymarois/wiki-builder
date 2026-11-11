@@ -45,17 +45,25 @@ wiki families
 ## Output
 
 A child's headings are listed in order, leaving out any shown in a code sample.[^report] A title repeats its
-parent's when a word of more than three letters, singular or plural, is in both.[^report] On wiki-builder's
-own wiki, where the Checks and Commands pages declare families:[^report]
+parent's when a word of more than three letters, singular or plural, is in both.[^report] The line for such
+a title says to rename the page and leave it under its parent, because a page moved elsewhere keeps the
+wrong name and loses the right place:[^report]
 ```text
-wiki: pages.md declares no family for its 4 children
+wiki: reports/saved-reports.md is titled 'Saved reports', which repeats 'reports' from its parent's title 'Reports'; rename the page to only what sets it apart and leave it under reports.md, because moving it elsewhere does not fix its name
+```
+
+On wiki-builder's own wiki, where the Checks and Commands pages declare families:[^report]
+```text
+wiki: pages.md declares no family for its 6 children
+wiki:   pages/charts.md: Kinds, Drawing, Numbers
 wiki:   pages/diagrams.md: Writing, Drawing, Citations, Copies
+wiki:   pages/index-tables.md: Declaring, Columns, Writing
 wiki:   pages/markdown.md: Links, Code, Tables, Citations
 wiki:   pages/pdfs.md: Links, Publishing, Viewer
 wiki:   pages/pictures.md: Text pictures, Infobox picture, Lightbox
 wiki: site.md declares no family for its 2 children
 wiki:   site/agent-markdown.md: Copies, Index, Audiences
-wiki:   site/layout.md: Sidebar, Article, Footer, Narrow screens
+wiki:   site/layout.md: Article, Footer, Narrow screens
 wiki: 2 families declared; 2 parents with two or more children declaring none
 ```
 
@@ -70,8 +78,8 @@ wiki: 2 families declared; 2 parents with two or more children declaring none
 
 [^report]: `src/builder/cli.py` — `run()` prints each line `families_report()` returns; `src/builder/build.py`
     — `families_report()` lists each parent of two or more `children_of()` it with no `family`, their
-    `section_headings()`, each child title sharing a word longer than three letters with its parent's, and
-    the totals, and writes nothing.
+    `section_headings()`, each child title sharing a word longer than three letters with its parent's, with
+    the instruction to rename it under that parent, and the totals, and writes nothing.
 [^usage]: `src/builder/cli.py` — `main()` gives `families` only the shared options.
 [^exit]: `src/builder/cli.py` — `run()` returns 0 after the report; `main()` returns 1 for a `WikiError`, which
     `read_front_matter()` in `src/builder/build.py` raises, and 2 with no wiki; argparse exits 2 on an option

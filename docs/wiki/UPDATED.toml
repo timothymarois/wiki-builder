@@ -94,8 +94,8 @@ digest = "0b8eedd326388afb551a520d374b79e15f6b6c5f4d7b95442731c1c151dc35c9"
 audited = "2026-09-15"
 
 ["commands/families"]
-updated = "2026-09-17"
-digest = "39abecb0999287ce5c39c22b394485595e45a3ba283f6c6c86a0256c1e855070"
+updated = "2026-11-10"
+digest = "9ef772f735befa633a88164ca4d0cd9a9b29011107e64b842bd41e652c239fd9"
 audited = "2026-09-15"
 
 ["commands/publish"]
@@ -170,8 +170,8 @@ updated = "2026-09-19"
 digest = "f1e73960340670310f67cfe88093ec264d01e0a49fe37c6ce3e1996501d072f9"
 
 ["organization-prompt"]
-updated = "2026-09-15"
-digest = "a8581f33f7f82cbc457c141d8954e4e37faa2f29a27bf4dfac8fee5e3accfc20"
+updated = "2026-11-10"
+digest = "1e365d9810c23f0c74539aa13aec945cda898bea736b1fd809b6ba6a4a47ac80"
 
 ["pages"]
 updated = "2026-09-17"
@@ -211,8 +211,8 @@ digest = "6e8f0898c8a06d14743da810993f4abe1c22c80cb9d6d9820403f1b264c5bd9e"
 audited = "2026-09-14"
 
 ["review-prompt"]
-updated = "2026-09-17"
-digest = "6d77ce93d8328bd45f72553a5b84c7d843c452590ed81432af234ea208b4865d"
+updated = "2026-11-10"
+digest = "351ab985d2cdfdb429eeaa6d13639bc8a2970962c99e8170d275390b15f05f40"
 
 ["serving"]
 updated = "2026-09-19"
@@ -239,14 +239,18 @@ updated = "2026-09-19"
 digest = "dc333c7df889312cffff1e74fe1148c28f79719041387a8e7a0a929acf206506"
 
 ["skill"]
-updated = "2026-09-17"
-digest = "e6cb30d21415e950cd46e401a2233a0486aaa0137b333ecf211b9ac3d368d5a7"
+updated = "2026-11-10"
+digest = "3dda0858a734d2c7a6222f44a0c980e9744d5fc42c81d12491fe0426e74e4c5b"
 audited = "2026-09-14"
 
 ["skill/delivery"]
 updated = "2026-11-10"
 digest = "cdacc8ea7f6dd27e4a488f3f1682b06aff924138b4cf4d01b14da110f8c08c78"
 audited = "2026-09-15"
+
+["skill/organization"]
+updated = "2026-11-10"
+digest = "e6ebd9ae0b0ef3e75c415bc4018548159bf78689f1fd4a95e68addffe437999a"
 
 ["wiki-toml"]
 updated = "2026-09-15"

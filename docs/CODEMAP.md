@@ -68,10 +68,11 @@ inside it.
 
 | File | Holds |
 |---|---|
-| `SKILL.md` | The steps for each task, and how to write a page: the four readers and the part each reads, the intent contract, naming, page families, what may never appear, the voice |
+| `SKILL.md` | The steps for each task, and how to write a page: the four readers and the part each reads, the intent contract, naming, organization, page families, what may never appear, the voice |
 | `references/page-standard.md` | The worked example — a page done well, the same content done badly, and the difference |
 | `references/reference-standard.md` | The same for reference pages — a command and an endpoint, each done well and badly |
-| `references/page-families.md` | Pages about things of one kind: finding a family, designing its shared layout, the parent page, and a family done well and badly |
+| `references/page-families.md` | Pages about things of one kind: finding a family, designing its shared layout, the parent page, the rule that a family lists every member, and a family done well and badly |
+| `references/organization.md` | How a wiki is organized: where its structure comes from, sections, the placement test, the brief, the tree review, migrating existing documents, and one product organized well and badly |
 | `references/naming-and-grammar.md` | Names a writer chooses and names the software owns, and the grammar pages are held to |
 | `references/infobox.md` | The infobox: its groups, labels and values, the keys a row takes, and an example |
 | `references/reference-pages.md` | How a page documents a command, endpoint, function, settings file or event |
@@ -82,9 +83,9 @@ inside it.
 them inside the package; a checkout leaves them where they were written, and `build.skill_dir()` finds
 them either way.
 
-## Tests (`tests/` — 353 cases)
+## Tests (`tests/` — 362 cases)
 
-`tests/test_build.py` (3977 lines). Each case builds a small wiki in a temporary directory, breaks exactly
+`tests/test_build.py` (4104 lines). Each case builds a small wiki in a temporary directory, breaks exactly
 one rule, and asserts the tool names it. Run them with:
 
 ```sh
@@ -93,7 +94,8 @@ uv run --with mistune==3.3.4 python -m unittest discover -s tests -t tests
 
 Two classes carry properties rather than cases: `ServingTests`, that a cited file is shown rather than
 downloaded, that nothing is cached and that no hidden file is served; and `PackageTests`, that neither the code nor the skill names
-anything about any project.
+anything about any project, that `SKILL.md` links every reference it ships, that every link to a heading inside the
+skill lands on one, and that each task the skill is loaded for has its steps.
 
 ## What a project looks like
 

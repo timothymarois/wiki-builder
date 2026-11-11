@@ -3189,7 +3189,8 @@ Every page, with its sources and dates.
         self.assertIn("  thing/part.md: Speed, Colour", lines)
         self.assertIn("  thing/notes.md: Speed, Ground", lines)
         self.assertIn("thing/notes.md is titled 'Thing notes', which repeats 'thing' from its parent's title "
-                      "'A thing'; a nested page's title names only what sets it apart", lines)
+                      "'A thing'; rename the page to only what sets it apart and leave it under thing.md, "
+                      "because moving it elsewhere does not fix its name", lines)
 
     # --- coverage ------------------------------------------------------------------------------------
 
@@ -4046,6 +4047,57 @@ class PackageTests(unittest.TestCase):
             for word in self.SOMEBODY_ELSES:
                 self.assertIsNone(re.search(r"\b" + word + r"\b", text),
                                   f"{name} names {word!r}; this package must not know it")
+
+    def test_every_reference_the_skill_ships_is_one_its_instructions_send_a_reader_to(self):
+        """`SKILL.md` links every file in `references/`, and every reference it links is shipped.
+
+        An agent reads a reference only when the instructions point at it, so a file nothing links is never
+        read, and a link to a file that did not ship sends the agent nowhere.
+        """
+        instructions = (wiki.SKILL / "SKILL.md").read_text(encoding="utf-8")
+        linked = set(re.findall(r"\]\((references/[^)#\s]+)", instructions))
+        shipped = {path.relative_to(wiki.SKILL).as_posix() for path in sorted((wiki.SKILL / "references").glob("*.md"))}
+        self.assertTrue(shipped, "the skill ships no references")
+        self.assertEqual([], sorted(shipped - linked), "SKILL.md never sends a reader to these references")
+        self.assertEqual([], sorted(linked - shipped), "SKILL.md links references that did not ship")
+
+    def test_every_link_to_a_heading_in_the_skill_names_a_heading_that_exists(self):
+        """A link written `(#heading)` or `(file.md#heading)` inside the skill lands on a real heading.
+
+        The tasks send a reader to sections by these links, and a heading renamed without its links leaves a
+        step pointing at nothing, which no reader of the markdown reports.
+        """
+        def headings(path):
+            prose = re.sub(r"```.*?```", "", path.read_text(encoding="utf-8"), flags=re.S)
+            return {re.sub(r"[^a-z0-9 -]", "", title.lower()).strip().replace(" ", "-")
+                    for title in re.findall(r"^#{1,6}\s+(.+)$", prose, flags=re.M)}
+
+        followed = 0
+        for path in sorted(wiki.SKILL.rglob("*.md")):
+            prose = re.sub(r"```.*?```", "", path.read_text(encoding="utf-8"), flags=re.S)
+            for target, fragment in re.findall(r"\]\(([^)#\s]*)#([^)\s]+)\)", prose):
+                destination = path.parent / target if target else path
+                if not destination.is_file():
+                    continue  # a link inside a worked example, to a page of the example's own wiki
+                followed += 1
+                self.assertIn(fragment, headings(destination),
+                              f"{path.relative_to(wiki.SKILL)} links #{fragment}, which is no heading of "
+                              f"{destination.relative_to(wiki.SKILL)}")
+        self.assertGreater(followed, 5, "no links to headings were found to follow")
+
+    def test_the_skill_has_a_task_for_each_kind_of_work_its_description_routes(self):
+        """Each task the skill is loaded for has its own numbered steps under Tasks.
+
+        The description is what loads the skill; a kind of work it names with no steps beneath leaves the
+        agent to improvise the task the skill was loaded to direct.
+        """
+        instructions = (wiki.SKILL / "SKILL.md").read_text(encoding="utf-8")
+        tasks = instructions.split("\n## Tasks\n", 1)[1].split("\n## ", 1)[0]
+        titles = re.findall(r"^### (.+)$", tasks, flags=re.M)
+        self.assertEqual(["New page", "Change in the code", "Requirement not built yet", "Failing check",
+                          "Review", "Organization", "Migration"], titles)
+        for title, steps in zip(titles, re.split(r"^### .+$", tasks, flags=re.M)[1:]):
+            self.assertRegex(steps, r"(?m)^1\. ", f"the {title} task has no numbered steps")
 
 
 if __name__ == "__main__":

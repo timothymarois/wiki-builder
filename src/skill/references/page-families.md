@@ -22,6 +22,10 @@ member knows where to look on every other, and can set two members side by side.
   spread across parents cannot be compared, because no page shows its members together.
 - **Two members make a family.** A page written alone keeps its own shape. When a second page of its kind
   arrives, the layout is designed for both, and the first page is rewritten to it.
+- **A family is complete.** It has a page for every member the system has: every platform it builds for,
+  every provider it supports. Count the members from the code and the product's published copy, never from
+  the pages that exist. A missing member is a coverage gap, and it is most often the main member, which
+  was built first and never written about. A member not written yet gets a draft page in the layout.
 - **A reference page already has a layout.** Commands, endpoints, functions, settings files, events and
   forms take theirs from [Reference pages](reference-pages.md), and a family of them shares that layout.
 
@@ -225,5 +229,6 @@ engineer finds through the references. **Delivery** is what a reader of either p
 3. Every member carries the layout's headings in its order, leaving out only those that do not apply, and
    no second-level heading of its own.
 4. Every member's infobox uses the family's groups and labels.
-5. The parent's lead names the sections every member covers, and its table lists every member.
+5. The parent's lead names the sections every member covers, and its table lists every member the system
+   has.
 6. The parent declares the layout as `[family]`, and `wiki check` passes.

@@ -70,8 +70,9 @@ audited as the oldest. Review the whole wiki only when you are asked to.
 
 ## What to check
 
-Work page by page for truth, citations, writing and structure: read the page, then the code it
-describes. Coverage works the other way, from the code to the wiki.
+Review the tree first, as section 7 describes, before reading any page's content. Then work page by
+page for truth, citations and writing: read the page, then the code it describes. Coverage works the
+other way, from the code to the wiki.
 
 ### 1. Truth
 - Every citation: open the file, find the function or setting it names, and confirm it does exactly
@@ -160,7 +161,16 @@ Flowcharts reference.
 
 ### 7. Structure
 - Every page is reachable from the sidebar. Unfinished pages are drafts; nothing unfinished is approved.
-- A page sits in the section a reader would look in first.
+- The tree, reviewed before any page, as the Tree review in the skill's organization.md describes: read
+  the sidebar alone against the product's own navigation and published copy, then list every page's
+  title and parent. Each section is one subject a person meets; no section, page or order mirrors
+  existing documents, phases or the code's folders.
+- Every page passes the placement test: it is a kind of, or a part of, its parent; it sits in the
+  section a reader would look in first; no other page covers the same subject. A title that repeats its
+  parent's word is renamed, never moved.
+- Every group lists every member the system has, counted from the code and the published copy.
+- The brief states purpose, users and scope where the published copy gives them, and the first sentence
+  of every lead says what its subject is, not where it is set up or stored.
 - Reference pages (commands, endpoints, settings files) follow the reference standard: usage, every
   option or field with its type and default, output, errors and exit codes, and an example.
 
