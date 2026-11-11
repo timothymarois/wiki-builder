@@ -19,7 +19,7 @@ rows = [
 group = "Contents"
 rows = [
   { label = "Instructions", value = "SKILL.md", cite = "contents" },
-  { label = "Worked examples", value = "page-standard.md, page-families.md, reference-standard.md", cite = "contents" },
+  { label = "Worked examples", value = "page-standard.md, page-families.md, reference-standard.md, organization.md", cite = "contents" },
   { label = "Rule files", value = "naming-and-grammar.md, infobox.md, reference-pages.md, flowcharts.md, charts.md", cite = "contents" },
 ]
 
@@ -66,10 +66,10 @@ page becomes a child page, not another heading.[^split]
 Every title, heading, infobox label and category is a noun phrase naming the answer a reader wants, never
 the writer's question, and a name the software owns is written exactly as the software spells it.[^naming]
 
-## Page families
+## Organization
 
-**Pages about things of one kind share one layout**: the same headings in the same order and the same
-infobox labels, under a parent page that lists and compares them.[^families]
+A wiki's sidebar, its sections, each page's place and the layout that pages of one kind share follow the
+rules on [Organization](skill/organization.md).
 
 ## Reference pages
 
@@ -101,14 +101,15 @@ marked `{missing}`.[^missing]
 ## Tasks
 
 `SKILL.md` gives the steps for each task an agent is handed: a new page, a change in the code, a
-requirement not built yet, a failing check, a review and organizing pages.[^tasks]
+requirement not built yet, a failing check, a review, organizing pages and migrating existing
+documents.[^tasks]
 
 [^files]: `src/builder/cli.py` — `SKILL_NAME` names the skill; `sync()` copies every markdown file under
     `SKILL`, which `src/builder/build.py` finds with `skill_dir()`.
 [^contents]: `src/skill/` — `SKILL.md`, and in `references/` the rule files `naming-and-grammar.md`,
     `infobox.md`, `reference-pages.md`, `flowcharts.md` and `charts.md` and the worked examples `page-standard.md`, one
-    ordinary page, `page-families.md`, a family of notification channels, and `reference-standard.md`, a
-    command and an endpoint.
+    ordinary page, `page-families.md`, a family of notification channels, `reference-standard.md`, a
+    command and an endpoint, and `organization.md`, one product's sidebar organized well and badly.
 [^sync]: `src/builder/cli.py` — `sync()`.
 [^readers]: `src/skill/SKILL.md` — the opening paragraph and the Readers section, whose rules keep one page
     for every reader and keep the team, agents, functions, fields and branches off a page for
@@ -128,8 +129,6 @@ requirement not built yet, a failing check, a review and organizing pages.[^task
 [^naming]: `src/skill/SKILL.md` — the Naming section; `src/skill/references/naming-and-grammar.md` — names
     a writer chooses as noun phrases, and names the software owns written exactly as the software spells
     them.
-[^families]: `src/skill/SKILL.md` — the Page families section; `src/skill/references/page-families.md` —
-    the layout rules, the parent page, and a family done well and badly.
 [^reference]: `src/skill/SKILL.md` — the Reference pages section; `src/skill/references/reference-pages.md`
     — a layout for each of those surfaces, and the contract every input and error meets;
     `src/skill/references/reference-standard.md` — a command page and an endpoint page, each done well and
@@ -146,4 +145,4 @@ requirement not built yet, a failing check, a review and organizing pages.[^task
     from the wiki.
 [^missing]: `src/skill/SKILL.md` — the Missing citations section, where a stated requirement not built yet
     is written now and marked.
-[^tasks]: `src/skill/SKILL.md` — the Tasks section, one list of steps for each of those six tasks.
+[^tasks]: `src/skill/SKILL.md` — the Tasks section, one list of steps for each of those seven tasks.

@@ -2900,7 +2900,8 @@ def families_report(root, wiki=None):
                         if len(word) > 3 and word.rstrip("s") in parent_words]
             if repeated:
                 lines.append(f"{child}.md is titled {title!r}, which repeats {repeated[0]!r} from its parent's "
-                             f"title {parent_title!r}; a nested page's title names only what sets it apart")
+                             f"title {parent_title!r}; rename the page to only what sets it apart and leave it "
+                             f"under {parent_id}.md, because moving it elsewhere does not fix its name")
     lines.append(f"{declared} famil{'y' if declared == 1 else 'ies'} declared; {undeclared} parent"
                  f"{'' if undeclared == 1 else 's'} with two or more children declaring none")
     return lines

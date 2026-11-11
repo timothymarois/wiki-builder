@@ -1,6 +1,6 @@
 ---
 name: writing-wiki-pages
-description: Use when writing, updating, reviewing or fixing the pages of a wiki that the `wiki` command builds and checks — a folder holding `wiki.toml` and `pages/` — including a new page, a page the code has moved on from, a stated requirement not built yet, a failing `wiki check`, pages to organize or restructure, or the name or wording of a page, a heading or a label a reader sees there. It supplies the page contract, citations, naming, voice, and the steps for each of those tasks. Do not use for documentation written for builders, such as a README, codemap or contributing guide.
+description: Use when writing, updating, reviewing or fixing the pages of a wiki that the `wiki` command builds and checks — a folder holding `wiki.toml` and `pages/` — including a new page, a page the code has moved on from, a stated requirement not built yet, a failing `wiki check`, pages to organize or restructure, a project's existing documents to turn into a wiki, a brief or a sidebar to write, or the name or wording of a page, a heading or a label a reader sees there. It supplies the page contract, citations, naming, voice, how a wiki is organized, and the steps for each of those tasks. Do not use for documentation written for builders, such as a README, codemap or contributing guide.
 ---
 
 # Writing wiki pages
@@ -36,7 +36,8 @@ needs [Naming and grammar](references/naming-and-grammar.md) rather than the pag
 2. Read the code the page describes. Every statement comes from it, the stated requirements, or an
    outside service's own documentation.
 3. Write the intent first, from the stated requirements, set `status = "draft"`, and ask for approval.
-4. Put the file where it nests, cite every sentence, and add a row to any page that lists its siblings.
+4. Put the file where it passes the placement test in [Organization](#organization), cite every
+   sentence, and add a row to any page that lists its siblings.
 5. Run `wiki check`, then the self-edit at the end of Page standard.
 
 ### Change in the code
@@ -68,30 +69,50 @@ needs [Naming and grammar](references/naming-and-grammar.md) rather than the pag
 
 1. Read this skill and every reference in full: they are the standard. Report findings, and edit a page
    only when the task asks for fixes.
-2. Run `wiki check` and record its result. It proves that every sentence cites something, not that what
+2. Run the tree review in [Organization](references/organization.md) before reading any page's content:
+   the sidebar alone, then every page's title and parent, with the placement test run on each. A review
+   of one part of the wiki reviews that part's tree.
+3. Run `wiki check` and record its result. It proves that every sentence cites something, not that what
    it cites is true.
-3. Open every file and function each page cites, and confirm it does exactly what the sentence says:
+4. Open every file and function each page cites, and confirm it does exactly what the sentence says:
    numbers, defaults, names, messages and exit codes.
-4. Inventory the part of the code under review, as [Coverage](#coverage) describes, and name what no page
+5. Inventory the part of the code under review, as [Coverage](#coverage) describes, and name what no page
    covers. When `wiki.toml` has a `[coverage]` table, start from what `wiki coverage` lists.
-5. Report each finding by page and line, with what is wrong and the fix, most severe first: false,
-   undocumented, uncited, stale, writing.
-6. Run `wiki audit` with every page reviewed that had no finding, leaving out any page that says
+6. Report the tree's findings first, then each finding by page and line, with what is wrong and the fix,
+   most severe first: misplaced, false, undocumented, uncited, stale, writing.
+7. Run `wiki audit` with every page reviewed that had no finding, leaving out any page that says
    `goals = false`.
 
 ### Organization
 
-1. Read [Page families](references/page-families.md).
-2. Run `wiki families`, then list every page in the part of the wiki to organize, with its title, intent
+1. Read [Organization](references/organization.md) and [Page families](references/page-families.md).
+2. Run the tree review before grouping any pages: read the sidebar alone against the product's own
+   navigation and published copy, then list every page's title and parent and run the placement test on
+   each.
+3. Run `wiki families`, then list every page in the part of the wiki to organize, with its title, intent
    and headings.
-3. Group the pages about things of one kind into families, each nested under one parent page.
-4. Design each family's layout: the headings every member carries, in order, and the infobox groups and
+4. Group the pages about things of one kind into families, each nested under one parent page, and count
+   each family's members against the code, so a member with no page is found.
+5. Design each family's layout: the headings every member carries, in order, and the infobox groups and
    labels every member fills.
-5. Ask for approval of the families, their layouts and every page that moves, and change nothing until
-   they are approved.
-6. Move each page, rewrite each member to its family's layout keeping every citation, and give each parent
+6. Ask for approval of the sections, the families, their layouts and every page that moves, merges or is
+   renamed, and change nothing until they are approved.
+7. Move each page, rewrite each member to its family's layout keeping every citation, and give each parent
    its lead, its member table and its `[family]` declaration.
-7. Run `wiki check`, which names every link a move broke.
+8. Run `wiki check`, which names every link a move broke.
+
+### Migration
+
+Turning a project's existing documents into a wiki. The old documents are leads, never the structure.
+
+1. Read [Organization](references/organization.md) in full.
+2. Read the product's own navigation, its published copy and its code, and only then the old documents.
+3. Write the brief from the published copy, then build the sidebar from the product: one section for each
+   subject a person meets. Ask for approval of both before writing pages.
+4. Map each old section onto that structure, and list what the structure holds that no old document
+   covers. Never mirror an old heading, an old order or a phase.
+5. Write each page as [New page](#new-page) describes, from the code, never citing an old document.
+6. Run the tree review, then `wiki check`.
 
 ## Wiki structure
 
@@ -115,7 +136,8 @@ wiki check    # what the gate runs
 ```
 
 **To add a page**, put its file where it belongs: a page in a folder named after another page nests under
-it. Name it in `wiki.toml` only when it starts a new branch.
+it. Name it in `wiki.toml` only when it starts a new branch. Where a page belongs is decided by the
+placement test in [Organization](#organization).
 
 ## Vocabulary
 
@@ -124,6 +146,10 @@ Use these words in commits, reviews and conversation. They are the generator's.
 - **Page** — one markdown file, one address.
 - **Intent** — two to four sentences of front matter saying what the thing is *for*. The contract.
 - **Lead** — the body's opening paragraph, before any heading.
+- **Section** — one titled group of the sidebar, declared in `wiki.toml`.
+- **Brief** — the page saying what the product is, who it is for and what it covers.
+- **Published copy** — what the product says of itself in public: its website, README, store listing and
+  release notes.
 - **Infobox** — the panel at the top right: **groups** of **rows**, each a **label** and a **value**.
 - **Citation** — a numbered mark in the prose. **Reference** — its entry at the foot of the page.
 - **Missing citation** — the red mark for a claim with nothing to cite, written `{missing}`.
@@ -261,11 +287,43 @@ the section, a sentence's first clause answers the sentence. A reader who stops 
 
 - **The lead stands alone.** Whoever reads only the first paragraph gets the true shape of the thing,
   surprising fact included.
+- **The lead's first sentence says what the thing is and what sets it apart**, never where it is set up,
+  stored or shown. "A payment provider is an entry a person keeps in Settings › Providers" tells a reader
+  where to click and not what a provider is: "A payment provider is the outside service that charges a
+  customer's card."
 - **A heading is a label on a drawer**: it names what is inside, so a scanning reader knows whether to stop.
   One or two plain words is usually right, named as [Naming](#naming) describes.
 - **Three to five sections.** More, and the page is two pages.
 - **Split rather than swell.** A subject that needs its own treatment becomes a child page and a link, not
   another heading; the sidebar nests it.
+
+## Organization
+
+**A wiki is organized by what the product is, as a person meets it**, and every check can pass on a wiki
+that is organized wrongly. The sidebar is the first thing every reader sees, and a reader who knows the
+product and finds a part of it under the wrong heading stops trusting the pages beneath.
+
+- **The structure comes from the product**: its own navigation, such as menus, sidebars, settings tabs and
+  the commands its help lists, and its own published copy. It never comes from existing documents, phases,
+  the code's folders, the settings screen or the word budget.
+- **Published copy is a stated requirement.** The product's website, README, store listing and release
+  notes say what it is, who it is for and how it is grouped. Read them before writing a brief, an intent
+  or the sidebar, and before marking any of those facts `{missing}`.
+- **The brief states purpose, users and scope from those sources**, and is written before the sidebar.
+  Users is never left `{missing}` while one of them says who the product is for.
+- **A section is one subject a person meets**, named with the product's word for it. Every page in it is
+  about that subject, and a section of one page is folded into its neighbor.
+- **Every page passes the placement test**: it is a kind of, or a part of, its parent; it sits in the
+  section a reader would look in; and no other page covers the same subject.
+- **A naming refusal is fixed by renaming the page, never by moving it.** "Saved reports" under
+  **Reports** becomes **Saved** and stays there. A page is never placed, moved or split to satisfy a
+  check.
+- **A group lists every member the system has**: every platform it builds for, every provider it
+  supports. Count them from the code and the published copy; a member with no page is a coverage gap.
+
+**Read [Organization](references/organization.md) before building or changing a sidebar, writing a brief,
+migrating existing documents, or reviewing or organizing more than one page.** It holds each of these
+rules in full, the tree review, the migration steps, and one product organized well and badly.
 
 ## Page families
 
@@ -280,6 +338,8 @@ place elsewhere.
   a section the others lack changes the layout for the whole family, or gets a child page.
 - **The parent introduces the family**: its lead names the sections every member covers, and one table
   lists every member with the values the members share.
+- **A family is complete.** It has a page for every member the system has, counted from the code and the
+  product's published copy, never from the pages that exist. A missing member is a coverage gap.
 - **Only pages of one kind are a family.** A topic beside its settings page and its errors page is not one,
   and each keeps the shape its subject needs. Reference pages take their layouts from
   [Reference pages](references/reference-pages.md).
@@ -523,7 +583,8 @@ ask it to do and nothing does yet, which is written and marked `{missing}`, as
 [Missing citations](#missing-citations) describes.
 
 **Never invent.** Everything on a page comes from one of three places: **the code**, **the stated
-requirements**, or **an outside service's own documentation** for how that service behaves. Nothing else is a
+requirements**, which include the product's own published copy, or **an outside service's own
+documentation** for how that service behaves. Nothing else is a
 source — not what is typical, what similar tools do, what seems likely, what would make the page
 complete, or what you would have built.
 
@@ -607,3 +668,4 @@ serving nothing is still wrong, and a page over it is saying its intent has grow
 9. The behavior the change touched, and every requirement stated for it, has a page or a section.
 10. Nothing on the page was invented: every statement traces to the code, the stated requirements, or an
     outside service's own documentation.
+11. The page passes the placement test, and its lead's first sentence says what the thing is.

@@ -26,7 +26,9 @@ rows = [
 
 The prompt below has an agent review how a wiki is organized: which pages are about things of one kind,
 whether each such family shares one layout of headings and infobox labels, whether its parent page lists
-and compares its members, and whether every page sits where a reader would look for it.[^families] Every
+and compares its members, and whether every page sits where a reader would look for it.[^families] It
+reviews the tree first, the sidebar against the product and every page against the placement test, before
+any family or page.[^tree] Every
 proposal waits for approval, because a family's layout decides what each of its pages covers.[^families]
 It works in any project that uses wiki-builder, and names nothing about the project it is used in. Checking
 what the pages say against the code has its own [Review prompt](review-prompt.md).
@@ -50,10 +52,12 @@ review the whole sidebar, one section at a time.
 ## Before starting
 
 1. Load the writing-wiki-pages skill, and read SKILL.md and, in its references folder,
-   page-families.md, reference-pages.md, infobox.md and naming-and-grammar.md in full. They are the
-   standard you are reviewing against.
+   organization.md, page-families.md, reference-pages.md, infobox.md and naming-and-grammar.md in full.
+   They are the standard you are reviewing against.
 2. Read the project's agent instructions (AGENTS.md, CLAUDE.md or similar), the wiki's brief, and
-   docs/wiki/wiki.toml.
+   docs/wiki/wiki.toml. Then read the product itself: its own navigation, such as menus, sidebars,
+   settings tabs or the commands its help lists, and its published copy, such as its website, README,
+   store listing and release notes.
 3. Do not edit any page. Do not run `wiki build`, `wiki serve` or `wiki audit`, which rewrite the page
    dates; `wiki check` writes nothing and may be run.
 4. Run `wiki families`, which lists every parent whose children declare no layout, with each child's
@@ -63,14 +67,30 @@ review the whole sidebar, one section at a time.
 
 ## What to check
 
-### 1. Families
+Review the tree before any family or page, as the Tree review in organization.md describes.
+
+### 1. Tree
+- Read the sidebar alone, against the product's navigation and published copy. Each section is one
+  subject a person meets in the product, named with the product's word; every page in it is about that
+  subject; a section of one page with no children is folded into its neighbor. Name every section, page
+  or order that mirrors existing documents, phases, the code's folders or the settings screen.
+- Run the placement test on every page in the inventory: it is a kind of, or a part of, its parent; it
+  sits in the section a reader would look in; no other page covers the same subject. Read every pair of
+  pages that share a title.
+- A title that repeats its parent's word is renamed where it is, never moved.
+- Count the members of every group against the code and the published copy: every platform, provider
+  or plan the system has. A member with no page is a finding.
+- The brief states purpose, users and scope, and none is marked {missing} while the published copy
+  gives it. The first sentence of every lead says what its subject is, not where it is set up or stored.
+
+### 2. Families
 - Every family: children of one parent that are about things of one kind. The test is the parent's
   title followed by "such as" and two of its children's titles.
 - Families that exist but are scattered: pages about things of one kind under different parents or
   sidebar sections, with no parent page listing them.
 - Groups presented as one kind that are not. Each of those pages keeps the shape its own subject needs.
 
-### 2. Layouts
+### 3. Layouts
 - For each family, every place its members differ: headings, heading order, infobox groups and labels.
 - One label used for two different facts, or two labels for one fact, across the family.
 - A proposed layout for each family, drawn from the questions each reader asks of every member, never
@@ -81,14 +101,12 @@ review the whole sidebar, one section at a time.
 - A command, endpoint, published function, settings file, event or form takes the layout in
   references/reference-pages.md.
 
-### 3. Parent pages
+### 4. Parent pages
 - The parent's lead names the sections every member covers.
 - The parent lists every member in one table, a row per member and a column per value the members
   share. Propose the columns from values the member pages already state.
 
-### 4. Placement
-- Each page sits under the parent, and in the sidebar section, a first-time reader would look in.
-- A nested page's title names only what sets it apart within its parent.
+### 5. Repetition
 - A fact stated on several pages belongs on one of them, and the others link to it. Name the page that
   owns it and every page that repeats it.
 - The sidebar sections, in order, lead a first-time reader from what the system is for to how each part
@@ -104,11 +122,13 @@ your own preference, or a new fact: every proposal moves or renames what the pag
 ## Report
 
 1. One line: the part reviewed, the commit, and how many families you found.
-2. Each family, the largest first: its members, where they differ, the proposed layout written as the
+2. Tree findings, before anything else, one line each: the section or page, the test it fails, and the
+   move, merge, rename or new page that fixes it.
+3. Each family, the largest first: its members, where they differ, the proposed layout written as the
    [family] table its parent would declare, and each member's mapping onto it.
-3. Parent pages to add or change: the sections the lead names, and the table's columns.
-4. Placement findings, one line each: the page, what is wrong, and the move.
-5. For approval, one line each: every new page that needs an intent, every sentence a change would
+4. Parent pages to add or change: the sections the lead names, and the table's columns.
+5. Facts stated on several pages, one line each: the page that owns the fact and each page that repeats it.
+6. For approval, one line each: every new page that needs an intent, every sentence a change would
    cut, and every layout awaiting approval.
 
 Rank every finding by how much it changes what a reader can compare or find.
@@ -124,6 +144,8 @@ each." A parent page the agent adds is a draft until its intent is approved.[^dr
 
 [^families]: `src/skill/references/page-families.md` — the families, layout and parent page rules the prompt
     reviews against, where each layout is shown for approval before any page is rewritten to it.
+[^tree]: `src/skill/references/organization.md` — the Tree review section, and the Sections and Placement
+    rules it runs.
 [^skill]: `src/builder/cli.py` — `SKILL_NAME` names the skill, and `sync()` copies `SKILL.md` and its
     `references` into the project.
 [^check]: `src/builder/build.py` — `check()` builds the site in a temporary folder and gathers every
