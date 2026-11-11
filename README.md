@@ -14,7 +14,7 @@ Nothing to install per project. The release is one file the project commits, and
 
 ```text
 # scripts/wiki-version
-v0.11.2
+v0.11.3
 ```
 
 [uv](https://docs.astral.sh/uv/) runs that release locally, from one wrapper:
@@ -87,7 +87,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: timothymarois/wiki-builder@v0.11.2
+      - uses: timothymarois/wiki-builder@v0.11.3
 ```
 
 ## More
